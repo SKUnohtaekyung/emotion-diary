@@ -29,7 +29,7 @@
     "rate_limit_confirmed": "unknown",
     "cloudflare_access_free_applicable": "unknown",
     "identity_header_available": "unknown",
-    "custom_header_csrf_passthrough": "partial — local and remote: missing header 403, cross Origin 403, Sec-Fetch-Site cross-site 403; phone browser not yet tested",
+    "custom_header_csrf_passthrough": "partial — local, remote (node fetch) and real desktop browser (Windows Chrome 152: with header 200, without header 403, session cookie round trip over HTTPS); phone browser not yet tested",
     "secrets_confirmed": "partial — 3 secrets registered via wrangler secret put, none in wrangler.toml or source; bundle/log scan not yet done",
     "phone_access_confirmed": "unknown",
     "free_tier_limits_confirmed": "unknown"
