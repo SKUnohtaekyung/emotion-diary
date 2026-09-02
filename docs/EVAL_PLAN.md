@@ -42,7 +42,7 @@
 | B-07 | 검색 계층 | 구독/무료 경로에서 query/filter/score/metadata, one-card-one-file, chunk 반환 시 source span 대조, 배열 attribute(topicCodes) 매핑 검증(결함 I-09) | retrieval 대안 결정 또는 RAG 보류 |
 | B-08 | 모바일 runtime | iPhone Safari/Android Chrome이 Pages/Workers에 접속해 토큰 입력·저장·조회 기본 동작, 홈 화면 바로가기 동작 | framework/무료 hosting 교체 |
 
-2026-09-02 스파이크(`work/spikes/g2a-cloudflare`, wrangler 4.128.0): 로컬 miniflare에 이어 **원격**(D1 `emotion-diary-spike` APAC, Workers `emotion-diary-spike.ntk7890.workers.dev`, secret 3개는 `wrangler secret put`)에서도 HTTP 22건 PASS, D1 trigger 2종·CHECK 2종·UNIQUE 거부와 부모 우선 cascade 확인. B-02/B-03/B-04/B-06 큐는 `partial`. 휴대폰 실기기·무료 한도 수치·rate limit·실제 PC worker 프로세스는 아직 `unknown`이다. 스파이크 자원에는 합성 데이터만 넣었고 검증 후 비운다.
+2026-09-02 스파이크(`work/spikes/g2a-cloudflare`, wrangler 4.128.0): 로컬 miniflare에 이어 **원격**(D1 `emotion-diary-spike` APAC, Workers `<spike-worker>.workers.dev`, secret 3개는 `wrangler secret put`)에서도 HTTP 22건 PASS, D1 trigger 2종·CHECK 2종·UNIQUE 거부와 부모 우선 cascade 확인. B-02/B-03/B-04/B-06 큐는 `partial`. 휴대폰 실기기·무료 한도 수치·rate limit·실제 PC worker 프로세스는 아직 `unknown`이다. 스파이크 자원에는 합성 데이터만 넣었고 검증 후 비운다.
 
 `unknown`은 pass가 아니다. B-06/B-07은 RAG 트랙이며 제한 MVP(D-018)의 critical path에 있지 않다. 현재 제품 핵심과 양립하지 않는 후보 기술은 [DECISIONS.md](DECISIONS.md)에서 reject하고 그래프를 수정한다.
 

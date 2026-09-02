@@ -3,7 +3,7 @@
   "generated_at": "2026-09-02T11:30:00+09:00",
   "verified_by": "Claude Code (Fable 5.1), TASK-BOOTSTRAP G0/G1",
   "repository": {
-    "root": "C:/Users/Noh TaeKyung/Desktop/emotion_diary",
+    "root": "<local-project-root>",
     "git_repository": true,
     "default_branch": "main",
     "baseline_commit": "32e68c8e3d72ed8799643f931c2a435b65214630",
