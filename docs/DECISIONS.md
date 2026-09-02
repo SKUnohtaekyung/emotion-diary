@@ -24,9 +24,20 @@
 | D-014 | accepted | `AGENTS.md`를 공용 계약으로 하고 Claude는 `CLAUDE.md`에서 import한다 | 중복 규칙 drift 방지 | 도구 동작 변경 |
 | D-015 | accepted | 한 파일에 동시에 한 writer만 두고 조사/검증 역할은 읽기 전용으로 시작한다 | 병합 충돌과 자기검증 편향 감소 | 격리된 worktree+소유권 확보 |
 | D-016 | accepted | 계획의 기술 결함은 증거·영향·대안·검증을 기록해 수정할 수 있다 | 잘못된 초기 가설의 고착 방지 | 제품 핵심/위험 허용 변경이면 사용자 승인 |
+| D-017 | accepted | 기존 `.git`을 삭제하고 현 계정에서 `git init -b main` 후 baseline commit으로 저장소를 재확립한다 | 2026-09-02 사용자 승인. 기존 `.git`은 커밋 0·스태시 0·다른 계정 소유로 보존 가치 없음(결함 I-01). baseline commit `32e68c8` | 없음 |
+| D-018 | accepted | 직접 작성+결정론적 대시보드의 **제한 MVP**를 먼저 배포하고 AI 대화 작성·RAG 분석은 후행 단계로 분리한다 | 2026-09-02 사용자 결정. AI/RAG 미확정이 핵심 기록 기능 출시를 막지 않게 함. work-graph에 `limited-mvp-release` 노드를 두고 `release-candidate`는 그 뒤에 온다 | 사용자 요구 변경 |
+| D-019 | accepted | OpenAI API 등 **유료 API를 사용하지 않는다**. AI 기능은 사용자가 구독 중인 Codex/Claude 자원으로 가능한 경로만 검증하고(B-06을 "구독 기반 모델 호출 경로 확인"으로 재정의), 경로가 확인되지 않으면 AI 대화·RAG를 보류한 채 제한 MVP만 진행한다 | 2026-09-02 사용자 결정. 과금 자원 생성·유료 호출 금지. `.env.example`의 `OPENAI_API_KEY`는 사용하지 않음. 위험 RK-016 | 사용자가 유료 자원을 별도 승인 |
+| D-020 | accepted | 위기 리소스 기준 국가는 **한국**. 위기 감지는 AI 관여 경로(AI 대화 작성, 사용자가 명시 요청한 분석)에서만 수행하고, 직접 작성 원문은 자동 스캔하지 않으며 그 한계를 사용자에게 고지한다 | 2026-09-02 사용자가 국가를 확정, 감지 범위는 권고안을 기본값으로 채택(결함 I-02). 원문 자동 스캔은 개인정보·오탐 위험이 크고 제품이 위기 서비스가 아님 | 사용자 이의 제기, 임상/안전 검토 결과 |
+| D-021 | accepted | Sites 후보가 실패하면 hosting 대안은 **무료 옵션으로만** 제한한다 | 2026-09-02 사용자 결정. D-019의 비용 금지와 일관 | 사용자가 유료 hosting 승인 |
+| D-022 | accepted | `emotion_code`는 카테고리별로 독립 발급한다(`<category_code>-<slug>` 형식). 카테고리 간 같은 한글 label은 서로 다른 code이며 label 중복 자체는 허용한다 | 결함 I-06: 원자료에 카테고리 간 중복 label 최소 7건(가벼운·흐뭇한·뿌듯한·포근한·고통스러운·구역질나는·황량한). `UNIQUE(diary_id, emotion_code)`와 category 교차 검증은 유지 | taxonomy-v1 검수 결과 |
+| D-023 | accepted | completed 기록을 편집하는 동안에도 `status`는 completed를 유지한다. 사용자의 명시적 "완료 취소"만 draft로 되돌리며, 편집 저장은 완료조건을 다시 검사해 미충족이면 저장을 거부한다 | 결함 I-05: DATA_MODEL §5 상태도가 PRD §8/UX §7과 모순. 편집마다 draft로 내려가면 통계·streak·분석 stale 의미가 흔들림 | 없음 |
+| D-024 | accepted | D1 후보에서 interactive transaction을 전제하지 않는다. 완료 전환은 조건을 포함한 **단일 조건부 UPDATE**, 강도 범위는 `CHECK`, 완료 후 불변조건은 trigger 또는 조건부 statement, cascade 삭제는 원자적 batch로 보장한다 | 결함 I-04: DATA_MODEL "transaction 안에서" 서술이 D1 후보와 불일치하고 완료 검사에 TOCTOU 창이 있음. 실제 D1 batch/trigger 지원은 B-04에서 검증 | B-04 결과, DB 교체 |
+| D-025 | accepted | 변경 API의 CSRF 방어는 **custom header 필수**(`X-Requested-With: emotion-diary` 등 서버가 정한 값)+`Origin`/`Sec-Fetch-Site` 검사로 확정한다. 단일 사용자 배포의 `owner_key`는 서버 상수에만 의존하지 않고 런타임 identity(헤더/세션)를 서버 허용 목록과 대조하는 defense-in-depth를 필수로 한다 | 결함 I-03: 서버 상수 owner_key가 단일 장애점이며 CSRF 방식 미정. 실제 identity 헤더 유무는 B-02에서 확인 | B-02/B-03 결과, 다중 사용자 전환 |
+| D-026 | accepted | Claim–Evidence semantic Verifier는 "가능하면"이 아니라 **필수 독립 실행**이다. Quality Filter 항목은 code 검사와 LLM 판정으로 구분 표기하고, `observations`는 허용된 stat 필드·값과 코드로 대조해 자유 서술 유출을 막는다 | 결함 I-07. 독립 호출이 구독 기반 경로(D-019)에서 불가능하면 RAG 분석 자체를 보류 | 구독 기반 경로 확인 결과 |
+| D-027 | accepted | 1인 제품에서는 reviewer 2인 요구를 **시간 분리 2회 검수**(초안 검수 후 24시간 이상 지나 원본 이미지와 재대조, 두 기록 보존) 또는 사용자 최종 대조로 대체한다. Recall/Precision 등 retrieval 지표는 "고정셋 기준"임을 표기한다 | 결함 I-08: reviewer 2인 요구가 1인 제품과 충돌 | 협업자/외부 reviewer 확보 |
 | D-028 | accepted | Codebase Memory는 프로젝트 한정 MCP와 동일 사용자 cache를 공유하는 탐색 보조로 사용한다. 구조 탐색은 Graph→후보→source, 최종 정본은 working tree·실행 결과다 | 2026-09-02 사용자 통합 요청. 전역 설정 재작성을 피하려 v0.10.8 binary-only 설치를 선택; 기존 MCP 목록과 프로젝트 hooks/source 보존은 확인했으나 전역 파일 3개의 byte 동일성은 미확인. full/manual index와 기존 watcher 설정 사용. 실제 Graph의 누락·오연결에 source 검증과 fallback 필수화. 상세 운영은 AGENT_WORKFLOW §9, 검증은 CURRENT_TASK | binary 업데이트, 앱 scaffold/새 확장자, root 이동, index 품질/비용 변화 |
 
-D-017~D-027은 보류된 bootstrap 작업의 예약 번호다. D-028은 앱 범위·데이터 계약·유료 외부 서비스를 변경하지 않는다. 설치 시 기존 Git 소유자 불일치 때문에 CBM의 Git 감지가 실패하여 현 root 하나만 전역 `safe.directory`에 등록했다. `.git` 재초기화/commit은 수행하지 않았다.
+D-017~D-027은 2026-09-02 계획 재검증(TASK-BOOTSTRAP G1)에서 사용자 결정 5건과 결함 등록부 I-01~I-18의 수정 방향을 기록한 것이다. 영향 문서는 `DATA_MODEL`, `ARCHITECTURE`, `AI_RAG_SPEC`, `SAFETY_POLICY`, `UX_SPEC`, `EVAL_PLAN`, `RISK_REGISTER`, `ROADMAP`, `TRACEABILITY`, `harness/*`, `schemas/*`이며 같은 commit에서 갱신했다. D-028은 앱 범위·데이터 계약·유료 외부 서비스를 변경하지 않는다. 설치 시 기존 Git 소유자 불일치 때문에 CBM의 Git 감지가 실패하여 현 root 하나만 전역 `safe.directory`에 등록했다. `.git` 재초기화/commit은 수행하지 않았다.
 
 ## 새 결정 템플릿
 

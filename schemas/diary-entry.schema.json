@@ -5,6 +5,23 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "id", "entryDate", "timezone", "status", "revision", "taxonomyVersion", "eventText", "reasonText", "emotions", "praises", "gratitudes"],
+  "$defs": {
+    "reflectionSlot": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["slot", "text"],
+      "properties": {
+        "slot": { "type": "integer", "minimum": 1, "maximum": 3 },
+        "text": { "type": "string", "pattern": "\\S", "minLength": 1, "maxLength": 2000 }
+      }
+    },
+    "reflectionSlots": {
+      "type": "array",
+      "maxItems": 3,
+      "uniqueItems": true,
+      "items": { "$ref": "#/$defs/reflectionSlot" }
+    }
+  },
   "properties": {
     "schemaVersion": { "const": "diary-entry-v1" },
     "id": { "type": "string", "minLength": 16, "maxLength": 64 },
@@ -24,25 +41,18 @@
         "required": ["categoryCode", "emotionCode", "labelSnapshot", "intensity", "displayOrder"],
         "properties": {
           "categoryCode": { "enum": ["enjoyment", "wish", "sadness", "anger", "joy", "love", "hate"] },
-          "emotionCode": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
-          "labelSnapshot": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "emotionCode": { "type": "string", "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate)-[a-z0-9][a-z0-9-]{0,55}$" },
+          "labelSnapshot": { "type": "string", "pattern": "\\S", "minLength": 1, "maxLength": 100 },
           "intensity": { "type": "integer", "minimum": 1, "maximum": 10 },
           "displayOrder": { "type": "integer", "minimum": 0 }
         }
       }
     },
-    "praises": {
-      "type": "array",
-      "maxItems": 3,
-      "items": { "type": "string", "minLength": 1, "maxLength": 2000 }
-    },
-    "gratitudes": {
-      "type": "array",
-      "maxItems": 3,
-      "items": { "type": "string", "minLength": 1, "maxLength": 2000 }
-    },
+    "praises": { "$ref": "#/$defs/reflectionSlots" },
+    "gratitudes": { "$ref": "#/$defs/reflectionSlots" },
     "firstCompletedAt": { "type": ["string", "null"], "format": "date-time" },
     "firstCompletedLocalDate": { "type": ["string", "null"], "format": "date" },
+    "completedAt": { "type": ["string", "null"], "format": "date-time" },
     "createdAt": { "type": "string", "format": "date-time" },
     "updatedAt": { "type": "string", "format": "date-time" }
   },
@@ -50,13 +60,16 @@
     {
       "if": { "properties": { "status": { "const": "completed" } }, "required": ["status"] },
       "then": {
+        "required": ["firstCompletedAt", "firstCompletedLocalDate", "completedAt"],
         "properties": {
           "eventText": { "type": "string", "pattern": "\\S", "maxLength": 10000 },
           "reasonText": { "type": "string", "pattern": "\\S", "maxLength": 10000 },
-          "emotions": { "minItems": 1 }
+          "emotions": { "minItems": 1 },
+          "firstCompletedAt": { "type": "string", "format": "date-time" },
+          "firstCompletedLocalDate": { "type": "string", "format": "date" },
+          "completedAt": { "type": "string", "format": "date-time" }
         }
       }
     }
   ]
 }
-

@@ -14,9 +14,32 @@
       "items": { "$ref": "diary-entry.schema.json" }
     },
     "analyses": {
+      "description": "선택. 각 항목은 분석 출력에 기간·버전 metadata를 감싼 것이다(DATA_MODEL §3.5, 결함 I-13 후속). owner key, raw prompt, verifier 내부 판정 전문은 포함하지 않는다.",
       "type": "array",
-      "items": { "$ref": "analysis-output.schema.json" }
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["analysisId", "periodStart", "periodEnd", "status", "statsVersion", "promptVersion", "evidenceSetVersion", "createdAt", "output"],
+        "properties": {
+          "analysisId": { "type": "string", "minLength": 16, "maxLength": 64 },
+          "periodStart": { "type": "string", "format": "date" },
+          "periodEnd": { "type": "string", "format": "date" },
+          "status": { "enum": ["passed", "withheld", "stale"] },
+          "statsVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "promptVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "modelId": { "type": ["string", "null"], "maxLength": 128 },
+          "evidenceSetVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "completedAt": { "type": ["string", "null"], "format": "date-time" },
+          "evidenceRetired": {
+            "description": "인용 카드 중 이후 retired된 evidence id@version 목록(DATA_MODEL §3.6 소급 표시)",
+            "type": "array",
+            "uniqueItems": true,
+            "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,127}@[1-9][0-9]*$" }
+          },
+          "output": { "$ref": "analysis-output.schema.json" }
+        }
+      }
     }
   }
 }
-

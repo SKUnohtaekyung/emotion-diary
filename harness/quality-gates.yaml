@@ -1,5 +1,8 @@
-schema_version: "1.0"
+schema_version: "1.1"
 source_of_truth: docs/EVAL_PLAN.md
+label_definitions: docs/EVAL_PLAN.md §14
+# 2026-09-02 G1(결함 I-10): node_gates 라벨을 EVAL §14 정의와 1:1로 재매핑하고
+# severity medium을 EVAL §2/§11(차단·높음만 출시 차단)과 일치시켰다.
 
 policies:
   no_skipped_required_gate: true
@@ -8,6 +11,7 @@ policies:
   same_hypothesis_failure_limit: 2
   block_on_unknown_privacy_boundary: true
   one_writer_per_file: true
+  no_paid_api_calls: true
 
 gates:
   quick:
@@ -56,12 +60,14 @@ gates:
         status: pending
 
 severity_policy:
+  # docs/EVAL_PLAN.md §2, §11: 차단/높음이 하나라도 열려 있으면 출시 불가. 중간은 출시를 막지 않지만
+  # 릴리스 증거 묶음(§12 항목 9)에 owner와 함께 반드시 기록한다. 낮음은 Decision으로 수용 여부를 정한다.
   blocker:
     allowed_open: 0
   high:
     allowed_open: 0
   medium:
-    allowed_open: 0
+    allowed_open: listed in release evidence bundle with owner
   low:
     allowed_open: decision required
 
@@ -69,7 +75,13 @@ node_gates:
   bootstrap-facts:
     requires: [B-01, source-files-present, runtime-profile-complete, quick]
   security-foundation:
-    requires: [B-02, B-03, B-04, B-05, B-06, B-07, B-08]
+    requires: [B-02, B-03, B-08]
+  data-contract:
+    requires: [B-04, B-05]
+  model-access:
+    requires: [B-06]
+  retrieval-contract:
+    requires: [B-07]
   code-quality:
     requires: [reproducible-install, lint-configured, typecheck-configured, test-configured, build-configured, full]
   data-integrity:
@@ -79,12 +91,14 @@ node_gates:
   core-product:
     requires: [F-03, F-04, F-05, F-07, F-08, mobile-core-flow, accessibility-core-flow]
   journal-ai:
-    requires: [ai-journal-fixed-set, no-fabrication, no-emotion-assertion, direct-entry-fallback]
+    requires: [ai-journal-fixed-set, no-fabrication, no-emotion-assertion, direct-entry-fallback, crisis-signal-100, history-forgery-0]
   reflection-core:
     requires: [F-11, F-12, F-13, deterministic-statistics, timezone-boundaries]
   evidence-quality:
     requires: [active-card-schema-valid, source-and-hash-valid, reviewer-approved, retrieval-baseline-frozen]
   ai-safety:
-    requires: [citation-validity-100, citation-coverage-100, unsupported-claim-0, gate-false-pass-0, injection-success-0, crisis-flow-100]
+    requires: [citation-validity-100, citation-coverage-100, unsupported-claim-0, gate-false-pass-0, injection-success-0, observation-accuracy-100, crisis-flow-100]
+  limited-release:
+    requires: [full, browser-e2e, mobile-real-device, security-and-privacy, deployment-boundary-review, blocker-0, high-0, ai-paths-disabled-or-verified]
   release:
     requires: [full, browser-e2e, mobile-real-device, security-and-privacy, ai-evals, deployment-boundary-review, blocker-0, high-0]

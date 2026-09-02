@@ -1,44 +1,53 @@
 {
-  "schema_version": "1.0",
-  "generated_at": "2026-09-02T00:52:31.7378478+09:00",
-  "verified_by": "Codex",
+  "schema_version": "1.1",
+  "generated_at": "2026-09-02T11:30:00+09:00",
+  "verified_by": "Claude Code (Fable 5.1), TASK-BOOTSTRAP G0/G1",
   "repository": {
-    "root": "C:/Users/Noh TaeKyung/Documents/Codex/2026-09-01/referenced-chatgpt-conversation-this-is-an",
+    "root": "C:/Users/Noh TaeKyung/Desktop/emotion_diary",
     "git_repository": true,
     "default_branch": "main",
-    "dirty_at_bootstrap": true,
+    "baseline_commit": "32e68c8e3d72ed8799643f931c2a435b65214630",
+    "dirty_at_bootstrap": false,
     "existing_user_changes": [
-      "프로젝트 정본과 사용자 원자료는 최초 baseline이며 아직 commit되지 않음"
+      "2026-09-02 G0(D-017): 커밋 0·다른 계정 소유였던 기존 .git을 사용자 승인으로 삭제하고 main으로 재초기화, 46개 파일 baseline commit",
+      "outputs/, work/, .mcp.json, .codex/config.toml, .claude/settings.local.json은 .gitignore로 제외된 로컬 산출물/설정"
     ]
   },
   "runtime": {
-    "os": "Windows",
+    "os": "Windows 11",
     "node_version": "22.16.0",
     "npm_version": "10.9.2",
+    "git_version": "2.49.0.windows.1",
     "package_manager": "npm",
     "framework": null,
     "language": "JavaScript/TypeScript candidate; not selected"
   },
   "hosting": {
-    "target": "ChatGPT Sites candidate",
+    "target": "ChatGPT Sites candidate; fallback limited to free options (D-021)",
     "project_exists": "unknown",
     "server_runtime_confirmed": "unknown",
     "private_access_confirmed": "unknown",
+    "identity_header_available": "unknown",
+    "custom_header_csrf_passthrough": "unknown",
     "secrets_confirmed": "unknown",
     "data_residency_accepted": "unknown"
   },
   "storage": {
     "diary_database": "D1 candidate",
     "binding_confirmed": "unknown",
-    "transactions_confirmed": "unknown",
-    "backup_and_deletion_confirmed": "unknown",
-    "evidence_store": "OpenAI Vector Store candidate"
+    "conditional_update_and_check_confirmed": "unknown",
+    "trigger_support_confirmed": "unknown",
+    "batch_atomicity_confirmed": "unknown",
+    "backup_and_deletion_confirmed": "unknown (vendor inquiry required, I-17)",
+    "evidence_store": "not selected; paid Vector Store excluded by D-019"
   },
-  "openai": {
+  "model_access": {
+    "policy": "no paid API (D-019); subscription-based Codex/Claude path only",
+    "path_confirmed": "unknown (B-06 redefined)",
     "server_only": "unknown",
-    "responses_api_version_or_sdk": null,
     "structured_outputs_confirmed": "unknown",
-    "store_false_confirmed": "unknown",
+    "retention_control_confirmed": "unknown",
+    "independent_verifier_call_confirmed": "unknown",
     "vector_search_filter_confirmed": "unknown"
   },
   "commands": {
@@ -53,18 +62,21 @@
     "verify_full": "npm run verify:full"
   },
   "evidence": [
-    "git rev-parse --is-inside-work-tree => true",
+    "git rev-parse --is-inside-work-tree => true (2026-09-02, after re-init)",
     "git branch --show-current => main",
+    "git log --oneline -1 => 32e68c8 감정일기 프로젝트 baseline",
+    "git status (no safe.directory flag) => clean working tree",
     "node --version => v22.16.0",
     "npm --version => 10.9.2",
+    "git --version => 2.49.0.windows.1",
     "references/manifest.json SHA-256 verification is enforced by scripts/verify.mjs"
   ],
   "unknowns": [
-    "Application framework and Sites project",
-    "Sites private identity and server runtime behavior",
-    "D1 binding, transaction, backup, and deletion behavior",
-    "OpenAI API account settings and runtime adapter",
+    "Application framework and Sites project (B-08, G2a)",
+    "Sites private identity header, allowlist comparison, custom-header CSRF passthrough (B-02/B-03, G2a)",
+    "D1 binding, conditional UPDATE/CHECK/trigger/batch behavior, backup and deletion vendor evidence (B-04/B-05, G2b)",
+    "Subscription-based model call path without paid API, incl. server-only, strict schema, retention control, independent verifier call (B-06 redefined, G2c)",
+    "Retrieval layer on subscription or free path (B-07, G2d)",
     "Web Push and PWA support"
   ]
 }
-

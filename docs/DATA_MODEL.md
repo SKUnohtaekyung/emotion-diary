@@ -11,6 +11,7 @@
 - 모든 ID는 추측하기 어려운 UUID/ULID 계열을 사용한다.
 - `owner_key`는 서버 인증 컨텍스트에서 생성하며 요청 body/query의 값을 받지 않는다.
 - 시각은 DB에 UTC ISO-8601로 저장한다. 일기 귀속 날짜는 별도 `entry_date`(YYYY-MM-DD)와 당시 IANA `timezone`으로 저장한다.
+- 클라이언트가 보낸 `timezone`은 서버의 IANA 목록으로 검증하고, `entry_date`는 그 timezone의 서버 현재 날짜와 대조해 미래 날짜를 거부한다. 클라이언트 timezone은 사용자 편의 값이지 권한·완료 판정의 근거가 아니다(결함 I-15).
 - 사용자 텍스트는 UTF-8, 서버에서 길이 제한과 제어문자 검사를 적용하고 출력 시 context-aware escaping한다.
 - 행 변경에는 `revision`과 `updated_at`을 사용해 오래된 클라이언트의 무조건 덮어쓰기를 막는다.
 - 분석·대시보드는 `status = completed`인 기록만 사용한다.
@@ -38,7 +39,9 @@
 DB 불변조건:
 
 - `UNIQUE(owner_key, entry_date)` — draft와 completed를 합쳐 하루 한 기록.
-- completed일 때 사건·이유·감정 1개 이상·모든 강도 1~10이 transaction 안에서 검증되어야 한다.
+- `status`는 `CHECK (status IN ('draft','completed'))`, completed 행은 `CHECK (status <> 'completed' OR (first_completed_at IS NOT NULL AND completed_at IS NOT NULL AND first_completed_local_date IS NOT NULL))`.
+- 완료 전환은 D1 후보의 interactive transaction을 전제하지 않는다(D-024). 서버는 사건·이유 nonblank, `diary_emotions` 1행 이상, 모든 `intensity` 1~10을 **하나의 조건부 UPDATE**로 검사한다. 예: `UPDATE diary_entries SET status='completed', revision=revision+1, ... WHERE id=? AND owner_key=? AND revision=? AND status='draft' AND trim(event_text)<>'' AND trim(reason_text)<>'' AND EXISTS (SELECT 1 FROM diary_emotions WHERE diary_id=diary_entries.id)`. 영향 행이 0이면 완료를 실패(409 revision 충돌 또는 422 완료조건 미충족)로 돌려주고 어떤 상태도 바꾸지 않는다. 검사와 갱신을 분리한 read-then-write는 TOCTOU 창이 있으므로 금지한다.
+- completed 이후에는 마지막 감정 행 삭제나 사건·이유 blank 갱신을 trigger(`BEFORE DELETE ON diary_emotions` / `BEFORE UPDATE ON diary_entries`에서 `RAISE(ABORT)`) 또는 같은 조건을 포함한 조건부 statement로 차단한다. trigger 지원 여부는 B-04에서 확인하고, 미지원이면 조건부 statement만으로 같은 불변조건을 보장해야 한다.
 - 과거 `entry_date`라도 `first_completed_local_date`는 실제 작성 완료일이므로 과거 streak를 복구하지 않는다.
 
 ### 3.2 `diary_emotions`
@@ -47,12 +50,12 @@ DB 불변조건:
 | --- | --- |
 | `id`, `diary_id` | PK/FK, diary hard delete 시 cascade |
 | `category_code` | 7개 상위 감정의 안정 코드 |
-| `emotion_code` | taxonomy의 세부 감정 안정 코드 |
-| `label_snapshot` | 기록 당시 한글 표시명 |
-| `intensity` | 정수 1~10 |
+| `emotion_code` | taxonomy의 세부 감정 안정 코드. 카테고리별 독립 발급 `<category_code>-<slug>`(D-022) |
+| `label_snapshot` | 기록 당시 한글 표시명. 카테고리가 다르면 같은 label이라도 다른 code |
+| `intensity` | 정수 1~10, `CHECK (intensity BETWEEN 1 AND 10)` |
 | `display_order` | 사용자가 선택한 순서 |
 
-`UNIQUE(diary_id, emotion_code)`로 같은 세부 감정의 중복 선택을 막는다. 카테고리는 taxonomy에서 도출해 교차 검증한다.
+`UNIQUE(diary_id, emotion_code)`로 같은 세부 감정의 중복 선택을 막는다. 카테고리는 taxonomy에서 도출해 교차 검증한다. 원자료에는 카테고리 간 중복 label(예: 가벼운·흐뭇한·뿌듯한·포근한·고통스러운·구역질나는·황량한)이 있으므로 label만으로 감정을 식별하지 않는다.
 
 ### 3.3 `diary_reflections`
 
@@ -69,7 +72,7 @@ DB 불변조건:
 
 ### 3.4 `reminder_settings`
 
-- owner당 1행: `enabled`, `local_time`, `timezone`, `channel`, `permission_state`, `updated_at`.
+- `owner_key`가 PK인 owner당 1행: `enabled`, `local_time`, `timezone`, `channel`, `permission_state`, `updated_at`. 갱신은 upsert(`INSERT ... ON CONFLICT(owner_key) DO UPDATE`)로 재시도에 안전해야 한다.
 - MVP `channel`은 `in_app`; 플랫폼 검증 후에만 `web_push`를 허용한다.
 - 당일 diary가 completed이면 reminder를 표시하지 않는다.
 
@@ -88,11 +91,14 @@ DB 불변조건:
 
 일기 revision 또는 taxonomy/stats 정의가 바뀌어 snapshot hash가 달라지면 관련 분석을 `stale`로 표시한다.
 
+read-time guard(결함 I-16): 저장된 `status`만 믿지 않는다. 분석을 조회할 때 서버는 같은 기간의 현재 completed diary ID+revision+stats 정의로 canonical hash를 다시 계산해 `input_snapshot_hash`와 비교하고, 다르면 저장 상태와 무관하게 `stale`로 응답한다. 쓰기 시점의 stale 갱신이 누락되거나 지연돼도 사용자에게 최신인 것처럼 보이지 않게 한다.
+
 ### 3.6 `analysis_claims`와 `claim_evidence`
 
 - 사용자에게 보인 claim 단위 텍스트, claim type, confidence/limitation, verification status를 저장한다.
-- 각 심리학적 claim은 하나 이상의 active Evidence Card version과 연결한다.
+- 각 심리학적 claim은 하나 이상의 active Evidence Card version과 연결한다. 연결에는 당시 card version과 content hash를 보존한다.
 - observation claim은 diary/stat snapshot에 연결하고 연구 citation을 가장하지 않는다.
+- 카드가 `retired`(정정·철회)되면 그 version을 인용한 기존 분석에 `evidence_retired` 표시를 소급 적용한다(결함 I-18). 기존 출력 문장을 다시 쓰지는 않지만 UI는 해당 해석을 "근거가 철회됨"으로 표시하고 재분석을 권한다.
 
 ### 3.7 `idempotency_records`
 
@@ -126,20 +132,21 @@ DB 불변조건:
 ## 5. 상태 전이
 
 ```text
-없음 ──첫 입력──> draft ──완료조건 통과──> completed
+없음 ──첫 입력──> draft ──완료조건 통과──> completed ──편집 저장(완료조건 재검사)──> completed
                      ^                         |
-                     |────완료 취소/편집───────|
+                     |────명시적 완료 취소─────|
 
 draft/completed ──사용자 확인──> hard deleted
 completed ──revision 변경──> 기존 analysis stale
 ```
 
-완료 취소를 허용하더라도 `first_completed_at/local_date`는 지우지 않는다. 삭제 후 같은 날짜에 새 일기를 만들 수 있지만 새 ID와 새 audit event를 가진다.
+completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편집 저장은 완료조건을 다시 검사하며 미충족이면 저장을 거부하고 상태를 바꾸지 않는다. draft로 돌아가는 유일한 경로는 사용자의 명시적 "완료 취소"이며, 자동 저장이나 편집 중 상태로는 draft가 되지 않는다. 완료 취소를 허용하더라도 `first_completed_at/local_date`는 지우지 않는다. 삭제 후 같은 날짜에 새 일기를 만들 수 있지만 새 ID와 새 audit event를 가진다.
 
 ## 6. 임시저장과 AI 대화
 
 - 서버에는 구조화 draft만 저장한다. AI와 주고받은 전체 대화 transcript는 기본적으로 영구 저장하지 않는다.
 - 현재 요청을 처리하는 데 필요한 최근 턴은 메모리/요청 범위에서만 사용하고 응답 후 폐기한다.
+- 턴 계약(결함 I-11): 클라이언트가 전송하는 이전 assistant 턴은 신뢰하지 않는다. 서버는 응답마다 `(draft_id, revision, turn_index, assistant_message)`에 대한 HMAC `turn_token`을 발급하고, 다음 요청에 포함된 이전 턴은 token이 일치할 때만 문맥으로 사용한다. 불일치·누락 턴은 폐기하고 현재 사용자 발화와 구조화 draft만으로 응답한다. 문맥 턴 수와 총 길이에 상한을 둔다.
 - 새로고침 뒤에는 구조화 draft는 복구되지만 AI 대화 문장 전체는 복구되지 않을 수 있음을 UX에서 알린다.
 - 브라우저 local storage에 일기 원문을 장기 저장하지 않는다. 오프라인 기능은 별도 암호화·위협 모델 없이는 제공하지 않는다.
 
@@ -160,7 +167,7 @@ completed ──revision 변경──> 기존 analysis stale
 ### 삭제
 
 - 기록 삭제는 사용자 확인 후 즉시 영구 삭제하는 MVP 계약이다. 휴지통/복구를 암시하지 않는다.
-- diary, emotion, reflection, 연결 claim을 transaction으로 cascade 삭제한다. 해당 snapshot의 분석은 제거하거나 재사용 불가 상태로 만든다.
+- diary, emotion, reflection, 연결 claim을 원자적 batch(또는 FK `ON DELETE CASCADE`)로 cascade 삭제한다(D-024). 부분 삭제가 관찰되면 차단 결함이다. 해당 snapshot의 분석은 제거하거나 재사용 불가 상태로 만든다.
 - 로그에는 원문 없이 삭제 event와 결과만 남기고, DB/호스팅 백업의 실제 소거 지연은 개인정보 안내에 명시한다.
 
 ### 내보내기
@@ -172,7 +179,8 @@ completed ──revision 변경──> 기존 analysis stale
 
 ### 보존
 
-- 계정/사이트 제거 시 데이터 처리, 서버 로그, OpenAI API와 백업의 보존 기간은 배포 전 실제 공급자 설정을 확인해 정책에 기록한다.
+- 계정/사이트 제거 시 데이터 처리, 서버 로그, 모델 공급자 경로(구독 기반, D-019)와 백업의 보존 기간은 배포 전 실제 공급자 설정을 확인해 정책에 기록한다.
+- D1 후보의 백업·보존·복구 특성은 공개 문서만으로 확정하지 않고 벤더 문의 또는 공식 문서의 명시 조항을 B-05 증거로 남긴다(결함 I-17). 답을 얻지 못한 항목은 `unknown`으로 두고 사용자 고지에 반영한다.
 - 확정할 수 없는 보존 특성은 “즉시 완전 삭제”로 약속하지 않는다.
 
 ## 9. 마이그레이션 원칙

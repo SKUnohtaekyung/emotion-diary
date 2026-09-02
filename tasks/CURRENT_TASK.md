@@ -12,9 +12,11 @@
 ## 현재 체크포인트
 
 - 완료: Windows/PowerShell 7.6.4, Node 22.16.0/npm 10.9.2; `main`, commit 0, 프로젝트 파일 untracked. 기존 파일 46개를 `work/cbm-integration/baseline/`에 보존하고 SHA-256 목록을 기록했다. 변경 전/후 quick/full PASS. v0.10.8 binary-only 설치, 프로젝트 MCP 설정 2개, 공유 index, 실제 Codex CLI 호출, scope 거부, watcher 추가/삭제 반영, Graph-source 비교 완료.
-- 다음: 사용자가 현재 root에서 `claude`를 열어 정상 workspace trust 절차를 승인 → `claude mcp get codebase-memory-mcp` Connected 확인 → Claude에서 `list_projects`/`search_graph` 실제 호출. 그전에는 전체 완료로 보고하지 않는다.
+- 다음: 사용자가 Codex 앱과 모든 CBM 명령을 종료해 실행 중인 `pre-cohort/unknown` daemon을 해소 → Claude Code 세션 재시작 → `claude mcp get codebase-memory-mcp` 상태 확인 → Claude에서 `list_projects`/`index_status`/`search_graph`/`trace_path`/`get_code_snippet` 실제 호출. 그전에는 전체 완료로 보고하지 않는다.
 - 결정: D-028. 조사 초반에는 일회성 Git 신뢰 옵션만 썼으나 CBM의 Git 감지를 위해 이후 전역 `safe.directory`에 현재 root 하나를 추가했다. 이제 일반 `git status`와 CBM `is_git=true`, branch `main`이 확인된다. `.git/config`, 이력·branch·staging은 변경하지 않았다.
-- 차단: Claude 2.1.237의 기존 trust 기록은 backslash 경로 키에만 있고 현재 CLI가 조회하는 forward-slash 키는 없다. `.mcp.json` 및 로컬 단일 서버 활성화 설정은 정상이나 `Pending approval`. 사용자 신뢰 기록을 조작하거나 전체 자동 승인을 추가하지 않는다.
+- 차단(1) CBM daemon 세대 충돌 — 2026-09-02 10:45 확인. 실행 중 daemon(pid 13804, 10:29 기동, Codex 앱 pid 5160 소유, 9749 정상)이 `active_version=pre-cohort/unknown`, `active_build=0…0`으로 등록되어 build `b4b403b1…`의 신규 frontend와 CLI가 모두 즉시 종료된다. Claude 세션은 `CONNECTION_CLOSED`로 `mcp__codebase-memory-mcp__*` 도구를 노출하지 못했고, 동일 `.mcp.json` 설정으로 직접 spawn하면 975ms 만에 exit 1과 `CBM daemon could not start within 30000 ms`, `config list`는 "pre-coordination or unverified CBM generation is active; close all CBM sessions and commands, then retry"를 반환한다. 근거는 바이너리가 남긴 `logs/daemon-conflicts.ndjson`의 `daemon.version_conflict reason=build`다. 해소는 바이너리가 안내하는 절차(모든 CBM 세션·명령 종료 후 재시작)만 사용하고 사용자 프로세스를 임의 종료하지 않는다.
+- 차단(2) `claude mcp get`은 여전히 `Pending approval`이다. 다만 이번 Claude 세션은 서버 spawn을 실제 시도했으므로 승인이 이 세션의 실패 원인은 아니었다. daemon 충돌 해소 후 다시 판정해야 한다.
+- 정정: 이전 "backslash 경로 키만 있고 forward-slash 키가 없다"는 원인 가설은 근거가 확인되지 않았다. 전역 `~/.claude.json`의 `projects`에 이 root 키는 backslash 형식 1개뿐이고 `hasTrustDialogAccepted=true`이며 `enabledMcpjsonServers`는 빈 배열이다. 프로젝트 `.claude/settings.local.json`에는 이 server 1개만 활성화되어 있다. `Pending approval` 표시의 정확한 판정 경로는 미확인으로 남긴다.
 - 제한: 앱 source/framework/test suite가 아직 없다. 아래 실제 하네스 흐름으로 검증했다. Graph-first 호출 절감은 관찰되지 않았고 token 절감률은 산출하지 않았다.
 - 증거 중간물: `work/cbm-integration/` (Git·하네스 대상 제외, 민감값 기록 금지).
 
@@ -37,13 +39,15 @@
 | Codex 0.147.0 `mcp get/list` | PASS, project MCP enabled |
 | Codex `exec --ephemeral --json --sandbox read-only --skip-git-repo-check ...` | PASS, 실제 `list_projects` 및 `search_graph` 완료 이벤트, walk/visit 2건 |
 | 현재 Codex 앱 및 독립 verifier의 실제 MCP 도구 | PASS, `list_projects`/index/status/search/schema 호출. 최종 수동 full index 654 nodes / 700 edges |
-| Claude 2.1.237 `mcp get` | 설정 발견, Pending approval. 실제 Claude tool 호출 미검증 |
+| Claude `mcp get` / 세션 MCP 도구 (2026-09-02 10:45) | FAIL(연결). `mcp get`은 Pending approval, 세션은 `CONNECTION_CLOSED`로 도구 미노출. 실제 Claude tool 호출 미검증 |
+| Claude 세션 조건에서 binary 직접 spawn (2026-09-02 10:45) | FAIL. exit 1 / 975ms / daemon 세대 충돌. 바이너리 자체는 `--version` 0.10.8, 도움말 정상 |
+| 실행 중 daemon 상태 (2026-09-02 10:45) | pid 13804 생존, `http://127.0.0.1:9749/` HTTP 200, 기존 index DB 2.8MB 유지. 신규 client만 거부됨 |
 | MCP `index_repository` full / persistence=false | PASS, 38 File nodes, skipped 0, partial parse 0. 문서 변경에 따라 전체 node/edge 수는 변함 |
 | MCP symbol / trace / query / snippet | PASS 호출; 정확성과 한계는 아래 기록 |
 | `index_repository(repo_path="C:/Windows")` | 예상대로 outside allowed root 오류. index 생성 없음 |
 | watcher 재생 | 수동 재index 없이 임시 함수 추가 15초 후 1건, 삭제 12초 후 0건. 임시 파일 제거됨 |
 | Graph UI | MCP 연결 중 `http://127.0.0.1:9749/` HTTP 200, HTML 반환. 시각적 UI 조작은 미검증 |
-| `node scripts/verify.mjs --mode quick` / `--mode full` | 변경 전·후 모두 PASS |
+| `node scripts/verify.mjs --mode quick` / `--mode full` | 변경 전·후 모두 PASS. 2026-09-02 이번 세션 재실행도 quick PASS / full PASS |
 | 앱 lint/typecheck/test/build/e2e | 해당 scripts·suite가 없어 실행 불가. 앱 검증 통과를 뜻하지 않음 |
 | `git diff --check`, source hash | PASS. 기존 3개 실행 source 및 Claude Stop 설정/CLAUDE.md는 baseline과 동일 |
 | `uninstall --dry-run` | FAIL, 동일 Codex command_render 사전 검사. 실제 uninstall 미실행. 수동 rollback은 AGENT_WORKFLOW §9 |
@@ -56,6 +60,7 @@
 - recursive 41/127행은 trace의 CALLS에는 없고 self_recursive metadata만 true. 외부 builtin/subprocess 연결도 그래프에 없으므로 targeted search/실제 코드로 보완했다.
 - `walk` USAGE 중 `ignored`/`textExtensions`/`files`는 맞지만 `name`은 CI YAML, `path`는 references manifest의 동명 항목에 잘못 연결됨. 해당 dependency 주장은 기각했다.
 - `.claude` 기본 제외, `package.json` File node 누락, 수정하지 않은 source의 coverage `metadata_changed` 응답도 확인. parse_partial=0이나 ready는 완전성 보장이 아니다.
+- 2026-09-02 현재 working tree 재확인: `walk` 정의 37행 / 재귀 41행 / module 호출 45행, `visit` 정의 123행 / 재귀 127행 / module 호출 131행으로 위 기록과 동일하다. Stop 경로 `.claude/settings.json:11` → `scripts/claude-stop-hook.mjs:18` `spawnSync(process.execPath, [verifyPath, "--mode", "quick"])`도 그대로다. 따라서 위 Graph 누락·오연결 기록은 현재 source에 그대로 적용된다. 이번 세션에서는 Claude MCP로 재호출하지 못해 Graph 측 재확인은 미검증이다.
 
 이미 구조를 알고 수행한 최소 경로 재생 실험이다. 각 질문을 독립 계산하고 batching과 무관하게 논리 작업 1개를 call 1개로 센다. 초기 인덱싱·세션 시작·공통 준비 호출은 제외했다.
 
@@ -73,8 +78,10 @@
 
 - baseline 46개 중 변경 파일은 `.gitignore`, `AGENTS.md`, `.claude/agents` 2개, `AGENT_WORKFLOW`, `DECISIONS`, `TRACEABILITY`, 이 파일 8개. 나머지 source·원자료·스키마·제품 명세·Stop hook·CLAUDE import는 보존.
 - Git은 작업 전후 commit 0 / 전체 untracked이므로 일반 `git diff`가 비어 있다. 저장한 baseline과 `git diff --no-index`/SHA-256로 실제 변경을 검토한다. commit/stage/reset/reinit 없음.
+- 위 Git 전제는 2026-09-02 10:42:49 이후 더 이상 성립하지 않는다. 이 세션과 별개로 진행된 보류 bootstrap 작업이 baseline commit `32e68c8`(author `admin`)을 만들었고, 같은 시각대에 `docs/` 6개 파일이 다른 writer에 의해 계속 수정되고 있었다. TASK-CBM Writer는 commit/stage/reset/reinit을 수행하지 않았고 `docs/`의 해당 변경에도 관여하지 않았다. 이후 TASK-CBM 검토는 저장한 baseline이 아니라 이 commit 기준 `git diff`로 수행한다.
 - 기존 Claude MCP 3개 Connected, Codex 기존 7개 설정 유지(6 enabled, cua_repl disabled). Notion not_logged_in은 baseline에도 있었던 제한.
-- 세션 중단 전후 전역 `.claude.json`, `.claude/settings.json`, `.codex/config.toml` hash가 달라졌다. 이 작업의 Writer는 해당 파일을 직접 수정하지 않았으며 바이트 동일성은 증명하지 못한다. 현재 기존 MCP와 사용자 설정을 유지하고 임의로 되돌리지 않는다.
+- 2026-09-02 재확인: 기존 Claude MCP 3개(sequential-thinking, superpowers, context7) 모두 Connected 유지. `CLAUDE.md`의 `@AGENTS.md` import와 `.claude/settings.json`의 Stop hook 보존. `.claude/agents/`의 researcher/verifier는 읽기 전용 Graph 도구 11개만 보유하고 `index_repository`/`delete_project`/`manage_adr`/`ingest_traces`를 포함하지 않는다. 전역 MCP의 raw 설정·인수·환경변수는 credential을 포함할 수 있어 기록하지 않는다.
+- 세션 중단 전후 전역 `.claude.json`, `.claude/settings.json`, `.codex/config.toml` hash가 달라졌다. 이 작업의 Writer는 해당 파일을 직접 수정하지 않았으며 바이트 동일성은 증명하지 못한다. 2026-09-02 추가 관찰: 세 파일의 마지막 쓰기 시각은 각각 10:29:06, 10:30:05, 10:41:28로 installer activation(02:13)과 겹치지 않고 각 앱 기동 시각과 일치한다. mtime만으로 그 이전 쓰기를 배제할 수 없으므로 원인은 여전히 단정하지 않는다. 현재 기존 MCP와 사용자 설정을 유지하고 임의로 되돌리지 않는다.
 - Claude 정상 신뢰 승인/실제 호출, 앱 미구현으로 인한 기능 검증 부재, Graph 오연결·누락과 효과 미입증, 전역 파일 hash 차이는 숨기지 않는다.
 - 자동 uninstall 사전 검사도 실패하여 자동 rollback 미검증. 전역 hash 차이의 원인을 installer·다른 프로세스 어느 쪽으로도 단정하지 않는다. 현재 기존 설정을 임의 복원하지 않는다.
 - 독립 검증: 수정에 참여하지 않은 Agent A가 실제 MCP, ZIP checksum/binary, 설정, source·diff/hash, full 하네스를 재검증했다. Claude 실제 호출 미검증과 전역 byte 동일성 미확인 때문에 전체 판정은 PARTIAL.
@@ -111,10 +118,10 @@
 
 ## 인수 조건
 
-- [ ] 현재 폴더를 `main` 브랜치의 정상 Git 저장소로 재확립했다(2026-09-02 감사: 기존 "[x] 초기화" 기록은 옛 경로 기준으로 부정확 — 커밋 0개, `.git` 소유자가 CodexSandboxOffline 계정, 현 경로 safe.directory 미등록. 사용자 승인으로 재초기화 예정).
-- [x] Node/npm과 문서 하네스 명령을 `package.json`과 runtime profile에 기록했다.
+- [x] 현재 폴더를 `main` 브랜치의 정상 Git 저장소로 재확립했다(2026-09-02 G0, D-017: 기존 `.git` 삭제 → `git init -b main` → baseline commit `32e68c8`, 46개 파일 → 플래그 없는 `git status` clean. 이전 "[x] 초기화" 기록은 옛 경로 기준으로 부정확했음).
+- [x] Node/npm과 문서 하네스 명령을 `package.json`과 runtime profile에 기록했다(root를 현 경로로 갱신).
 - [x] 원자료 3개의 존재·byte·SHA-256을 하네스로 확인했다(2026-09-02 재확인 PASS).
-- [ ] G1 계획 교정: 2026-09-02 재검증 보고서의 결함(I-01~I-18)과 사용자 결정을 정본에 반영했다.
+- [x] G1 계획 교정: 2026-09-02 재검증 보고서의 결함(I-01~I-18)과 사용자 결정을 정본에 반영했다(D-017~D-027, 아래 체크포인트의 파일 목록).
 - [ ] B-02~B-08을 증거와 함께 `pass | fail | unknown`으로 판정했다(B-06은 "구독 기반 모델 호출 경로"로 재정의됨).
 - [ ] `unknown`인 개인정보·권한 경계가 남아 있으면 구현을 차단했다.
 - [ ] 앱 stack과 `lint/typecheck/test/build/e2e` 명령을 실제 스파이크 후 확정했다.
@@ -125,8 +132,8 @@
 
 - [x] 저장소/runtime/원자료 감사
 - [x] 2026-09-02 계획 재검증(주 에이전트 정독 + Sonnet 4개 병렬 적대적 검토 + 통합 심사; 보고서는 대화에 제출, 사용자 결정 5건 수령)
-- [ ] **G0**: `.git` 삭제 → `git init -b main` → user.name/email 확인(없으면 repo-local 설정) → baseline commit
-- [ ] **G1**: 계획 교정(아래 파일별 목록) → `verify:quick`/`verify:full` → 교정 commit
+- [x] **G0**: `.git` 삭제 → `git init -b main` → user.name/email 확인(전역 설정 존재하여 repo-local 미설정) → baseline commit `32e68c8`
+- [x] **G1**: 계획 교정(아래 파일별 목록) → `verify:quick`/`verify:full` PASS → 교정 commit(해시는 검증 증거 절)
 - [ ] G2a hosting/identity 스파이크(B-02/B-03/B-08) → G2b D1 스파이크(B-04/B-05)
 - [ ] G2c 구독 기반 모델 호출 경로 확인(B-06 재정의) / G2d Vector search(B-07) — RAG 트랙, critical path 밖
 - [ ] G3 taxonomy-v1 전사+사용자 검수(G2와 병렬 가능)
@@ -134,11 +141,11 @@
 
 ## 체크포인트
 
-- 완료: 계획 재검증 완료(판정: "제한적인 기술 스파이크만 가능"). 사용자 결정 5건 수령. `.git` 내부 검사 완료 — 커밋 0, 스태시 0, 특수 설정 없음(objects 58개는 스테이징 blob으로 추정), 보존 가치 없음 확인. **`.git` 삭제는 아직 실행하지 않음.**
-- 다음: G0 실행(위 계획의 정확한 순서), 직후 baseline commit, 그다음 G1.
-- 결정: 사용자 승인 5건(아래 인계 메모) — G1에서 `docs/DECISIONS.md`에 D-017~D-027로 기록할 것.
-- 실패: 이전 체크포인트의 "safe-directory 이 정확한 경로만 등록함"은 옛 경로(`Documents/Codex/2026-09-01/...`) 기준 기록이었고 현 경로에는 미적용 — 본 파일에서 정정함.
-- 주의: `outputs/`·`work/`는 비정본. 커밋 메시지는 한국어, `Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>` 푸터. 파일 교정은 반드시 Decision과 연결. 유료 API 호출·외부 자원 생성은 금지(D-019 예정; Sites 프로젝트 생성은 G2a 시점에 사용자 재확인).
+- 완료(2026-09-02, Claude Code Fable 5.1): 계획 재검증 → 사용자 결정 5건 → **G0** 기존 `.git` 삭제, `git init -b main`, baseline commit `32e68c8`(46 files, `.gitignore` 준수, `outputs/`·`work/`·로컬 MCP 설정 제외), 플래그 없는 `git status` clean → **G1** 아래 파일 교정 완료. 교정 파일: `docs/DECISIONS.md`(D-017~D-027), `docs/DATA_MODEL.md`(§2 timezone 검증, §3.1 조건부 UPDATE/CHECK/trigger, §3.2 CHECK·D-022 code, §3.4 PK, §3.5 read-time guard, §3.6 retired 소급, §5 상태도 D-023, §6 turn token, §8 batch 삭제·벤더 근거), `docs/ARCHITECTURE.md`(§1 결정 요약, §2 다이어그램·무료 대안, §3 턴 신뢰, §4.2/§4.4 구독 기반·후행, §5 CSRF D-025, §6 defense-in-depth, §10 게이트 열), `docs/AI_RAG_SPEC.md`(§1 hedging, §4, §5.1 이력 계약, §5.2 safety_signal, §7.2 code/LLM, §8 observation 대조, §9 필수 verifier, §10 감지 범위), `docs/SAFETY_POLICY.md`(§6 감지 범위·한국 리소스, §8), `docs/UX_SPEC.md`(§4 검색/필터, §5 후행·위기 전환, §7 상태 유지, §13 내보내기 신설), `docs/EVAL_PLAN.md`(§3, §4 B-06 재정의, §7 위기·턴 위조 케이스, §8.3 D-027, §9 턴 위조·관찰 위장, §13 제한 MVP, §14 게이트 라벨 정의 신설), `docs/RISK_REGISTER.md`(RK-001~003 대안, RK-011 정정, RK-015, RK-016 신규), `docs/ROADMAP.md`(Phase 0 G2a~d, Phase 3/5 후행, 제한 MVP 릴리스 절 신설), `docs/TRACEABILITY.md`(노드 재매핑, 불변조건 4건, 변경 영향), `harness/work-graph.yaml`(privacy-hosting-spike → hosting-identity/d1-data/model-access/vector-search, limited-mvp-release 추가, vector-search→evidence-pipeline 엣지), `harness/quality-gates.yaml`(severity medium, node_gates 재매핑, no_paid_api_calls), `harness/runtime-profile.json`·`.template.json`(root, model_access), `harness/loop-state.json`, `schemas/diary-entry`(slot 객체, completed 필수 시각, `\S`, category-prefixed code), `schemas/journal-assist-output`(`safetySignal` 필수, slot 동기화), `schemas/export`(analyses metadata 래핑), `scripts/verify.mjs`(`harness/README.md` required), `references/README.md`(D-027/D-022 문구), `.env.example`(OPENAI_API_KEY 제거, D-019/D-025 주석).
+- 다음: **G2a** `hosting-identity-spike`(B-02/B-03/B-08). Sites 프로젝트 생성은 외부 자원이므로 실행 직전 사용자 재확인 필수. G3 taxonomy-v1 전사(D-022 code, D-027 검수)는 G2와 병렬 가능. G2b는 G2a 통과 후, G2c/G2d는 RAG 트랙으로 critical path 밖.
+- 결정: D-017~D-027 기록 완료(`docs/DECISIONS.md`). 이번 세션에서 제품 핵심(PR-001~PR-015, 원형 6영역, taxonomy, 두 작성 흐름)은 변경하지 않았다. `emotion_code` 형식만 D-022로 카테고리 접두어 규칙을 확정했다.
+- 실패: 없음. 이전 체크포인트의 "safe-directory 이 정확한 경로만 등록함"은 옛 경로 기준이었고, TASK-CBM(D-028)이 이후 현 경로를 전역 `safe.directory`에 추가한 상태였다. G0 재초기화 후 `.git` 소유자가 현 계정이므로 그 항목 없이도 동작하며, 전역 설정은 변경하지 않았다.
+- 주의: `outputs/`·`work/`는 비정본. Git 전역 `user.name=admin`/`user.email`은 기존 전역 설정 그대로 사용했고(지시: 없을 때만 repo-local 설정), 커밋 푸터는 실제 모델 표기 `Claude Fable 5.1`을 사용했다. 파일 교정은 모두 Decision과 연결. 유료 API 호출·외부 자원 생성 금지(D-019). TASK-CBM 기록은 원문 보존.
 
 ## 인계 메모 — 2026-09-02 계획 재검증 (새 세션 재개용)
 
@@ -197,6 +204,7 @@
 
 ## 검증 증거
 
-- 환경: Windows, Node 22.16.0, npm 10.9.2, git 2.49.0(현 사용자 계정에서는 safe.directory 미등록으로 플래그 없이는 실패 — G0로 해소 예정)
-- 명령: `node scripts/verify.mjs --mode quick`(2026-09-02) → PASS, 원자료 SHA-256 일치
-- 미검증/알려진 제한: baseline commit 미생성(G0 대기), Sites/D1/구독 기반 모델 경로/Web Push 전부 `unknown`, G1 교정 미반영 상태의 정본에는 I-02~I-18 결함이 그대로 남아 있음
+- 환경: Windows 11, Node 22.16.0, npm 10.9.2, git 2.49.0.windows.1. G0 이후 플래그 없는 `git status` 정상.
+- G0 증거: `git log --oneline -1` → `32e68c8 감정일기 프로젝트 baseline: 제품 정본·하네스·원자료 초기 커밋`; `git status` → `nothing to commit, working tree clean`.
+- G1 명령: `npm run verify:quick` → PASS, `npm run verify:full` → PASS(앱 script가 없어 문서 하네스만 검사; 앱 기능 검증이 아님). 교정 commit 해시는 완료 보고와 `git log`로 확인.
+- 미검증/알려진 제한: Sites/D1/구독 기반 모델 경로/검색 계층/Web Push 전부 `unknown`(B-02~B-08 미판정). D-024의 D1 trigger/batch 지원, D-025의 identity 헤더·custom header 통과는 G2a/G2b 실검증 전까지 가설. `schemas/*`는 Ajv 등 실제 validator로 아직 검증하지 않았다(JSON 구문만 하네스 확인). taxonomy-v1 전사와 D-027 검수는 미착수. Codebase Memory MCP는 이 세션에서 연결 실패(CONNECTION_CLOSED)하여 Graph 탐색 없이 직접 Read/Grep으로 진행했다.

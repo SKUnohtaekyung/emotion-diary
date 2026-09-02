@@ -1,15 +1,18 @@
 {
   "schema_version": "1.0",
   "task_id": "TASK-BOOTSTRAP",
-  "phase": "plan-correction",
-  "iteration": 1,
+  "phase": "spike-preparation",
+  "iteration": 2,
   "status": "in_progress",
-  "current_hypothesis": "Plan review complete; after G0 git re-init and G1 canonical-doc corrections, the split Phase 0 spikes (hosting/identity, D1, subscription-based model access, vector search) can decide the architecture.",
+  "current_hypothesis": "With the Git baseline (G0, D-017) and corrected canonical docs (G1, D-018~D-027) in place, the split Phase 0 spikes G2a hosting-identity / G2b d1-data (critical path) and G2c model-access / G2d vector-search (RAG track, non-paid subscription path only) can decide the architecture for the limited MVP first.",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": null,
+  "last_verified_commit": "32e68c8e3d72ed8799643f931c2a435b65214630",
   "completed_nodes": [],
   "next_node": "bootstrap-audit",
-  "blockers": [],
-  "last_checkpoint": "2026-09-02 plan review done (verdict: spikes only). User approved: git re-init (G0, .git not yet deleted), limited-MVP-first with RAG deferred, crisis scope AI-paths-only with KR resources, no paid API (subscription-based model access only, B-06 redefined), free hosting fallback only. Next: G0 then G1 per tasks/CURRENT_TASK.md 인계 메모."
+  "blockers": [
+    "G2a: Sites project creation is an external resource; re-confirm with the user right before creating it",
+    "G2c: no subscription-based model call path verified yet; AI journaling and RAG stay on hold (D-019, RK-016)"
+  ],
+  "last_checkpoint": "2026-09-02 G0 done: old .git removed, git init -b main, baseline commit 32e68c8 (46 files). G1 done: D-017~D-027 recorded; DATA_MODEL/ARCHITECTURE/AI_RAG_SPEC/SAFETY_POLICY/UX_SPEC/EVAL_PLAN/RISK_REGISTER/ROADMAP/TRACEABILITY corrected; work-graph split into hosting-identity/d1-data/model-access/vector-search spikes plus limited-mvp-release; quality-gates labels remapped to EVAL §14; runtime-profile root updated; schemas (slot objects, safetySignal, export analysis metadata) updated. Next: G2a hosting-identity-spike (B-02/B-03/B-08) after user re-confirms Sites project creation; G3 taxonomy-v1 can run in parallel."
 }

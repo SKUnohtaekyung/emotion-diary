@@ -31,11 +31,13 @@
     "backup_and_deletion_confirmed": "unknown",
     "evidence_store": "OpenAI Vector Store candidate"
   },
-  "openai": {
+  "model_access": {
+    "policy": "no paid API (D-019); subscription-based Codex/Claude path only",
+    "path_confirmed": "unknown",
     "server_only": "unknown",
-    "responses_api_version_or_sdk": null,
     "structured_outputs_confirmed": "unknown",
-    "store_false_confirmed": "unknown",
+    "retention_control_confirmed": "unknown",
+    "independent_verifier_call_confirmed": "unknown",
     "vector_search_filter_confirmed": "unknown"
   },
   "commands": {

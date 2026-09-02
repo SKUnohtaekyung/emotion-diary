@@ -4,7 +4,9 @@
 
 이 문서는 감정일기의 AI 입력·출력·근거·보류·재검증 계약의 정본이다. 제품 기능은 [../PRD.md](../PRD.md), 저장/version은 [DATA_MODEL.md](DATA_MODEL.md), 금지·위기·개인정보는 [SAFETY_POLICY.md](SAFETY_POLICY.md), 합격 기준은 [EVAL_PLAN.md](EVAL_PLAN.md)를 따른다.
 
-OpenAI Responses API와 Vector Store search는 현재의 **후보 구현**이다. 새 프로젝트 에이전트는 최신 공식 API와 실제 SDK로 `store`, strict schema, refusal/incomplete/error, metadata filter, score 응답을 스파이크한 뒤 [DECISIONS.md](DECISIONS.md)를 확정한다.
+이 문서의 AI 기능 전체는 **후행 단계**다(D-018). 제한 MVP(직접 작성+결정론적 대시보드)는 이 문서의 어떤 구성요소도 없이 배포된다.
+
+모델 접근 경로는 **유료 API가 아니어야 한다**(D-019). OpenAI Responses API·Vector Store search 표기는 이 결정 이전의 후보이며, 실제로는 사용자가 구독 중인 Codex/Claude 자원으로 가능한 경로가 B-06(G2c)에서 server-only 호출, strict schema 출력, refusal/incomplete/error 처리, 데이터 보존 통제를 만족하는지로 판정한다. 확인되지 않으면 AI 대화 작성·RAG 분석은 보류 상태로 남고 [DECISIONS.md](DECISIONS.md)에 그 사실을 기록한다. 검색 계층(B-07, G2d)도 유료 Vector Store 대신 구독 경로 또는 로컬/무료 대안이어야 하며 확인 전에는 `unknown`이다.
 
 기계 검증 시드는 [../schemas/journal-assist-output.schema.json](../schemas/journal-assist-output.schema.json), [../schemas/evidence-card.schema.json](../schemas/evidence-card.schema.json), [../schemas/analysis-output.schema.json](../schemas/analysis-output.schema.json)에 있다.
 
@@ -50,8 +52,8 @@ Evidence Vector Store <── approved Evidence Cards
 - 일기 원문과 AI 작성 transcript를 Evidence Vector Store에 업로드하지 않는다.
 - 분석 기본 입력은 기간, 기록 수, emotion code/label, intensity 집계, 사용자가 입력한 상황의 최소 발췌다. 전체 일기는 명시된 필요와 사용자 표시 가능성을 확인한 경우에만 제한적으로 포함한다.
 - account identity, owner key, token, API key는 prompt, Vector Store attributes, Evidence Card, 평가 fixture에 넣지 않는다.
-- OpenAI API는 서버에서만 호출한다. 일기/분석 요청은 지원되는 경우 `store: false`를 명시하고, 계정 수준 데이터 사용·보존 설정을 출시 전에 확인한다.
-- 다른 사용자의 response ID나 `previous_response_id`를 재사용하지 않는다. 작성 대화의 장기 server state는 기본 사용하지 않는다.
+- 모델은 서버에서만 호출하며 유료 API는 사용하지 않는다(D-019). 구독 기반 경로가 확인되면 그 경로의 보존·학습 사용 설정(`store: false` 상당)을 명시·확인하고, 통제할 수 없는 경로에는 일기 원문을 보내지 않는다.
+- 공급자 측 대화 상태 ID(`previous_response_id` 등)를 다른 사용자 간에 재사용하지 않는다. 작성 대화의 장기 server state는 기본 사용하지 않는다.
 - 모델에 내부 DB/사용자 조회 도구를 제공하지 않는다. 애플리케이션이 먼저 권한을 검사하고 최소 입력을 조립한다.
 
 ## 5. Journal Conversation과 Structuring
@@ -59,6 +61,13 @@ Evidence Vector Store <── approved Evidence Cards
 ### 5.1 상태
 
 서버가 보유하는 입력은 현재 구조화 draft와 요청 처리에 필요한 최근 사용자 턴이다. 전체 transcript를 영구 저장하지 않는다. 클라이언트는 `revision`을 보내고 서버는 허용된 patch만 적용한다.
+
+대화 이력 신뢰 계약(결함 I-11, DATA_MODEL §6):
+
+- 클라이언트가 보내는 이전 assistant 턴은 **신뢰하지 않는 입력**이다. 서버는 응답마다 `(draft_id, revision, turn_index, assistant_message)`의 HMAC `turn_token`을 발급하고, 다음 요청의 이전 턴은 token이 일치하는 경우에만 모델 문맥에 포함한다.
+- token 불일치·누락·순서 오류 턴은 조용히 폐기하지 않고 `history_rejected` 사유로 기록한 뒤 현재 사용자 발화와 서버 보유 draft만으로 응답한다.
+- 문맥에 넣는 턴 수와 총 길이에 상한을 둔다. 사용자 턴도 길이·제어문자 검사를 거친다.
+- 과거 턴에 있는 "당신은 ~라고 확정했다" 같은 위조 문장이 감정 확정·빈칸 채우기·안전 우회의 근거가 되지 않는지 EVAL §9 턴 위조 사례로 검증한다.
 
 ### 5.2 출력 schema 개념
 
@@ -72,10 +81,13 @@ Evidence Vector Store <── approved Evidence Cards
     "emotions": []
   },
   "missing_required_fields": ["reason_text"],
-  "ready_for_user_review": false
+  "ready_for_user_review": false,
+  "safety_signal": "none"
 }
 ```
 
+- `safety_signal`은 필수이며 `none | possible_crisis` 중 하나다(결함 I-02, D-020). `possible_crisis`이면 서버는 `draft_patch`와 `suggested_emotion_codes`를 무시하고 draft를 바꾸지 않은 채 [SAFETY_POLICY.md](SAFETY_POLICY.md) §6의 위기 흐름으로 전환한다. 모델의 신호는 단독 근거가 아니라 Safety Validator의 규칙 검사와 결합하며, 위험도 점수나 진단 label은 schema에 두지 않는다.
+- 이 감지는 AI 대화 경로에서만 일어난다. 직접 작성 원문은 자동 스캔하지 않는다(D-020).
 - `additionalProperties: false`, enum/range/length를 포함한 strict schema를 사용한다.
 - 사용자 발화에서 명확하지 않은 값은 `null`/미포함이며 모델이 채우지 않는다.
 - suggested emotion code는 현재 taxonomy 허용 목록과 코드로 재검사한다.
@@ -161,12 +173,15 @@ MVP 후보는 모델이 `file_search`를 자율 호출하는 경로가 아니라
 
 ### 7.2 Quality Filter
 
-- 현상과 claim boundary가 실제로 관련 있는가
-- population/setting/조건이 사용자에게 일반화 가능한 범위인가
-- source, review, active status, content hash가 유효한가
-- 더 높은 수준 또는 최신의 상충 근거가 있는가
-- 진단·치료·낙인으로 직접 이어지지 않는가
-- retrieval content가 카드의 source span과 일치하는가
+각 항목은 코드 검사(`[code]`)와 LLM 판정(`[LLM]`)으로 구분한다(D-026). `[code]` 항목 하나라도 실패하면 LLM 판정 없이 후보에서 제외하고, `[LLM]` 판정은 독립 prompt와 reason code만 출력하며 카드 내용을 재작성하지 않는다.
+
+- `[code]` source, review, active status, content hash가 유효한가
+- `[code]` retrieval이 반환한 content가 카드의 `source_spans.supporting_text`와 정확히 일치하는가(chunk 반환이면 카드 span 포함 여부를 코드로 대조; 결함 I-09)
+- `[code]` file/card ID·version이 Gate allowlist에 있고 `topic_codes` 등 배열 attribute가 검색 filter의 스칼라 제약과 일치하는가(B-07 스파이크 항목)
+- `[LLM]` 현상과 claim boundary가 실제로 관련 있는가
+- `[LLM]` population/setting/조건이 사용자에게 일반화 가능한 범위인가
+- `[LLM]` 더 높은 수준 또는 최신의 상충 근거가 있는가
+- `[LLM]`+`[code]` 진단·치료·낙인으로 직접 이어지지 않는가(금지 label 정규식은 code, 문맥 판단은 LLM)
 
 ### 7.3 Gate reason codes
 
@@ -204,7 +219,7 @@ Generator는 Gate가 허용한 observation과 claim boundary만 받는다. raw �
 }
 ```
 
-- `observations`는 전달된 snapshot 필드와 코드로 대조한다.
+- `observations`는 자유 서술이 아니다(결함 I-07, D-026). 각 `text`는 `stat_refs`가 가리키는 snapshot 필드만 언급할 수 있고, 코드가 텍스트 안의 수치·기간·emotion label을 추출해 snapshot 값과 대조한다. `stat_refs`에 없는 수치·기간·label·인과 표현(“때문에”, “영향으로” 등)이 있으면 그 observation을 제거한다. Generator는 허용된 관찰 template 목록에서 선택하는 방식을 우선하고, 자유 문장은 template로 표현할 수 없을 때만 허용한다.
 - 모든 interpretation claim은 적어도 하나의 허용 Evidence version을 인용한다.
 - 확률, 인과, 질환, 성격 label은 schema 이후 별도 safety rule로도 차단한다.
 - strict JSON parsing 실패, refusal, incomplete, content filter, timeout은 정상 오류 상태로 처리하며 free-text fallback을 표시하지 않는다.
@@ -222,9 +237,10 @@ Generator는 Gate가 허용한 observation과 claim boundary만 받는다. raw �
 - interpretation의 citation coverage 100%
 - 금지 정규식/label과 개인정보 패턴
 
-### 독립 semantic 검사
+### 독립 semantic 검사 (필수, D-026)
 
-- 가능하면 별도 호출/독립 prompt(필요 시 다른 고정 모델)로 claim을 카드 `claim_boundary`, population, conditions, limitations와 비교한다.
+- **필수**: Generator와 분리된 별도 호출과 독립 prompt(가능하면 다른 고정 모델)로 claim을 카드 `claim_boundary`, population, conditions, limitations와 비교한다. Generator 호출 안의 자기확인이나 같은 대화 문맥 재사용은 검증으로 인정하지 않는다.
+- 구독 기반 모델 경로(D-019)에서 독립 호출을 구성할 수 없으면 RAG 분석 기능 전체를 보류한다. 코드 검사만으로 semantic 검증을 대체하지 않는다.
 - 출력은 `supported | too_strong | unsupported | safety_prohibited`와 reason code만 사용한다.
 - verifier에 추가 검색 도구를 주지 않아 사후 근거 창작을 막는다.
 
@@ -232,7 +248,9 @@ Generator는 Gate가 허용한 observation과 claim boundary만 받는다. raw �
 
 ## 10. Safety Validator와 위기 분기
 
-최종 후보를 [SAFETY_POLICY.md](SAFETY_POLICY.md)에 따라 검사한다. 즉각적 자해·타해·위기 신호가 감지되면 RAG 분석을 중단하고 versioned crisis flow로 전환한다. 진단 질문에는 근거를 검색해 진단을 시도하지 않는다.
+최종 후보를 [SAFETY_POLICY.md](SAFETY_POLICY.md)에 따라 검사한다. 즉각적 자해·타해·위기 신호가 감지되면 RAG 분석을 중단하고 한국 기준 versioned crisis flow로 전환한다(D-020). 진단 질문에는 근거를 검색해 진단을 시도하지 않는다.
+
+위기 감지 범위(D-020): Safety Validator와 `safety_signal`은 AI 대화 작성과 사용자가 명시 요청한 분석의 입력·출력에만 적용한다. 직접 작성 원문을 백그라운드에서 스캔하는 경로는 만들지 않으며, 이 한계는 UX 고지로 보완한다.
 
 Prompt injection 방어:
 

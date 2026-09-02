@@ -1,6 +1,8 @@
-schema_version: "1.0"
+schema_version: "1.1"
 graph_kind: directed_acyclic_work_graph
 source_of_truth: docs/AGENT_WORKFLOW.md
+# 2026-09-02 G1(D-018~D-027, 결함 I-10): privacy-hosting-spike를 4개 스파이크로 분해하고
+# limited-mvp-release 노드를 추가했다. 형식은 scripts/verify.mjs 파서(id/depends_on/gate 줄)를 따른다.
 
 statuses:
   allowed: [blocked, ready, in_progress, verifying, done]
@@ -14,27 +16,57 @@ nodes:
       - harness/runtime-profile.json
       - tasks/CURRENT_TASK.md
     outputs:
-      - verified repository and runtime facts
+      - verified repository and runtime facts (G0 baseline commit, G1 plan correction done)
       - preserved user changes inventory
       - provisional decision audit
     gate: bootstrap-facts
 
-  - id: privacy-hosting-spike
+  - id: hosting-identity-spike
     status: blocked
     depends_on: [bootstrap-audit]
     owns:
-      - docs/ARCHITECTURE.md
-      - docs/SAFETY_POLICY.md
-      - docs/DECISIONS.md
+      - docs/ARCHITECTURE.md §5, §6, §10 hosting/identity rows
+      - docs/DECISIONS.md hosting/identity decisions
     outputs:
-      - server-derived owner proof
-      - Sites sharing and secret boundary proof
-      - D1 CRUD, uniqueness, and deletion proof or approved alternative
+      - Sites sharing boundary and server identity proof or free-hosting alternative (D-021, D-025)
+      - secret isolation and custom-header CSRF proof
+      - mobile runtime baseline
     gate: security-foundation
+
+  - id: d1-data-spike
+    status: blocked
+    depends_on: [hosting-identity-spike]
+    owns:
+      - docs/DATA_MODEL.md §3 SQL-level contracts
+      - docs/DECISIONS.md storage decisions
+    outputs:
+      - D1 CRUD, uniqueness, conditional UPDATE completion, CHECK/trigger, batch atomicity, hard delete proof (D-024)
+      - retention/deletion vendor evidence (I-17)
+    gate: data-contract
+
+  - id: model-access-spike
+    status: blocked
+    depends_on: [bootstrap-audit]
+    owns:
+      - docs/AI_RAG_SPEC.md §1, §4 model access sections
+      - docs/DECISIONS.md model access decisions
+    outputs:
+      - subscription-based (non-paid) server-only model call path proof or AI hold (B-06 redefined, D-019)
+      - independent verifier call feasibility (D-026)
+    gate: model-access
+
+  - id: vector-search-spike
+    status: blocked
+    depends_on: [model-access-spike]
+    owns:
+      - docs/AI_RAG_SPEC.md §7 retrieval sections
+    outputs:
+      - retrieval layer query/filter/score/metadata proof on subscription or free path (B-07, I-09)
+    gate: retrieval-contract
 
   - id: app-scaffold
     status: blocked
-    depends_on: [privacy-hosting-spike]
+    depends_on: [hosting-identity-spike, d1-data-spike]
     owns:
       - package manifest and lockfile
       - application configuration
@@ -64,8 +96,8 @@ nodes:
       - versioned taxonomy data
       - character and color tokens
     outputs:
-      - complete transcription from both source images
-      - human or user review evidence
+      - complete transcription from both source images with per-category codes (D-022)
+      - time-separated double review or user review evidence (D-027)
     gate: source-fidelity
 
   - id: direct-journal
@@ -79,18 +111,6 @@ nodes:
       - complete direct journal flow
     gate: core-product
 
-  - id: ai-journal
-    status: blocked
-    depends_on: [direct-journal]
-    owns:
-      - journal conversation endpoint and schemas
-      - AI fallback UI
-      - synthetic dialogue evals
-    outputs:
-      - user-confirmed structured draft
-      - direct-entry fallback
-    gate: journal-ai
-
   - id: dashboard-reminder
     status: blocked
     depends_on: [direct-journal]
@@ -103,9 +123,33 @@ nodes:
       - in-app reminder
     gate: reflection-core
 
+  - id: limited-mvp-release
+    status: blocked
+    depends_on: [direct-journal, dashboard-reminder]
+    owns:
+      - limited release evidence bundle
+      - deployment checklist (AI paths disabled)
+    outputs:
+      - tested private mobile deployment of direct journal + deterministic dashboard (D-018)
+      - rollback and limitations including no AI and no automatic crisis scanning (D-020)
+    gate: limited-release
+
+  - id: ai-journal
+    status: blocked
+    depends_on: [direct-journal, model-access-spike]
+    owns:
+      - journal conversation endpoint and schemas
+      - AI fallback UI
+      - synthetic dialogue evals
+    outputs:
+      - user-confirmed structured draft
+      - direct-entry fallback
+      - safetySignal crisis handoff and signed turn history
+    gate: journal-ai
+
   - id: evidence-pipeline
     status: blocked
-    depends_on: [bootstrap-audit]
+    depends_on: [bootstrap-audit, vector-search-spike]
     owns:
       - evidence card schema and ingestion
       - approved evaluation corpus
@@ -128,7 +172,7 @@ nodes:
 
   - id: release-candidate
     status: blocked
-    depends_on: [ai-journal, rag-analysis]
+    depends_on: [limited-mvp-release, ai-journal, rag-analysis]
     owns:
       - release evidence bundle
       - deployment checklist
@@ -139,17 +183,35 @@ nodes:
 
 edges:
   - from: bootstrap-audit
-    to: privacy-hosting-spike
+    to: hosting-identity-spike
     reason: hosting and identity facts precede sensitive storage
+  - from: bootstrap-audit
+    to: model-access-spike
+    reason: subscription-based model access must be proven before any AI work (D-019)
   - from: bootstrap-audit
     to: taxonomy-v1
     reason: source assets must be verified before transcription
   - from: bootstrap-audit
     to: evidence-pipeline
-    reason: API and source-governance assumptions must be verified
-  - from: privacy-hosting-spike
+    reason: source-governance assumptions must be verified
+  - from: hosting-identity-spike
+    to: d1-data-spike
+    reason: storage spike runs inside the verified hosting boundary
+  - from: hosting-identity-spike
     to: app-scaffold
     reason: unsupported architecture must not be scaffolded
+  - from: d1-data-spike
+    to: app-scaffold
+    reason: data contract must be provable before migrations are written
+  - from: model-access-spike
+    to: vector-search-spike
+    reason: retrieval path depends on the same non-paid access decision
+  - from: model-access-spike
+    to: ai-journal
+    reason: AI journaling needs a verified model call path
+  - from: vector-search-spike
+    to: evidence-pipeline
+    reason: evidence ingestion format depends on the verified retrieval layer (I-10 missing edge)
   - from: app-scaffold
     to: data-foundation
     reason: migrations need an executable runtime
@@ -165,21 +227,30 @@ edges:
   - from: direct-journal
     to: dashboard-reminder
     reason: reflection uses completed records
+  - from: direct-journal
+    to: limited-mvp-release
+    reason: limited MVP ships direct journaling first (D-018)
+  - from: dashboard-reminder
+    to: limited-mvp-release
+    reason: limited MVP includes the deterministic dashboard (D-018)
   - from: dashboard-reminder
     to: rag-analysis
     reason: analysis begins with deterministic statistics
   - from: evidence-pipeline
     to: rag-analysis
     reason: generation cannot precede approved evidence
+  - from: limited-mvp-release
+    to: release-candidate
+    reason: full MVP extends the already-released limited MVP
   - from: ai-journal
     to: release-candidate
-    reason: both authoring modes are MVP requirements
+    reason: both authoring modes are full-MVP requirements
   - from: rag-analysis
     to: release-candidate
     reason: RAG safety gates must pass before full MVP release
 
 mutation_rule:
-  adding_or_removing_nodes: update docs/ROADMAP.md and docs/TRACEABILITY.md
+  adding_or_removing_nodes: update docs/ROADMAP.md, docs/TRACEABILITY.md, harness/quality-gates.yaml node_gates, docs/EVAL_PLAN.md §14
   changing_product_scope: user_approval_required
   changing_privacy_risk: user_approval_required
   changing_technical_hypothesis: evidence_and_decision_record_required
