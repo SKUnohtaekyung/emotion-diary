@@ -123,6 +123,13 @@ read-time guard(결함 I-16): 저장된 `status`만 믿지 않는다. 분석을 
 - 결과 반영은 job이 `leased`이고 lease가 유효할 때만 허용하며, 결과의 `draft_patch`는 별도 사용자 확인 없이는 diary에 적용하지 않는다.
 - 일기 원문은 payload에 그 턴에 필요한 범위만 들어가고, 완료 후 남지 않는다. worker 로그에도 payload를 남기지 않는다.
 
+### 3.9 `auth_failures` (D-032, ARCHITECTURE §6)
+
+- 단일 행(`id=1` CHECK): `fail_count`, `window_start`, `locked_until`.
+- 토큰 검증 실패 시 창(60초) 안이면 `fail_count+1`, 아니면 1로 초기화. 임계(10회) 도달 시 `locked_until`을 5분 뒤로 설정. 성공 시 0으로 초기화.
+- `locked_until`이 미래이면 토큰이 맞아도 429와 `Retry-After`를 반환한다. 원문·토큰 값은 저장하지 않는다.
+- 2026-09-02 원격 스파이크: 실패 10회 뒤 429, 잠금 중 올바른 토큰 429(`Retry-After: 300`), 카운터 초기화 후 200 확인. 배포 직후 첫 요청 1건이 이전 버전에서 처리된 것으로 보이는 off-by-one 관찰(전파 지연).
+
 ## 4. 감정 taxonomy
 
 원자료 이미지는 [../references/README.md](../references/README.md)의 파일이다. 구현용 taxonomy는 다음 필드를 갖는 versioned JSON/seed data로 만든다.

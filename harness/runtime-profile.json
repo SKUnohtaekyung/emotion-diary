@@ -26,12 +26,12 @@
     "target": "own backend on free cloud: Cloudflare Pages (static UI) + Workers (API) + D1 (D-032); fallback limited to free options such as Netlify+Turso (D-021)",
     "account_or_project_exists": "yes — user approved 2026-09-02; wrangler OAuth login by the user; spike Worker emotion-diary-spike (workers.dev) and D1 emotion-diary-spike (APAC) created, free plan, synthetic data only",
     "access_token_cookie_confirmed": "partial — local and remote workers.dev 2026-09-02 (401 without/wrong token, HMAC cookie HttpOnly/Secure/SameSite=Lax); phone not yet",
-    "rate_limit_confirmed": "unknown",
-    "cloudflare_access_free_applicable": "unknown",
+    "rate_limit_confirmed": "partial — Workers Rate Limiting binding deployed on free plan but never blocked (30 same-key calls across HKG/NRT; permissive per docs) → rejected; D1 global lockout adopted and verified remotely (10 fails → 429, correct token 429 while locked, Retry-After 300)",
+    "cloudflare_access_free_applicable": "unknown — Zero Trust free-plan user limit and workers.dev applicability not confirmed from fetched docs; JWT header Cf-Access-Jwt-Assertion + certs endpoint documented",
     "identity_header_available": "unknown",
     "custom_header_csrf_passthrough": "partial — local, remote (node fetch) and real desktop browser (Windows Chrome 152: with header 200, without header 403, session cookie round trip over HTTPS); phone browser not yet tested",
     "secrets_confirmed": "partial — 3 secrets registered via wrangler secret put, none in wrangler.toml or source; bundle/log scan not yet done",
-    "phone_access_confirmed": "unknown",
+    "phone_access_confirmed": "partial — iPhone iOS 18.7 KakaoTalk in-app WebView 2026-09-02: session 200, PUT with header reached DB (409 revision conflict vs desktop draft), PUT without header 403; Safari proper, home-screen standalone, Android Chrome not yet",
     "free_tier_limits_confirmed": "unknown"
   },
   "storage": {

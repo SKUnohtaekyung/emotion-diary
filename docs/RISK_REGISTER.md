@@ -9,7 +9,7 @@
 
 | ID | 위험 | 확률 | 영향 | 조기 신호/검증 | 완화 | fallback | 상태 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| RK-001 | 공개 URL의 Workers가 접근 토큰 하나에 의존해 brute force·설정 오류로 접근 경계가 무너짐 | medium | high | B-02 실패, 토큰 없는 요청에 데이터 응답 | 긴 무작위 토큰 해시 대조+rate limit+CSRF, Cloudflare Access 추가 검토(D-025, D-032) | 접근 경계 추가 또는 무료 private hosting(D-021) | open |
+| RK-001 | 공개 URL의 Workers가 접근 토큰 하나에 의존해 brute force·설정 오류로 접근 경계가 무너짐 | medium | high | B-02 실패, 토큰 없는 요청에 데이터 응답 | 긴 무작위 토큰 해시 대조+D1 전역 잠금(실패 10회/60초 → 5분)+CSRF, Cloudflare Access 추가 검토(D-025, D-032). 2026-09-02 원격 스파이크로 잠금 동작 확인 | 접근 경계 추가 또는 무료 private hosting(D-021) | open |
 | RK-002 | 서버 접근 토큰 또는 worker secret 유출·재사용으로 owner 데이터·큐 접근 | low | high | 토큰 로그 노출, cookie 속성 누락, secret이 wrangler.toml에 커밋 | Workers secret/PC `.env` 전용 보관, HttpOnly/Secure cookie, 회전 절차 | secret 회전 후 재감사 | open |
 | RK-003 | D1 batch/CHECK/trigger·concurrency·migration·무료 한도가 데이터 계약 미충족 | medium | high | 같은 날짜 중복, 부분 delete, TOCTOU, trigger 미지원, 한도 초과 | unique/조건부 UPDATE/batch/idempotency/백업 스파이크(D-024, B-04/B-05) | 무료 범위의 대체 DB(Turso 등) | open |
 | RK-004 | Web Push/background가 Pages/모바일에서 미지원·불안정 | high | medium | permission 후 실제 알림 없음, background 제한 | 제품 약속에서 분리, 실제 기기 검증 | 인앱 reminder만 MVP | open |
