@@ -20,6 +20,7 @@
 - **AI 경로(D-029, D-031)**: 유료 API 없이 PC의 worker가 백엔드 작업 큐를 가져가 Claude Code 헤드리스(`claude -p`)로 처리한다. 작성 보조는 Sonnet 5, 검증·분석은 Opus 5. PC가 꺼져 있으면 AI만 비활성이고 기록·대시보드는 동작한다.
 - **순서(D-018)**: 직접 작성+대시보드의 제한 MVP를 먼저 배포하고 AI 대화·RAG는 그 뒤.
 - **안전(D-020)**: 위기 감지는 AI 관여 경로에서만, 직접 작성 원문은 자동 스캔하지 않으며 한계를 고지. 위기 리소스는 한국 기준.
+- **디자인 시스템(D-033, provisional)**: 원자료 7색 계열의 토큰, chip 중심 강조, 접근성 대비 자동 검사. 정본 `docs/DESIGN_SYSTEM.md`, 값 `design/tokens.json`. 사용자 시각 검수 대기.
 
 ## 3. 스파이크로 확인된 것 (2026-09-02)
 
@@ -38,13 +39,14 @@
 
 ## 4. 다음 할 일 (우선순위 순)
 
-1. **G3 taxonomy v1 전사**: 원자료 이미지 2장의 세부 감정을 카테고리별 code(D-022)로 전사하고 시간 분리 2회 검수 또는 사용자 최종 대조(D-027). 직접 작성 화면의 선행 조건.
-2. **Phase 1 app-scaffold**: Workers API, D1 migration(현재 스파이크 스키마 기반), 재현 가능한 install, lint/typecheck/test/build 명령, CI. `package.json`의 하네스 명령과 연결.
-3. **data-foundation**: 하루 1개 unique, revision/idempotency, hard delete(부모 우선 cascade), versioned JSON export, 합성 fixture 테스트.
-4. **direct-journal → dashboard-reminder → 제한 MVP 릴리스**: 원형 6영역 직접 작성, autosave, 완료조건, 달력/상세/수정, 7/30일 통계, 인앱 reminder, 실기기·접근성 검증.
-5. **B-06 잔여 검증**(병렬 가능): job 만료·`failed` 전환, verifier 독립 2회 호출, 위기 케이스, 구독 경로의 데이터 보존 설정, 기동 오버헤드 절감.
-6. **B-05/B-08 잔여**: 백업 절차와 삭제 지연 고지 문구, iPhone Safari 본체·홈 화면 바로가기·Android Chrome 확인, 무료 한도 수치 기록.
-7. **후행**: Phase 3 AI 대화 작성(`safetySignal`, turn token), Phase 5 Evidence 공급망과 RAG 분석(B-07 포함).
+1. **디자인 시스템 검수**: 스타일 가이드 미리보기에서 7개 감정 색·chip·강도 선택기·달력 상태를 확인하고 D-033을 accepted로 전환. 캐릭터 아이콘 자산은 taxonomy 검수와 함께 제작.
+2. **G3 taxonomy v1 전사**: 원자료 이미지 2장의 세부 감정을 카테고리별 code(D-022)로 전사하고 시간 분리 2회 검수 또는 사용자 최종 대조(D-027). 직접 작성 화면의 선행 조건.
+3. **Phase 1 app-scaffold**: Workers API, D1 migration(현재 스파이크 스키마 기반), 재현 가능한 install, lint/typecheck/test/build 명령, CI. `package.json`의 하네스 명령과 연결.
+4. **data-foundation**: 하루 1개 unique, revision/idempotency, hard delete(부모 우선 cascade), versioned JSON export, 합성 fixture 테스트.
+5. **direct-journal → dashboard-reminder → 제한 MVP 릴리스**: 원형 6영역 직접 작성, autosave, 완료조건, 달력/상세/수정, 7/30일 통계, 인앱 reminder, 실기기·접근성 검증.
+6. **B-06 잔여 검증**(병렬 가능): job 만료·`failed` 전환, verifier 독립 2회 호출, 위기 케이스, 구독 경로의 데이터 보존 설정, 기동 오버헤드 절감.
+7. **B-05/B-08 잔여**: 백업 절차와 삭제 지연 고지 문구, iPhone Safari 본체·홈 화면 바로가기·Android Chrome 확인, 무료 한도 수치 기록.
+8. **후행**: Phase 3 AI 대화 작성(`safetySignal`, turn token), Phase 5 Evidence 공급망과 RAG 분석(B-07 포함).
 
 ## 5. 알려진 제한
 

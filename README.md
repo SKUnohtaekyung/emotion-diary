@@ -41,6 +41,7 @@ Phase 0 부트스트랩 단계입니다. 제품·데이터·AI·안전 명세와
 | 시스템 경계·배포·신뢰 경계 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
 | 저장 구조·무결성·삭제·내보내기 | [docs/DATA_MODEL.md](docs/DATA_MODEL.md) |
 | 화면·직접 작성·AI 작성 흐름 | [docs/UX_SPEC.md](docs/UX_SPEC.md) |
+| 색·글자·구성요소·접근성 | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md), [design/tokens.json](design/tokens.json) |
 | AI·RAG·근거·검증기 | [docs/AI_RAG_SPEC.md](docs/AI_RAG_SPEC.md) |
 | 금지 출력·위기·개인정보 정책 | [docs/SAFETY_POLICY.md](docs/SAFETY_POLICY.md) |
 | 테스트·평가·출시 게이트 | [docs/EVAL_PLAN.md](docs/EVAL_PLAN.md) |

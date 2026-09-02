@@ -20,7 +20,7 @@ const required = [
   "docs/ARCHITECTURE.md", "docs/DATA_MODEL.md", "docs/UX_SPEC.md",
   "docs/AI_RAG_SPEC.md", "docs/SAFETY_POLICY.md", "docs/EVAL_PLAN.md",
   "docs/AGENT_WORKFLOW.md", "docs/DECISIONS.md", "docs/ROADMAP.md",
-  "docs/RISK_REGISTER.md", "docs/TRACEABILITY.md", "docs/STATUS.md", "tasks/CURRENT_TASK.md", "tasks/TASK_TEMPLATE.md",
+  "docs/RISK_REGISTER.md", "docs/TRACEABILITY.md", "docs/STATUS.md", "docs/DESIGN_SYSTEM.md", "design/tokens.json", "scripts/check-contrast.mjs", "tasks/CURRENT_TASK.md", "tasks/TASK_TEMPLATE.md",
   "references/README.md", "references/manifest.json", "harness/README.md", "harness/work-graph.yaml", "harness/quality-gates.yaml",
   "harness/runtime-profile.json", "harness/runtime-profile.template.json", "harness/loop-state.json", "scripts/claude-stop-hook.mjs", "schemas/README.md",
   "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json",
@@ -64,7 +64,7 @@ for (const absolute of files) {
   }
 }
 
-for (const jsonFile of ["package.json", ".claude/settings.json", "harness/runtime-profile.json", "harness/runtime-profile.template.json", "harness/loop-state.json", "references/manifest.json", "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json", "schemas/evidence-card.schema.json", "schemas/analysis-output.schema.json", "schemas/export.schema.json"]) {
+for (const jsonFile of ["package.json", "design/tokens.json", ".claude/settings.json", "harness/runtime-profile.json", "harness/runtime-profile.template.json", "harness/loop-state.json", "references/manifest.json", "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json", "schemas/evidence-card.schema.json", "schemas/analysis-output.schema.json", "schemas/export.schema.json"]) {
   const absolute = path.join(root, jsonFile);
   if (!fs.existsSync(absolute)) continue;
   try { JSON.parse(fs.readFileSync(absolute, "utf8")); }
@@ -129,6 +129,13 @@ function visit(node) {
   visited.add(node);
 }
 for (const node of nodes.keys()) visit(node);
+
+// 디자인 토큰 대비 검사(DESIGN_SYSTEM §8)
+if (fs.existsSync(path.join(root, "scripts/check-contrast.mjs"))) {
+  const contrast = spawnSync(process.execPath, [path.join(root, "scripts/check-contrast.mjs")], { cwd: root, encoding: "utf8" });
+  if (contrast.status !== 0) failures.push(`디자인 토큰 대비 검사 실패: ${(contrast.stdout + contrast.stderr).trim().split(/?
+/).slice(-3).join(" | ")}`);
+}
 
 const loopState = JSON.parse(fs.readFileSync(path.join(root, "harness/loop-state.json"), "utf8"));
 if (!nodes.has(loopState.next_node)) failures.push(`loop-state의 알 수 없는 next_node: ${loopState.next_node}`);

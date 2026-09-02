@@ -88,6 +88,52 @@
 
 ---
 
+# TASK-DESIGN — 디자인 시스템 검수와 확정 (새 세션 인계)
+
+## 상태
+
+`ready` — 2026-09-02 사용자 요청("디자인 시스템 잡아야 할 것 같다", "새 세션에서 대화하며 정하고, 프리뷰로 계속 확인하고 싶다"). D-033은 provisional이며 사용자 시각 검수로 accepted 전환이 목표다.
+
+## 정본과 산출물
+
+- 정본: `docs/DESIGN_SYSTEM.md`(원칙·색·글자·간격·구성요소·접근성·금지 사항), 값: `design/tokens.json`, 대비 검사: `scripts/check-contrast.mjs`(quick 하네스에 포함, 60건).
+- 시각 미리보기(저장소): `design/style-guide.html`. 로컬 서버 `node scripts/preview.mjs 4173` → `http://localhost:4173/`. Claude Code 브라우저 pane에서는 `.claude/launch.json`의 `design-preview` 구성을 `preview_start`로 열면 된다.
+- 시각 미리보기(공유 링크, 같은 내용): https://claude.ai/code/artifact/8673a33c-900c-4273-8592-0fb3bdcc36a9 — 새 세션에서 갱신하려면 Artifact 도구에 `url`로 이 주소를 넘겨 재발행한다(먼저 `read`).
+
+## 새 세션 작업 루프
+
+1. 사용자와 항목별로 대화해 결정한다(아래 체크리스트). 결정은 `docs/DECISIONS.md` D-033 행 갱신(또는 D-034+ 신규)과 `docs/DESIGN_SYSTEM.md`·`design/tokens.json`에 같은 commit으로 반영한다.
+2. 값을 바꾸면 `node scripts/check-contrast.mjs --verbose`로 대비를 확인하고, `design/style-guide.html`의 `:root` 토큰과 dark-panel 인라인 값을 함께 고친다(현재 미리보기는 tokens.json을 자동 로드하지 않는다 — 자동화는 아래 후속).
+3. 미리보기를 다시 열어 사용자가 확인하게 한다: 브라우저 pane(`design-preview`)과 Artifact 재발행(위 URL). 휴대폰 확인이 필요하면 Artifact 링크를 공유한다.
+4. `npm run verify:quick` → commit → `git push origin main`.
+
+## 결정 체크리스트 (사용자와 정할 것)
+
+- [ ] 7개 감정 색 계열이 원자료 인상과 맞는가(특히 기쁨 노랑의 강조 700, 미움 남보라의 채도)
+- [ ] chip 규칙(100 fill / 300 border / 900 text)과 선택 표시(2px 500 + 체크)가 충분히 구분되는가
+- [ ] 카테고리 토글 형태(가로 스크롤 chip vs 2줄 격자)와 캐릭터 아이콘 제작 방식(단색 아이콘 vs 원본 재가공)
+- [ ] 강도 선택기: 2줄 세그먼트 vs 슬라이더+숫자 병행, 앵커 문구 위치
+- [ ] 글꼴: Pretendard 웹폰트 self-host 여부(용량·라이선스) vs 시스템 글꼴만
+- [ ] 다크 모드: MVP에 포함할지, 시스템 설정만 따를지
+- [ ] 달력 셀·기록 카드·대시보드 카드의 밀도(간격 4pt 단계 확인)
+- [ ] 위기 안내 문구 톤과 연락처 표기 형식(연락처 값은 검수 후)
+- [ ] 하단 탐색 4개 이름과 아이콘 스타일(선/면)
+- [ ] 브랜드 요소: 앱 이름 표기, 로고/워드마크 필요 여부
+
+## 후속 작업(선택)
+
+- `design/style-guide.html`이 `design/tokens.json`을 fetch해 CSS 변수를 생성하도록 바꾸면 값 이중 관리가 사라진다(Artifact는 외부 fetch가 막히므로 발행 시 인라인 필요).
+- 캐릭터 단색 아이콘 7종(`design/characters/`)은 taxonomy v1 검수와 함께 제작.
+- 실기기(iPhone Safari·Android Chrome)에서 chip 대비와 44px 터치 영역 확인.
+
+## 체크포인트
+
+- 완료(2026-09-02): D-033 provisional, DESIGN_SYSTEM/tokens/check-contrast/style-guide 작성, quick 하네스에 대비 검사 통합, README·UX §8·TRACEABILITY·STATUS 연결, Artifact 발행.
+- 다음: 새 세션에서 위 체크리스트를 사용자와 하나씩 결정.
+- 주의: 색의 의미(어떤 계열이 어떤 감정인지)는 원자료를 따르므로 사용자 승인 없이 바꾸지 않는다(PR-010). 감정 색으로 위험·순위를 표현하지 않는다.
+
+---
+
 # 보류 기록: TASK-BOOTSTRAP — 현재 프로젝트 기술 감사와 구현 기반 확정
 
 ## 상태
