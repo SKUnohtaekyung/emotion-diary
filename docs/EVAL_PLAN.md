@@ -21,11 +21,11 @@
 | --- | --- | --- |
 | quick harness | 문서·링크·secret·conflict·필수 구조 | 매 변경/Claude Stop hook |
 | unit | schema, 날짜, 통계, Gate code rule, export | 관련 코드 변경 |
-| integration | server auth, SQLite 원자적 statement/trigger, 모델 접근 어댑터(후행), idempotency | PR/작업 완료 |
+| integration | server auth, D1 조건부 statement/batch/trigger, 모델 접근 어댑터(후행), idempotency | PR/작업 완료 |
 | browser E2E | 직접/AI 작성, 저장, dashboard, delete/export | PR/릴리스 |
 | mobile/accessibility | 실제 Safari/Chrome, keyboard/screen reader | 릴리스 후보 |
 | AI eval | 고정 대화/RAG/safety dataset | model/prompt/Evidence 변경 |
-| deployment audit | 자체 호스팅 노출·secret·log·백업·rollback | 배포마다 |
+| deployment audit | Workers 접근 경계·secret·log·백업·rollback | 배포마다 |
 
 전체 명령은 [../harness/quality-gates.yaml](../harness/quality-gates.yaml)에 실제 stack을 확인한 뒤 채운다.
 
@@ -34,13 +34,13 @@
 | ID | 검증 | 합격 증거 | 실패 시 |
 | --- | --- | --- | --- |
 | B-01 | 실제 저장소/runtime | `runtime-profile.json`에 명령 출력과 버전 | stack 추측 금지 |
-| B-02 | 자체 호스팅 접근 경계(D-030) | 서버가 사설망 인터페이스에만 bind, 사설망 밖 접속 실패, 접근 토큰 없는/틀린 요청 401, 토큰 cookie 속성 확인, identity 헤더가 있으면 허용 목록 대조(D-025) | 접근 경계 추가 또는 무료 private hosting 대안(D-021) |
-| B-03 | 서버 비밀값·CSRF | `.env` 비밀값이 client bundle/source/log에 없음, custom header 없는 변경 요청 403(D-025), 휴대폰 브라우저 실제 요청으로 확인 | 배포 차단 |
-| B-04 | 로컬 SQLite | CRUD, unique, 조건부 UPDATE 완료 전환, CHECK/trigger, transaction 원자성/부분실패, WAL, migration, hard delete+VACUUM 스파이크(D-024) | 무료 대체 DB 결정 |
-| B-05 | 보존/삭제/백업 | SQLite 파일 위치·권한, 백업 방법·주기, 백업본 삭제 반영 지연, Claude 구독 경로의 데이터 정책을 사용자 고지 가능한 범위로 문서화(결함 I-17) | 백업 약속 축소 |
-| B-06 | 구독 기반 모델 호출 경로(재정의, D-019/D-029) | 유료 API 없이 본인 PC의 `claude -p`를 구독 로그인으로 server-only 호출, strict schema 출력, 보존 통제, refusal/incomplete/timeout 처리가 가능함을 실제 호출로 증명. Verifier용 독립 2회 호출, 10회 반복 지연 p95, 구독 한도 영향 포함(D-026). 2026-09-02 최소 스파이크 1회 PASS(합성 입력, 15초) — 나머지 항목은 미검증 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
+| B-02 | Workers 접근 경계(D-032) | 접근 토큰 없는/틀린 요청 401, 실패 시도 rate limit, 토큰 cookie 속성(HttpOnly/Secure/SameSite) 확인, Cloudflare Access 무료 적용 가능 여부와 identity 헤더 허용 목록 대조(D-025) | 접근 경계 추가 또는 무료 private hosting 대안(D-021) |
+| B-03 | 서버 비밀값·CSRF | Workers secret이 client bundle/source/log/`wrangler.toml`에 없음, custom header 없는 변경 요청 403(D-025), worker 전용 경로는 Bearer secret만 허용, 휴대폰 브라우저 실제 요청으로 확인 | 배포 차단 |
+| B-04 | Cloudflare D1 | CRUD, unique, 조건부 UPDATE 완료 전환, CHECK/trigger, `batch()` 원자성/부분실패, migration(wrangler), hard delete 스파이크(D-024), 무료 한도·미사용 정지 없음 확인 | 무료 대체 DB 결정(예: Turso) |
+| B-05 | 보존/삭제/백업 | D1 저장 지역·암호화, Time Travel 무료 범위, worker export 백업 주기, 백업본 삭제 반영 지연, Claude 구독 경로의 데이터 정책을 사용자 고지 가능한 범위로 문서화(결함 I-17) | 백업 약속 축소 |
+| B-06 | 구독 기반 모델 호출 경로(재정의, D-019/D-029) | 유료 API 없이 본인 PC의 `claude -p`를 구독 로그인으로 server-only 호출, strict schema 출력, 보존 통제, refusal/incomplete/timeout 처리가 가능함을 실제 호출로 증명. Verifier용 독립 2회 호출, 10회 반복 지연 p95, 구독 한도 영향 포함(D-026). PC worker의 `ai_jobs` lease→호출→결과 반환 왕복과 PC 꺼짐 시 job 만료+직접 작성 fallback(D-032). 2026-09-02 최소 스파이크 1회 PASS(합성 입력, Opus 15초/Sonnet 8초) — 나머지 항목은 미검증 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
 | B-07 | 검색 계층 | 구독/무료 경로에서 query/filter/score/metadata, one-card-one-file, chunk 반환 시 source span 대조, 배열 attribute(topicCodes) 매핑 검증(결함 I-09) | retrieval 대안 결정 또는 RAG 보류 |
-| B-08 | 모바일 runtime | iPhone Safari/Android Chrome이 사설망으로 로컬 서버에 접속해 저장·조회 기본 동작, 홈 화면 바로가기 동작 | framework/무료 hosting 교체 |
+| B-08 | 모바일 runtime | iPhone Safari/Android Chrome이 Pages/Workers에 접속해 토큰 입력·저장·조회 기본 동작, 홈 화면 바로가기 동작 | framework/무료 hosting 교체 |
 
 `unknown`은 pass가 아니다. B-06/B-07은 RAG 트랙이며 제한 MVP(D-018)의 critical path에 있지 않다. 현재 제품 핵심과 양립하지 않는 후보 기술은 [DECISIONS.md](DECISIONS.md)에서 reject하고 그래프를 수정한다.
 
@@ -195,7 +195,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | 로그 최소화 | 일기/이유/email/token가 정상·오류 로그에 등장 | 0건 |
 | CSRF/XSS/input | state change와 diary rendering 공격 | 성공 0건 |
 | PHI 경계 | 의료기록 용도 유도 | 제한을 정확히 고지하고 임상 기능으로 확장 안 함 |
-| 자체 호스팅 노출 | 공개 인터페이스 bind, 사설망 밖 접속, 토큰 없는 접속, 정적 asset·log 경로 | 민감 content 노출 0건 |
+| 공개 URL 노출 | 토큰 없는 접속, 토큰 brute force, worker secret 없는 큐 접근, 정적 asset·log 경로 | 민감 content 노출 0건, 큐 lease/결과 반영 성공 0건 |
 
 의존성 scanner의 critical/high known vulnerability는 0을 요구한다. 예외는 악용 불가 근거, 완화, 만료일, owner가 있는 Decision 없이는 허용하지 않는다.
 
@@ -205,7 +205,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 
 - 1년 분량 합성 diary에서 save/dashboard p50/p95와 DB query count.
 - AI/RAG latency p50/p95, timeout, token과 요청당 비용, cache/idempotency 효과.
-- API 429/5xx/timeout, SQLite 잠금/일시 실패, browser offline에서 데이터 유실/중복이 없는지.
+- API 429/5xx/timeout, D1 일시 실패, PC worker 부재, browser offline에서 데이터 유실/중복이 없는지.
 - 연속 100회 duplicate submit 및 20개 동시 같은-date 요청에서 unique invariant 유지.
 - 분석 기능 장애 중 직접 작성·저장·dashboard가 유지되는지.
 - 비용 한도 도달 시 진단적/무근거 fallback 없이 분석만 보류되는지.
@@ -238,7 +238,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 4. iPhone Safari/Android Chrome와 접근성 수동 기록
 5. AI journal dataset/version/result와 human rubric
 6. Evidence manifest/hash/review, retrieval baseline, RAG/verifier/safety eval run
-7. 보안·개인정보·호스팅 노출·secret/log/백업 점검
+7. 보안·개인정보·공개 URL 노출·secret/log/백업 점검
 8. 성능·비용·rate-limit/장애 결과
 9. 열린 결함, 알려진 제한, rollback 방법, 승인자
 
@@ -251,7 +251,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 - 차단/높음 결함 0.
 - taxonomy 원자료 대조 완료.
 - RAG 절대 gate와 안전/보안 절대 gate 통과.
-- 실제 자체 호스팅/대체 hosting의 접근·저장·secret·보존 경계 승인.
+- 실제 Cloudflare/대체 hosting의 접근·저장·secret·보존 경계 승인.
 - 미지원 기능과 데이터 한계가 UI/고지에 정확히 반영.
 
 제한 MVP 릴리스(D-018)는 기본 계획이다. `direct journal + deterministic dashboard` 제한 릴리스는 §14의 `limited-release` 게이트(권한·개인정보·데이터 무결성·모바일·배포 경계)를 모두 통과해야 하며, AI 경로가 비활성임을 UI가 정확히 표시해야 한다. 권한·개인정보·데이터 무결성이 미달이면 축소 출시도 불가하다. AI 대화·RAG는 그 뒤 `release` 게이트에서 추가된다.

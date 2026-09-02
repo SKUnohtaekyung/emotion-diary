@@ -28,20 +28,20 @@ nodes:
       - docs/ARCHITECTURE.md §5, §6, §10 hosting/identity rows
       - docs/DECISIONS.md hosting/identity decisions
     outputs:
-      - self-hosted server bound to private network only, phone access via free private network (D-030, D-021)
-      - access-token cookie boundary, secret isolation and custom-header CSRF proof (D-025)
+      - Cloudflare Pages/Workers minimal deployment with access-token cookie boundary (D-032, D-021)
+      - Workers secret isolation, custom-header CSRF and worker-only Bearer route proof (D-025)
       - mobile runtime baseline
     gate: security-foundation
 
-  - id: local-data-spike
+  - id: data-store-spike
     status: blocked
     depends_on: [hosting-identity-spike]
     owns:
       - docs/DATA_MODEL.md §3 SQL-level contracts
       - docs/DECISIONS.md storage decisions
     outputs:
-      - local SQLite CRUD, uniqueness, conditional UPDATE completion, CHECK/trigger, transaction atomicity, hard delete + VACUUM proof (D-024)
-      - owner-managed backup and deletion procedure (I-17)
+      - D1 CRUD, uniqueness, conditional UPDATE completion, CHECK/trigger, batch atomicity, hard delete proof (D-024)
+      - Time Travel/export backup and deletion procedure, free-tier limits (I-17)
     gate: data-contract
 
   - id: model-access-spike
@@ -51,7 +51,8 @@ nodes:
       - docs/AI_RAG_SPEC.md §1, §4 model access sections
       - docs/DECISIONS.md model access decisions
     outputs:
-      - subscription-based (non-paid) server-only model call path proof or AI hold (B-06 redefined, D-019)
+      - subscription-based (non-paid) claude -p path proof: minimal spike PASS 2026-09-02 (D-029, D-031)
+      - PC worker ai_jobs lease/result round trip and offline fallback (D-032)
       - independent verifier call feasibility (D-026)
     gate: model-access
 
@@ -66,7 +67,7 @@ nodes:
 
   - id: app-scaffold
     status: blocked
-    depends_on: [hosting-identity-spike, local-data-spike]
+    depends_on: [hosting-identity-spike, data-store-spike]
     owns:
       - package manifest and lockfile
       - application configuration
@@ -195,12 +196,12 @@ edges:
     to: evidence-pipeline
     reason: source-governance assumptions must be verified
   - from: hosting-identity-spike
-    to: local-data-spike
+    to: data-store-spike
     reason: storage spike runs inside the verified hosting boundary
   - from: hosting-identity-spike
     to: app-scaffold
     reason: unsupported architecture must not be scaffolded
-  - from: local-data-spike
+  - from: data-store-spike
     to: app-scaffold
     reason: data contract must be provable before migrations are written
   - from: model-access-spike

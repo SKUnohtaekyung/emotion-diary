@@ -23,22 +23,24 @@
     "language": "JavaScript/TypeScript candidate; not selected"
   },
   "hosting": {
-    "target": "self-hosted on the owner's PC (Node server + local SQLite), phone via free private network such as Tailscale (D-030); fallback limited to free options (D-021)",
-    "private_network_tool": "not selected yet (Tailscale candidate)",
-    "server_bind_private_only_confirmed": "unknown",
+    "target": "own backend on free cloud: Cloudflare Pages (static UI) + Workers (API) + D1 (D-032); fallback limited to free options such as Netlify+Turso (D-021)",
+    "account_or_project_exists": "unknown (external resource; re-confirm with user before creating)",
     "access_token_cookie_confirmed": "unknown",
+    "rate_limit_confirmed": "unknown",
+    "cloudflare_access_free_applicable": "unknown",
     "identity_header_available": "unknown",
     "custom_header_csrf_passthrough": "unknown",
-    "secrets_confirmed": "unknown",
-    "phone_access_confirmed": "unknown"
+    "secrets_confirmed": "unknown (wrangler secret)",
+    "phone_access_confirmed": "unknown",
+    "free_tier_limits_confirmed": "unknown"
   },
   "storage": {
-    "diary_database": "local SQLite file (node:sqlite or better-sqlite3 candidate, D-030)",
-    "driver_selected": "unknown",
+    "diary_database": "Cloudflare D1 (SQLite-compatible, D-032)",
     "conditional_update_and_check_confirmed": "unknown",
     "trigger_support_confirmed": "unknown",
-    "transaction_atomicity_confirmed": "unknown",
-    "backup_and_deletion_confirmed": "unknown (owner-managed backup procedure to define, I-17)",
+    "batch_atomicity_confirmed": "unknown",
+    "backup_and_deletion_confirmed": "unknown (Time Travel free scope + worker export, I-17)",
+    "ai_jobs_queue_round_trip_confirmed": "unknown (PC worker, D-032)",
     "evidence_store": "not selected; paid Vector Store excluded by D-019"
   },
   "model_access": {
@@ -75,9 +77,10 @@
     "references/manifest.json SHA-256 verification is enforced by scripts/verify.mjs"
   ],
   "unknowns": [
-    "Application framework, private-network tool, phone access to local server (B-08, G2a)",
-    "Server bind to private interface only, access-token cookie, custom-header CSRF from phone browser (B-02/B-03, G2a)",
-    "SQLite driver choice, conditional UPDATE/CHECK/trigger/transaction behavior, backup and deletion procedure (B-04/B-05, G2b)",
+    "Cloudflare Pages/Workers minimal deployment, phone access, free-tier limits (B-08, G2a)",
+    "Access-token cookie, rate limit, Cloudflare Access applicability, custom-header CSRF from phone browser, worker-only Bearer route (B-02/B-03, G2a)",
+    "D1 conditional UPDATE/CHECK/trigger/batch behavior, wrangler migration, Time Travel/export backup (B-04/B-05, G2b)",
+    "PC worker ai_jobs lease/result round trip and offline fallback (B-06, G2c)",
     "claude -p subscription path remaining checks: retention/training settings, independent verifier call, latency p95 over 10 runs, subscription quota impact, crisis-signal cases (B-06, G2c)",
     "Retrieval layer on subscription or free path (B-07, G2d)",
     "Web Push and PWA support"

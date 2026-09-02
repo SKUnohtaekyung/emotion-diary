@@ -2,17 +2,17 @@
   "schema_version": "1.0",
   "task_id": "TASK-BOOTSTRAP",
   "phase": "spike-preparation",
-  "iteration": 3,
+  "iteration": 4,
   "status": "in_progress",
-  "current_hypothesis": "Self-hosted single-user deployment on the owner's PC (D-030) with subscription-based claude -p model access (D-029, Sonnet 5 for journaling, Opus 5 for verifier/RAG per D-031) can pass G2a/G2b spikes; the limited MVP ships first (D-018).",
+  "current_hypothesis": "Own backend on free cloud (Cloudflare Pages + Workers + D1, access-token cookie, D-032) with a PC-side AI worker pulling ai_jobs and calling claude -p on the Claude subscription (D-029, D-031) can pass G2a/G2b/G2c spikes; the limited MVP ships first (D-018).",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "bc6cb85",
+  "last_verified_commit": "02dadf0",
   "completed_nodes": [],
   "next_node": "bootstrap-audit",
   "blockers": [
-    "G2c remaining: retention/training settings of the subscription path, independent verifier double call, latency p95 over 10 runs, subscription quota, crisis-signal cases (RK-016)",
-    "User is evaluating a hybrid alternative (Netlify + Supabase for the web app, PC-side claude -p worker for AI); if chosen it supersedes parts of D-030 as a new decision"
+    "G2a: Cloudflare account/project creation is an external resource (free); re-confirm with the user right before creating it",
+    "G2c remaining: ai_jobs queue round trip with the PC worker, retention/training settings, independent verifier double call, latency p95 over 10 runs, subscription quota, crisis-signal cases (RK-016)"
   ],
-  "last_checkpoint": "2026-09-02 D-030 accepted (self-hosted PC + SQLite + private network), D-031 model choice (Sonnet 5 journaling / Opus 5 verifier+RAG; Haiku rejected after real runs). Docs, PRD PR-002, README, EVAL, RISK, ROADMAP, work-graph (local-data-spike), runtime-profile updated. Next: G2a hosting-identity-spike on local server unless the user switches to the Netlify+Supabase hybrid."
+  "last_checkpoint": "2026-09-02 D-032 accepted (Cloudflare Pages/Workers/D1 + PC AI worker via ai_jobs queue); D-030 superseded. PRD, README, ARCHITECTURE (§4.6 worker, §5 job routes), DATA_MODEL §3.8 ai_jobs, SAFETY, EVAL B-02~B-08, RISK (RK-001/002/003/010/018 rewritten, RK-019 new), ROADMAP, TRACEABILITY, work-graph (data-store-spike), runtime-profile updated. Next: G2a hosting-identity-spike on Cloudflare after user re-confirms project creation; G3 taxonomy-v1 in parallel."
 }

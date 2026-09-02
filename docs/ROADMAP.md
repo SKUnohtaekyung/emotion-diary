@@ -10,9 +10,9 @@
 
 - 실제 stack/git/hosting/Node/package manager/runtime profile 확인 — G0 Git baseline(D-017)과 G1 계획 교정(D-018~D-027) 완료
 - 원자료 보존과 taxonomy 전사 계획 확정
-- G2a `hosting-identity-spike`(D-030): 본인 PC Node 서버를 사설망 인터페이스에만 bind, Tailscale로 휴대폰 접속, 접근 토큰 cookie, secret 격리, custom header CSRF, 모바일 runtime(B-02/B-03/B-08). 외부 유료 자원 생성 없음
-- G2b `local-data-spike`: 로컬 SQLite CRUD, unique, 조건부 UPDATE, CHECK/trigger, transaction 원자성, WAL, hard delete+VACUUM, 백업 절차(B-04/B-05)
-- G2c `model-access-spike`(RAG 트랙, critical path 밖): 본인 PC `claude -p` 구독 경로(D-029). 최소 스파이크 PASS(2026-09-02). 남은 검증: 보존/학습 설정, 독립 verifier 2회 호출, 10회 지연 p95, 구독 한도, 위기 신호 케이스
+- G2a `hosting-identity-spike`(D-032): Cloudflare Pages/Workers 최소 배포, 접근 토큰 cookie+rate limit, Workers secret 격리, custom header CSRF, worker 전용 Bearer 경로, 휴대폰 접속(B-02/B-03/B-08). Cloudflare 계정·프로젝트 생성은 무료지만 외부 자원이므로 실행 직전 사용자 재확인
+- G2b `data-store-spike`: D1 CRUD, unique, 조건부 UPDATE, CHECK/trigger, `batch()` 원자성, wrangler migration, hard delete, Time Travel/export 백업, 무료 한도(B-04/B-05)
+- G2c `model-access-spike`(RAG 트랙, critical path 밖): 본인 PC `claude -p` 구독 경로(D-029). 최소 스파이크 PASS(2026-09-02). 남은 검증: PC worker의 `ai_jobs` 큐 왕복(D-032), 보존/학습 설정, 독립 verifier 2회 호출, 10회 지연 p95, 구독 한도, 위기 신호 케이스
 - G2d `vector-search-spike`(RAG 트랙): 구독/무료 경로의 검색 계층 검증(B-07)
 - G3 taxonomy-v1 전사+D-027 검수(G2와 병렬 가능)
 - quality gates를 실제 명령으로 채우고 quick/full 통과
@@ -90,7 +90,7 @@ Exit: false pass 0, unsupported claim 0, citation validity 100% 등 [EVAL_PLAN.m
 
 제한 MVP 릴리스에 Phase 3·5를 더한 `release-candidate`다. 아래 항목은 제한 MVP 릴리스에서 이미 수행한 것을 AI 경로 포함으로 재실행한다.
 
-- 자체 호스팅 노출·비밀값·로그·백업 재감사
+- 공개 URL 노출·비밀값·로그·백업 재감사
 - iPhone Safari/Android Chrome 실제 기기 검증
 - 성능/비용/rate limit/장애 복구 시험
 - 개인정보 고지, 데이터 export/delete, 위기 문구 검토

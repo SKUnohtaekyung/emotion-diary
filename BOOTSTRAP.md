@@ -20,7 +20,7 @@
 
 ### 근거가 있으면 에이전트가 교정할 수 있는 기술 가설
 
-- 선택한 hosting/DB(현재 D-030: 본인 PC 자체 호스팅+SQLite)가 민감한 개인 일기의 실제 배포 요구를 충족하는지
+- 선택한 hosting/DB(현재 D-032: Cloudflare Pages/Workers+D1, AI는 PC worker)가 민감한 개인 일기의 실제 배포 요구를 충족하는지
 - hosting의 접근 제한을 MVP의 계정 경계로 사용할 수 있는지
 - 현재 SDK/API의 이름, 파라미터, 한도, 보존 설정
 - Web Push/PWA/background 작업 지원 여부

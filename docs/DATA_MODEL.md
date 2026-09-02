@@ -40,7 +40,7 @@ DB 불변조건:
 
 - `UNIQUE(owner_key, entry_date)` — draft와 completed를 합쳐 하루 한 기록.
 - `status`는 `CHECK (status IN ('draft','completed'))`, completed 행은 `CHECK (status <> 'completed' OR (first_completed_at IS NOT NULL AND completed_at IS NOT NULL AND first_completed_local_date IS NOT NULL))`.
-- 완료 전환은 저장소의 interactive transaction에 의존하지 않는다(D-024). 로컬 SQLite(D-030)는 `BEGIN IMMEDIATE` transaction과 trigger를 지원하므로 함께 쓸 수 있지만, 검사 조건은 여전히 statement 안에 둔다. 서버는 사건·이유 nonblank, `diary_emotions` 1행 이상, 모든 `intensity` 1~10을 **하나의 조건부 UPDATE**로 검사한다. 예: `UPDATE diary_entries SET status='completed', revision=revision+1, ... WHERE id=? AND owner_key=? AND revision=? AND status='draft' AND trim(event_text)<>'' AND trim(reason_text)<>'' AND EXISTS (SELECT 1 FROM diary_emotions WHERE diary_id=diary_entries.id)`. 영향 행이 0이면 완료를 실패(409 revision 충돌 또는 422 완료조건 미충족)로 돌려주고 어떤 상태도 바꾸지 않는다. 검사와 갱신을 분리한 read-then-write는 TOCTOU 창이 있으므로 금지한다.
+- 완료 전환은 저장소의 interactive transaction에 의존하지 않는다(D-024). D1(D-032)은 interactive transaction이 없고 `batch()` 원자 실행과 trigger를 제공하므로, 검사 조건은 statement 안에 두고 다중 statement는 batch로 묶는다. 서버는 사건·이유 nonblank, `diary_emotions` 1행 이상, 모든 `intensity` 1~10을 **하나의 조건부 UPDATE**로 검사한다. 예: `UPDATE diary_entries SET status='completed', revision=revision+1, ... WHERE id=? AND owner_key=? AND revision=? AND status='draft' AND trim(event_text)<>'' AND trim(reason_text)<>'' AND EXISTS (SELECT 1 FROM diary_emotions WHERE diary_id=diary_entries.id)`. 영향 행이 0이면 완료를 실패(409 revision 충돌 또는 422 완료조건 미충족)로 돌려주고 어떤 상태도 바꾸지 않는다. 검사와 갱신을 분리한 read-then-write는 TOCTOU 창이 있으므로 금지한다.
 - completed 이후에는 마지막 감정 행 삭제나 사건·이유 blank 갱신을 trigger(`BEFORE DELETE ON diary_emotions` / `BEFORE UPDATE ON diary_entries`에서 `RAISE(ABORT)`) 또는 같은 조건을 포함한 조건부 statement로 차단한다. trigger 지원 여부는 B-04에서 확인하고, 미지원이면 조건부 statement만으로 같은 불변조건을 보장해야 한다.
 - 과거 `entry_date`라도 `first_completed_local_date`는 실제 작성 완료일이므로 과거 streak를 복구하지 않는다.
 
@@ -105,6 +105,23 @@ read-time guard(결함 I-16): 저장된 `status`만 믿지 않는다. 분석을 
 - `(owner_key, operation, idempotency_key)` unique.
 - request hash, response status/reference, expiry를 저장한다.
 - 같은 키에 다른 request hash가 오면 `409`로 거부한다.
+
+### 3.8 `ai_jobs` (후행 단계, D-032)
+
+| 필드 | 계약 |
+| --- | --- |
+| `id`, `owner_key` | job 소유권 |
+| `kind` | `journal_turn | analysis_generate | analysis_verify` |
+| `status` | `pending | leased | done | failed | expired` |
+| `payload_json` | 그 작업에 필요한 최소 입력(현재 draft, 서명 검증된 최근 턴 또는 통계 snapshot). `done/failed/expired` 전환 시 NULL로 지운다 |
+| `result_json` | worker가 되돌린 schema 검증 통과 출력만 |
+| `model_id`, `prompt_version`, `schema_version` | 재현 metadata(D-031) |
+| `lease_until`, `attempts` | worker lease 만료 시각과 재시도 횟수(상한 2) |
+| `created_at`, `updated_at`, `expires_at` | UTC. `expires_at` 경과 시 `expired` |
+
+- lease는 `UPDATE ai_jobs SET status='leased', lease_until=? WHERE id=? AND status='pending'`처럼 조건부 statement로만 획득한다(D-024).
+- 결과 반영은 job이 `leased`이고 lease가 유효할 때만 허용하며, 결과의 `draft_patch`는 별도 사용자 확인 없이는 diary에 적용하지 않는다.
+- 일기 원문은 payload에 그 턴에 필요한 범위만 들어가고, 완료 후 남지 않는다. worker 로그에도 payload를 남기지 않는다.
 
 ## 4. 감정 taxonomy
 
@@ -179,8 +196,8 @@ completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편
 
 ### 보존
 
-- 데이터는 본인 PC의 SQLite 파일에만 있다(D-030). 서버 로그와 모델 공급자 경로(Claude 구독, D-029)의 보존은 배포 전 실제 설정을 확인해 정책에 기록한다.
-- 백업은 본인 책임이다. B-05에서 백업 방법(파일 복사 또는 `VACUUM INTO`), 주기, 보관 위치, 백업본의 삭제 반영 지연을 정하고 사용자 고지에 반영한다(결함 I-17). hard delete 후 `VACUUM` 또는 `secure_delete` 설정으로 파일 내 잔존 데이터를 줄이는지도 확인한다.
+- 데이터는 Cloudflare D1에 있다(D-032). 저장 지역·암호화·공급자 보존 특성, 서버 로그, 모델 공급자 경로(Claude 구독, D-029)의 보존은 배포 전 공식 문서와 실제 설정으로 확인해 정책에 기록한다.
+- 백업은 D1 Time Travel(무료 플랜 지원 범위 확인)과 PC worker가 주기적으로 내려받는 versioned export로 이중화한다. B-05에서 주기, 보관 위치, 백업본의 hard delete 반영 지연을 정하고 사용자 고지에 반영한다(결함 I-17). Time Travel은 삭제 후에도 보존 기간 동안 복구 가능하므로 "즉시 완전 삭제"로 표현하지 않는다.
 - 확정할 수 없는 보존 특성은 “즉시 완전 삭제”로 약속하지 않는다.
 
 ## 9. 마이그레이션 원칙
