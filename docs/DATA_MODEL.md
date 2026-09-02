@@ -185,6 +185,8 @@ completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편
 
 - 기록 삭제는 사용자 확인 후 즉시 영구 삭제하는 MVP 계약이다. 휴지통/복구를 암시하지 않는다.
 - diary, emotion, reflection, 연결 claim을 원자적 batch(또는 FK `ON DELETE CASCADE`)로 cascade 삭제한다(D-024). 부분 삭제가 관찰되면 차단 결함이다. 해당 snapshot의 분석은 제거하거나 재사용 불가 상태로 만든다.
+- 삭제 순서(2026-09-02 로컬 D1 스파이크 발견): **부모 `diary_entries`를 먼저 지우고 FK cascade로 자식을 지운다.** 자식 `diary_emotions`를 먼저 지우면 completed 보호 trigger가 마지막 감정 행 삭제를 막는다. 부모 삭제 시 cascade는 trigger와 충돌하지 않았다(고아 0). `PRAGMA foreign_keys`가 1인지 배포 환경에서 재확인한다.
+- `meta.changes`는 cascade/trigger가 개입한 DELETE에서 실제 부모 행 수와 다를 수 있다(스파이크에서 부모 1행 삭제에 2 반환). 삭제 성공 판정은 changes 값이 아니라 삭제 후 SELECT(부모 0행·고아 0행)로 한다. 완료 전환의 조건부 UPDATE는 RAISE 전용 trigger만 있어 changes 0/1 판정이 그대로 유효했다.
 - 로그에는 원문 없이 삭제 event와 결과만 남기고, DB/호스팅 백업의 실제 소거 지연은 개인정보 안내에 명시한다.
 
 ### 내보내기
