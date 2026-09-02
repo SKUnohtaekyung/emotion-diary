@@ -1,0 +1,185 @@
+schema_version: "1.0"
+graph_kind: directed_acyclic_work_graph
+source_of_truth: docs/AGENT_WORKFLOW.md
+
+statuses:
+  allowed: [blocked, ready, in_progress, verifying, done]
+  initial: blocked
+
+nodes:
+  - id: bootstrap-audit
+    status: in_progress
+    depends_on: []
+    owns:
+      - harness/runtime-profile.json
+      - tasks/CURRENT_TASK.md
+    outputs:
+      - verified repository and runtime facts
+      - preserved user changes inventory
+      - provisional decision audit
+    gate: bootstrap-facts
+
+  - id: privacy-hosting-spike
+    status: blocked
+    depends_on: [bootstrap-audit]
+    owns:
+      - docs/ARCHITECTURE.md
+      - docs/SAFETY_POLICY.md
+      - docs/DECISIONS.md
+    outputs:
+      - server-derived owner proof
+      - Sites sharing and secret boundary proof
+      - D1 CRUD, uniqueness, and deletion proof or approved alternative
+    gate: security-foundation
+
+  - id: app-scaffold
+    status: blocked
+    depends_on: [privacy-hosting-spike]
+    owns:
+      - package manifest and lockfile
+      - application configuration
+      - CI and test configuration
+    outputs:
+      - reproducible install
+      - dev, lint, typecheck, test, build commands
+    gate: code-quality
+
+  - id: data-foundation
+    status: blocked
+    depends_on: [app-scaffold]
+    owns:
+      - migrations
+      - diary repository and server authorization
+      - data contract tests
+    outputs:
+      - daily uniqueness
+      - revision and idempotency
+      - delete and export
+    gate: data-integrity
+
+  - id: taxonomy-v1
+    status: blocked
+    depends_on: [bootstrap-audit]
+    owns:
+      - versioned taxonomy data
+      - character and color tokens
+    outputs:
+      - complete transcription from both source images
+      - human or user review evidence
+    gate: source-fidelity
+
+  - id: direct-journal
+    status: blocked
+    depends_on: [data-foundation, taxonomy-v1]
+    owns:
+      - direct-entry UI
+      - autosave and completion flow
+      - diary mobile tests
+    outputs:
+      - complete direct journal flow
+    gate: core-product
+
+  - id: ai-journal
+    status: blocked
+    depends_on: [direct-journal]
+    owns:
+      - journal conversation endpoint and schemas
+      - AI fallback UI
+      - synthetic dialogue evals
+    outputs:
+      - user-confirmed structured draft
+      - direct-entry fallback
+    gate: journal-ai
+
+  - id: dashboard-reminder
+    status: blocked
+    depends_on: [direct-journal]
+    owns:
+      - deterministic statistics
+      - dashboard UI
+      - reminder adapter
+    outputs:
+      - reproducible dashboard
+      - in-app reminder
+    gate: reflection-core
+
+  - id: evidence-pipeline
+    status: blocked
+    depends_on: [bootstrap-audit]
+    owns:
+      - evidence card schema and ingestion
+      - approved evaluation corpus
+      - retrieval baseline
+    outputs:
+      - versioned active evidence set
+      - frozen retrieval thresholds
+    gate: evidence-quality
+
+  - id: rag-analysis
+    status: blocked
+    depends_on: [dashboard-reminder, evidence-pipeline]
+    owns:
+      - planner, search, gate, generator
+      - verifier and safety validator
+      - RAG evaluation runs
+    outputs:
+      - grounded or safely withheld analysis
+    gate: ai-safety
+
+  - id: release-candidate
+    status: blocked
+    depends_on: [ai-journal, rag-analysis]
+    owns:
+      - release evidence bundle
+      - deployment checklist
+    outputs:
+      - tested private mobile deployment
+      - rollback and limitations
+    gate: release
+
+edges:
+  - from: bootstrap-audit
+    to: privacy-hosting-spike
+    reason: hosting and identity facts precede sensitive storage
+  - from: bootstrap-audit
+    to: taxonomy-v1
+    reason: source assets must be verified before transcription
+  - from: bootstrap-audit
+    to: evidence-pipeline
+    reason: API and source-governance assumptions must be verified
+  - from: privacy-hosting-spike
+    to: app-scaffold
+    reason: unsupported architecture must not be scaffolded
+  - from: app-scaffold
+    to: data-foundation
+    reason: migrations need an executable runtime
+  - from: data-foundation
+    to: direct-journal
+    reason: UI must rest on database invariants
+  - from: taxonomy-v1
+    to: direct-journal
+    reason: emotion choices must match source material
+  - from: direct-journal
+    to: ai-journal
+    reason: AI must degrade to a working direct flow
+  - from: direct-journal
+    to: dashboard-reminder
+    reason: reflection uses completed records
+  - from: dashboard-reminder
+    to: rag-analysis
+    reason: analysis begins with deterministic statistics
+  - from: evidence-pipeline
+    to: rag-analysis
+    reason: generation cannot precede approved evidence
+  - from: ai-journal
+    to: release-candidate
+    reason: both authoring modes are MVP requirements
+  - from: rag-analysis
+    to: release-candidate
+    reason: RAG safety gates must pass before full MVP release
+
+mutation_rule:
+  adding_or_removing_nodes: update docs/ROADMAP.md and docs/TRACEABILITY.md
+  changing_product_scope: user_approval_required
+  changing_privacy_risk: user_approval_required
+  changing_technical_hypothesis: evidence_and_decision_record_required

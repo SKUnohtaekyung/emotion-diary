@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/export.schema.json",
+  "title": "Emotion diary export",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "exportedAt", "timezone", "diaries"],
+  "properties": {
+    "schemaVersion": { "const": "emotion-diary-export-v1" },
+    "exportedAt": { "type": "string", "format": "date-time" },
+    "timezone": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "diaries": {
+      "type": "array",
+      "items": { "$ref": "diary-entry.schema.json" }
+    },
+    "analyses": {
+      "type": "array",
+      "items": { "$ref": "analysis-output.schema.json" }
+    }
+  }
+}
+

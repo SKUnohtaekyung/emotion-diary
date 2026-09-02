@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "task_id": "TASK-BOOTSTRAP",
+  "phase": "plan-correction",
+  "iteration": 1,
+  "status": "in_progress",
+  "current_hypothesis": "Plan review complete; after G0 git re-init and G1 canonical-doc corrections, the split Phase 0 spikes (hosting/identity, D1, subscription-based model access, vector search) can decide the architecture.",
+  "same_hypothesis_failures": 0,
+  "transient_retries": 0,
+  "last_verified_commit": null,
+  "completed_nodes": [],
+  "next_node": "bootstrap-audit",
+  "blockers": [],
+  "last_checkpoint": "2026-09-02 plan review done (verdict: spikes only). User approved: git re-init (G0, .git not yet deleted), limited-MVP-first with RAG deferred, crisis scope AI-paths-only with KR resources, no paid API (subscription-based model access only, B-06 redefined), free hosting fallback only. Next: G0 then G1 per tasks/CURRENT_TASK.md 인계 메모."
+}

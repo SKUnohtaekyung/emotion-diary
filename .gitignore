@@ -1,0 +1,27 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+
+# Dependencies and generated output
+node_modules/
+dist/
+coverage/
+.next/
+
+# Local agent/runtime state that may contain machine paths
+harness/runtime-profile.local.json
+CLAUDE.local.md
+# Project MCP launch settings contain this machine's absolute paths.
+.mcp.json
+.codex/config.toml
+.claude/settings.local.json
+
+# Previous portable package and verification scratch space are not project source
+outputs/
+work/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+*.swp

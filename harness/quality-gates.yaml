@@ -1,0 +1,90 @@
+schema_version: "1.0"
+source_of_truth: docs/EVAL_PLAN.md
+
+policies:
+  no_skipped_required_gate: true
+  no_test_weakening_without_decision: true
+  retry_limit_transient: 2
+  same_hypothesis_failure_limit: 2
+  block_on_unknown_privacy_boundary: true
+  one_writer_per_file: true
+
+gates:
+  quick:
+    blocking: true
+    commands:
+      - name: repository-document-check
+        command: node scripts/verify.mjs --mode quick
+        status: ready
+
+  full:
+    blocking: true
+    commands:
+      - name: repository-full-check
+        command: node scripts/verify.mjs --mode full
+        status: ready
+      - name: lint
+        command: null
+        status: configure_after_bootstrap
+      - name: typecheck
+        command: null
+        status: configure_after_bootstrap
+      - name: unit-and-integration
+        command: null
+        status: configure_after_bootstrap
+      - name: production-build
+        command: null
+        status: configure_after_bootstrap
+
+  release:
+    blocking: true
+    commands:
+      - name: browser-e2e
+        command: null
+        status: configure_after_bootstrap
+      - name: mobile-real-device
+        command: manual evidence required
+        status: pending
+      - name: security-and-privacy
+        command: manual plus automated evidence required
+        status: pending
+      - name: ai-evals
+        command: null
+        status: configure_after_evidence_baseline
+      - name: deployment-boundary-review
+        command: manual evidence required
+        status: pending
+
+severity_policy:
+  blocker:
+    allowed_open: 0
+  high:
+    allowed_open: 0
+  medium:
+    allowed_open: 0
+  low:
+    allowed_open: decision required
+
+node_gates:
+  bootstrap-facts:
+    requires: [B-01, source-files-present, runtime-profile-complete, quick]
+  security-foundation:
+    requires: [B-02, B-03, B-04, B-05, B-06, B-07, B-08]
+  code-quality:
+    requires: [reproducible-install, lint-configured, typecheck-configured, test-configured, build-configured, full]
+  data-integrity:
+    requires: [F-01, F-02, F-06, F-07, F-09, F-10, F-14, F-15]
+  source-fidelity:
+    requires: [source-hashes-recorded, taxonomy-one-to-one-review, user-or-human-review]
+  core-product:
+    requires: [F-03, F-04, F-05, F-07, F-08, mobile-core-flow, accessibility-core-flow]
+  journal-ai:
+    requires: [ai-journal-fixed-set, no-fabrication, no-emotion-assertion, direct-entry-fallback]
+  reflection-core:
+    requires: [F-11, F-12, F-13, deterministic-statistics, timezone-boundaries]
+  evidence-quality:
+    requires: [active-card-schema-valid, source-and-hash-valid, reviewer-approved, retrieval-baseline-frozen]
+  ai-safety:
+    requires: [citation-validity-100, citation-coverage-100, unsupported-claim-0, gate-false-pass-0, injection-success-0, crisis-flow-100]
+  release:
+    requires: [full, browser-e2e, mobile-real-device, security-and-privacy, ai-evals, deployment-boundary-review, blocker-0, high-0]

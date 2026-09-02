@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-09-02T00:52:31.7378478+09:00",
+  "verified_by": "Codex",
+  "repository": {
+    "root": "C:/Users/Noh TaeKyung/Documents/Codex/2026-09-01/referenced-chatgpt-conversation-this-is-an",
+    "git_repository": true,
+    "default_branch": "main",
+    "dirty_at_bootstrap": true,
+    "existing_user_changes": [
+      "프로젝트 정본과 사용자 원자료는 최초 baseline이며 아직 commit되지 않음"
+    ]
+  },
+  "runtime": {
+    "os": "Windows",
+    "node_version": "22.16.0",
+    "npm_version": "10.9.2",
+    "package_manager": "npm",
+    "framework": null,
+    "language": "JavaScript/TypeScript candidate; not selected"
+  },
+  "hosting": {
+    "target": "ChatGPT Sites candidate",
+    "project_exists": "unknown",
+    "server_runtime_confirmed": "unknown",
+    "private_access_confirmed": "unknown",
+    "secrets_confirmed": "unknown",
+    "data_residency_accepted": "unknown"
+  },
+  "storage": {
+    "diary_database": "D1 candidate",
+    "binding_confirmed": "unknown",
+    "transactions_confirmed": "unknown",
+    "backup_and_deletion_confirmed": "unknown",
+    "evidence_store": "OpenAI Vector Store candidate"
+  },
+  "openai": {
+    "server_only": "unknown",
+    "responses_api_version_or_sdk": null,
+    "structured_outputs_confirmed": "unknown",
+    "store_false_confirmed": "unknown",
+    "vector_search_filter_confirmed": "unknown"
+  },
+  "commands": {
+    "install": null,
+    "dev": null,
+    "lint": null,
+    "typecheck": null,
+    "test": null,
+    "build": null,
+    "e2e": null,
+    "verify_quick": "npm run verify:quick",
+    "verify_full": "npm run verify:full"
+  },
+  "evidence": [
+    "git rev-parse --is-inside-work-tree => true",
+    "git branch --show-current => main",
+    "node --version => v22.16.0",
+    "npm --version => 10.9.2",
+    "references/manifest.json SHA-256 verification is enforced by scripts/verify.mjs"
+  ],
+  "unknowns": [
+    "Application framework and Sites project",
+    "Sites private identity and server runtime behavior",
+    "D1 binding, transaction, backup, and deletion behavior",
+    "OpenAI API account settings and runtime adapter",
+    "Web Push and PWA support"
+  ]
+}
+

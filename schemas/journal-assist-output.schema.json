@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/journal-assist-output.schema.json",
+  "title": "Journal assistant structured output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "assistantMessage", "suggestedEmotionCodes", "draftPatch", "missingRequiredFields", "readyForUserReview"],
+  "properties": {
+    "schemaVersion": { "const": "journal-assist-output-v1" },
+    "assistantMessage": { "type": "string", "minLength": 1, "maxLength": 1000 },
+    "suggestedEmotionCodes": {
+      "type": "array",
+      "maxItems": 5,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" }
+    },
+    "draftPatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "eventText": { "type": ["string", "null"], "maxLength": 10000 },
+        "reasonText": { "type": ["string", "null"], "maxLength": 10000 },
+        "emotions": {
+          "type": "array",
+          "maxItems": 100,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["emotionCode", "intensity"],
+            "properties": {
+              "emotionCode": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+              "intensity": { "type": ["integer", "null"], "minimum": 1, "maximum": 10 }
+            }
+          }
+        },
+        "praises": { "type": "array", "maxItems": 3, "items": { "type": "string", "minLength": 1, "maxLength": 2000 } },
+        "gratitudes": { "type": "array", "maxItems": 3, "items": { "type": "string", "minLength": 1, "maxLength": 2000 } }
+      }
+    },
+    "missingRequiredFields": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["eventText", "emotions", "intensities", "reasonText"] }
+    },
+    "readyForUserReview": { "type": "boolean" }
+  }
+}
+

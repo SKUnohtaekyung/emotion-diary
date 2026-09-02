@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/analysis-output.schema.json",
+  "title": "Grounded analysis output",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "analysisStatus", "observations", "interpretations", "limitations", "reflectionQuestions", "withholdReasonCodes"],
+  "properties": {
+    "schemaVersion": { "const": "analysis-output-v1" },
+    "analysisStatus": { "enum": ["grounded", "observation_only", "withheld"] },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["text", "statRefs"],
+        "properties": {
+          "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+          "statRefs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 256 } }
+        }
+      }
+    },
+    "interpretations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["claimId", "text", "evidenceRefs"],
+        "properties": {
+          "claimId": { "type": "string", "minLength": 1, "maxLength": 64 },
+          "text": { "type": "string", "minLength": 1, "maxLength": 2000 },
+          "evidenceRefs": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,127}@[1-9][0-9]*$" } }
+        }
+      }
+    },
+    "limitations": { "type": "array", "items": { "type": "string", "minLength": 1, "maxLength": 2000 } },
+    "reflectionQuestions": { "type": "array", "maxItems": 3, "items": { "type": "string", "minLength": 1, "maxLength": 1000 } },
+    "withholdReasonCodes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "enum": ["NO_RESULTS", "BELOW_RETRIEVAL_THRESHOLD", "UNAPPROVED_OR_STALE_EVIDENCE", "POPULATION_OR_CONDITION_MISMATCH", "CONFLICT_NOT_RESOLVABLE", "CLAIM_OUTSIDE_EVIDENCE_BOUNDARY", "INSUFFICIENT_DIARY_DATA", "SAFETY_PROHIBITED", "PIPELINE_ERROR"] }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "analysisStatus": { "const": "grounded" } }, "required": ["analysisStatus"] },
+      "then": { "properties": { "interpretations": { "minItems": 1 }, "withholdReasonCodes": { "maxItems": 0 } } }
+    },
+    {
+      "if": { "properties": { "analysisStatus": { "enum": ["observation_only", "withheld"] } }, "required": ["analysisStatus"] },
+      "then": { "properties": { "interpretations": { "maxItems": 0 }, "withholdReasonCodes": { "minItems": 1 } } }
+    }
+  ]
+}
+

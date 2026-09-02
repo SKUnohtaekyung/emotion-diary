@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/diary-entry.schema.json",
+  "title": "Diary entry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "entryDate", "timezone", "status", "revision", "taxonomyVersion", "eventText", "reasonText", "emotions", "praises", "gratitudes"],
+  "properties": {
+    "schemaVersion": { "const": "diary-entry-v1" },
+    "id": { "type": "string", "minLength": 16, "maxLength": 64 },
+    "entryDate": { "type": "string", "format": "date" },
+    "timezone": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "status": { "enum": ["draft", "completed"] },
+    "revision": { "type": "integer", "minimum": 1 },
+    "taxonomyVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "eventText": { "type": "string", "maxLength": 10000 },
+    "reasonText": { "type": "string", "maxLength": 10000 },
+    "emotions": {
+      "type": "array",
+      "maxItems": 100,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["categoryCode", "emotionCode", "labelSnapshot", "intensity", "displayOrder"],
+        "properties": {
+          "categoryCode": { "enum": ["enjoyment", "wish", "sadness", "anger", "joy", "love", "hate"] },
+          "emotionCode": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" },
+          "labelSnapshot": { "type": "string", "minLength": 1, "maxLength": 100 },
+          "intensity": { "type": "integer", "minimum": 1, "maximum": 10 },
+          "displayOrder": { "type": "integer", "minimum": 0 }
+        }
+      }
+    },
+    "praises": {
+      "type": "array",
+      "maxItems": 3,
+      "items": { "type": "string", "minLength": 1, "maxLength": 2000 }
+    },
+    "gratitudes": {
+      "type": "array",
+      "maxItems": 3,
+      "items": { "type": "string", "minLength": 1, "maxLength": 2000 }
+    },
+    "firstCompletedAt": { "type": ["string", "null"], "format": "date-time" },
+    "firstCompletedLocalDate": { "type": ["string", "null"], "format": "date" },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "updatedAt": { "type": "string", "format": "date-time" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "completed" } }, "required": ["status"] },
+      "then": {
+        "properties": {
+          "eventText": { "type": "string", "pattern": "\\S", "maxLength": 10000 },
+          "reasonText": { "type": "string", "pattern": "\\S", "maxLength": 10000 },
+          "emotions": { "minItems": 1 }
+        }
+      }
+    }
+  ]
+}
+

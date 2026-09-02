@@ -1,0 +1,24 @@
+{
+  "schema_version": "1.0",
+  "files": [
+    {
+      "path": "source/emotion-words-anger-happiness-love-hate.jpg",
+      "bytes": 109188,
+      "sha256": "8171810bf965f40f6ea55a46a86314ff589b12eb5fb91c2d0dfb5c00c6de9c0b",
+      "role": "분노·기쁨·사랑·미움 세부 감정과 색/캐릭터 원자료"
+    },
+    {
+      "path": "source/emotion-words-joy-hope-sadness.jpg",
+      "bytes": 90997,
+      "sha256": "2f0c4a0469465cdf6d3e9207186d73efd05b1e5db1b984be286260037511fe83",
+      "role": "즐거움·바램·슬픔 세부 감정과 색/캐릭터 원자료"
+    },
+    {
+      "path": "source/journal-template.txt",
+      "bytes": 221,
+      "sha256": "b1d77d38991cf0d4cb07c6f566e759001f90fc70258961736ce611ac1ed80c57",
+      "role": "감정일기 원형 6영역과 순서"
+    }
+  ]
+}
+

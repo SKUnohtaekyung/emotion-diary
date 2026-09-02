@@ -1,0 +1,16 @@
+{
+  "name": "emotion-diary",
+  "version": "0.0.0",
+  "private": true,
+  "description": "모바일 우선 개인용 감정일기 MVP",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "verify": "node scripts/verify.mjs --mode full",
+    "verify:quick": "node scripts/verify.mjs --mode quick",
+    "verify:full": "node scripts/verify.mjs --mode full"
+  }
+}
+

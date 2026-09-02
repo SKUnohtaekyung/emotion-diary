@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "generated_at": null,
+  "verified_by": null,
+  "repository": {
+    "root": null,
+    "git_repository": "unknown",
+    "default_branch": null,
+    "dirty_at_bootstrap": "unknown",
+    "existing_user_changes": []
+  },
+  "runtime": {
+    "os": null,
+    "node_version": null,
+    "package_manager": null,
+    "framework": null,
+    "language": null
+  },
+  "hosting": {
+    "target": "ChatGPT Sites candidate",
+    "project_exists": "unknown",
+    "server_runtime_confirmed": "unknown",
+    "private_access_confirmed": "unknown",
+    "secrets_confirmed": "unknown",
+    "data_residency_accepted": "unknown"
+  },
+  "storage": {
+    "diary_database": "D1 candidate",
+    "binding_confirmed": "unknown",
+    "transactions_confirmed": "unknown",
+    "backup_and_deletion_confirmed": "unknown",
+    "evidence_store": "OpenAI Vector Store candidate"
+  },
+  "openai": {
+    "server_only": "unknown",
+    "responses_api_version_or_sdk": null,
+    "structured_outputs_confirmed": "unknown",
+    "store_false_confirmed": "unknown",
+    "vector_search_filter_confirmed": "unknown"
+  },
+  "commands": {
+    "install": null,
+    "dev": null,
+    "lint": null,
+    "typecheck": null,
+    "test": null,
+    "build": null,
+    "e2e": null
+  },
+  "evidence": [],
+  "unknowns": []
+}
+

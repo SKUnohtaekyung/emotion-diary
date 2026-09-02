@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "defaultMode": "default"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/claude-stop-hook.mjs\""
+          }
+        ]
+      }
+    ]
+  }
+}
