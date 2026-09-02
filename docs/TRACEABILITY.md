@@ -14,19 +14,19 @@
 | 요구 ID | 주요 설계 정본 | 필수 평가 증거 | 작업 그래프 노드 |
 | --- | --- | --- | --- |
 | PR-001 비진단 경계 | `SAFETY_POLICY` §2, §4~6(D-020 감지 범위); `AI_RAG_SPEC` §2, §5(`safetySignal`) | EVAL §7 창작/확정 0·위기 케이스, §9 진단·위기 100% 안전 전환 | ai-journal, rag-analysis |
-| PR-002 접근·모바일 Sites 후보 | `ARCHITECTURE` §2, §5(CSRF D-025), §6(defense-in-depth), §10; `UX_SPEC` §2~3 | B-02, B-03, B-05, B-08; F-01, F-02; EVAL §6 모바일 | bootstrap-audit, hosting-identity-spike, limited-mvp-release, release-candidate |
+| PR-002 접근·자체 호스팅·모바일(D-030) | `ARCHITECTURE` §2, §5(CSRF D-025), §6(사설망+접근 토큰), §10; `UX_SPEC` §2~3 | B-02, B-03, B-05, B-08; F-01, F-02; EVAL §6 모바일 | bootstrap-audit, hosting-identity-spike, limited-mvp-release, release-candidate |
 | PR-003 원형 6영역 | `DATA_MODEL` §3.1~3.3; `UX_SPEC` §4~5; `schemas/diary-entry`(slot 객체) | F-03, F-04; EVAL §6 원자료 충실성; create/read/edit/export/AI draft 대조 | direct-journal, ai-journal |
 | PR-004 7개·세부 감정 원자료 | `DATA_MODEL` §4, §3.2(D-022 code 규칙); `UX_SPEC` §8; `references/README` | EVAL §6 모든 label/category 1:1 대조+D-027 검수 | taxonomy-v1 |
 | PR-005 복수선택·강도 | `DATA_MODEL` §3.2(CHECK); `UX_SPEC` §4(검색/필터) | F-05, 범위/중복 경계 fixture, 모바일/스크린리더 | taxonomy-v1, direct-journal |
 | PR-006 직접 작성 | `UX_SPEC` §3~4, §6~7; `DATA_MODEL` §5~6 | F-03~F-11, browser E2E, mobile 핵심 flow | data-foundation, direct-journal |
 | PR-007 AI 대화 작성(후행, D-018) | `AI_RAG_SPEC` §5(턴 계약, `safetySignal`); `UX_SPEC` §5; D-019 | B-06; EVAL §7 전 지표, 특히 창작/확정 0, fallback 100%, 위기·턴 위조 | model-access-spike, ai-journal |
-| PR-008 하루 1개·소급·streak | `DATA_MODEL` §2~3.1(D-024 원자화), §7 | F-06, F-07, 동시성·timezone·DST fixture | d1-data-spike, data-foundation, dashboard-reminder |
+| PR-008 하루 1개·소급·streak | `DATA_MODEL` §2~3.1(D-024 원자화), §7 | F-06, F-07, 동시성·timezone·DST fixture | local-data-spike, data-foundation, dashboard-reminder |
 | PR-009 autosave·완료·수정/stale | `DATA_MODEL` §3.1, §3.5(read-time guard), §5(D-023)~6; `ARCHITECTURE` §7 | F-03, F-08~F-11, network/revision/idempotency fixture | data-foundation, direct-journal |
 | PR-010 색상·캐릭터 | `UX_SPEC` §8, §12; source images | EVAL §6 source fidelity, 색 외 의미, AA/스크린리더 | taxonomy-v1, direct-journal |
 | PR-011 알림 | `DATA_MODEL` §3.4(PK); `UX_SPEC` §10; `ARCHITECTURE` §7 | F-13, 권한 거부/미지원 fallback, 오늘 완료/소급 사례 | dashboard-reminder |
 | PR-012 결정론적 대시보드 | `DATA_MODEL` §7; `UX_SPEC` §9 | F-12, missing≠0, 수정/삭제 snapshot, 1년 성능 | dashboard-reminder, limited-mvp-release |
 | PR-013 RAG Gate/Verifier(후행, D-018) | `AI_RAG_SPEC` §6~13(§7.2 code/LLM, §8 observation 대조, §9 필수 verifier D-026); `DATA_MODEL` §3.6(retired 소급) | B-06, B-07; EVAL §8 절대 gate, verifier 독립성, injection 0, 관찰 위장 0 | model-access-spike, vector-search-spike, evidence-pipeline, rag-analysis |
-| PR-014 개인정보·삭제·export | `ARCHITECTURE` §3~8; `DATA_MODEL` §6, §8(벤더 근거 I-17); `SAFETY_POLICY` §3, §7~10; `UX_SPEC` §13; `schemas/export`(analysis metadata) | B-02~B-05; F-01, F-02, F-09, F-10, F-14~F-16; EVAL §9 | hosting-identity-spike, d1-data-spike, data-foundation, limited-mvp-release, release-candidate |
+| PR-014 개인정보·삭제·export | `ARCHITECTURE` §3~8; `DATA_MODEL` §6, §8(벤더 근거 I-17); `SAFETY_POLICY` §3, §7~10; `UX_SPEC` §13; `schemas/export`(analysis metadata) | B-02~B-05; F-01, F-02, F-09, F-10, F-14~F-16; EVAL §9 | hosting-identity-spike, local-data-spike, data-foundation, limited-mvp-release, release-candidate |
 | PR-015 모바일·오류·MVP 제외 | `UX_SPEC` §11~13; `ARCHITECTURE` §7, §9; `ROADMAP` 제한 MVP 릴리스 | B-08; EVAL §6, §10, §14 `limited-release`; release evidence bundle | app-scaffold, limited-mvp-release, release-candidate |
 
 ## 3. 교차 안전 불변조건

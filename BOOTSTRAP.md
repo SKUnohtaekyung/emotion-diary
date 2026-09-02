@@ -20,8 +20,8 @@
 
 ### 근거가 있으면 에이전트가 교정할 수 있는 기술 가설
 
-- ChatGPT Sites와 D1이 민감한 개인 일기의 실제 배포 요구를 충족하는지
-- Sites 접근 제한을 MVP의 계정 경계로 사용할 수 있는지
+- 선택한 hosting/DB(현재 D-030: 본인 PC 자체 호스팅+SQLite)가 민감한 개인 일기의 실제 배포 요구를 충족하는지
+- hosting의 접근 제한을 MVP의 계정 경계로 사용할 수 있는지
 - 현재 SDK/API의 이름, 파라미터, 한도, 보존 설정
 - Web Push/PWA/background 작업 지원 여부
 - 프레임워크, 패키지, 디렉터리, 테스트 도구
@@ -35,8 +35,8 @@
 1. 현재 프로젝트 루트, git 상태, 기존 코드와 사용자 변경을 확인한다.
 2. [AGENTS.md](AGENTS.md), [tasks/CURRENT_TASK.md](tasks/CURRENT_TASK.md), [README.md](README.md)를 읽는다.
 3. [references/README.md](references/README.md)의 원자료가 빠짐없이 복사됐는지 해시/파일로 확인한다.
-4. 실제 패키지 관리자, 프레임워크, Node 버전, 테스트 명령, 배포 대상, Sites 프로젝트 유무를 확인한다.
-5. ChatGPT Sites/D1/인증/비밀값/데이터 처리와 OpenAI API의 현재 지원을 공식 문서 및 작은 스파이크로 검증한다.
+4. 실제 패키지 관리자, 프레임워크, Node 버전, 테스트 명령, 배포 대상을 확인한다.
+5. hosting/DB/인증/비밀값/데이터 처리와 모델 접근 경로(D-029)의 현재 지원을 공식 문서 및 작은 스파이크로 검증한다.
 6. [harness/runtime-profile.json](harness/runtime-profile.json)의 확인된 사실과 `unknown`을 갱신한다. 새 환경용 형식은 [runtime-profile.template.json](harness/runtime-profile.template.json)을 참고한다.
 7. [harness/work-graph.yaml](harness/work-graph.yaml)의 `bootstrap-audit`부터 선행 조건과 상태를 갱신한다.
 8. [harness/quality-gates.yaml](harness/quality-gates.yaml)의 placeholder를 실제 명령으로 바꾸고 quick/full 하네스를 실행한다.
@@ -49,9 +49,9 @@
 - 실제 런타임 프로필과 저장소 구조
 - 기술 가설 판정표: `confirmed | rejected | unknown`
 - 인증·데이터 저장·API 비밀값의 신뢰 경계
-- 적어도 한 번의 D1 CRUD/권한 기술 스파이크 또는 대체 백엔드 결정
-- OpenAI 호출의 서버 전용 실행, `store` 정책, 오류/거부 처리 스파이크
-- 모바일 브라우저와 Sites 제한의 확인 목록
+- 적어도 한 번의 DB CRUD/권한 기술 스파이크 또는 대체 백엔드 결정
+- 모델 호출의 서버 전용 실행, 보존 정책, 오류/거부 처리 스파이크
+- 모바일 브라우저와 hosting 제한의 확인 목록
 - 구체적인 테스트 명령이 들어간 quality gates
 - 첫 구현 task와 요구사항/테스트 연결
 
@@ -61,7 +61,7 @@
 
 - 개인 일기가 공개되거나 다른 사용자/클라이언트 ID로 접근될 가능성
 - 데이터 저장 위치·보존·삭제를 설명하거나 검증할 수 없음
-- Sites가 요구되는 민감정보 수준, 서버 권한 검사, 런타임을 지원하지 않음
+- hosting이 요구되는 민감정보 수준, 서버 권한 검사, 런타임을 지원하지 않음
 - 원자료의 세부 감정 분류를 정확히 전사·검수할 수 없음
 - 제품 핵심 간 모순이 발견되어 한쪽을 임의 선택해야 함
 - 배포·유료 API·외부 데이터 이동처럼 새 권한이 필요한 작업

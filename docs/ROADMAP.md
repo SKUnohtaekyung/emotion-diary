@@ -8,12 +8,11 @@
 
 목표: 현재 저장소의 기술 가설을 실제 런타임에 맞게 냉정하게 교정한다.
 
-- 실제 stack/git/Sites/Node/package manager/runtime profile 확인 — G0 Git baseline(D-017)과 G1 계획 교정(D-018~D-027) 완료
+- 실제 stack/git/hosting/Node/package manager/runtime profile 확인 — G0 Git baseline(D-017)과 G1 계획 교정(D-018~D-027) 완료
 - 원자료 보존과 taxonomy 전사 계획 확정
-- G2a `hosting-identity-spike`: Sites 제한 공유, server identity·허용 목록 대조, secret 격리, custom header CSRF, 모바일 runtime(B-02/B-03/B-08). Sites 프로젝트 생성은 외부 자원이므로 실행 직전 사용자 재확인
-- G2b `d1-data-spike`: D1 CRUD, unique, 조건부 UPDATE, CHECK/trigger, batch 원자성, hard delete, 보존/삭제 벤더 근거(B-04/B-05)
+- G2a `hosting-identity-spike`(D-030): 본인 PC Node 서버를 사설망 인터페이스에만 bind, Tailscale로 휴대폰 접속, 접근 토큰 cookie, secret 격리, custom header CSRF, 모바일 runtime(B-02/B-03/B-08). 외부 유료 자원 생성 없음
+- G2b `local-data-spike`: 로컬 SQLite CRUD, unique, 조건부 UPDATE, CHECK/trigger, transaction 원자성, WAL, hard delete+VACUUM, 백업 절차(B-04/B-05)
 - G2c `model-access-spike`(RAG 트랙, critical path 밖): 본인 PC `claude -p` 구독 경로(D-029). 최소 스파이크 PASS(2026-09-02). 남은 검증: 보존/학습 설정, 독립 verifier 2회 호출, 10회 지연 p95, 구독 한도, 위기 신호 케이스
-- G2a 재정의 후보(D-030, 사용자 승인 대기): hosting을 Sites 대신 본인 PC 자체 호스팅+무료 사설망(Tailscale)으로 교체. 승인되면 B-02/B-04/B-08을 로컬 서버·SQLite·휴대폰 접속 기준으로 재정의
 - G2d `vector-search-spike`(RAG 트랙): 구독/무료 경로의 검색 계층 검증(B-07)
 - G3 taxonomy-v1 전사+D-027 검수(G2와 병렬 가능)
 - quality gates를 실제 명령으로 채우고 quick/full 통과
@@ -91,7 +90,7 @@ Exit: false pass 0, unsupported claim 0, citation validity 100% 등 [EVAL_PLAN.m
 
 제한 MVP 릴리스에 Phase 3·5를 더한 `release-candidate`다. 아래 항목은 제한 MVP 릴리스에서 이미 수행한 것을 AI 경로 포함으로 재실행한다.
 
-- Sites(또는 무료 대안) 공유·비밀값·로그·데이터 보존 재감사
+- 자체 호스팅 노출·비밀값·로그·백업 재감사
 - iPhone Safari/Android Chrome 실제 기기 검증
 - 성능/비용/rate limit/장애 복구 시험
 - 개인정보 고지, 데이터 export/delete, 위기 문구 검토

@@ -2,18 +2,17 @@
   "schema_version": "1.0",
   "task_id": "TASK-BOOTSTRAP",
   "phase": "spike-preparation",
-  "iteration": 2,
+  "iteration": 3,
   "status": "in_progress",
-  "current_hypothesis": "With the Git baseline (G0, D-017) and corrected canonical docs (G1, D-018~D-027) in place, the split Phase 0 spikes G2a hosting-identity / G2b d1-data (critical path) and G2c model-access / G2d vector-search (RAG track, non-paid subscription path only) can decide the architecture for the limited MVP first.",
+  "current_hypothesis": "Self-hosted single-user deployment on the owner's PC (D-030) with subscription-based claude -p model access (D-029, Sonnet 5 for journaling, Opus 5 for verifier/RAG per D-031) can pass G2a/G2b spikes; the limited MVP ships first (D-018).",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "32e68c8e3d72ed8799643f931c2a435b65214630",
+  "last_verified_commit": "bc6cb85",
   "completed_nodes": [],
   "next_node": "bootstrap-audit",
   "blockers": [
-    "G2a: Sites project creation is an external resource; re-confirm with the user right before creating it",
-    "G2c: claude -p subscription path minimal spike PASS (D-029); retention, independent verifier, latency p95, quota still unverified (RK-016)",
-    "D-030 hosting switch (self-hosted PC + Tailscale instead of Sites) needs user approval because PRD PR-002 names Sites"
+    "G2c remaining: retention/training settings of the subscription path, independent verifier double call, latency p95 over 10 runs, subscription quota, crisis-signal cases (RK-016)",
+    "User is evaluating a hybrid alternative (Netlify + Supabase for the web app, PC-side claude -p worker for AI); if chosen it supersedes parts of D-030 as a new decision"
   ],
-  "last_checkpoint": "2026-09-02 G0 done: old .git removed, git init -b main, baseline commit 32e68c8 (46 files). G1 done: D-017~D-027 recorded; DATA_MODEL/ARCHITECTURE/AI_RAG_SPEC/SAFETY_POLICY/UX_SPEC/EVAL_PLAN/RISK_REGISTER/ROADMAP/TRACEABILITY corrected; work-graph split into hosting-identity/d1-data/model-access/vector-search spikes plus limited-mvp-release; quality-gates labels remapped to EVAL §14; runtime-profile root updated; schemas (slot objects, safetySignal, export analysis metadata) updated. Next: G2a hosting-identity-spike (B-02/B-03/B-08) after user re-confirms Sites project creation; G3 taxonomy-v1 can run in parallel."
+  "last_checkpoint": "2026-09-02 D-030 accepted (self-hosted PC + SQLite + private network), D-031 model choice (Sonnet 5 journaling / Opus 5 verifier+RAG; Haiku rejected after real runs). Docs, PRD PR-002, README, EVAL, RISK, ROADMAP, work-graph (local-data-spike), runtime-profile updated. Next: G2a hosting-identity-spike on local server unless the user switches to the Netlify+Supabase hybrid."
 }

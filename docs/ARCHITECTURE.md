@@ -4,23 +4,22 @@
 
 이 문서는 시스템 구성요소, 신뢰 경계, API와 배포 가설을 정한다. 제품 범위는 [../PRD.md](../PRD.md), 데이터 불변조건은 [DATA_MODEL.md](DATA_MODEL.md), AI 내부 단계는 [AI_RAG_SPEC.md](AI_RAG_SPEC.md), 안전 판단은 [SAFETY_POLICY.md](SAFETY_POLICY.md)가 정본이다.
 
-이 문서의 ChatGPT Sites·D1·모델 접근 경로 세부는 **현재 프로젝트 Phase 0에서 검증할 기술 가설**이다. 검증 없이 프레임워크나 API 이름을 코드에 고정하지 않는다.
+이 문서의 로컬 서버·SQLite·모델 접근 경로 세부는 **현재 프로젝트 Phase 0에서 검증할 기술 가설**이다. 검증 없이 프레임워크나 API 이름을 코드에 고정하지 않는다.
 
-2026-09-02 사용자 결정(D-018, D-019, D-021): 제한 MVP(직접 작성+결정론적 대시보드)를 먼저 배포하고 AI 대화·RAG는 후행 단계다. 유료 API(OpenAI API 등)는 사용하지 않으며 AI 기능은 사용자가 구독 중인 Codex/Claude 자원으로 가능한 경로가 B-06에서 확인된 경우에만 활성화한다. hosting 대안은 무료 옵션으로 제한한다. 아래의 "OpenAI Responses/Vector Store" 표기는 이 결정 이전의 후보이며, 구독 기반 경로가 동일 계약(server-only, strict schema, 보존 통제)을 만족하는지로 대체 평가한다.
+2026-09-02 사용자 결정(D-018, D-019, D-021, D-029, D-030): 배포는 제작자 본인 PC의 자체 호스팅(Node 서버+SQLite 파일)이며 휴대폰은 무료 사설망(Tailscale)으로만 접속한다. 제한 MVP(직접 작성+결정론적 대시보드)를 먼저 배포하고 AI 대화·RAG는 후행 단계다. 유료 API(OpenAI API 등)는 사용하지 않으며 AI 기능은 같은 PC에서 Claude 구독 로그인으로 `claude -p`를 호출하는 경로만 쓴다. 본인 1명 전용이다. 이전 후보였던 ChatGPT Sites/D1(D-006)은 superseded다.
 
 ## 2. 후보 기준 아키텍처
 
 ```text
 모바일 브라우저 / 홈 화면 바로가기
                  |
-        ChatGPT Sites 접근 경계
+   무료 사설망(Tailscale) 접근 경계
                  |
-       UI + 서버 라우트/액션 계층
+   본인 PC: Node 서버 + 접근 토큰 검사
         |          |           |
         v          v           v
-     D1 DB    모델 접근 어댑터   알림 어댑터
- (개인 일기)  (구독 기반 경로,   (인앱 우선)
-              B-06 확인 전 비활성)
+  SQLite 파일   claude -p 어댑터   알림 어댑터
+ (개인 일기)   (구독 로그인, 후행)  (인앱 우선)
                     |
                     v
           Psychology Evidence Store
@@ -30,19 +29,19 @@
                                       -> 평가 -> 활성화
 ```
 
-MVP 후보는 제한 공유된 단일 사용자 Site, 서버 측 접근 검사, D1 구조화 저장이다. 모델 호출은 서버 전용이되 유료 API가 아닌 구독 기반 경로여야 한다(D-019). 별도 Supabase나 agent framework는 기본 의존성이 아니다. 후보가 부트스트랩 스파이크를 통과하지 못하면 동일한 계약을 만족하는 **무료** 비공개 호스팅/DB로 교체한다(D-021). 제한 MVP는 모델 접근 어댑터와 Evidence Store 없이 배포 가능해야 한다(D-018).
+MVP는 본인 PC의 단일 Node 프로세스, 사설망 접속+서버 접근 토큰 검사, 로컬 SQLite 파일 저장이다(D-030). 모델 호출은 같은 PC의 `claude -p` subprocess이며 유료 API가 아닌 구독 로그인 경로다(D-019, D-029). 별도 Supabase나 agent framework는 기본 의존성이 아니다. 후보가 부트스트랩 스파이크를 통과하지 못하면 동일한 계약을 만족하는 **무료** 비공개 호스팅/DB로 교체한다(D-021). 제한 MVP는 모델 접근 어댑터와 Evidence Store 없이 배포 가능해야 한다(D-018).
 
 ## 3. 신뢰 경계
 
 | 경계 | 신뢰하지 않는 입력 | 서버가 해야 할 일 |
 | --- | --- | --- |
 | 브라우저 → 앱 | owner ID, 날짜, 상태, 분석 대상, 완료 여부 | 세션에서 owner를 결정하고 스키마/권한/날짜를 검증 |
-| 앱 → D1 | 중복 요청, 오래된 revision, 부분 실패 | transaction, unique constraint, optimistic concurrency, idempotency |
+| 앱 → SQLite | 중복 요청, 오래된 revision, 부분 실패 | 조건부 statement/transaction, unique constraint, optimistic concurrency, idempotency |
 | 앱 → 모델 접근 경로 | 일기 속 지시문, 과도한 원문, 모델 출력, 클라이언트가 보낸 이전 대화 턴 | 최소화, source-as-data, strict schema, 오류/거부/미완료 처리, 서명된 turn token만 문맥으로 사용(DATA_MODEL §6) |
 | Evidence 수집 → Store | 악성 지시, 잘못된 출처, 권리 불명 | 인간 승인, 해시, 상태, provenance, prompt injection 격리 |
 | 앱 → 사용자 | 진단성 주장, 무근거 해석, 위기 혼합 | Gate, Verifier, Safety Validator, 안전 대체 응답 |
 
-API 키, HMAC salt, DB binding은 서버 환경/사이트 비밀값으로 관리한다. 클라이언트 번들, 저장소, `.openai/hosting.json`, 로그에 넣지 않는다.
+서버 접근 토큰, HMAC salt, DB 파일 경로는 본인 PC의 `.env`(Git 제외)로 관리한다. 클라이언트 번들, 저장소, 로그에 넣지 않는다. Claude 구독 자격 증명은 Claude Code가 관리하는 저장소에만 있으며 앱이 읽거나 복사하지 않는다.
 
 ## 4. 구성요소 계약
 
@@ -64,7 +63,7 @@ API 키, HMAC salt, DB binding은 서버 환경/사이트 비밀값으로 관리
 
 ### 4.3 Diary Database
 
-- D1/SQLite 후보이며 [DATA_MODEL.md](DATA_MODEL.md)의 논리 계약을 만족해야 한다.
+- 본인 PC의 로컬 SQLite 파일(D-030)이며 [DATA_MODEL.md](DATA_MODEL.md)의 논리 계약을 만족해야 한다. WAL 모드, 파일 권한, 백업 방법은 B-04/B-05에서 확정한다.
 - 한 owner의 한 local date에 활성 일기 하나만 허용한다.
 - 대시보드는 완료된 최신 revision만 집계한다.
 - 영구 삭제는 transaction으로 종속 데이터까지 제거한다.
@@ -105,7 +104,7 @@ API 키, HMAC salt, DB binding은 서버 환경/사이트 비밀값으로 관리
 - 모든 변경 요청(PUT/POST/DELETE)은 서버가 정한 custom header(예: `X-Requested-With: emotion-diary`)를 요구한다. 단순 form 제출이나 cross-site fetch는 이 header를 붙일 수 없으므로 header가 없으면 403이다.
 - 추가로 `Origin`(없으면 `Referer`)과 `Sec-Fetch-Site`를 배포 origin 허용 목록과 대조한다. 두 검사는 서로 대체가 아니라 중첩이다.
 - 세션 cookie를 쓰는 경우 `SameSite=Lax` 이상과 `Secure`를 요구한다. 삭제는 여기에 확인 토큰을 더한다.
-- Sites 런타임이 custom header를 통과시키는지는 B-02/B-03에서 실제 요청으로 확인한다.
+- 로컬 Node 서버가 custom header와 `Sec-Fetch-Site`를 실제로 받는지는 B-03에서 휴대폰 브라우저 요청으로 확인한다.
 
 공개 URL이 생기면 CSP, secure cookie, HSTS, X-Content-Type-Options와 프레임 정책을 배포 게이트에 포함한다.
 
@@ -113,14 +112,15 @@ API 키, HMAC salt, DB binding은 서버 환경/사이트 비밀값으로 관리
 
 ### 제한 단일 사용자 MVP
 
-- Site를 owner/명시적 허용 사용자로 제한하고 그 접근 경계를 로그인으로 취급한다.
-- D1의 `owner_key`는 클라이언트가 정하지 않는다. 단일 사용자 배포에서는 서버 상수/배포 namespace로 만들 수 있다.
-- defense-in-depth(D-025, 결함 I-03): 서버 상수 owner_key 하나에 의존하지 않는다. 런타임이 제공하는 identity(헤더/세션/subject)가 있으면 서버 비밀 설정의 허용 목록과 대조해 불일치·누락이면 403을 반환하고, identity 자체가 제공되지 않는 런타임이면 그 사실을 B-02 증거로 기록하고 Sites 공유 설정 외 두 번째 경계(예: 서버 측 접근 토큰)를 추가한다. Sites 공유 설정 오류 하나로 다른 사용자가 owner 데이터에 접근하는 경로가 있어서는 안 된다.
+- 첫 번째 경계는 무료 사설망(Tailscale)이다. 서버는 사설망 인터페이스에만 bind하고 공개 인터넷에 노출하지 않는다(D-030).
+- 두 번째 경계는 서버 측 접근 토큰이다. 휴대폰 브라우저가 1회 입력한 긴 무작위 토큰을 `HttpOnly; Secure; SameSite=Lax` 세션 cookie로 보관하고, 서버는 모든 API에서 이 cookie를 검증한다. 토큰은 본인 PC의 `.env`에만 있다.
+- `owner_key`는 클라이언트가 정하지 않는다. 단일 사용자 배포에서는 서버 상수/배포 namespace로 만들 수 있다.
+- defense-in-depth(D-025, 결함 I-03): 사설망 하나에 의존하지 않는다. Tailscale identity 헤더 등 런타임이 제공하는 identity가 있으면 허용 목록과 대조하고, 없으면 접근 토큰 검증만으로 경계를 만든다. 사설망 설정 오류 하나로 다른 기기가 owner 데이터에 접근하는 경로가 있어서는 안 된다.
 - 이 모드는 같은 배포에 임의 다중 사용자를 추가할 수 없다.
 
 ### 공개 또는 다중 사용자로 전환할 때
 
-- Sites의 현재 Sign in with ChatGPT/서버 identity header 지원을 재검증한다.
+- 자체 호스팅을 벗어나 실제 인증 제공자와 공개 hosting을 새로 선택한다. 현재 접근 토큰 방식은 다중 사용자에 쓰지 않는다.
 - 서버가 신뢰 가능한 identity로부터 `HMAC(server_secret, normalized_subject)` 형태의 pseudonymous `owner_key`를 도출한다.
 - 원시 이메일은 제품에 필요하지 않으면 저장하지 않는다.
 - 계정 연결, 탈퇴, subject 변경, 공유 링크와 row isolation을 새 threat model과 migration으로 설계한다.
@@ -163,11 +163,11 @@ API 키, HMAC salt, DB binding은 서버 환경/사이트 비밀값으로 관리
 
 | 가설 | 게이트 | 판정 | 실패 시 대안 |
 | --- | --- | --- | --- |
-| Sites가 선택한 UI/server framework를 지원 | B-08 | unknown | 지원되는 얇은 stack 또는 무료 별도 hosting(D-021) |
-| D1 binding과 batch/CHECK/trigger가 데이터 계약(D-024) 충족 | B-04 | unknown | 무료 범위의 대체 DB 재평가 |
-| 제한 공유+identity 대조가 요구 인증 경계 충족 | B-02 | unknown | server auth/무료 private hosting |
-| server secret을 client에서 격리, custom header CSRF 통과 | B-03 | unknown | 배포 중단 |
+| 휴대폰 브라우저가 사설망으로 로컬 서버에 접속해 핵심 흐름을 수행 | B-08 | unknown | 무료 별도 hosting(D-021) |
+| 로컬 SQLite(Node 내장 또는 better-sqlite3)의 조건부 UPDATE/CHECK/trigger/transaction이 데이터 계약(D-024) 충족 | B-04 | unknown | 무료 범위의 대체 DB 재평가 |
+| 사설망+서버 접근 토큰이 요구 인증 경계 충족(사설망 밖·토큰 없는 접속 거부) | B-02 | unknown | 접근 경계 추가 또는 무료 private hosting |
+| `.env` 비밀값이 client bundle/로그에 없고 custom header CSRF 통과 | B-03 | unknown | 배포 중단 |
 | 구독 기반 모델 호출 경로가 존재하고 server-only·strict schema·보존 통제 가능(B-06 재정의, D-019, D-029: 본인 PC `claude -p`) | B-06 | partial — 2026-09-02 최소 스파이크 PASS(구독 인증, strict schema, 15초). 미검증: 보존/학습 사용 설정, 독립 verifier 2회 호출, p95 지연, 구독 한도, 정책 회색지대 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
 | Web Push/background 동작 | B-08 | unknown | 인앱 reminder만 MVP |
 | Vector search filter/score 응답이 Gate 입력 충족(유료 Vector Store 불가 시 구독 경로/로컬 대안) | B-07 | unknown | custom DB/hybrid retrieval 또는 RAG 보류 |
-| 데이터 보존·삭제·residency가 허용 수준 충족 | B-05 | unknown | 다른 무료 저장/hosting 또는 제품 범위 축소 |
+| 로컬 파일 보존·삭제(VACUUM 포함)·백업 절차가 고지 가능한 수준으로 정의됨 | B-05 | unknown | 백업 약속 축소 또는 제품 범위 축소 |

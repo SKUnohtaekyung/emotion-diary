@@ -28,20 +28,20 @@ nodes:
       - docs/ARCHITECTURE.md §5, §6, §10 hosting/identity rows
       - docs/DECISIONS.md hosting/identity decisions
     outputs:
-      - Sites sharing boundary and server identity proof or free-hosting alternative (D-021, D-025)
-      - secret isolation and custom-header CSRF proof
+      - self-hosted server bound to private network only, phone access via free private network (D-030, D-021)
+      - access-token cookie boundary, secret isolation and custom-header CSRF proof (D-025)
       - mobile runtime baseline
     gate: security-foundation
 
-  - id: d1-data-spike
+  - id: local-data-spike
     status: blocked
     depends_on: [hosting-identity-spike]
     owns:
       - docs/DATA_MODEL.md §3 SQL-level contracts
       - docs/DECISIONS.md storage decisions
     outputs:
-      - D1 CRUD, uniqueness, conditional UPDATE completion, CHECK/trigger, batch atomicity, hard delete proof (D-024)
-      - retention/deletion vendor evidence (I-17)
+      - local SQLite CRUD, uniqueness, conditional UPDATE completion, CHECK/trigger, transaction atomicity, hard delete + VACUUM proof (D-024)
+      - owner-managed backup and deletion procedure (I-17)
     gate: data-contract
 
   - id: model-access-spike
@@ -66,7 +66,7 @@ nodes:
 
   - id: app-scaffold
     status: blocked
-    depends_on: [hosting-identity-spike, d1-data-spike]
+    depends_on: [hosting-identity-spike, local-data-spike]
     owns:
       - package manifest and lockfile
       - application configuration
@@ -195,12 +195,12 @@ edges:
     to: evidence-pipeline
     reason: source-governance assumptions must be verified
   - from: hosting-identity-spike
-    to: d1-data-spike
+    to: local-data-spike
     reason: storage spike runs inside the verified hosting boundary
   - from: hosting-identity-spike
     to: app-scaffold
     reason: unsupported architecture must not be scaffolded
-  - from: d1-data-spike
+  - from: local-data-spike
     to: app-scaffold
     reason: data contract must be provable before migrations are written
   - from: model-access-spike

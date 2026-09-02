@@ -23,22 +23,22 @@
     "language": "JavaScript/TypeScript candidate; not selected"
   },
   "hosting": {
-    "target": "ChatGPT Sites candidate; fallback limited to free options (D-021)",
-    "project_exists": "unknown",
-    "server_runtime_confirmed": "unknown",
-    "private_access_confirmed": "unknown",
+    "target": "self-hosted on the owner's PC (Node server + local SQLite), phone via free private network such as Tailscale (D-030); fallback limited to free options (D-021)",
+    "private_network_tool": "not selected yet (Tailscale candidate)",
+    "server_bind_private_only_confirmed": "unknown",
+    "access_token_cookie_confirmed": "unknown",
     "identity_header_available": "unknown",
     "custom_header_csrf_passthrough": "unknown",
     "secrets_confirmed": "unknown",
-    "data_residency_accepted": "unknown"
+    "phone_access_confirmed": "unknown"
   },
   "storage": {
-    "diary_database": "D1 candidate",
-    "binding_confirmed": "unknown",
+    "diary_database": "local SQLite file (node:sqlite or better-sqlite3 candidate, D-030)",
+    "driver_selected": "unknown",
     "conditional_update_and_check_confirmed": "unknown",
     "trigger_support_confirmed": "unknown",
-    "batch_atomicity_confirmed": "unknown",
-    "backup_and_deletion_confirmed": "unknown (vendor inquiry required, I-17)",
+    "transaction_atomicity_confirmed": "unknown",
+    "backup_and_deletion_confirmed": "unknown (owner-managed backup procedure to define, I-17)",
     "evidence_store": "not selected; paid Vector Store excluded by D-019"
   },
   "model_access": {
@@ -75,11 +75,10 @@
     "references/manifest.json SHA-256 verification is enforced by scripts/verify.mjs"
   ],
   "unknowns": [
-    "Application framework and Sites project (B-08, G2a)",
-    "Sites private identity header, allowlist comparison, custom-header CSRF passthrough (B-02/B-03, G2a)",
-    "D1 binding, conditional UPDATE/CHECK/trigger/batch behavior, backup and deletion vendor evidence (B-04/B-05, G2b)",
+    "Application framework, private-network tool, phone access to local server (B-08, G2a)",
+    "Server bind to private interface only, access-token cookie, custom-header CSRF from phone browser (B-02/B-03, G2a)",
+    "SQLite driver choice, conditional UPDATE/CHECK/trigger/transaction behavior, backup and deletion procedure (B-04/B-05, G2b)",
     "claude -p subscription path remaining checks: retention/training settings, independent verifier call, latency p95 over 10 runs, subscription quota impact, crisis-signal cases (B-06, G2c)",
-    "Hosting switch to self-hosted PC + Tailscale (D-030) awaiting user approval; if approved, B-02/B-04/B-08 are redefined for local server + SQLite",
     "Retrieval layer on subscription or free path (B-07, G2d)",
     "Web Push and PWA support"
   ]

@@ -17,7 +17,7 @@
     "language": null
   },
   "hosting": {
-    "target": "ChatGPT Sites candidate",
+    "target": "hosting candidate (see D-030)",
     "project_exists": "unknown",
     "server_runtime_confirmed": "unknown",
     "private_access_confirmed": "unknown",
@@ -25,7 +25,7 @@
     "data_residency_accepted": "unknown"
   },
   "storage": {
-    "diary_database": "D1 candidate",
+    "diary_database": "database candidate (see D-030)",
     "binding_confirmed": "unknown",
     "transactions_confirmed": "unknown",
     "backup_and_deletion_confirmed": "unknown",
