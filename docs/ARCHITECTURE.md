@@ -59,6 +59,7 @@ API 키, HMAC salt, DB binding은 서버 환경/사이트 비밀값으로 관리
 - 모든 diary CRUD, dashboard 집계, export, delete, AI orchestration의 유일한 진입점이다.
 - 입력과 모델 출력에 런타임 schema validation을 적용한다.
 - 모델 호출은 서버에서만 수행한다. 유료 OpenAI API는 사용하지 않으며(D-019) 구독 기반 경로가 B-06에서 확인되기 전까지 AI 경로는 비활성이다. 경로가 확인되면 그 경로의 데이터 보존·학습 사용 설정(`store: false`에 상당하는 통제)을 확인하고 기록한다.
+- D-029 후보 경로: 서버가 본인 PC의 `claude -p --output-format json --json-schema <schema> --tools "" --max-turns 1`을 subprocess로 호출한다. 프로젝트 hooks/MCP가 섞이지 않도록 전용 작업 디렉터리에서 실행하고, `--bare`는 구독 인증을 지원하지 않으므로 쓰지 않는다. 서버는 `structured_output`을 다시 schema 검증하고 `result` 문자열은 신뢰하지 않는다. 호출 timeout, 동시 호출 1개 제한, 실패 시 직접 작성 fallback을 둔다. 사용자 본인 1명 전용이며 다른 사용자에게 제공하지 않는다.
 - timeout, rate limit, bounded retry, idempotency, correlation ID, 사용자 안전 오류를 표준화한다.
 
 ### 4.3 Diary Database
@@ -166,7 +167,7 @@ API 키, HMAC salt, DB binding은 서버 환경/사이트 비밀값으로 관리
 | D1 binding과 batch/CHECK/trigger가 데이터 계약(D-024) 충족 | B-04 | unknown | 무료 범위의 대체 DB 재평가 |
 | 제한 공유+identity 대조가 요구 인증 경계 충족 | B-02 | unknown | server auth/무료 private hosting |
 | server secret을 client에서 격리, custom header CSRF 통과 | B-03 | unknown | 배포 중단 |
-| 구독 기반 모델 호출 경로가 존재하고 server-only·strict schema·보존 통제 가능(B-06 재정의, D-019) | B-06 | unknown | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
+| 구독 기반 모델 호출 경로가 존재하고 server-only·strict schema·보존 통제 가능(B-06 재정의, D-019, D-029: 본인 PC `claude -p`) | B-06 | partial — 2026-09-02 최소 스파이크 PASS(구독 인증, strict schema, 15초). 미검증: 보존/학습 사용 설정, 독립 verifier 2회 호출, p95 지연, 구독 한도, 정책 회색지대 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
 | Web Push/background 동작 | B-08 | unknown | 인앱 reminder만 MVP |
 | Vector search filter/score 응답이 Gate 입력 충족(유료 Vector Store 불가 시 구독 경로/로컬 대안) | B-07 | unknown | custom DB/hybrid retrieval 또는 RAG 보류 |
 | 데이터 보존·삭제·residency가 허용 수준 충족 | B-05 | unknown | 다른 무료 저장/hosting 또는 제품 범위 축소 |

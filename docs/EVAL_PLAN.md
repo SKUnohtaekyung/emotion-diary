@@ -38,7 +38,7 @@
 | B-03 | 서버 비밀값·CSRF | client bundle/source/log에 비밀 없음, server에서만 호출 성공, custom header 없는 변경 요청 403(D-025) | 배포 차단 |
 | B-04 | D1 후보 | CRUD, unique, 조건부 UPDATE 완료 전환, CHECK/trigger 지원, batch 원자성/부분실패, migration, hard delete 스파이크(D-024) | 무료 대체 DB 결정 |
 | B-05 | 보존/삭제/위치 | 공급자 설정·벤더 문의 결과와 사용자 고지 가능한 범위 문서화(결함 I-17) | 민감 저장 차단 |
-| B-06 | 구독 기반 모델 호출 경로(재정의, D-019) | 유료 API 없이 사용자 구독 Codex/Claude 자원으로 server-only 호출, strict schema 출력, 보존 통제, refusal/incomplete/timeout 처리가 가능함을 실제 호출로 증명. Verifier용 독립 호출 구성 가능 여부 포함(D-026) | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
+| B-06 | 구독 기반 모델 호출 경로(재정의, D-019/D-029) | 유료 API 없이 본인 PC의 `claude -p`를 구독 로그인으로 server-only 호출, strict schema 출력, 보존 통제, refusal/incomplete/timeout 처리가 가능함을 실제 호출로 증명. Verifier용 독립 2회 호출, 10회 반복 지연 p95, 구독 한도 영향 포함(D-026). 2026-09-02 최소 스파이크 1회 PASS(합성 입력, 15초) — 나머지 항목은 미검증 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
 | B-07 | 검색 계층 | 구독/무료 경로에서 query/filter/score/metadata, one-card-one-file, chunk 반환 시 source span 대조, 배열 attribute(topicCodes) 매핑 검증(결함 I-09) | retrieval 대안 결정 또는 RAG 보류 |
 | B-08 | 모바일 runtime | 실제 Sites preview가 지원 브라우저에서 기본 동작 | framework/무료 hosting 교체 |
 

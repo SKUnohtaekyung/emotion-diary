@@ -42,12 +42,15 @@
     "evidence_store": "not selected; paid Vector Store excluded by D-019"
   },
   "model_access": {
-    "policy": "no paid API (D-019); subscription-based Codex/Claude path only",
-    "path_confirmed": "unknown (B-06 redefined)",
-    "server_only": "unknown",
-    "structured_outputs_confirmed": "unknown",
-    "retention_control_confirmed": "unknown",
+    "policy": "no paid API (D-019); single-user subscription path via local Claude Code CLI headless mode (D-029)",
+    "path": "claude -p --output-format json --json-schema (Claude Code 2.1.237, subscription login, no ANTHROPIC_API_KEY)",
+    "path_confirmed": "partial — 2026-09-02 minimal spike PASS with synthetic input",
+    "server_only": "yes by design (subprocess on the same PC); not yet exercised from an app server",
+    "structured_outputs_confirmed": "yes — structured_output matched 6 required keys, no extra keys",
+    "latency_observed": "1 run: wall 15s, API 8.5s, model claude-opus-5; p95 not measured",
+    "retention_control_confirmed": "unknown (subscription account data settings to verify)",
     "independent_verifier_call_confirmed": "unknown",
+    "policy_status": "gray area for single-user personal tool; user acknowledged (RK-017)",
     "vector_search_filter_confirmed": "unknown"
   },
   "commands": {
@@ -75,7 +78,8 @@
     "Application framework and Sites project (B-08, G2a)",
     "Sites private identity header, allowlist comparison, custom-header CSRF passthrough (B-02/B-03, G2a)",
     "D1 binding, conditional UPDATE/CHECK/trigger/batch behavior, backup and deletion vendor evidence (B-04/B-05, G2b)",
-    "Subscription-based model call path without paid API, incl. server-only, strict schema, retention control, independent verifier call (B-06 redefined, G2c)",
+    "claude -p subscription path remaining checks: retention/training settings, independent verifier call, latency p95 over 10 runs, subscription quota impact, crisis-signal cases (B-06, G2c)",
+    "Hosting switch to self-hosted PC + Tailscale (D-030) awaiting user approval; if approved, B-02/B-04/B-08 are redefined for local server + SQLite",
     "Retrieval layer on subscription or free path (B-07, G2d)",
     "Web Push and PWA support"
   ]

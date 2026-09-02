@@ -24,7 +24,9 @@
 | RK-013 | OpenAI/Anthropic/Sites API·도구 동작 변경 | high | medium | SDK upgrade, deprecated field, hook failure | version pin, official docs 재검증, adapter tests | 이전 version rollback/adapter 변경 | open |
 | RK-014 | 사용자가 제품을 임상/위기 서비스로 오해 | medium | high | PHI 입력, 진단 요구, 위기 대화 | 근접 고지, 금지 output, crisis flow | 기능 제한·전문 검토 전 배포 중단 | open |
 | RK-015 | hard delete와 provider backup 보존 약속 불일치 | medium | high | 즉시 완전 소거를 증명 못함, 벤더 문의 미회신(I-17) | 앱 DB hard delete와 공급자 지연을 구분 고지, B-05에 벤더 근거 첨부 | hosting 변경 또는 약속 축소 | open |
-| RK-016 | 구독 기반 모델 호출 경로가 없거나 server-only·strict schema·보존 통제·독립 verifier 호출을 만족하지 못함 | high | medium | B-06 fail/unknown, 구독 자원이 앱 런타임에서 호출 불가 | 유료 API 미사용 원칙 유지(D-019), 제한 MVP를 먼저 배포(D-018), AI 진입점 비활성 표시 | AI 대화·RAG 무기한 보류, 제한 MVP만 운영 | open |
+| RK-016 | 구독 기반 모델 호출 경로(`claude -p`, D-029)가 보존 통제·독립 verifier·지연 목표·구독 한도를 만족하지 못함 | medium | medium | B-06 잔여 항목 fail, 구독 한도 소진, 응답 p95 8초 초과 | 최소 스파이크 PASS(2026-09-02). 남은 항목을 G2c에서 검증, 제한 MVP 선행(D-018), AI 진입점 비활성 표시 | AI 대화·RAG 보류, 제한 MVP만 운영 | open |
+| RK-017 | 개인 단일 사용자 도구에서 구독 자격 증명으로 `claude -p`를 호출하는 것이 Anthropic 정책상 회색지대 | medium | high | 정책 명문화, 계정 경고, 약관 변경 | 본인 1명 전용 유지, 다중 사용자·타인 제공 금지(D-029), 공식 문서 변경 시 재검토 | AI 기능 즉시 중단, 제한 MVP만 운영 | accepted (사용자 인지) |
+| RK-018 | 본인 PC 자체 호스팅(D-030)은 PC 전원·네트워크에 의존해 휴대폰에서 접속 불가 시간이 생김 | high | low | PC 꺼짐, Tailscale 미연결 | 앱은 저장 실패를 명확히 표시하고 입력을 잃지 않음(UX §4), 인앱 reminder는 접속 시에만 | 무료 hosting 대안 재평가(D-021) | open |
 
 위험을 `closed`로 바꿀 때 테스트/스파이크/정책 링크를 추가한다. `accepted`는 사용자가 잔여 위험을 이해하고 승인한 경우에만 사용한다.
 

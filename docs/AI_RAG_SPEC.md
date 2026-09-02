@@ -6,7 +6,7 @@
 
 이 문서의 AI 기능 전체는 **후행 단계**다(D-018). 제한 MVP(직접 작성+결정론적 대시보드)는 이 문서의 어떤 구성요소도 없이 배포된다.
 
-모델 접근 경로는 **유료 API가 아니어야 한다**(D-019). OpenAI Responses API·Vector Store search 표기는 이 결정 이전의 후보이며, 실제로는 사용자가 구독 중인 Codex/Claude 자원으로 가능한 경로가 B-06(G2c)에서 server-only 호출, strict schema 출력, refusal/incomplete/error 처리, 데이터 보존 통제를 만족하는지로 판정한다. 확인되지 않으면 AI 대화 작성·RAG 분석은 보류 상태로 남고 [DECISIONS.md](DECISIONS.md)에 그 사실을 기록한다. 검색 계층(B-07, G2d)도 유료 Vector Store 대신 구독 경로 또는 로컬/무료 대안이어야 하며 확인 전에는 `unknown`이다.
+모델 접근 경로는 **유료 API가 아니어야 한다**(D-019). 확정 후보는 본인 PC의 Claude Code CLI 헤드리스 호출(`claude -p --json-schema`, 구독 로그인)이며 사용자 본인 1명 전용이다(D-029). 2026-09-02 최소 스파이크에서 구독 인증·strict schema 출력·비창작·`safety_signal` 필드를 확인했고, 보존 설정·독립 verifier·지연 p95는 G2c에서 마저 검증한다. OpenAI Responses API·Vector Store search 표기는 이 결정 이전의 후보이며, 실제로는 사용자가 구독 중인 Codex/Claude 자원으로 가능한 경로가 B-06(G2c)에서 server-only 호출, strict schema 출력, refusal/incomplete/error 처리, 데이터 보존 통제를 만족하는지로 판정한다. 확인되지 않으면 AI 대화 작성·RAG 분석은 보류 상태로 남고 [DECISIONS.md](DECISIONS.md)에 그 사실을 기록한다. 검색 계층(B-07, G2d)도 유료 Vector Store 대신 구독 경로 또는 로컬/무료 대안이어야 하며 확인 전에는 `unknown`이다.
 
 기계 검증 시드는 [../schemas/journal-assist-output.schema.json](../schemas/journal-assist-output.schema.json), [../schemas/evidence-card.schema.json](../schemas/evidence-card.schema.json), [../schemas/analysis-output.schema.json](../schemas/analysis-output.schema.json)에 있다.
 

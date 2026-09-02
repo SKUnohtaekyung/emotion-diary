@@ -12,7 +12,8 @@
   "next_node": "bootstrap-audit",
   "blockers": [
     "G2a: Sites project creation is an external resource; re-confirm with the user right before creating it",
-    "G2c: no subscription-based model call path verified yet; AI journaling and RAG stay on hold (D-019, RK-016)"
+    "G2c: claude -p subscription path minimal spike PASS (D-029); retention, independent verifier, latency p95, quota still unverified (RK-016)",
+    "D-030 hosting switch (self-hosted PC + Tailscale instead of Sites) needs user approval because PRD PR-002 names Sites"
   ],
   "last_checkpoint": "2026-09-02 G0 done: old .git removed, git init -b main, baseline commit 32e68c8 (46 files). G1 done: D-017~D-027 recorded; DATA_MODEL/ARCHITECTURE/AI_RAG_SPEC/SAFETY_POLICY/UX_SPEC/EVAL_PLAN/RISK_REGISTER/ROADMAP/TRACEABILITY corrected; work-graph split into hosting-identity/d1-data/model-access/vector-search spikes plus limited-mvp-release; quality-gates labels remapped to EVAL §14; runtime-profile root updated; schemas (slot objects, safetySignal, export analysis metadata) updated. Next: G2a hosting-identity-spike (B-02/B-03/B-08) after user re-confirms Sites project creation; G3 taxonomy-v1 can run in parallel."
 }
