@@ -40,7 +40,7 @@
     "trigger_support_confirmed": "partial — local and remote D1: keep-last-emotion and nonblank-text triggers RAISE(ABORT) (SQLITE_CONSTRAINT_TRIGGER code 7500)",
     "batch_atomicity_confirmed": "partial — local and remote batch() ran; parent-first delete + FK cascade verified (orphans 0); meta.changes over-counts with cascade",
     "backup_and_deletion_confirmed": "partial — `wrangler d1 time-travel info` returns a restorable bookmark on the free plan (restore not exercised); `d1 info`: region APAC, jurisdiction null, read_replication disabled; worker export backup and deletion-lag notice still to define (I-17)",
-    "ai_jobs_queue_round_trip_confirmed": "partial — local: 202 enqueue, lease 200/204, result 200/409, payload cleared; real PC worker process not yet run",
+    "ai_jobs_queue_round_trip_confirmed": "partial — remote queue + real PC worker (work/spikes/g2a-cloudflare/pc-worker.mjs) + claude -p Sonnet 5 round trip PASS 2026-09-02: lease → 7.4s → result 200 → owner reads done, payload cleared; Windows quoting fixed by running claude via Git Bash with env-passed prompt/schema; failed-job → failed status not yet implemented",
     "spike_location": "work/spikes/g2a-cloudflare (not in Git), wrangler 4.128.0, 22/22 HTTP + 9 SQL checks PASS 2026-09-02",
     "evidence_store": "not selected; paid Vector Store excluded by D-019"
   },
@@ -50,7 +50,7 @@
     "path_confirmed": "partial — 2026-09-02 minimal spike PASS with synthetic input",
     "server_only": "yes by design (subprocess on the same PC); not yet exercised from an app server",
     "structured_outputs_confirmed": "yes — structured_output matched 6 required keys, no extra keys",
-    "latency_observed": "1 run: wall 15s, API 8.5s, model claude-opus-5; p95 not measured",
+    "latency_observed": "Sonnet 5 via PC worker, 10 runs 2026-09-02: worker-side min 7.7s / p50 8.4s / p95 12.1s; API-only p50 4.9s / p95 9.4s. Opus 5 single run: wall 15s / API 8.5s. Exceeds the 8s first-response target → UI must show thinking state with ~20s fallback",
     "retention_control_confirmed": "unknown (subscription account data settings to verify)",
     "independent_verifier_call_confirmed": "unknown",
     "policy_status": "gray area for single-user personal tool; user acknowledged (RK-017)",

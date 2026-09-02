@@ -17,7 +17,7 @@
 | RK-006 | RAG가 그럴듯한 무근거/진단 claim 생성 | medium | high | false pass/unsupported claim/injection | app-controlled search, Gate, code+semantic verifier, safety eval | 분석 기능 즉시 보류 | open |
 | RK-007 | 이미지 OCR가 세부 감정 label/소속을 오기 | medium | high | taxonomy와 원본 대조 불일치 | 원본 보존, 사람/사용자 1:1 검수 | taxonomy 출시 차단 | open |
 | RK-008 | 일기 원문이 로그·API 보존·Vector Store로 유출 | medium | high | log scan/API instrumentation 실패 | server-only, `store` 검증, log denylist, store 분리 | AI/배포 중단·incident response | open |
-| RK-009 | AI latency/비용/rate limit가 모바일 UX를 방해 | high | medium | p95/비용 budget 초과, 429 | 최소 snapshot, idempotent cache, bounded output | 직접 작성·통계 fallback | open |
+| RK-009 | AI latency가 모바일 UX를 방해(`claude -p` 기동 오버헤드 포함 p95 12초 관측, 목표 8초 초과) | high | medium | 2026-09-02 10회 측정 p50 8.4초/p95 12.1초, 구독 한도 429 | "생각 중" UI+20초 timeout fallback, 최소 snapshot, idempotent cache, 기동 오버헤드 절감 검토(세션 재사용 등) | 직접 작성·통계 fallback | open |
 | RK-010 | Workers 런타임 제약(Node API 일부 미지원, 실행 시간 한도)이 앱 구조와 충돌 | medium | medium | build/runtime 실패, 라이브러리 비호환 | Phase 0 최소 vertical spike(B-08), nodejs_compat 확인, 무거운 작업은 PC worker로 | Netlify+Turso 등 무료 대안 | open |
 | RK-011 | Claude/Codex 지침이 분기되거나 동시 writer 충돌 | medium | medium | CLAUDE/AGENTS 불일치, 같은 파일 충돌 | CLAUDE import, one-writer, quick hook 적용됨. worktree 격리는 G0 baseline(D-017) 이후 가능하나 병렬 writer는 아직 실증 없음 | 통합 중단 후 소유권 재설정 | open (부분 완화; 2026-09-02 `mitigated` 과장 정정) |
 | RK-012 | AI 평가 세트가 좁아 실제 실패를 놓침 | medium | high | 실제 failure가 고정 set에 없음, reviewer 편향 | stratified synthetic set, red-team, adjudication, 회귀 추가 | 분석 rollout 중단 | open |
