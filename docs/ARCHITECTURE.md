@@ -180,10 +180,10 @@ MVP는 Cloudflare Workers 하나가 모든 API를 처리하고, 서버 접근 �
 | 가설 | 게이트 | 판정 | 실패 시 대안 |
 | --- | --- | --- | --- |
 | 휴대폰 브라우저가 Pages/Workers에 접속해 핵심 흐름을 수행 | B-08 | unknown | 무료 별도 hosting(D-021, 예: Netlify+Turso) |
-| D1의 조건부 UPDATE/CHECK/trigger/batch가 데이터 계약(D-024) 충족, 무료 한도·미사용 정지 없음 | B-04 | partial — 2026-09-02 로컬 D1(wrangler 4.128 miniflare) PASS: CHECK, UNIQUE 2종, completed 보호 trigger 2종, 조건부 완료 UPDATE, revision 충돌, FK cascade. 미검증: 원격 D1, 무료 한도, migration 적용, Time Travel | 무료 범위의 대체 DB 재평가 |
-| 서버 접근 토큰 cookie가 요구 인증 경계 충족(토큰 없는 접속 거부, rate limit) | B-02 | partial — 로컬 Workers PASS: 토큰 없음/오류 401, HMAC 세션 cookie(HttpOnly/Secure/SameSite=Lax). 미검증: rate limit, 원격 배포, 휴대폰 접속, Cloudflare Access | Cloudflare Access 추가 또는 무료 private hosting |
-| Workers secret이 client bundle/로그/`wrangler.toml`에 없고 custom header CSRF 통과, worker secret 경로 분리 | B-03 | partial — 로컬 PASS: custom header 없음 403, 교차 Origin 403, `Sec-Fetch-Site: cross-site` 403, worker 경로 Bearer 없음 401. 미검증: 원격 secret 격리, 휴대폰 브라우저 실제 헤더 | 배포 중단 |
-| PC worker가 `ai_jobs` lease→`claude -p`→결과 반환 왕복을 완료하고, PC 꺼짐 시 job 만료+직접 작성 fallback | B-06 | partial — 로컬 큐 PASS: 등록 202, lease 200/중복 lease 204, 결과 반영 200/중복 409, 완료 후 payload NULL. 미검증: 실제 worker 프로세스+`claude -p` 결합, 만료 처리, 원격 | AI 대화·RAG 보류 |
+| D1의 조건부 UPDATE/CHECK/trigger/batch가 데이터 계약(D-024) 충족, 무료 한도·미사용 정지 없음 | B-04 | partial — 2026-09-02 로컬·**원격 D1(APAC)** 모두 PASS: migration 적용, CHECK(intensity, completed 시각), UNIQUE 2종, completed 보호 trigger 2종(`SQLITE_CONSTRAINT_TRIGGER`), 조건부 완료 UPDATE, revision 충돌, batch, 부모 우선 FK cascade(고아 0). 미검증: 무료 한도 수치, 동시성 부하, Time Travel 복구 실습 | 무료 범위의 대체 DB 재평가 |
+| 서버 접근 토큰 cookie가 요구 인증 경계 충족(토큰 없는 접속 거부, rate limit) | B-02 | partial — 로컬·**원격 workers.dev** PASS: 토큰 없음/오류 401, HMAC 세션 cookie(HttpOnly/Secure/SameSite=Lax). 미검증: rate limit, 휴대폰 실기기 접속, Cloudflare Access | Cloudflare Access 추가 또는 무료 private hosting |
+| Workers secret이 client bundle/로그/`wrangler.toml`에 없고 custom header CSRF 통과, worker secret 경로 분리 | B-03 | partial — 로컬·**원격** PASS: 3개 secret은 `wrangler secret put`으로만 등록(`wrangler.toml`에 없음), custom header 없음 403, 교차 Origin 403, `Sec-Fetch-Site: cross-site` 403, worker 경로 Bearer 없음 401. 미검증: 휴대폰 브라우저가 실제로 보내는 헤더 | 배포 중단 |
+| PC worker가 `ai_jobs` lease→`claude -p`→결과 반환 왕복을 완료하고, PC 꺼짐 시 job 만료+직접 작성 fallback | B-06 | partial — 로컬·**원격** 큐 PASS: 등록 202, lease 200/중복 lease 204, 결과 반영 200/중복 409, 완료 후 payload NULL. 미검증: 실제 worker 프로세스+`claude -p` 결합, 만료 처리 | AI 대화·RAG 보류 |
 | 구독 기반 모델 호출 경로가 존재하고 server-only·strict schema·보존 통제 가능(B-06 재정의, D-019, D-029: 본인 PC `claude -p`) | B-06 | partial — 2026-09-02 최소 스파이크 PASS(구독 인증, strict schema, 15초). 미검증: 보존/학습 사용 설정, 독립 verifier 2회 호출, p95 지연, 구독 한도, 정책 회색지대 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
 | Web Push/background 동작 | B-08 | unknown | 인앱 reminder만 MVP |
 | Vector search filter/score 응답이 Gate 입력 충족(유료 Vector Store 불가 시 구독 경로/로컬 대안) | B-07 | unknown | custom DB/hybrid retrieval 또는 RAG 보류 |
