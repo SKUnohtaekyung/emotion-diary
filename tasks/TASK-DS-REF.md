@@ -116,7 +116,7 @@ RISK_REGISTER 추가 초안: `RK-0xx | 외부 UI 라이브러리·디자인 자�
 
 ### T4 — 정본 반영 (writer)
 
-- 산출물: `docs/DESIGN_SYSTEM.md` §6(채택 규칙 반영), 필요 시 `design/tokens.json`(새 간격·크기 토큰만, 색 값 변경 없음), `design/style-guide.html`(같은 변경), `docs/DECISIONS.md` D-037 행의 결과 갱신 또는 D-037(구성요소 규칙 변경이 있을 때), `docs/TRACEABILITY.md`(UX §11 상태 ↔ §6 매핑이 바뀌면).
+- 산출물: `docs/DESIGN_SYSTEM.md` §6(채택 규칙 반영), 필요 시 `design/tokens.json`(새 간격·크기 토큰만, 색 값 변경 없음), `design/style-guide.html`(같은 변경), `docs/DECISIONS.md` D-037 행의 결과 갱신 또는 다음 번호의 신규 결정(구성요소 규칙 변경이 있을 때), `docs/TRACEABILITY.md`(UX §11 상태 ↔ §6 매핑이 바뀌면).
 - 완료 기준: 채택 규칙이 §6 해당 항목에 "모양 / 상태 / 접근성" 형식으로 들어가 있고, `node scripts/check-contrast.mjs --verbose` 통과, `npm run verify:quick`·`npm run verify:full` PASS, 미리보기(`node scripts/preview.mjs 4173`)에서 변경 항목이 보이며 Artifact(`https://claude.ai/code/artifact/8673a33c-900c-4273-8592-0fb3bdcc36a9`, 먼저 `read`)가 재발행된다.
 - 성공 기준: 채택 규칙마다 UX §11 상태 목록의 어떤 상태를 채우는지 명시되어 있고, 색 토큰 값은 한 개도 바뀌지 않았다(`git diff design/tokens.json`에 `#` 색 값 변경 없음).
 - 중단 조건: D-034·D-035 값을 바꿔야만 반영 가능하면 반영하지 않고 `보류`로 돌린다.
