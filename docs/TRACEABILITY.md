@@ -16,8 +16,8 @@
 | PR-001 비진단 경계 | `SAFETY_POLICY` §2, §4~6(D-020 감지 범위); `AI_RAG_SPEC` §2, §5(`safetySignal`) | EVAL §7 창작/확정 0·위기 케이스, §9 진단·위기 100% 안전 전환 | ai-journal, rag-analysis |
 | PR-002 접근·자체 백엔드·모바일(D-032) | `ARCHITECTURE` §2, §4.6(PC worker), §5(CSRF D-025), §6(접근 토큰), §10; `UX_SPEC` §2~3 | B-02, B-03, B-05, B-08; F-01, F-02; EVAL §6 모바일 | bootstrap-audit, hosting-identity-spike, limited-mvp-release, release-candidate |
 | PR-003 원형 6영역 | `DATA_MODEL` §3.1~3.3; `UX_SPEC` §4~5; `schemas/diary-entry`(slot 객체) | F-03, F-04; EVAL §6 원자료 충실성; create/read/edit/export/AI draft 대조 | direct-journal, ai-journal |
-| PR-004 7개·세부 감정 원자료 | `DATA_MODEL` §4, §3.2(D-022 code 규칙); `UX_SPEC` §8; `references/README` | EVAL §6 모든 label/category 1:1 대조+D-027 검수 | taxonomy-v1 |
-| PR-005 복수선택·강도 | `DATA_MODEL` §3.2(CHECK); `UX_SPEC` §4(검색/필터) | F-05, 범위/중복 경계 fixture, 모바일/스크린리더 | taxonomy-v1, direct-journal |
+| PR-004 7개·세부 감정 원자료 | `DATA_MODEL` §4, §3.2(D-022 code 규칙); `UX_SPEC` §8; `references/README`; D-038(심리학 문헌 기반 v2 계획) | EVAL §6 모든 label/category 1:1 대조+D-027 검수; v2는 항목별 출처·근거·검수자 기록 | taxonomy-v1, taxonomy-v2-research |
+| PR-005 복수선택·강도 | `DATA_MODEL` §3.2(CHECK); `UX_SPEC` §4(검색/필터); `DESIGN_SYSTEM` §6.3(소프트 리스트)·§6.4(슬라이더), D-037 | F-05, 범위/중복 경계 fixture, 모바일/스크린리더, 슬라이더 키보드 조작 | taxonomy-v1, direct-journal |
 | PR-006 직접 작성 | `UX_SPEC` §3~4, §6~7; `DATA_MODEL` §5~6 | F-03~F-11, browser E2E, mobile 핵심 flow | data-foundation, direct-journal |
 | PR-007 AI 대화 작성(후행, D-018) | `AI_RAG_SPEC` §5(턴 계약, `safetySignal`); `UX_SPEC` §5; D-019 | B-06; EVAL §7 전 지표, 특히 창작/확정 0, fallback 100%, 위기·턴 위조 | model-access-spike, ai-journal |
 | PR-008 하루 1개·소급·streak | `DATA_MODEL` §2~3.1(D-024 원자화), §7 | F-06, F-07, 동시성·timezone·DST fixture | data-store-spike, data-foundation, dashboard-reminder |
