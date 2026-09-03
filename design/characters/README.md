@@ -8,6 +8,8 @@
 
 원자료(`references/source/*.jpg`)의 손그림 캐릭터를 **자르거나 그대로 쓰지 않고**, 같은 무드로 다시 생성한다. 생성기는 **codex imagegen**이고 프롬프트 정본은 [prompts.json](prompts.json)이다.
 
+생성 경로는 **codex imagegen 직접 호출 하나뿐이다.** 별도의 이미지 생성 스킬·플러그인이나 외부 이미지 API는 도입하지 않는다. `prompts.json`의 공통 프롬프트로 캐릭터별 최종 프롬프트를 먼저 만들고, 그 묶음을 codex imagegen에 **한 번에** 넘겨 생성한다.
+
 - 공통 스타일 프롬프트(`common_style_prompt`)와 금지 프롬프트(`negative_prompt`)는 7종에 **똑같이** 붙인다. 여기에 각 캐릭터의 `subject_prompt`만 이어 붙인다.
 - **7종을 한 번에, 같은 seed로 생성한다.** 한 개만 나중에 다시 만들면 선 굵기와 채도가 어긋나 카테고리 토글에 나란히 놓았을 때 티가 난다. 한 개를 고쳐야 하면 7종을 다시 만든다.
 - 프롬프트를 고치면 `prompts.json`의 `version`을 올리고 7종을 다시 생성한다.
