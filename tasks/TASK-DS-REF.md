@@ -4,19 +4,27 @@
 
 `planned` — 2026-09-04 사용자 결정 3건: (1) **TDS Mobile 미채택 확정**, (2) TDS는 **규칙만 참고**해 자체 디자인 시스템을 보강, (3) 다른 세션이 `docs/DECISIONS.md`·`docs/DESIGN_SYSTEM.md`·`design/style-guide.html`을 수정 중이므로 결정 기록과 작업 계획을 이 파일로 인계. 새 세션에서 "TASK-DS-REF 이어서"라고 말하면 §8 절차로 시작한다.
 
+> **2026-09-04 갱신(TASK-DESIGN 세션이 사용자 요청으로 수정).** 이 계획서가 쓰인 뒤 디자인 세션이 D-037·D-038을 기록하고 `docs/DESIGN_SYSTEM.md` §6 구성요소 세 개를 교체했다. 그 결과 이 파일의 **결정 번호와 "불변" 목록이 낡아** 아래를 고쳤다. 조사 내용(§4)과 미채택 결론(§5), 기준 설계(§6), 작업 분할의 구조(§7)는 그대로 유효하다.
+>
+> - 신규 결정 번호: **D-037 → D-039** (D-038까지 사용됨. T0에서 `docs/DECISIONS.md` 마지막 행으로 반드시 재확인)
+> - 불변이 아니게 된 것: D-035의 **2줄 격자 토글** → 아크 휠, D-036의 **2줄 세그먼트 강도** → 슬라이더+숫자+스테퍼, 세부 감정 **chip 격자** → 소프트 리스트(chip은 표시 전용)
+> - 새로 불변에 들어온 것: **D-037**(입력 방식 3종), **D-038**(taxonomy v2 방향 — 공포 카테고리 신설 예정)
+> - `docs/DESIGN_SYSTEM.md`에 **§7 브랜드가 신설**되어 이후 절이 8~12로 밀렸다. §6.x 하위 번호와 UX_SPEC 절 번호는 그대로다.
+> - T0 선행 조건(디자인 세션 미커밋 변경 없음)은 **충족됐다** — 해당 변경은 모두 커밋·푸시됨.
+
 ## 1. 목표
 
-토스 TDS Mobile의 **구성 규칙**(상태·간격·배치·피드백 원칙)을 관찰해 `docs/DESIGN_SYSTEM.md` §6 구성요소 규칙의 빈틈을 메운다. 코드·CSS 값·이미지·아이콘·글꼴 등 **자산은 하나도 가져오지 않는다**. 결과는 우리 토큰(`design/tokens.json`)과 확정 결정(D-034~D-036)으로만 표현된다.
+토스 TDS Mobile의 **구성 규칙**(상태·간격·배치·피드백 원칙)을 관찰해 `docs/DESIGN_SYSTEM.md` §6 구성요소 규칙의 빈틈을 메운다. 코드·CSS 값·이미지·아이콘·글꼴 등 **자산은 하나도 가져오지 않는다**. 결과는 우리 토큰(`design/tokens.json`)과 확정 결정(D-034~D-038)으로만 표현된다.
 
 ## 2. 범위
 
-- 포함: TDS Mobile 공개 문서 관찰, 우리 §6 항목과의 1:1 대응 분석, 사용자 승인 후 §6·tokens·style-guide 반영, 결정 D-037 기록, 라이선스 안전 검증.
-- 제외: `@toss/tds-mobile` 계열 패키지 설치·import·코드 인용, TDS 색·타이포 값 이식, UI 프레임워크 결정(Phase 1 scaffold에서 별도), 이미 확정된 디자인 결정(D-034~D-036)의 재검토, 캐릭터 자산 생성·실기기 확인(TASK-DESIGN 실행 항목), 앱 코드 작성.
+- 포함: TDS Mobile 공개 문서 관찰, 우리 §6 항목과의 1:1 대응 분석, 사용자 승인 후 §6·tokens·style-guide 반영, 결정 **D-039** 기록, 라이선스 안전 검증.
+- 제외: `@toss/tds-mobile` 계열 패키지 설치·import·코드 인용, TDS 색·타이포 값 이식, UI 프레임워크 결정(Phase 1 scaffold에서 별도), 이미 확정된 디자인 결정(D-034~D-038)의 재검토, 캐릭터 자산 생성·실기기 확인(TASK-DESIGN 실행 항목), 앱 코드 작성.
 
 ## 3. 연결 요구사항
 
 - `PR-010`(감정 색은 식별 라벨, 의미 불변), UX §11 상태 설계, DESIGN_SYSTEM §2 원칙·§11 하지 않는 것.
-- 관련 결정: D-033~D-036(모두 accepted, 이 작업에서 **불변**), 신규 D-037(§5 초안). **번호 주의**: 2026-09-04 현재 작업 트리는 D-036까지 사용했다. T0에서 `docs/DECISIONS.md`의 마지막 번호를 확인해 다음 번호로 확정하고 이 파일의 D-037 표기를 맞춘다.
+- 관련 결정: D-033~D-037(accepted, 이 작업에서 **불변**), D-038(provisional, taxonomy v2 — 이 작업에서 다루지 않음), 신규 **D-039**(§5 초안). **번호 주의**: 2026-09-04 현재 작업 트리는 **D-038까지** 사용했다. T0에서 `docs/DECISIONS.md`의 마지막 행을 다시 확인해 번호를 확정하고 이 파일의 D-039 표기를 맞춘다. 계획 작성과 실행 사이에 다른 세션이 번호를 가져가는 일이 이미 두 번 있었으므로, T0에서 번호를 정하는 즉시 `| D-039 | reserved | (TASK-DS-REF 작업 중) |` 한 줄을 먼저 커밋해 선점한다.
 
 ## 4. 확정 사실 (2026-09-04 조사, writer가 직접 재확인한 항목은 ★)
 
@@ -37,10 +45,10 @@
 
 미확인: 패키지 tarball 안 LICENSE 파일 유무(다운로드 안 함), 브라우저 단독 런타임 동작(실행 안 함). 둘 다 결론을 바꾸지 않는다 — 라이선스 문서가 독립 웹 사용을 허가 범위 밖으로 둔다.
 
-## 5. 결정 초안 D-037 (T0에서 `docs/DECISIONS.md` 표에 합칠 원문)
+## 5. 결정 초안 D-039 (T0에서 `docs/DECISIONS.md` 표에 합칠 원문)
 
 ```text
-ID / 날짜 / 상태 / 결정자: D-037 / 2026-09-04 / accepted / 사용자
+ID / 날짜 / 상태 / 결정자: D-039 / 2026-09-04 / accepted / 사용자
 문제: 더 정교한 디자인 시스템을 위해 토스 TDS Mobile(@toss/tds-mobile) 채택을 검토했다.
 관찰 근거: 공개 npm에 있으나 license 필드 없음. 토스 공식 문서는 TDS 사용을 "앱인토스 서비스를 제공하기 위한 제한적인 권한"으로 한정하고, UI Kit 라이선스는 다른 프로젝트·서비스 사용, 복사·수정·재가공, 재배포를 금지한다. npm 패키지 라이선스 문의에 토스 측이 같은 문서로 답했다. 기술적으로도 React 18 고정, @emotion/react 11 필수, AIT Provider가 앱인토스 WebView bridge를 peer로 요구, SSG 빌드 오류 사례, gzip 339KB, 다크 모드 미지원, 전역 테마 오버라이드 미문서화. (URL은 tasks/TASK-DS-REF.md §4)
 선택: TDS Mobile을 채택하지 않는다. 패키지 설치·import·코드/값/자산 이식을 금지한다. 공개 문서의 구성 규칙(상태·간격·배치·피드백)만 관찰해 자체 DESIGN_SYSTEM §6을 보강한다(TASK-DS-REF).
@@ -52,7 +60,7 @@ ID / 날짜 / 상태 / 결정자: D-037 / 2026-09-04 / accepted / 사용자
 사용자 승인 필요 여부: 2026-09-04 사용자 승인 완료.
 ```
 
-RISK_REGISTER 추가 초안: `RK-0xx | 외부 UI 라이브러리·디자인 자산의 라이선스가 독립 웹 사용을 금지(TDS 사례) | low | high | 배포 중단·법적 위험 | 의존성 추가 전 SPDX license 필드와 공식 사용 범위 확인을 Phase 1 scaffold 게이트에 포함 | 자체 구현 | mitigated(D-037)`.
+RISK_REGISTER 추가 초안: `RK-0xx | 외부 UI 라이브러리·디자인 자산의 라이선스가 독립 웹 사용을 금지(TDS 사례) | low | high | 배포 중단·법적 위험 | 의존성 추가 전 SPDX license 필드와 공식 사용 범위 확인을 Phase 1 scaffold 게이트에 포함 | 자체 구현 | mitigated(D-039)`.
 
 ## 6. 완료 기준·성공 기준을 세우기 전에: 기준이 주는 치명적 단점
 
@@ -76,25 +84,32 @@ GitHub 이슈 매핑(2026-09-04 생성): T0 → #10, T1 → #11, T2 → #12, T3�
 
 ### 7.0 전 task 공통 불변·중단 조건
 
-- 불변: D-034(색 값, 시스템 글꼴, light 전용), D-035(chip 선택 표시, 2줄 격자 토글·40px 캐릭터, 하단 탭 이름), D-036(강도 선택기 2줄 세그먼트·앵커 한 줄, 위기 톤, 브랜드 "감정일기"만, 탐색 아이콘 선/면, 4pt 밀도·달력 `1fr`), DESIGN_SYSTEM §2 원칙·§11 하지 않는 것, PR-010.
+- 불변:
+  - **D-034** 색 값, 시스템 글꼴(웹폰트 미탑재), light 전용.
+  - **D-035** 캐릭터 아이콘 40px, 하단 탭 이름(오늘·달력·통계·설정). *2줄 격자 토글은 D-037로 대체됐고 큰 글자 폴백 규격으로만 남는다.*
+  - **D-036** 앵커 문구 한 줄(1~3 / 4~7 / 8~10), 위기 톤, 브랜드 "감정일기"만, 탐색 아이콘 선/면, 4pt 밀도·달력 `1fr`. *2줄 세그먼트 강도는 D-037로 대체됐다.*
+  - **D-037**(신규 불변) 카테고리 = 아크 휠(반지름 460, 간격 7.6°, 회전 45%, listbox/aria-live/화살표 키/reduced-motion), 세부 감정 = 소프트 리스트(1열 행 + 초성 레일 + 선택 트레이 + 초성·부분 검색), 강도 = 슬라이더 + 숫자 + −/+ 스테퍼. **chip은 선택 조작에서 빠지고 표시 전용**(트레이·기록 카드·범례·AI 후보).
+  - **D-038**(provisional) 세부 감정 목록은 심리학 리서치로 재구성 예정이며 **공포/두려움 카테고리가 신설된다**. 이 작업에서 감정 목록·카테고리 수를 건드리지 않는다.
+  - DESIGN_SYSTEM §2 원칙·§11 하지 않는 것, PR-010.
+- **미해결로 열려 있는 항목(이 작업이 도울 수 있음)**: 아크 휠은 반지름이 고정이라 글자를 크게 키우면 항목이 겹친다. 확대 시 2줄 격자로 내려가는 폴백이 필요하다(D-037, DESIGN_SYSTEM §6.2). TDS 관찰에서 "큰 글자·접근성 배율에서의 대체 배치" 규칙이 나오면 `실행 참고`가 아니라 `적용` 후보로 올린다.
 - 금지: `@toss/*`·`@apps-in-toss/*` 설치·import, TDS 코드·CSS 값·색·타이포 수치·이미지·아이콘 복사, 문서 원문 15단어 초과 인용.
 - 중단: 위 금지에 닿는 순간 멈추고 체크포인트에 기록. 프레임워크 선택 논의가 필요해지면 `주의`에 적고 진행하지 않는다. 같은 가설 2회 실패 시 재진단(AGENTS §5).
 - 파일 소유: writer 1명. 하위 에이전트는 `researcher`·`verifier` 역할만 쓰고 읽기 전용이다.
 
 ### T0 — 결정·위험 기록 합치기 (writer, 선행 조건 있음)
 
-- 선행 조건: 디자인 세션의 미커밋 변경이 커밋·푸시되어 `git status`에 `docs/DECISIONS.md`·`docs/DESIGN_SYSTEM.md`·`design/style-guide.html`·`tasks/CURRENT_TASK.md`가 없을 것. 있으면 T0를 건너뛰고 T1부터 하되, T4 전에 반드시 T0로 돌아온다.
-- 산출물: `docs/DECISIONS.md`에 D-037 행(§5 원문을 표 형식으로), `docs/RISK_REGISTER.md`에 위험 행, `docs/STATUS.md` §2에 한 줄, `tasks/CURRENT_TASK.md` 상단에 이 파일로의 링크 한 줄.
+- 선행 조건: 디자인 세션의 미커밋 변경이 커밋·푸시되어 `git status`에 `docs/DECISIONS.md`·`docs/DESIGN_SYSTEM.md`·`design/style-guide.html`·`tasks/CURRENT_TASK.md`가 없을 것. **2026-09-04 기준 충족됐다**(commit `0464800`까지 푸시 완료). 시작 시 `git status`로 다시 확인하고, 다른 세션의 미커밋 변경이 보이면 T0를 건너뛰고 T1부터 하되 T4 전에 반드시 T0로 돌아온다.
+- 산출물: `docs/DECISIONS.md`에 D-039 행(§5 원문을 표 형식으로), `docs/RISK_REGISTER.md`에 위험 행, `docs/STATUS.md` §2에 한 줄, `tasks/CURRENT_TASK.md` 상단에 이 파일로의 링크 한 줄. **주의**: `tasks/CURRENT_TASK.md` 상단에는 이미 TASK-DESIGN 세션이 남긴 조정 메모가 있다 — 지우지 말고 그 아래에 링크를 더한다.
 - 완료 기준: 네 파일에 해당 행이 존재하고 `npm run verify:quick` PASS.
-- 성공 기준: D-037 행만 읽고도 "왜 안 쓰는가"와 "언제 재검토하는가"를 답할 수 있다(URL 없이 요약만 있으면 실패).
+- 성공 기준: D-039 행만 읽고도 "왜 안 쓰는가"와 "언제 재검토하는가"를 답할 수 있다(URL 없이 요약만 있으면 실패).
 - 중단 조건: 대상 파일에 미커밋 변경이 있으면 편집하지 않는다.
 
 ### T1 — TDS Mobile 규칙 관찰 (researcher 2명 병렬, 읽기 전용)
 
 - 입력: §4 문서 인덱스 URL, `docs/DESIGN_SYSTEM.md` §6, `docs/UX_SPEC.md` §11 상태 목록.
 - 분담(파일 겹침 없음):
-  - A 입력·선택: Button, BottomCTA, Checkbox, Segmented Control, Slider, Stepper, Numeric Spinner, TextField, Search Field, Rating → 우리 §6.1 버튼, §6.2 토글, §6.3 chip, §6.4 강도 선택기, §6.5 텍스트 입력.
-  - B 구조·피드백: ListRow, Bottom Sheet, Dialog, Toast, Tab, Top, Skeleton, Loader, Result, Badge, Board Row, List Header/Footer, Progress → 우리 §6.6 저장 상태, §6.7 달력 셀, §6.8 기록 카드, §6.9 대시보드, §6.11 내비·시트·토스트.
+  - A 입력·선택: Button, BottomCTA, Checkbox, Segmented Control, Slider, Stepper, Numeric Spinner, TextField, Search Field, Rating → 우리 §6.1 버튼, §6.2 **카테고리 선택기(아크 휠)**, §6.3 **세부 감정 선택기(소프트 리스트)**·§6.3.1 chip(표시용), §6.4 **강도 선택기(슬라이더+숫자+스테퍼)**, §6.5 텍스트 입력. **D-037로 대응 관계가 더 직접적이 됐다** — 우리도 슬라이더와 스테퍼를 쓰게 됐으므로 TDS의 Slider·Stepper·Numeric Spinner 관찰이 §6.4에 1:1로 붙고, Search Field는 §6.3의 검색 입력에 붙는다.
+  - B 구조·피드백: ListRow, Bottom Sheet, Dialog, Toast, Tab, Top, Skeleton, Loader, Result, Badge, Board Row, List Header/Footer, Progress → 우리 §6.6 저장 상태, §6.7 달력 셀, §6.8 기록 카드, §6.9 대시보드, §6.11 내비·시트·토스트. **ListRow·List Header/Footer는 §6.3 소프트 리스트 행·초성 그룹 머리글과도 직접 대응하므로**, B가 관찰하되 대응 표에서 §6.3으로 연결한다(A와 중복되면 A 쪽에 남기고 B는 참조만 적는다).
 - 산출물: `design/reference/tds-mobile-observations-a.md`, `-b.md`. 각 파일 구조: (1) 대응 표 — 열: 우리 §6 항목 / TDS 컴포넌트 / 관찰된 규칙(우리 말로 바꿔 쓴 상태·간격·배치·피드백 원칙) / 우리 현재 규칙 / 차이 / URL / 확인일. (2) `예상 밖 발견`(필수, 없으면 "없음"). (3) `미확인`(문서에 없어 알 수 없는 것). 우리 §6 항목 중 TDS에 대응이 없는 것은 "해당 없음 — 이유"로 채운다.
 - 하위 에이전트 프롬프트에 반드시 넣을 것: 사실/추론/미확인 구분, 관찰마다 URL+확인일, **코드 블록·CSS 값·픽셀 수치 표·이미지 설명 금지**, 인용은 컴포넌트당 1개·15단어 이내, 우리 불변 목록(§7.0)과 충돌하는 관찰은 그대로 적되 `불변 충돌` 표시.
 - 완료 기준: 두 파일이 존재하고, 우리 §6 항목(6.1~6.11 중 담당분) 모두 행이 있거나 "해당 없음" 사유가 있고, 모든 행에 URL·확인일이 있고, `예상 밖 발견` 절이 있고, 코드 블록이 0개이며 `npm run verify:quick` PASS.
@@ -118,21 +133,21 @@ GitHub 이슈 매핑(2026-09-04 생성): T0 → #10, T1 → #11, T2 → #12, T3�
 
 ### T4 — 정본 반영 (writer)
 
-- 산출물: `docs/DESIGN_SYSTEM.md` §6(채택 규칙 반영), 필요 시 `design/tokens.json`(새 간격·크기 토큰만, 색 값 변경 없음), `design/style-guide.html`(같은 변경), `docs/DECISIONS.md` D-037 행의 결과 갱신 또는 다음 번호의 신규 결정(구성요소 규칙 변경이 있을 때), `docs/TRACEABILITY.md`(UX §11 상태 ↔ §6 매핑이 바뀌면).
+- 산출물: `docs/DESIGN_SYSTEM.md` §6(채택 규칙 반영), 필요 시 `design/tokens.json`(새 간격·크기 토큰만, 색 값 변경 없음), `design/style-guide.html`(같은 변경), `docs/DECISIONS.md` D-039 행의 결과 갱신 또는 다음 번호의 신규 결정(구성요소 규칙 변경이 있을 때), `docs/TRACEABILITY.md`(UX §11 상태 ↔ §6 매핑이 바뀌면).
 - 완료 기준: 채택 규칙이 §6 해당 항목에 "모양 / 상태 / 접근성" 형식으로 들어가 있고, `node scripts/check-contrast.mjs --verbose` 통과, `npm run verify:quick`·`npm run verify:full` PASS, 미리보기(`node scripts/preview.mjs 4173`)에서 변경 항목이 보이며 Artifact(`https://claude.ai/code/artifact/8673a33c-900c-4273-8592-0fb3bdcc36a9`, 먼저 `read`)가 재발행된다.
 - 성공 기준: 채택 규칙마다 UX §11 상태 목록의 어떤 상태를 채우는지 명시되어 있고, 색 토큰 값은 한 개도 바뀌지 않았다(`git diff design/tokens.json`에 `#` 색 값 변경 없음).
-- 중단 조건: D-034·D-035 값을 바꿔야만 반영 가능하면 반영하지 않고 `보류`로 돌린다.
+- 중단 조건: D-034·D-035·**D-037** 값을 바꿔야만 반영 가능하면 반영하지 않고 `보류`로 돌린다. 감정 목록·카테고리 수를 건드려야 하면 D-038 소관이므로 역시 `보류`다.
 
 ### T5 — 독립 검증 (verifier, 읽기 전용)
 
-- 검사: (1) `package.json`·저장소 전체에 `@toss/`·`@apps-in-toss/` 문자열이 문서의 URL·설명 외에 없음(grep). (2) `design/reference/*.md`에 코드 블록·CSS 속성 값·픽셀 수치 표·이미지가 없고 인용이 컴포넌트당 1개·15단어 이내. (3) 관찰 표본 3건 URL 실재 및 내용 일치. (4) D-034·D-035 값 불변(`git diff` 기준). (5) `check-contrast` 144건 통과, `verify:full` PASS. (6) T3 승인 기록과 T4 반영 내용의 1:1 일치.
+- 검사: (1) `package.json`·저장소 전체에 `@toss/`·`@apps-in-toss/` 문자열이 문서의 URL·설명 외에 없음(grep). (2) `design/reference/*.md`에 코드 블록·CSS 속성 값·픽셀 수치 표·이미지가 없고 인용이 컴포넌트당 1개·15단어 이내. (3) 관찰 표본 3건 URL 실재 및 내용 일치. (4) D-034·D-035·D-037 값 불변(`git diff` 기준). 감정 계열 수 7개 유지(D-038은 이 작업 범위 밖). (5) `check-contrast` 144건 통과, `verify:full` PASS. (6) T3 승인 기록과 T4 반영 내용의 1:1 일치.
 - 완료 기준: 6개 검사 각각 통과/실패/미검증과 재현 명령이 이 파일 §10에 기록된다.
 - 성공 기준: 실패 0건. 실패가 있으면 writer가 고치고 T5를 다시 수행하며, 검사를 완화하지 않는다.
 
 ## 8. 새 세션 시작 절차
 
 1. `git status`로 미커밋 변경을 본다. 디자인 세션의 변경이 남아 있으면 그 파일은 편집하지 않는다(T0 선행 조건).
-2. `AGENTS.md` → 이 파일 → `docs/DESIGN_SYSTEM.md` §6·§11 → `docs/UX_SPEC.md` §11 순서로 읽는다. `tasks/CURRENT_TASK.md`의 TASK-DESIGN 절도 읽어 결정 완료 상태(D-036)와 남은 실행 항목을 확인한다. 절 번호가 이 파일과 다르면 정본(DESIGN_SYSTEM·UX_SPEC)을 따른다.
+2. `AGENTS.md` → 이 파일 → `docs/DESIGN_SYSTEM.md` §6·§11 → `docs/UX_SPEC.md` §11 순서로 읽는다. `tasks/CURRENT_TASK.md`의 TASK-DESIGN 절도 읽어 결정 완료 상태(**D-038까지**)와 남은 실행 항목을 확인한다. 그 파일 상단의 조정 메모를 먼저 읽는다. 절 번호가 이 파일과 다르면 정본(DESIGN_SYSTEM·UX_SPEC)을 따른다.
 3. T1을 `researcher` 하위 에이전트 2개로 **병렬** 시작한다(§7 T1의 프롬프트 필수 항목 포함). 기다리는 동안 T0 선행 조건이 충족되면 T0를 한다.
 4. T1 결과를 표본 재확인 → T2 → T3(AskUserQuestion) → T4 → T5 순서로 진행하고, 각 단계 끝에 §9 체크포인트를 갱신한다.
 5. 매 커밋: 한국어 메시지, 마지막 줄 `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`, `npm run verify:quick` 통과 후 `git push origin main`.
@@ -143,9 +158,10 @@ GitHub 이슈 매핑(2026-09-04 생성): T0 → #10, T1 → #11, T2 → #12, T3�
 
 - 완료: 2026-09-04 조사·사용자 결정 3건·이 계획 파일. 저장소 파일 변경 없음(이 파일 추가만).
 - 다음: T0 선행 조건 확인 → T1 researcher 2개 병렬 시작.
-- 결정: D-037 초안(§5, 번호는 T0에서 확정). `docs/DECISIONS.md` 반영은 T0.
-- 실패: 없음. 단, 이 파일을 처음 쓸 때 다른 세션이 이미 D-036을 쓴 것을 뒤늦게 확인해 번호를 D-037로 고쳤다 — 같은 실수를 막기 위해 T0 첫 단계가 번호 확인이다.
-- 주의: `docs/DECISIONS.md`·`docs/DESIGN_SYSTEM.md`·`design/style-guide.html`·`tasks/CURRENT_TASK.md`는 2026-09-04 현재 다른 세션이 수정 중(미커밋). `design/reference/`는 아직 없는 디렉터리이며 T1이 만든다.
+- 결정: D-039 초안(§5, 번호는 T0에서 재확인 후 확정·선점). `docs/DECISIONS.md` 반영은 T0.
+- 실패: 없음. 단, 번호 충돌이 **두 번** 있었다. ① 이 파일을 처음 쓸 때 다른 세션이 이미 D-036을 쓴 것을 뒤늦게 확인해 D-037로 고쳤다. ② 그 뒤 TASK-DESIGN 세션이 D-037·D-038을 먼저 써서 다시 D-039로 밀렸다. 계획서에 번호를 적어 두는 것만으로는 선점이 안 된다 — T0에서 번호를 정하는 즉시 `reserved` 행을 커밋한다.
+- 주의: `design/reference/`는 아직 없는 디렉터리이며 T1이 만든다.
+- **동시 작업 주의(2026-09-04)**: 이 저장소에는 같은 작업 트리를 쓰는 다른 계획이 둘 더 있다 — `tasks/CURRENT_TASK.md`의 TASK-DESIGN(실행 단계)과 `tasks/TASK-MOBILE.md`. 세 계획 모두 `docs/DECISIONS.md`·`docs/STATUS.md`·`docs/TRACEABILITY.md`를 건드리고, TASK-DS-REF와 TASK-MOBILE은 `docs/DESIGN_SYSTEM.md`·`design/style-guide.html`까지 겹친다. AGENTS.md §2에 따라 **한 파일에 writer는 한 명**이므로, 이 작업은 다른 세션이 같은 파일을 쓰고 있지 않을 때만 진행한다. 정말 병렬이 필요하면 별도 worktree/branch(`git worktree add ../emotion-diary-dsref -b task/ds-ref`)에서 작업해 충돌이 merge 단계에서 드러나게 한다.
 
 ## 10. 검증 증거
 
