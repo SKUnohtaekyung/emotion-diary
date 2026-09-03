@@ -1,6 +1,6 @@
 # 캐릭터 아이콘 자산
 
-7개 상위 감정 카테고리를 찾기 쉽게 돕는 보조 아이콘이다. 정본 규칙은 [../../docs/DESIGN_SYSTEM.md](../../docs/DESIGN_SYSTEM.md) §7, 제작 결정 근거는 `docs/DECISIONS.md` D-035.
+7개 상위 감정 카테고리를 찾기 쉽게 돕는 보조 아이콘이다. 정본 규칙은 [../../docs/DESIGN_SYSTEM.md](../../docs/DESIGN_SYSTEM.md) §8, 제작 결정 근거는 `docs/DECISIONS.md` D-035.
 
 ## 1. 만드는 방식
 
@@ -39,7 +39,7 @@ magick design/characters/src/enjoyment-1024.png -resize 120x120 -strip design/ch
 
 ## 4. 쓰는 자리와 쓰지 않는 자리
 
-쓰는 자리는 **카테고리 토글**과 **기록 카드의 카테고리 표시** 두 곳뿐이다. 강도 선택기, 평가·순위 표시, 위기 안내 화면에는 쓰지 않는다(DESIGN_SYSTEM §7·§10, SAFETY_POLICY).
+쓰는 자리는 **카테고리 토글**과 **기록 카드의 카테고리 표시** 두 곳뿐이다. 강도 선택기, 평가·순위 표시, 위기 안내 화면에는 쓰지 않는다(DESIGN_SYSTEM §8·§11, SAFETY_POLICY).
 
 이미지가 없어도 화면은 이름만으로 동작해야 한다. 각 아이콘은 `prompts.json`의 `alt` 값을 그대로 `alt`에 쓰고, 세부 감정 chip처럼 작은 자리에서는 아이콘 대신 8px 카테고리 색 점을 쓴다.
 

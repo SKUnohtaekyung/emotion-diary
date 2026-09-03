@@ -1,4 +1,4 @@
-// design/characters/ 의 캐릭터 아이콘이 규격을 만족하는지 검사한다(DESIGN_SYSTEM §7).
+// design/characters/ 의 캐릭터 아이콘이 규격을 만족하는지 검사한다(DESIGN_SYSTEM §8).
 // 자산이 아직 없으면 pending으로 통과하고, 하나라도 있으면 7종 전부를 요구한다.
 import fs from "node:fs";
 import path from "node:path";

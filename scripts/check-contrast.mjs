@@ -1,4 +1,4 @@
-// design/tokens.json의 색 조합이 WCAG 대비 기준(DESIGN_SYSTEM §8)과
+// design/tokens.json의 색 조합이 WCAG 대비 기준(DESIGN_SYSTEM §9)과
 // 감정 계열 간 색차 ΔE 기준(DESIGN_SYSTEM §3.2)을 만족하는지 검사한다.
 import fs from "node:fs";
 import path from "node:path";

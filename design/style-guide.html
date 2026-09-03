@@ -22,7 +22,7 @@
   --success:#7FCB84;--warning:#F0B54A;--danger:#F28B82;--info:#7FB3F0;}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:"Pretendard Variable",Pretendard,"Noto Sans KR",-apple-system,"Apple SD Gothic Neo",sans-serif;font-size:16px;line-height:1.5;word-break:keep-all;-webkit-font-smoothing:antialiased}
-.wrap{max-width:760px;margin:0 auto;padding:32px 20px 80px}
+.wrap{max-width:760px;margin:0 auto;padding:32px 20px 48px}
 header{display:flex;flex-direction:column;gap:12px;padding-bottom:24px;border-bottom:1px solid var(--border)}
 .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--subtle);font-weight:600}
 h1{font-family:"Gowun Batang","Noto Serif KR",serif;font-size:34px;line-height:1.25;margin:0;text-wrap:balance}
@@ -33,12 +33,12 @@ p{margin:0 0 8px}
 .note{color:var(--muted);font-size:14px;max-width:65ch}
 section{scroll-margin-top:16px}
 /* 색 */
-.fam{display:grid;grid-template-columns:96px repeat(6,1fr);gap:6px;align-items:center;margin:6px 0}
+.fam{display:grid;grid-template-columns:96px repeat(6,1fr);gap:8px;align-items:center;margin:8px 0}
 .fam .name{font-size:14px;font-weight:600}
 .fam .name small{display:block;color:var(--subtle);font-weight:400;font-size:12px}
-.sw{height:44px;border-radius:6px;border:1px solid var(--border);display:flex;align-items:flex-end;justify-content:center;font-size:11px;padding-bottom:3px;font-variant-numeric:tabular-nums}
+.sw{height:44px;border-radius:8px;border:1px solid var(--border);display:flex;align-items:flex-end;justify-content:center;font-size:11px;padding-bottom:4px;font-variant-numeric:tabular-nums}
 .neutrals{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
-.neutrals .sw{height:56px;flex-direction:column;justify-content:center;font-size:12px;gap:2px}
+.neutrals .sw{height:56px;flex-direction:column;justify-content:center;font-size:12px;gap:4px}
 /* chip */
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:999px;font-size:14px;font-weight:500;border:1px solid;cursor:default}
@@ -57,11 +57,11 @@ section{scroll-margin-top:16px}
 .cat .ic{width:40px;height:40px;border-radius:50%}
 .cat.sel{border-width:2px}
 /* 강도 */
-.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;max-width:320px}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-width:320px}
 .seg button{height:44px;border:1px solid var(--border-strong);background:var(--raised);color:var(--text);border-radius:var(--radius);font-size:16px;font-variant-numeric:tabular-nums;font-family:inherit}
 .seg button.sel{border:2px solid var(--anger-500);font-weight:600}
-.anchors{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px;color:var(--muted);max-width:480px;margin-top:8px}
-.anchors b{display:block;color:var(--text);font-variant-numeric:tabular-nums}
+.anchor-line{font-size:12px;color:var(--text);margin:8px 0 0;font-variant-numeric:tabular-nums}
+.anchor-line.muted-line{color:var(--subtle);margin-top:4px}
 /* 버튼 */
 .btns{display:flex;flex-wrap:wrap;gap:8px}
 .btn{height:48px;padding:0 16px;border-radius:var(--radius);font-size:16px;font-weight:600;border:1px solid transparent;display:inline-flex;align-items:center;gap:8px;font-family:inherit;cursor:default}
@@ -72,11 +72,11 @@ section{scroll-margin-top:16px}
 .btn.disabled{opacity:.45}
 /* 상태 */
 .status{display:flex;flex-wrap:wrap;gap:16px;font-size:14px}
-.status span::before{content:"●";margin-right:6px}
+.status span::before{content:"●";margin-right:8px}
 .st-saving{color:var(--info)}.st-saved{color:var(--success)}.st-fail{color:var(--danger)}
 /* 달력 */
-.cal{display:grid;grid-template-columns:repeat(7,44px);gap:6px}
-.day{width:44px;height:44px;border-radius:var(--radius);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;font-variant-numeric:tabular-nums;background:var(--raised);gap:1px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);column-gap:0;row-gap:4px;max-width:320px}
+.day{width:100%;min-width:0;height:44px;border-radius:var(--radius);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:14px;font-variant-numeric:tabular-nums;background:var(--raised);gap:4px}
 .day small{font-size:10px;line-height:1;color:var(--subtle)}
 .day.draft{border-style:dashed}
 .day.done small{color:var(--success)}
@@ -87,24 +87,29 @@ section{scroll-margin-top:16px}
 .card .date{font-size:12px;color:var(--subtle)}
 .card h4{margin:0;font-size:16px;font-weight:600}
 .card .lbl{font-size:12px;color:var(--subtle);letter-spacing:.04em}
-.slots{display:grid;gap:6px}
+.slots{display:grid;gap:8px}
 .slot{height:44px;border:1px solid var(--border);border-radius:var(--radius);background:var(--raised);padding:0 12px;display:flex;align-items:center;color:var(--subtle);font-size:16px}
 .slot.filled{color:var(--text)}
+/* 하단 탐색 */
+.nav{display:grid;grid-template-columns:repeat(4,1fr);height:56px;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--raised);max-width:360px;overflow:hidden}
+.nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:12px;color:var(--subtle)}
+.nav-item svg{width:24px;height:24px}
+.nav-item.cur{color:var(--text);font-weight:600}
 /* 위기 */
 .crisis{background:var(--bg);border:2px solid var(--danger);border-radius:var(--radius-card);padding:16px;display:flex;flex-direction:column;gap:8px}
 .crisis h4{margin:0;font-size:18px}
 /* 타이포 */
-.type{display:grid;gap:10px}
+.type{display:grid;gap:12px}
 .type div{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:baseline;border-bottom:1px solid var(--border);padding-bottom:8px}
 .type .k{font-size:12px;color:var(--subtle);font-variant-numeric:tabular-nums}
 .dont{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
 .dont div{border:1px solid var(--border);border-radius:var(--radius);padding:12px;font-size:14px}
 .dont b{color:var(--danger)}
-.stat{background:var(--surface);border-radius:var(--radius);padding:12px 14px}
+.stat{background:var(--surface);border-radius:var(--radius);padding:12px 16px}
 .stat .k{font-size:14px;color:var(--muted)}.stat .v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}.stat .c{font-size:12px;color:var(--subtle)}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}
 .bar{display:grid;grid-template-columns:72px 1fr 32px;gap:8px;align-items:center;font-size:14px;margin:4px 0}
-.bar i{display:block;height:12px;border-radius:3px}
+.bar i{display:block;height:12px;border-radius:4px}
 .bar em{font-style:normal;font-variant-numeric:tabular-nums;text-align:right;color:var(--muted)}
 @media (prefers-reduced-motion:no-preference){.chip,.btn{transition:transform .12s cubic-bezier(.2,0,0,1)}}
 </style>
@@ -184,12 +189,14 @@ section{scroll-margin-top:16px}
 
 <section>
 <h2>강도 선택기</h2>
-<p class="note">1~10 세그먼트 버튼(2줄). 색은 감정, 숫자는 강도. 강도를 색 농도로 표현하지 않습니다.</p>
+<p class="note">5개씩 2줄 세그먼트 버튼으로 확정(D-036). 색은 감정, 숫자는 강도이며 강도를 색 농도로 표현하지 않습니다. 360px에서 버튼 57.6×44입니다.</p>
 <div class="seg" role="radiogroup" aria-label="강도">
   <button>1</button><button>2</button><button>3</button><button>4</button><button>5</button>
   <button>6</button><button class="sel" aria-checked="true">7</button><button>8</button><button>9</button><button>10</button>
 </div>
-<div class="anchors"><div><b>1</b>거의 스쳐 지나간 감정</div><div><b>5</b>분명히 느껴졌고 하루에 영향을 준 감정</div><div><b>10</b>매우 커서 일상 행동에 큰 영향을 준 감정</div></div>
+<p class="anchor-line">선택 후 — <b>7</b> 분명히 느껴졌고 하루에 영향을 준 감정</p>
+<p class="anchor-line muted-line">선택 전 — 1 거의 스쳐 지나감 → 10 일상에 큰 영향</p>
+<p class="note">앵커 문구는 한 줄만 둡니다(D-036). 세부 감정마다 선택기가 하나씩 나오므로 3줄을 항상 띄우면 같은 문구가 반복됩니다. 구간은 1~3 / 4~7 / 8~10이며 앵커 1·5·10과 어긋나지 않습니다. <code>aria-describedby</code>로 선택기와 연결합니다.</p>
 </section>
 
 <section>
@@ -207,7 +214,7 @@ section{scroll-margin-top:16px}
 
 <section>
 <h2>달력 날짜 셀</h2>
-<p class="note">없음 / draft(점선+연필) / completed(체크) / 오늘(진한 테두리) / 미래(비활성). 색만으로 구분하지 않습니다.</p>
+<p class="note">없음 / draft(점선+연필) / completed(체크) / 오늘(진한 테두리) / 미래(비활성). 색만으로 구분하지 않습니다. 7열은 고정 폭이 아니라 1fr입니다 — 360px 화면에서 44px 셀에 열 간격까지 주면 가로로 넘칩니다.</p>
 <div class="cal">
   <div class="day">28</div>
   <div class="day draft">29<small>✎</small></div>
@@ -249,6 +256,17 @@ section{scroll-margin-top:16px}
   <div class="bar"><span>슬픔</span><i style="background:var(--sadness-500);width:60%"></i><em>3</em></div>
   <div class="bar"><span>기쁨</span><i style="background:var(--joy-700);width:40%"></i><em>2</em></div>
   <div class="bar"><span>즐거움</span><i style="background:var(--enjoyment-500);width:20%"></i><em>1</em></div>
+</div>
+</section>
+
+<section>
+<h2>하단 탐색</h2>
+<p class="note">오늘 · 달력 · 통계 · 설정(D-035). 현재 항목은 색·굵기에 더해 <b>면(filled) 아이콘</b>으로, 나머지는 <b>선(outline) 아이콘</b>으로 표시합니다 — 색만으로 현재 탭을 나타내지 않습니다.</p>
+<div class="nav">
+  <div class="nav-item cur"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3 3 10v11h6v-6h6v6h6V10z"/></svg>오늘</div>
+  <div class="nav-item"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5.5" width="17" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>달력</div>
+  <div class="nav-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19V11M12 19V5M19 19v-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>통계</div>
+  <div class="nav-item"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M12 3.5v2.6M12 17.9v2.6M20.5 12h-2.6M6.1 12H3.5M18 6l-1.8 1.8M7.8 16.2 6 18M18 18l-1.8-1.8M7.8 7.8 6 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>설정</div>
 </div>
 </section>
 

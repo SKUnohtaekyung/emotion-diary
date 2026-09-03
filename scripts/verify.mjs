@@ -130,13 +130,13 @@ function visit(node) {
 }
 for (const node of nodes.keys()) visit(node);
 
-// 디자인 토큰 색 검사: WCAG 대비(DESIGN_SYSTEM §8) + 감정 계열 색차 ΔE(§3.2)
+// 디자인 토큰 색 검사: WCAG 대비(DESIGN_SYSTEM §9) + 감정 계열 색차 ΔE(§3.2)
 if (fs.existsSync(path.join(root, "scripts/check-contrast.mjs"))) {
   const contrast = spawnSync(process.execPath, [path.join(root, "scripts/check-contrast.mjs")], { cwd: root, encoding: "utf8" });
   if (contrast.status !== 0) failures.push(`디자인 토큰 색 검사 실패: ${(contrast.stdout + contrast.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
 }
 
-// 캐릭터 아이콘 규격 검사(DESIGN_SYSTEM §7). 자산 미제작이면 pending으로 통과한다.
+// 캐릭터 아이콘 규격 검사(DESIGN_SYSTEM §8). 자산 미제작이면 pending으로 통과한다.
 if (fs.existsSync(path.join(root, "scripts/check-characters.mjs"))) {
   const chars = spawnSync(process.execPath, [path.join(root, "scripts/check-characters.mjs")], { cwd: root, encoding: "utf8" });
   if (chars.status !== 0) failures.push(`캐릭터 아이콘 검사 실패: ${(chars.stdout + chars.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
