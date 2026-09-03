@@ -2,6 +2,8 @@
 
 7개 상위 감정 카테고리를 찾기 쉽게 돕는 보조 아이콘이다. 정본 규칙은 [../../docs/DESIGN_SYSTEM.md](../../docs/DESIGN_SYSTEM.md) §8, 제작 결정 근거는 `docs/DECISIONS.md` D-035.
 
+> **지금 만들지 말 것.** 공포/두려움 카테고리가 추가될 예정이라(D-038) 7종이 8종이 된다. 아래 §1이 요구하듯 전부 같은 seed로 한 번에 만들어야 하므로, **카테고리가 확정된 뒤에 생성한다.** 먼저 만들면 전부 다시 만들어야 한다.
+
 ## 1. 만드는 방식
 
 원자료(`references/source/*.jpg`)의 손그림 캐릭터를 **자르거나 그대로 쓰지 않고**, 같은 무드로 다시 생성한다. 생성기는 **codex imagegen**이고 프롬프트 정본은 [prompts.json](prompts.json)이다.
@@ -17,7 +19,7 @@
 | `src/<key>-1024.png` | 1024×1024 | 생성 원본. 검수와 재생성 기준으로 저장소에 보관한다 |
 | `<key>.png` | 120×120 | 앱이 쓰는 파일. CSS에서 40px로 표시한다(3x 화면 대응) |
 
-`<key>`는 `enjoyment` `wish` `sadness` `anger` `joy` `love` `hate` 일곱 개다. 모두 **투명 배경 PNG**여야 한다 — 선택된 카테고리 칸은 그 계열의 50 배경을 깔기 때문에 아이콘이 흰 사각형을 달고 있으면 안 된다.
+`<key>`는 현재 `enjoyment` `wish` `sadness` `anger` `joy` `love` `hate` 일곱 개이며, taxonomy v2에서 공포/두려움 키가 추가될 예정이다(D-038). `prompts.json`의 `characters` 배열이 정본이고 `scripts/check-characters.mjs`가 그 배열을 그대로 따르므로, 키를 추가하면 검사 대상도 자동으로 늘어난다. 모두 **투명 배경 PNG**여야 한다 — 선택된 카테고리 칸은 그 계열의 50 배경을 깔기 때문에 아이콘이 흰 사각형을 달고 있으면 안 된다.
 
 크기를 줄일 때(예: ImageMagick):
 
