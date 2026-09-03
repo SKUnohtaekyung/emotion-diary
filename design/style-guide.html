@@ -6,12 +6,12 @@
   --text:#1F1F1D;--muted:#5F5E5A;--subtle:#767570;--focus:#2F6FB5;
   --success:#2E7D32;--warning:#9A5B00;--danger:#C62828;--info:#2F6FB5;
   --enjoyment-50:#F1F8E6;--enjoyment-100:#DCEFC2;--enjoyment-300:#A9D67C;--enjoyment-500:#5E9C2E;--enjoyment-700:#3F7A1C;--enjoyment-900:#1F4A0E;
-  --wish-50:#F3EEFB;--wish-100:#E3D8F6;--wish-300:#BFA6EA;--wish-500:#8E6BD6;--wish-700:#5B3FA3;--wish-900:#35245F;
+  --wish-50:#F8EFFC;--wish-100:#EFDAF7;--wish-300:#D5A3E8;--wish-500:#A855CE;--wish-700:#7B3399;--wish-900:#48195C;
   --sadness-50:#EAF4FB;--sadness-100:#CFE6F7;--sadness-300:#8FC2EA;--sadness-500:#3F8FD6;--sadness-700:#245F97;--sadness-900:#143A5E;
   --anger-50:#FDEEE7;--anger-100:#FBD5C4;--anger-300:#F5A07E;--anger-500:#E8663C;--anger-700:#A63F1E;--anger-900:#64240F;
-  --joy-50:#FFF9E0;--joy-100:#FDF0B3;--joy-300:#F8DE66;--joy-500:#E9BE1A;--joy-700:#9A7A08;--joy-900:#5C4904;
+  --joy-50:#FFF9E0;--joy-100:#FDF0B3;--joy-300:#F8DE66;--joy-500:#E9BE1A;--joy-700:#B08A00;--joy-900:#5C4904;
   --love-50:#FDEEF4;--love-100:#FAD3E2;--love-300:#F29CBE;--love-500:#E1609B;--love-700:#A33566;--love-900:#641C3C;
-  --hate-50:#EEEEF9;--hate-100:#D8D7F1;--hate-300:#A6A2E0;--hate-500:#6D66C9;--hate-700:#45409A;--hate-900:#26235C;
+  --hate-50:#ECEEF8;--hate-100:#D2D6EE;--hate-300:#98A0D4;--hate-500:#4750A6;--hate-700:#2F3878;--hate-900:#1B2049;
   --chip-fill:100;--radius:8px;--radius-card:12px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -110,7 +110,7 @@ section{scroll-margin-top:16px}
 </style>
 <div class="wrap">
 <header>
-  <span class="eyebrow">Design System v1 · provisional</span>
+  <span class="eyebrow">Design System v1 · 색·글꼴·모드 확정(D-034) · 구성요소 검수 중</span>
   <h1>감정일기 스타일 가이드</h1>
   <p class="lede">원자료의 수채 파스텔 일곱 색을 접근성 기준으로 정규화한 토큰과, 그 위에 올라가는 구성요소의 모양·상태입니다. 색은 감정을 찾기 쉽게 돕는 라벨이지 좋고 나쁨이나 점수가 아닙니다.</p>
 </header>
@@ -119,12 +119,12 @@ section{scroll-margin-top:16px}
 <h2>감정 색 7계열</h2>
 <p class="note">각 계열 6단계. chip은 100 위에 900 글자, 강조 테두리와 차트는 500(기쁨만 700). 왼쪽 열은 원자료의 계열 설명입니다.</p>
 <div class="fam"><div class="name">즐거움<small>연두·초록</small></div><div class="sw" style="background:var(--enjoyment-50)">50</div><div class="sw" style="background:var(--enjoyment-100)">100</div><div class="sw" style="background:var(--enjoyment-300)">300</div><div class="sw" style="background:var(--enjoyment-500);color:#fff">500</div><div class="sw" style="background:var(--enjoyment-700);color:#fff">700</div><div class="sw" style="background:var(--enjoyment-900);color:#fff">900</div></div>
-<div class="fam"><div class="name">바램<small>연보라</small></div><div class="sw" style="background:var(--wish-50)">50</div><div class="sw" style="background:var(--wish-100)">100</div><div class="sw" style="background:var(--wish-300)">300</div><div class="sw" style="background:var(--wish-500);color:#fff">500</div><div class="sw" style="background:var(--wish-700);color:#fff">700</div><div class="sw" style="background:var(--wish-900);color:#fff">900</div></div>
+<div class="fam"><div class="name">바램<small>가장 옅은 라일락</small></div><div class="sw" style="background:var(--wish-50)">50</div><div class="sw" style="background:var(--wish-100)">100</div><div class="sw" style="background:var(--wish-300)">300</div><div class="sw" style="background:var(--wish-500);color:#fff">500</div><div class="sw" style="background:var(--wish-700);color:#fff">700</div><div class="sw" style="background:var(--wish-900);color:#fff">900</div></div>
 <div class="fam"><div class="name">슬픔<small>하늘·청색</small></div><div class="sw" style="background:var(--sadness-50)">50</div><div class="sw" style="background:var(--sadness-100)">100</div><div class="sw" style="background:var(--sadness-300)">300</div><div class="sw" style="background:var(--sadness-500);color:#fff">500</div><div class="sw" style="background:var(--sadness-700);color:#fff">700</div><div class="sw" style="background:var(--sadness-900);color:#fff">900</div></div>
 <div class="fam"><div class="name">분노<small>주황·붉은</small></div><div class="sw" style="background:var(--anger-50)">50</div><div class="sw" style="background:var(--anger-100)">100</div><div class="sw" style="background:var(--anger-300)">300</div><div class="sw" style="background:var(--anger-500);color:#fff">500</div><div class="sw" style="background:var(--anger-700);color:#fff">700</div><div class="sw" style="background:var(--anger-900);color:#fff">900</div></div>
 <div class="fam"><div class="name">기쁨<small>노랑</small></div><div class="sw" style="background:var(--joy-50)">50</div><div class="sw" style="background:var(--joy-100)">100</div><div class="sw" style="background:var(--joy-300)">300</div><div class="sw" style="background:var(--joy-500)">500</div><div class="sw" style="background:var(--joy-700);color:#fff">700</div><div class="sw" style="background:var(--joy-900);color:#fff">900</div></div>
 <div class="fam"><div class="name">사랑<small>분홍</small></div><div class="sw" style="background:var(--love-50)">50</div><div class="sw" style="background:var(--love-100)">100</div><div class="sw" style="background:var(--love-300)">300</div><div class="sw" style="background:var(--love-500);color:#fff">500</div><div class="sw" style="background:var(--love-700);color:#fff">700</div><div class="sw" style="background:var(--love-900);color:#fff">900</div></div>
-<div class="fam"><div class="name">미움<small>남색·보라</small></div><div class="sw" style="background:var(--hate-50)">50</div><div class="sw" style="background:var(--hate-100)">100</div><div class="sw" style="background:var(--hate-300)">300</div><div class="sw" style="background:var(--hate-500);color:#fff">500</div><div class="sw" style="background:var(--hate-700);color:#fff">700</div><div class="sw" style="background:var(--hate-900);color:#fff">900</div></div>
+<div class="fam"><div class="name">미움<small>가장 짙은 남색·보라</small></div><div class="sw" style="background:var(--hate-50)">50</div><div class="sw" style="background:var(--hate-100)">100</div><div class="sw" style="background:var(--hate-300)">300</div><div class="sw" style="background:var(--hate-500);color:#fff">500</div><div class="sw" style="background:var(--hate-700);color:#fff">700</div><div class="sw" style="background:var(--hate-900);color:#fff">900</div></div>
 
 <h3>중립·의미 색</h3>
 <div class="neutrals">
@@ -154,15 +154,15 @@ section{scroll-margin-top:16px}
       <span class="chip" style="background:var(--hate-100);border-color:var(--hate-300);color:var(--hate-900)"><i class="dot" style="background:var(--hate-500)"></i>서운한</span>
     </div>
   </div>
-  <div class="dark-panel"><div class="cap">Dark · fill 900 / border 700 / text 100</div>
+  <div class="dark-panel"><div class="cap">Dark · fill 900 / border 700 / text 100 — 토큰 정의만, MVP 화면 미적용(D-034)</div>
     <div class="chips">
       <span class="chip" style="background:#1F4A0E;border-color:#3F7A1C;color:#DCEFC2"><i class="dot" style="background:#A9D67C"></i>상쾌한</span>
       <span class="chip sel" style="background:#64240F;border-color:#F5A07E;color:#FBD5C4"><i class="dot" style="background:#F5A07E"></i>답답한<span class="chk">✓</span></span>
       <span class="chip" style="background:#143A5E;border-color:#245F97;color:#CFE6F7"><i class="dot" style="background:#8FC2EA"></i>허전한</span>
-      <span class="chip" style="background:#5C4904;border-color:#9A7A08;color:#FDF0B3"><i class="dot" style="background:#F8DE66"></i>뿌듯한</span>
+      <span class="chip" style="background:#5C4904;border-color:#B08A00;color:#FDF0B3"><i class="dot" style="background:#F8DE66"></i>뿌듯한</span>
       <span class="chip" style="background:#641C3C;border-color:#A33566;color:#FAD3E2"><i class="dot" style="background:#F29CBE"></i>뿌듯한</span>
-      <span class="chip" style="background:#35245F;border-color:#5B3FA3;color:#E3D8F6"><i class="dot" style="background:#BFA6EA"></i>간절한</span>
-      <span class="chip" style="background:#26235C;border-color:#45409A;color:#D8D7F1"><i class="dot" style="background:#A6A2E0"></i>서운한</span>
+      <span class="chip" style="background:#48195C;border-color:#7B3399;color:#EFDAF7"><i class="dot" style="background:#D5A3E8"></i>간절한</span>
+      <span class="chip" style="background:#1B2049;border-color:#2F3878;color:#D2D6EE"><i class="dot" style="background:#98A0D4"></i>서운한</span>
     </div>
   </div>
 </div>
@@ -273,7 +273,7 @@ section{scroll-margin-top:16px}
   <div><span class="k">label 14/20/500</span><span style="font-size:14px;font-weight:500">답답한 · 7</span></div>
   <div><span class="k">caption 12/16/400</span><span style="font-size:12px;color:var(--subtle)">최근 7일 · 기록 5개</span></div>
 </div>
-<p class="note" style="margin-top:8px">제품 글꼴은 Pretendard 우선, 없으면 시스템 한글 글꼴. 이 미리보기는 Noto Sans KR로 렌더링됩니다.</p>
+<p class="note" style="margin-top:8px">MVP는 웹폰트를 싣지 않고 시스템 한글 글꼴로 렌더링합니다(D-034). 스택은 Pretendard를 먼저 찾으므로, 나중에 웹폰트를 얹으면 토큰 변경 없이 전환됩니다.</p>
 </section>
 
 <section>

@@ -92,29 +92,29 @@
 
 ## 상태
 
-`ready` — 2026-09-02 사용자 요청("디자인 시스템 잡아야 할 것 같다", "새 세션에서 대화하며 정하고, 프리뷰로 계속 확인하고 싶다"). D-033은 provisional이며 사용자 시각 검수로 accepted 전환이 목표다.
+`in-progress` — 2026-09-02 사용자 요청("디자인 시스템 잡아야 할 것 같다", "새 세션에서 대화하며 정하고, 프리뷰로 계속 확인하고 싶다"). 2026-09-04 세션에서 체크리스트 10건 중 4건(감정 색, 기쁨 강조, 다크 모드, 글꼴)을 확정해 D-034로 기록했다. 남은 6건을 정하면 D-033이 accepted로 간다.
 
 ## 정본과 산출물
 
-- 정본: `docs/DESIGN_SYSTEM.md`(원칙·색·글자·간격·구성요소·접근성·금지 사항), 값: `design/tokens.json`, 대비 검사: `scripts/check-contrast.mjs`(quick 하네스에 포함, 60건).
+- 정본: `docs/DESIGN_SYSTEM.md`(원칙·색·글자·간격·구성요소·접근성·금지 사항), 값: `design/tokens.json`, 색 검사: `scripts/check-contrast.mjs`(quick 하네스에 포함, 144건 = WCAG 대비 60 + 감정 계열 색차 ΔE 84).
 - 시각 미리보기(저장소): `design/style-guide.html`. 로컬 서버 `node scripts/preview.mjs 4173` → `http://localhost:4173/`. Claude Code 브라우저 pane에서는 `.claude/launch.json`의 `design-preview` 구성을 `preview_start`로 열면 된다.
 - 시각 미리보기(공유 링크, 같은 내용): https://claude.ai/code/artifact/8673a33c-900c-4273-8592-0fb3bdcc36a9 — 새 세션에서 갱신하려면 Artifact 도구에 `url`로 이 주소를 넘겨 재발행한다(먼저 `read`).
 
 ## 새 세션 작업 루프
 
 1. 사용자와 항목별로 대화해 결정한다(아래 체크리스트). 결정은 `docs/DECISIONS.md` D-033 행 갱신(또는 D-034+ 신규)과 `docs/DESIGN_SYSTEM.md`·`design/tokens.json`에 같은 commit으로 반영한다.
-2. 값을 바꾸면 `node scripts/check-contrast.mjs --verbose`로 대비를 확인하고, `design/style-guide.html`의 `:root` 토큰과 dark-panel 인라인 값을 함께 고친다(현재 미리보기는 tokens.json을 자동 로드하지 않는다 — 자동화는 아래 후속).
+2. 값을 바꾸면 `node scripts/check-contrast.mjs --verbose`로 대비와 계열 색차를 확인하고, `design/style-guide.html`의 `:root` 토큰과 dark-panel 인라인 값을 함께 고친다(현재 미리보기는 tokens.json을 자동 로드하지 않는다 — 자동화는 아래 후속).
 3. 미리보기를 다시 열어 사용자가 확인하게 한다: 브라우저 pane(`design-preview`)과 Artifact 재발행(위 URL). 휴대폰 확인이 필요하면 Artifact 링크를 공유한다.
 4. `npm run verify:quick` → commit → `git push origin main`.
 
 ## 결정 체크리스트 (사용자와 정할 것)
 
-- [ ] 7개 감정 색 계열이 원자료 인상과 맞는가(특히 기쁨 노랑의 강조 700, 미움 남보라의 채도)
-- [ ] chip 규칙(100 fill / 300 border / 900 text)과 선택 표시(2px 500 + 체크)가 충분히 구분되는가
+- [x] 7개 감정 색 계열 — **결정(D-034)**: 바램·미움이 ΔE 3.3~7.0으로 사실상 같은 색이던 결함을 발견해 원자료의 밝기 관계로 되돌렸다(바램 = 가장 옅은 라일락 `#A855CE`, 미움 = 가장 짙은 남색·보라 `#4750A6`). 기쁨 light 강조는 `#9A7A08`(올리브) → `#B08A00`(3.24:1).
+- [ ] chip 규칙(100 fill / 300 border / 900 text)과 선택 표시(2px 500 + 체크)가 충분히 구분되는가 — 색 자체는 D-034로 확정, 남은 건 선택 표시의 형태
 - [ ] 카테고리 토글 형태(가로 스크롤 chip vs 2줄 격자)와 캐릭터 아이콘 제작 방식(단색 아이콘 vs 원본 재가공)
 - [ ] 강도 선택기: 2줄 세그먼트 vs 슬라이더+숫자 병행, 앵커 문구 위치
-- [ ] 글꼴: Pretendard 웹폰트 self-host 여부(용량·라이선스) vs 시스템 글꼴만
-- [ ] 다크 모드: MVP에 포함할지, 시스템 설정만 따를지
+- [x] 글꼴 — **결정(D-034)**: 웹폰트를 싣지 않고 시스템 한글 글꼴만 쓴다. 스택이 Pretendard를 먼저 찾으므로 나중에 `@font-face`만 추가하면 토큰 변경 없이 전환된다.
+- [x] 다크 모드 — **결정(D-034)**: MVP는 light 전용. dark 토큰과 대비 검사는 유지하되 화면에는 적용하지 않고, 나중에 적용해도 앱 내 토글은 두지 않는다.
 - [ ] 달력 셀·기록 카드·대시보드 카드의 밀도(간격 4pt 단계 확인)
 - [ ] 위기 안내 문구 톤과 연락처 표기 형식(연락처 값은 검수 후)
 - [ ] 하단 탐색 4개 이름과 아이콘 스타일(선/면)
@@ -122,14 +122,15 @@
 
 ## 후속 작업(선택)
 
-- `design/style-guide.html`이 `design/tokens.json`을 fetch해 CSS 변수를 생성하도록 바꾸면 값 이중 관리가 사라진다(Artifact는 외부 fetch가 막히므로 발행 시 인라인 필요).
+- `design/style-guide.html`이 `design/tokens.json`을 fetch해 CSS 변수를 생성하도록 바꾸면 값 이중 관리가 사라진다(Artifact는 외부 fetch가 막히므로 발행 시 인라인 필요). 지금은 손으로 맞추며, 값이 어긋나도 하네스가 잡아 주지 못한다 — 이중 관리가 남은 유일한 자리다.
 - 캐릭터 단색 아이콘 7종(`design/characters/`)은 taxonomy v1 검수와 함께 제작.
 - 실기기(iPhone Safari·Android Chrome)에서 chip 대비와 44px 터치 영역 확인.
 
 ## 체크포인트
 
 - 완료(2026-09-02): D-033 provisional, DESIGN_SYSTEM/tokens/check-contrast/style-guide 작성, quick 하네스에 대비 검사 통합, README·UX §8·TRACEABILITY·STATUS 연결, Artifact 발행.
-- 다음: 새 세션에서 위 체크리스트를 사용자와 하나씩 결정.
+- 완료(2026-09-04): 체크리스트 4건 확정 → D-034 accepted. **결함 1건 발견·수정**: 바램·미움 계열이 CIEDE2000 ΔE 3.3(chip 글자)/4.2(chip fill)/7.0(강조)/5.6(dark 강조)으로 구별 불가였다. D-022 때문에 chip의 카테고리 색이 같은 표기 감정의 유일한 구분 단서라 기능 결함이었고, 원자료의 밝기 관계(바램 가장 옅음·미움 가장 짙음)로 되돌려 최솟값 7.2/18.8/11.3/13.3로 회복했다. 재발 방지로 `check-contrast.mjs`에 계열 색차 검사(ΔE≥7, 84건)를 추가했고 옛 값으로 되돌리면 실패하는 것을 확인했다. tokens/DESIGN_SYSTEM/style-guide/STATUS/TRACEABILITY/verify.mjs를 같은 commit에서 갱신.
+- 다음: 남은 체크리스트 6건(chip 선택 표시 형태, 카테고리 토글 배치, 강도 선택기, 카드 밀도, 위기 안내 문구, 하단 탐색 이름·아이콘, 브랜드 표기)을 사용자와 결정 → D-033 accepted 전환.
 - 주의: 색의 의미(어떤 계열이 어떤 감정인지)는 원자료를 따르므로 사용자 승인 없이 바꾸지 않는다(PR-010). 감정 색으로 위험·순위를 표현하지 않는다.
 
 ---

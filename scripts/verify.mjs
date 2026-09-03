@@ -130,10 +130,10 @@ function visit(node) {
 }
 for (const node of nodes.keys()) visit(node);
 
-// 디자인 토큰 대비 검사(DESIGN_SYSTEM §8)
+// 디자인 토큰 색 검사: WCAG 대비(DESIGN_SYSTEM §8) + 감정 계열 색차 ΔE(§3.2)
 if (fs.existsSync(path.join(root, "scripts/check-contrast.mjs"))) {
   const contrast = spawnSync(process.execPath, [path.join(root, "scripts/check-contrast.mjs")], { cwd: root, encoding: "utf8" });
-  if (contrast.status !== 0) failures.push(`디자인 토큰 대비 검사 실패: ${(contrast.stdout + contrast.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
+  if (contrast.status !== 0) failures.push(`디자인 토큰 색 검사 실패: ${(contrast.stdout + contrast.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
 }
 
 const loopState = JSON.parse(fs.readFileSync(path.join(root, "harness/loop-state.json"), "utf8"));

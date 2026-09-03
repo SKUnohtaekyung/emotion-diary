@@ -20,7 +20,7 @@
 - **AI 경로(D-029, D-031)**: 유료 API 없이 PC의 worker가 백엔드 작업 큐를 가져가 Claude Code 헤드리스(`claude -p`)로 처리한다. 작성 보조는 Sonnet 5, 검증·분석은 Opus 5. PC가 꺼져 있으면 AI만 비활성이고 기록·대시보드는 동작한다.
 - **순서(D-018)**: 직접 작성+대시보드의 제한 MVP를 먼저 배포하고 AI 대화·RAG는 그 뒤.
 - **안전(D-020)**: 위기 감지는 AI 관여 경로에서만, 직접 작성 원문은 자동 스캔하지 않으며 한계를 고지. 위기 리소스는 한국 기준.
-- **디자인 시스템(D-033, provisional)**: 원자료 7색 계열의 토큰, chip 중심 강조, 접근성 대비 자동 검사. 정본 `docs/DESIGN_SYSTEM.md`, 값 `design/tokens.json`. 사용자 시각 검수 대기.
+- **디자인 시스템(D-033 provisional / 색·글꼴·모드는 D-034 accepted)**: 원자료 7색 계열의 토큰, chip 중심 강조, 접근성 대비와 계열 색차 자동 검사(144건). 정본 `docs/DESIGN_SYSTEM.md`, 값 `design/tokens.json`. 2026-09-04 사용자 검수로 색 값·글꼴(웹폰트 미탑재)·light 전용을 확정했고, 남은 것은 구성요소 형태 검수다.
 
 ## 3. 스파이크로 확인된 것 (2026-09-02)
 
@@ -39,7 +39,7 @@
 
 ## 4. 다음 할 일 (우선순위 순)
 
-1. **디자인 시스템 검수**: 스타일 가이드 미리보기에서 7개 감정 색·chip·강도 선택기·달력 상태를 확인하고 D-033을 accepted로 전환. 캐릭터 아이콘 자산은 taxonomy 검수와 함께 제작.
+1. **디자인 시스템 구성요소 검수**: 색·글꼴·모드는 D-034로 확정됐다. 남은 것은 chip 선택 표시, 카테고리 토글 배치, 강도 선택기 형태, 카드 밀도, 하단 탐색 이름·아이콘, 위기 안내 문구 톤, 브랜드 표기 7건이며 이걸 정하면 D-033이 accepted로 간다. 캐릭터 아이콘 자산은 taxonomy 검수와 함께 제작.
 2. **G3 taxonomy v1 전사**: 원자료 이미지 2장의 세부 감정을 카테고리별 code(D-022)로 전사하고 시간 분리 2회 검수 또는 사용자 최종 대조(D-027). 직접 작성 화면의 선행 조건.
 3. **Phase 1 app-scaffold**: Workers API, D1 migration(현재 스파이크 스키마 기반), 재현 가능한 install, lint/typecheck/test/build 명령, CI. `package.json`의 하네스 명령과 연결.
 4. **data-foundation**: 하루 1개 unique, revision/idempotency, hard delete(부모 우선 cascade), versioned JSON export, 합성 fixture 테스트.
@@ -55,7 +55,7 @@
 1. **준비**: Node.js 22 이상, Git, `gh`(선택). `git clone https://github.com/SKUnohtaekyung/emotion-diary.git` 후 `npm run verify:quick`이 PASS인지 확인한다(의존성 설치 불필요).
 2. **디자인 미리보기**: `node scripts/preview.mjs 4173` → 브라우저에서 `http://localhost:4173/`. Claude Code에서는 `.claude/launch.json`의 `design-preview`를 브라우저 pane으로 연다. 공유 링크(같은 내용): https://claude.ai/code/artifact/8673a33c-900c-4273-8592-0fb3bdcc36a9
 3. **이어서 할 작업 읽기**: `tasks/CURRENT_TASK.md` 맨 위 **TASK-DESIGN** 절(결정 체크리스트 10개)과 이 문서 §4. 새 세션에 "TASK-DESIGN 이어서"라고 말하면 된다.
-4. **결정 반영 루프**: 값 변경 → `design/tokens.json`·`docs/DESIGN_SYSTEM.md`·`design/style-guide.html`(`:root` 토큰과 dark-panel 인라인 값) 함께 수정 → `node scripts/check-contrast.mjs --verbose` → `npm run verify:quick` → commit → `git push origin main`.
+4. **결정 반영 루프**: 값 변경 → `design/tokens.json`·`docs/DESIGN_SYSTEM.md`·`design/style-guide.html`(`:root` 토큰과 dark-panel 인라인 값) 함께 수정 → `node scripts/check-contrast.mjs --verbose`(대비 + 계열 색차 ΔE) → `npm run verify:quick` → commit → `git push origin main`.
 
 저장소에 **없는 것**(기기마다 다시 준비):
 

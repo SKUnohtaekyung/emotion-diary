@@ -52,7 +52,7 @@
 | --- | --- |
 | PRD 완료조건/일기 구조 | DATA_MODEL, UX_SPEC, AI schemas, EVAL, 이 표 |
 | taxonomy/label | source review, seed/migration, UI, dashboard, prompts, eval fixtures |
-| 색·글자·간격 토큰 | DESIGN_SYSTEM, design/tokens.json, `scripts/check-contrast.mjs`(quick 하네스), UX §8 |
+| 색·글자·간격 토큰 | DESIGN_SYSTEM, design/tokens.json, `scripts/check-contrast.mjs`(quick 하네스: WCAG 대비 + 감정 계열 색차 ΔE≥7), UX §8 |
 | 인증/hosting/DB | ARCHITECTURE, DATA_MODEL migration, SAFETY, B/F/Security tests |
 | 통계 정의 | DATA_MODEL, dashboard UX, analysis snapshots, RAG observation eval |
 | 모델/prompt/schema | AI_RAG_SPEC version, journal/RAG/safety 전체 고정 eval |
