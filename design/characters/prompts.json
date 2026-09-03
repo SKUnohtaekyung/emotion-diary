@@ -1,0 +1,25 @@
+{
+  "version": "characters-v1-draft",
+  "source": "references/source/*.jpg 의 손그림 캐릭터. 원자료를 자르거나 그대로 쓰지 않고 같은 무드로 다시 생성한다(D-035).",
+  "generator": "codex imagegen",
+  "output": { "master": "design/characters/src/<key>-1024.png", "delivered": "design/characters/<key>.png", "master_px": 1024, "delivered_px": 120, "format": "PNG, 투명 배경(alpha)" },
+  "usage_note": "7개를 한 번에, 같은 seed·같은 공통 프롬프트로 생성한다. 한 개만 다시 만들면 선 굵기와 채도가 어긋나 나란히 놓았을 때 티가 난다.",
+  "common_style_prompt": "Hand-drawn children's-book illustration in soft watercolor and colored pencil on lightly textured paper. Simple rounded shapes with visible, slightly wobbly pencil outlines of even weight. Gentle pastel washes with soft bleeding edges and faint paper grain. Minimal detail. Flat and friendly, calm and warm, never slick. A single character centered, full body, facing the viewer at a slight three-quarter angle, occupying about 80% of the frame with even margins on all sides. Fully transparent background. Square 1:1 composition at 1024x1024.",
+  "negative_prompt": "no text, no words, no letters, no Korean characters, no watermark, no signature, no frame, no border, no background scenery, no ground, no drop shadow, no photorealism, no 3D render, no glossy highlights, no vector-sharp edges, no heavy outlines, no weapons, no blood, no explosion, no mushroom cloud, no fire, no menacing or frightening expression, no tears streaming, no human figures, no logos",
+  "characters": [
+    { "key": "enjoyment", "label": "즐거움", "alt": "즐거움 캐릭터", "accent": "#5E9C2E",
+      "subject_prompt": "A small white cartoon dinosaur with a round belly, short arms and a gently curved tail, standing on two legs in the middle of a dance step with one foot lifted. Head tilted, eyes closed in happy upward curves, mouth a small open smile. Two tiny music notes float near its head. Pencil line and note accents in yellow-green." },
+    { "key": "wish", "label": "바램", "alt": "바램 캐릭터", "accent": "#A855CE",
+      "subject_prompt": "A small round-faced grey cat seen head-on, ears up and alert, eyes wide and hopeful looking slightly upward, front paws held together in front of its chest. Fur suggested with fine parallel pencil hatching. Pencil line accents in soft lilac." },
+    { "key": "sadness", "label": "슬픔", "alt": "슬픔 캐릭터", "accent": "#3F8FD6",
+      "subject_prompt": "A small grey cat sitting hunched with its head lowered and ears drooping, tail curled around its front paws, sitting in a shallow pale-blue puddle that reaches its paws. One small round water droplet near its cheek. Quiet, not distressed. Pencil line accents in sky blue." },
+    { "key": "anger", "label": "분노", "alt": "분노 캐릭터", "accent": "#E8663C",
+      "subject_prompt": "A small dark grey cat standing side-on with its back arched and fur bristling, ears flattened back, brows furrowed, mouth a small flat line, tail up and puffed. A soft orange watercolor glow blooms behind its shoulders. Grumpy and comical, never threatening. Pencil line accents in orange-red." },
+    { "key": "joy", "label": "기쁨", "alt": "기쁨 캐릭터", "accent": "#B08A00",
+      "subject_prompt": "A small grey cat flying horizontally through the air, front legs stretched forward and back legs trailing, eyes closed in delight, mouth a small smile. A tiny puff of cloud trails behind its back paws. Pencil line accents in golden yellow." },
+    { "key": "love", "label": "사랑", "alt": "사랑 캐릭터", "accent": "#E1609B",
+      "subject_prompt": "A small pale green-grey cat sitting upright with both front paws raised, eyes gentle upward curves, mouth a small smile. Three small pink hearts of different sizes float up from its chest. Pencil line accents in pink." },
+    { "key": "hate", "label": "미움", "alt": "미움 캐릭터", "accent": "#4750A6",
+      "subject_prompt": "A white cartoon dinosaur with a round body, short arms and a long gently curved tail, turning to look back over its shoulder with a flat, unimpressed, sulky expression: half-lidded eyes and a small downturned mouth. Sulky and a little stubborn, never scary or aggressive. Pencil line accents in deep indigo." }
+  ]
+}

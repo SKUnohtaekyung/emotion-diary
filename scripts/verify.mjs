@@ -20,7 +20,7 @@ const required = [
   "docs/ARCHITECTURE.md", "docs/DATA_MODEL.md", "docs/UX_SPEC.md",
   "docs/AI_RAG_SPEC.md", "docs/SAFETY_POLICY.md", "docs/EVAL_PLAN.md",
   "docs/AGENT_WORKFLOW.md", "docs/DECISIONS.md", "docs/ROADMAP.md",
-  "docs/RISK_REGISTER.md", "docs/TRACEABILITY.md", "docs/STATUS.md", "docs/DESIGN_SYSTEM.md", "design/tokens.json", "scripts/check-contrast.mjs", "tasks/CURRENT_TASK.md", "tasks/TASK_TEMPLATE.md",
+  "docs/RISK_REGISTER.md", "docs/TRACEABILITY.md", "docs/STATUS.md", "docs/DESIGN_SYSTEM.md", "design/tokens.json", "design/characters/prompts.json", "design/characters/README.md", "scripts/check-contrast.mjs", "scripts/check-characters.mjs", "tasks/CURRENT_TASK.md", "tasks/TASK_TEMPLATE.md",
   "references/README.md", "references/manifest.json", "harness/README.md", "harness/work-graph.yaml", "harness/quality-gates.yaml",
   "harness/runtime-profile.json", "harness/runtime-profile.template.json", "harness/loop-state.json", "scripts/claude-stop-hook.mjs", "schemas/README.md",
   "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json",
@@ -134,6 +134,12 @@ for (const node of nodes.keys()) visit(node);
 if (fs.existsSync(path.join(root, "scripts/check-contrast.mjs"))) {
   const contrast = spawnSync(process.execPath, [path.join(root, "scripts/check-contrast.mjs")], { cwd: root, encoding: "utf8" });
   if (contrast.status !== 0) failures.push(`디자인 토큰 색 검사 실패: ${(contrast.stdout + contrast.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
+}
+
+// 캐릭터 아이콘 규격 검사(DESIGN_SYSTEM §7). 자산 미제작이면 pending으로 통과한다.
+if (fs.existsSync(path.join(root, "scripts/check-characters.mjs"))) {
+  const chars = spawnSync(process.execPath, [path.join(root, "scripts/check-characters.mjs")], { cwd: root, encoding: "utf8" });
+  if (chars.status !== 0) failures.push(`캐릭터 아이콘 검사 실패: ${(chars.stdout + chars.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
 }
 
 const loopState = JSON.parse(fs.readFileSync(path.join(root, "harness/loop-state.json"), "utf8"));

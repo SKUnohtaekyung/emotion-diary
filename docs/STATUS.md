@@ -20,7 +20,7 @@
 - **AI 경로(D-029, D-031)**: 유료 API 없이 PC의 worker가 백엔드 작업 큐를 가져가 Claude Code 헤드리스(`claude -p`)로 처리한다. 작성 보조는 Sonnet 5, 검증·분석은 Opus 5. PC가 꺼져 있으면 AI만 비활성이고 기록·대시보드는 동작한다.
 - **순서(D-018)**: 직접 작성+대시보드의 제한 MVP를 먼저 배포하고 AI 대화·RAG는 그 뒤.
 - **안전(D-020)**: 위기 감지는 AI 관여 경로에서만, 직접 작성 원문은 자동 스캔하지 않으며 한계를 고지. 위기 리소스는 한국 기준.
-- **디자인 시스템(D-033 provisional / 색·글꼴·모드는 D-034 accepted)**: 원자료 7색 계열의 토큰, chip 중심 강조, 접근성 대비와 계열 색차 자동 검사(144건). 정본 `docs/DESIGN_SYSTEM.md`, 값 `design/tokens.json`. 2026-09-04 사용자 검수로 색 값·글꼴(웹폰트 미탑재)·light 전용을 확정했고, 남은 것은 구성요소 형태 검수다.
+- **디자인 시스템(D-033 provisional / D-034·D-035 accepted)**: 원자료 7색 계열의 토큰, chip 중심 강조, 접근성 대비와 계열 색차 자동 검사(144건), 캐릭터 자산 규격 검사. 정본 `docs/DESIGN_SYSTEM.md`, 값 `design/tokens.json`, 캐릭터 `design/characters/`. 2026-09-04 사용자 검수로 색 값·글꼴(웹폰트 미탑재)·light 전용(D-034)과 chip 선택 표시·2줄 격자 토글·캐릭터 생성 방식·하단 탐색 이름(D-035)을 확정했다. 남은 것은 구성요소 4건과 캐릭터 자산 실제 생성이다.
 
 ## 3. 스파이크로 확인된 것 (2026-09-02)
 
@@ -39,14 +39,15 @@
 
 ## 4. 다음 할 일 (우선순위 순)
 
-1. **디자인 시스템 구성요소 검수**: 색·글꼴·모드는 D-034로 확정됐다. 남은 것은 chip 선택 표시, 카테고리 토글 배치, 강도 선택기 형태, 카드 밀도, 하단 탐색 이름·아이콘, 위기 안내 문구 톤, 브랜드 표기 7건이며 이걸 정하면 D-033이 accepted로 간다. 캐릭터 아이콘 자산은 taxonomy 검수와 함께 제작.
-2. **G3 taxonomy v1 전사**: 원자료 이미지 2장의 세부 감정을 카테고리별 code(D-022)로 전사하고 시간 분리 2회 검수 또는 사용자 최종 대조(D-027). 직접 작성 화면의 선행 조건.
-3. **Phase 1 app-scaffold**: Workers API, D1 migration(현재 스파이크 스키마 기반), 재현 가능한 install, lint/typecheck/test/build 명령, CI. `package.json`의 하네스 명령과 연결.
-4. **data-foundation**: 하루 1개 unique, revision/idempotency, hard delete(부모 우선 cascade), versioned JSON export, 합성 fixture 테스트.
-5. **direct-journal → dashboard-reminder → 제한 MVP 릴리스**: 원형 6영역 직접 작성, autosave, 완료조건, 달력/상세/수정, 7/30일 통계, 인앱 reminder, 실기기·접근성 검증.
-6. **B-06 잔여 검증**(병렬 가능): job 만료·`failed` 전환, verifier 독립 2회 호출, 위기 케이스, 구독 경로의 데이터 보존 설정, 기동 오버헤드 절감.
-7. **B-05/B-08 잔여**: 백업 절차와 삭제 지연 고지 문구, iPhone Safari 본체·홈 화면 바로가기·Android Chrome 확인, 무료 한도 수치 기록.
-8. **후행**: Phase 3 AI 대화 작성(`safetySignal`, turn token), Phase 5 Evidence 공급망과 RAG 분석(B-07 포함).
+1. **디자인 시스템 구성요소 검수**: 색·글꼴·모드는 D-034, chip 선택 표시·카테고리 토글·캐릭터 제작 방식·하단 탐색 이름은 D-035로 확정됐다. 남은 것은 강도 선택기 형태, 카드 밀도, 위기 안내 문구 톤, 브랜드 표기 4건과 하단 탐색 아이콘 스타일이며, 이걸 정하면 D-033이 accepted로 간다.
+2. **캐릭터 아이콘 7종 생성**: 프롬프트와 규격은 `design/characters/`에 세팅돼 있다(D-035). codex imagegen으로 7종을 같은 seed로 한 번에 생성 → 투명 PNG 1024/120 저장 → `node scripts/check-characters.mjs` 통과 → README §3 눈 검수. taxonomy v1 검수와 함께 진행.
+3. **G3 taxonomy v1 전사**: 원자료 이미지 2장의 세부 감정을 카테고리별 code(D-022)로 전사하고 시간 분리 2회 검수 또는 사용자 최종 대조(D-027). 직접 작성 화면의 선행 조건.
+4. **Phase 1 app-scaffold**: Workers API, D1 migration(현재 스파이크 스키마 기반), 재현 가능한 install, lint/typecheck/test/build 명령, CI. `package.json`의 하네스 명령과 연결.
+5. **data-foundation**: 하루 1개 unique, revision/idempotency, hard delete(부모 우선 cascade), versioned JSON export, 합성 fixture 테스트.
+6. **direct-journal → dashboard-reminder → 제한 MVP 릴리스**: 원형 6영역 직접 작성, autosave, 완료조건, 달력/상세/수정, 7/30일 통계, 인앱 reminder, 실기기·접근성 검증.
+7. **B-06 잔여 검증**(병렬 가능): job 만료·`failed` 전환, verifier 독립 2회 호출, 위기 케이스, 구독 경로의 데이터 보존 설정, 기동 오버헤드 절감.
+8. **B-05/B-08 잔여**: 백업 절차와 삭제 지연 고지 문구, iPhone Safari 본체·홈 화면 바로가기·Android Chrome 확인, 무료 한도 수치 기록.
+9. **후행**: Phase 3 AI 대화 작성(`safetySignal`, turn token), Phase 5 Evidence 공급망과 RAG 분석(B-07 포함).
 
 ## 5. 다른 컴퓨터에서 이어가기
 

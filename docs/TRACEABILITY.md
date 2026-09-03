@@ -22,7 +22,7 @@
 | PR-007 AI 대화 작성(후행, D-018) | `AI_RAG_SPEC` §5(턴 계약, `safetySignal`); `UX_SPEC` §5; D-019 | B-06; EVAL §7 전 지표, 특히 창작/확정 0, fallback 100%, 위기·턴 위조 | model-access-spike, ai-journal |
 | PR-008 하루 1개·소급·streak | `DATA_MODEL` §2~3.1(D-024 원자화), §7 | F-06, F-07, 동시성·timezone·DST fixture | data-store-spike, data-foundation, dashboard-reminder |
 | PR-009 autosave·완료·수정/stale | `DATA_MODEL` §3.1, §3.5(read-time guard), §5(D-023)~6; `ARCHITECTURE` §7 | F-03, F-08~F-11, network/revision/idempotency fixture | data-foundation, direct-journal |
-| PR-010 색상·캐릭터 | `UX_SPEC` §8, §12; `DESIGN_SYSTEM` §3, §7, §8; `design/tokens.json`; source images | EVAL §6 source fidelity, 색 외 의미, AA/스크린리더 | taxonomy-v1, direct-journal |
+| PR-010 색상·캐릭터 | `UX_SPEC` §8, §12; `DESIGN_SYSTEM` §3, §7, §8; `design/tokens.json`; `design/characters/prompts.json`; source images | EVAL §6 source fidelity, 색 외 의미, AA/스크린리더, `scripts/check-contrast.mjs`(대비+계열 ΔE), `scripts/check-characters.mjs`(자산 규격) | taxonomy-v1, direct-journal |
 | PR-011 알림 | `DATA_MODEL` §3.4(PK); `UX_SPEC` §10; `ARCHITECTURE` §7 | F-13, 권한 거부/미지원 fallback, 오늘 완료/소급 사례 | dashboard-reminder |
 | PR-012 결정론적 대시보드 | `DATA_MODEL` §7; `UX_SPEC` §9 | F-12, missing≠0, 수정/삭제 snapshot, 1년 성능 | dashboard-reminder, limited-mvp-release |
 | PR-013 RAG Gate/Verifier(후행, D-018) | `AI_RAG_SPEC` §6~13(§7.2 code/LLM, §8 observation 대조, §9 필수 verifier D-026); `DATA_MODEL` §3.6(retired 소급) | B-06, B-07; EVAL §8 절대 gate, verifier 독립성, injection 0, 관찰 위장 0 | model-access-spike, vector-search-spike, evidence-pipeline, rag-analysis |
