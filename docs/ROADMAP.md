@@ -14,7 +14,8 @@
 - G2b `data-store-spike`: D1 CRUD, unique, 조건부 UPDATE, CHECK/trigger, `batch()` 원자성, wrangler migration, hard delete, Time Travel/export 백업, 무료 한도(B-04/B-05)
 - G2c `model-access-spike`(RAG 트랙, critical path 밖): 본인 PC `claude -p` 구독 경로(D-029). 최소 스파이크 PASS(2026-09-02). 남은 검증: PC worker의 `ai_jobs` 큐 왕복(D-032), 보존/학습 설정, 독립 verifier 2회 호출, 10회 지연 p95, 구독 한도, 위기 신호 케이스
 - G2d `vector-search-spike`(RAG 트랙): 구독/무료 경로의 검색 계층 검증(B-07)
-- G3 taxonomy-v1 전사+D-027 검수(G2와 병렬 가능)
+- G3a `taxonomy-v1` 원자료 전사+D-027 검수(G2와 병렬 가능). 목적은 **출처 아카이빙**(PR-004)이며 게이트는 `source-fidelity`(원본 사진과 1:1 대조)
+- G3b `taxonomy-v2-research` 세부 감정 목록의 심리학 문헌 리서치(D-038). 목적은 **제품이 쓸 목록 확정**이며 게이트는 `taxonomy-evidence`(문헌 축 충족·반증 표·근거 등급·라이선스·검수). G3a와 **병렬 가능하고 G3a를 기다리지 않는다** — 다만 항목 귀속 단계는 v1 전사본을 입력으로 쓰므로 그 시점까지 G3a가 끝나야 한다. 공포 계열 신설로 캐릭터 자산이 7종→8종이 되므로 자산 생성은 이 항목 뒤에 온다
 - quality gates를 실제 명령으로 채우고 quick/full 통과
 - 모든 provisional decision을 confirmed/rejected/unknown으로 평가
 

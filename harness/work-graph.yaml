@@ -3,6 +3,8 @@ graph_kind: directed_acyclic_work_graph
 source_of_truth: docs/AGENT_WORKFLOW.md
 # 2026-09-02 G1(D-018~D-027, 결함 I-10): privacy-hosting-spike를 4개 스파이크로 분해하고
 # limited-mvp-release 노드를 추가했다. 형식은 scripts/verify.mjs 파서(id/depends_on/gate 줄)를 따른다.
+# 2026-09-04 TASK-TAXONOMY T0: taxonomy-v2-research 노드를 신설했다(D-038). docs/TRACEABILITY.md PR-004 행이
+# 이 id를 이미 참조했으나 노드가 없어 끊어진 참조였다. verify.mjs quick은 이 종류를 검사하지 않는다.
 
 statuses:
   allowed: [blocked, ready, in_progress, verifying, done]
@@ -101,9 +103,22 @@ nodes:
       - time-separated double review or user review evidence (D-027)
     gate: source-fidelity
 
+  - id: taxonomy-v2-research
+    status: blocked
+    depends_on: [bootstrap-audit]
+    owns:
+      - docs/research/taxonomy-v2-*.md
+      - data/taxonomy/v2.json and data/taxonomy/v1-to-v2.json
+      - schemas/taxonomy.schema.json
+    outputs:
+      - literature record for research axes A-F with DOI or stable URI and access date (TASK-TAXONOMY 9.1)
+      - falsification table closing the five expert objections plus two independent sources per category (D-038, TASK-TAXONOMY 9.2)
+      - taxonomy v2 with per-item provenance and evidence grade, and the v1-to-v2 migration map keeping emotion_code stable (D-022, D-027)
+    gate: taxonomy-evidence
+
   - id: direct-journal
     status: blocked
-    depends_on: [data-foundation, taxonomy-v1]
+    depends_on: [data-foundation, taxonomy-v1, taxonomy-v2-research]
     owns:
       - direct-entry UI
       - autosave and completion flow
@@ -193,6 +208,9 @@ edges:
     to: taxonomy-v1
     reason: source assets must be verified before transcription
   - from: bootstrap-audit
+    to: taxonomy-v2-research
+    reason: source-governance and evidence-priority assumptions must be verified before literature research
+  - from: bootstrap-audit
     to: evidence-pipeline
     reason: source-governance assumptions must be verified
   - from: hosting-identity-spike
@@ -222,6 +240,9 @@ edges:
   - from: taxonomy-v1
     to: direct-journal
     reason: emotion choices must match source material
+  - from: taxonomy-v2-research
+    to: direct-journal
+    reason: the product-facing emotion list must be the evidence-backed v2 list (D-038)
   - from: direct-journal
     to: ai-journal
     reason: AI must degrade to a working direct flow

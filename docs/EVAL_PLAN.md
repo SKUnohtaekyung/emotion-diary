@@ -272,6 +272,11 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | source-hashes-recorded | taxonomy 파일에 source_files와 원자료 hash가 기록됨 | §6 원자료 충실성 |
 | taxonomy-one-to-one-review | 두 이미지의 모든 label·category가 versioned taxonomy와 1:1 대조되고 카테고리별 code(D-022) 발급 | §6 |
 | user-or-human-review | D-027의 시간 분리 2회 검수 또는 사용자 최종 대조 기록(검수자·날짜) | §6, D-027 |
+| literature-axes-covered | taxonomy v2 조사 축 A~F(기본 정서·위계·차원·한국어 어휘·동기 상태·적대/혐오)가 각 최소 근거 수를 충족하거나 미충족 사유가 기록됨. 모든 출처 행에 DOI 또는 안정 URI와 확인일이 있고 `상충`·`미확인` 절이 존재 | D-038, TASK-TAXONOMY §6.2/§9.1 |
+| falsification-table-complete | D-038이 열거한 전공자 지적 5건(공포 부재·놀람 편중·즐거움/기쁨 중첩·바램의 동기성·미움의 혐오 축)과 조사 중 신규 발견 항목 전부가 반증 표에서 해소 또는 "해소 안 함 + 이유"로 판정되고, 카테고리마다 독립 문헌 2편이 제시됨 | D-038, TASK-TAXONOMY §7.1 (A)(B) |
+| evidence-grade-recorded | taxonomy v2의 모든 세부 감정에 근거 등급(A·B·C)과 근거 참조가 있고 C등급 비율이 15% 이하. v1의 모든 항목이 매핑표에서 keep·move·rename·drop 중 하나로 처리되어 누락 0이며 발굴 어휘는 전부 add로 표시 | D-022, D-038, TASK-TAXONOMY §7.1 (C)(D)/§9.3 |
+| license-check-passed | 척도(PANAS-X·Geneva Emotion Wheel·DES 등)의 문항·어휘 목록을 제품 목록으로 이식한 건 0. 인용은 출처당 1개·15단어 이내이고, 임상 척도를 선별 도구로 차용하지 않음(PR-001) | D-038, TASK-TAXONOMY §6.4 |
+| taxonomy-evidence | `taxonomy-v2-research` 노드 게이트: literature-axes-covered, falsification-table-complete, evidence-grade-recorded, license-check-passed, user-or-human-review | D-038 |
 | mobile-core-flow | iPhone Safari·Android Chrome 실기기에서 직접 작성·저장·수정·삭제·export 완료 | §6 모바일 |
 | accessibility-core-flow | keyboard-only 완주, 한 screen reader 수동 증거, axe serious/critical 0 | §6 접근성 |
 | ai-journal-fixed-set | §7 고정 합성 대화 세트(≥50) 전체 실행 기록 | §7 |

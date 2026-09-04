@@ -88,6 +88,8 @@ node_gates:
     requires: [F-01, F-02, F-06, F-07, F-09, F-10, F-14, F-15]
   source-fidelity:
     requires: [source-hashes-recorded, taxonomy-one-to-one-review, user-or-human-review]
+  taxonomy-evidence:
+    requires: [literature-axes-covered, falsification-table-complete, evidence-grade-recorded, license-check-passed, user-or-human-review]
   core-product:
     requires: [F-03, F-04, F-05, F-07, F-08, mobile-core-flow, accessibility-core-flow]
   journal-ai:
