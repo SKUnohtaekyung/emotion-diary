@@ -208,8 +208,8 @@ section{scroll-margin-top:16px}
 <section>
 <h2>큰 글자 폴백 — 2줄 격자를 9계열에 적용</h2>
 <p class="note">아크 휠은 반지름이 고정이라 글자를 크게 키우면 격자로 폴백해야 합니다(D-035 규격: 칸 높이 80, 아이콘 40, 최소 폭 88). <b>계열이 9개가 되면서 2줄로는 끝나지 않고 3줄이 됩니다.</b> 아래 두 격자는 <b>360px 화면의 콘텐츠 폭 320px</b>로 고정했고, 선택 상태는 공포입니다.</p>
-<p class="note" style="margin-top:12px"><b>A · 4열</b> — 칸이 <b>74px</b>로 D-035의 최소 폭 88에 못 미치고, 마지막 줄에 한 칸만 남습니다.</p>
-  <div class="cats" style="grid-template-columns:repeat(4,1fr);width:320px;max-width:100%">
+<p class="note" style="margin-top:12px;opacity:.55"><b>A · 4열</b> — 칸이 <b>74px</b>로 D-035의 최소 폭 88에 못 미치고, 마지막 줄에 한 칸만 남습니다. <b>기각.</b></p>
+  <div class="cats" style="grid-template-columns:repeat(4,1fr);width:320px;max-width:100%;opacity:.55">
     <div class="cat"><span class="ic" style="background:var(--enjoyment-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--enjoyment-500);display:block"></i></span>즐거움</div>
     <div class="cat"><span class="ic" style="background:var(--wish-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--wish-500);display:block"></i></span>희망</div>
     <div class="cat"><span class="ic" style="background:var(--sadness-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--sadness-500);display:block"></i></span>슬픔</div>
@@ -220,8 +220,8 @@ section{scroll-margin-top:16px}
     <div class="cat sel" style="border-color:var(--fear-500)"><span class="ic" style="background:var(--fear-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--fear-500);display:block"></i></span>공포</div>
     <div class="cat"><span class="ic" style="background:var(--disgust-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--disgust-500);display:block"></i></span>혐오</div>
   </div>
-<p class="note" style="margin-top:16px"><b>B · 3열</b> — 칸 <b>101px</b>로 88을 넘고 3×3으로 빈칸 없이 채워집니다.</p>
-  <div class="cats" style="grid-template-columns:repeat(3,1fr);width:320px;max-width:100%">
+<p class="note" style="margin-top:16px"><b>B · 3열 — 채택(2026-09-04 사용자 결정)</b>. 칸 <b>101px</b>로 88을 넘고 3×3으로 빈칸 없이 채워집니다.</p>
+  <div class="cats" style="grid-template-columns:repeat(3,1fr);width:320px;max-width:100%;outline:2px solid var(--fear-500);outline-offset:6px;border-radius:12px">
     <div class="cat"><span class="ic" style="background:var(--enjoyment-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--enjoyment-500);display:block"></i></span>즐거움</div>
     <div class="cat"><span class="ic" style="background:var(--wish-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--wish-500);display:block"></i></span>희망</div>
     <div class="cat"><span class="ic" style="background:var(--sadness-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--sadness-500);display:block"></i></span>슬픔</div>
