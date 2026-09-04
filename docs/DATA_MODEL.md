@@ -153,6 +153,20 @@ read-time guard(결함 I-16): 저장된 `status`만 믿지 않는다. 분석을 
 
 원본 표기를 OCR로 자동 전사하더라도 출시 전 원본 이미지와 사람이 대조한다. label 수정은 기존 기록을 깨지 않도록 code는 유지하고 taxonomy version과 snapshot label을 갱신한다.
 
+### 4.1 v1 → v2 `emotion_code` 마이그레이션 규칙 (D-038, D-022)
+
+taxonomy v2에서 계열이 7개에서 **9개**가 되고(`공포`·`혐오` 신설), `바램`이 `희망`으로 개명됐다. 이미 저장된 일기를 깨지 않는 규칙은 다음과 같다.
+
+1. **`category_code`는 표시 라벨과 독립이다.** `바램`→`희망` 개명은 `category_code`(`wish`)를 바꾸지 않으므로 **어떤 `emotion_code`도 바뀌지 않는다.** taxonomy `version`과 기록의 snapshot label만 갱신한다. 색 값도 바뀌지 않는다.
+2. **계열 간 이동만 code가 바뀐다.** 예: 슬픔에 있던 `두려운`이 공포로 가면 `sadness-*` → `fear-*`. 오염·역겨움 어휘가 미움에서 혐오로 가면 `hate-*` → `disgust-*`.
+3. **기존 기록을 소급해서 고쳐 쓰지 않는다.** 저장된 `emotion_code`는 그대로 두고, `data/taxonomy/v1-to-v2.json`을 **읽기 시점 별칭 표**로 사용한다. 소급 UPDATE는 하지 않는다(D-024의 원자성 원칙과 재시도 안전성).
+4. **표시는 기록 시점의 snapshot label을 따른다.** 과거 기록을 열었을 때 그때 고른 표기가 보여야 한다. v2 라벨로 덮어쓰지 않는다.
+5. **통계·분석은 v2 code로 정규화한 뒤 집계한다.** 같은 감정이 v1·v2 code로 나뉘어 두 번 세어지면 안 된다(PR-012 결정론적 대시보드).
+6. **매핑표에 없는 v1 code는 오류로 처리한다.** v1의 모든 항목이 `keep`·`move`·`rename`·`drop` 중 하나로 처리되어 **누락 0**인 것이 T4 완료 기준이다.
+7. `drop`된 항목은 code를 재사용하지 않는다. 새 항목에 같은 slug를 붙이더라도 code는 새로 발급한다.
+
+`emotion_code` 형식은 D-022 그대로 `<category_code>-<slug>`이며, 카테고리 간 같은 한글 label이 서로 다른 code인 것도 그대로다.
+
 ## 5. 상태 전이
 
 ```text
