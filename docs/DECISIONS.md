@@ -52,6 +52,7 @@
 **순서 의존성**: 카테고리 수가 바뀌면 캐릭터 자산도 7종에서 8종이 된다. `design/characters/README.md`는 일관성 때문에 "7종을 같은 seed로 한 번에" 생성하도록 정했으므로, **캐릭터 생성은 카테고리 확정 뒤에 해야 한다** — 먼저 만들면 전부 다시 만들어야 한다.
 
 지금은 리서치를 수행하지 않았으므로 `provisional`이며, G3 taxonomy-v1(원자료 전사)은 출처 보존을 위해 그대로 선행한다 | 리서치 수행 결과, 세부 감정 귀속 확정, 색·코드 마이그레이션 영향 평가 |
+| D-040 | reserved | (TASK-TAXONOMY 작업 중) | 번호 선점용 자리표시자. 내용은 `tasks/TASK-TAXONOMY.md` T6에서 채운다(조사 방법론: 판정 기준·중단 조건·라이선스 규칙). **D-039는 `tasks/TASK-DS-REF.md`가 예약해 두었으므로 비워 둔다** | — |
 
 D-017~D-027은 2026-09-02 계획 재검증(TASK-BOOTSTRAP G1)에서 사용자 결정 5건과 결함 등록부 I-01~I-18의 수정 방향을 기록한 것이다. 영향 문서는 `DATA_MODEL`, `ARCHITECTURE`, `AI_RAG_SPEC`, `SAFETY_POLICY`, `UX_SPEC`, `EVAL_PLAN`, `RISK_REGISTER`, `ROADMAP`, `TRACEABILITY`, `harness/*`, `schemas/*`이며 같은 commit에서 갱신했다. D-028은 앱 범위·데이터 계약·유료 외부 서비스를 변경하지 않는다. 설치 시 기존 Git 소유자 불일치 때문에 CBM의 Git 감지가 실패하여 현 root 하나만 전역 `safe.directory`에 등록했다. `.git` 재초기화/commit은 수행하지 않았다.
 
