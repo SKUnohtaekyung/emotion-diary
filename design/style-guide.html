@@ -204,6 +204,36 @@ section{scroll-margin-top:16px}
 </section>
 
 <section>
+<h2>큰 글자 폴백 — 2줄 격자를 9계열에 적용</h2>
+<p class="note">아크 휠은 반지름이 고정이라 글자를 크게 키우면 격자로 폴백해야 합니다(D-035 규격: 칸 높이 80, 아이콘 40, 최소 폭 88). <b>계열이 9개가 되면서 2줄로는 끝나지 않고 3줄이 됩니다.</b> 아래 두 격자는 <b>360px 화면의 콘텐츠 폭 320px</b>로 고정했고, 선택 상태는 공포입니다.</p>
+<p class="note" style="margin-top:12px"><b>A · 4열</b> — 칸이 <b>74px</b>로 D-035의 최소 폭 88에 못 미치고, 마지막 줄에 한 칸만 남습니다.</p>
+  <div class="cats" style="grid-template-columns:repeat(4,1fr);width:320px;max-width:100%">
+    <div class="cat"><span class="ic" style="background:var(--enjoyment-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--enjoyment-500);display:block"></i></span>즐거움</div>
+    <div class="cat"><span class="ic" style="background:var(--wish-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--wish-500);display:block"></i></span>희망</div>
+    <div class="cat"><span class="ic" style="background:var(--sadness-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--sadness-500);display:block"></i></span>슬픔</div>
+    <div class="cat"><span class="ic" style="background:var(--anger-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--anger-500);display:block"></i></span>분노</div>
+    <div class="cat"><span class="ic" style="background:var(--joy-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--joy-700);display:block"></i></span>기쁨</div>
+    <div class="cat"><span class="ic" style="background:var(--love-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--love-500);display:block"></i></span>사랑</div>
+    <div class="cat"><span class="ic" style="background:var(--hate-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--hate-500);display:block"></i></span>미움</div>
+    <div class="cat sel" style="border-color:var(--fear-500)"><span class="ic" style="background:var(--fear-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--fear-500);display:block"></i></span>공포</div>
+    <div class="cat"><span class="ic" style="background:var(--disgust-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--disgust-500);display:block"></i></span>혐오</div>
+  </div>
+<p class="note" style="margin-top:16px"><b>B · 3열</b> — 칸 <b>101px</b>로 88을 넘고 3×3으로 빈칸 없이 채워집니다.</p>
+  <div class="cats" style="grid-template-columns:repeat(3,1fr);width:320px;max-width:100%">
+    <div class="cat"><span class="ic" style="background:var(--enjoyment-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--enjoyment-500);display:block"></i></span>즐거움</div>
+    <div class="cat"><span class="ic" style="background:var(--wish-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--wish-500);display:block"></i></span>희망</div>
+    <div class="cat"><span class="ic" style="background:var(--sadness-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--sadness-500);display:block"></i></span>슬픔</div>
+    <div class="cat"><span class="ic" style="background:var(--anger-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--anger-500);display:block"></i></span>분노</div>
+    <div class="cat"><span class="ic" style="background:var(--joy-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--joy-700);display:block"></i></span>기쁨</div>
+    <div class="cat"><span class="ic" style="background:var(--love-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--love-500);display:block"></i></span>사랑</div>
+    <div class="cat"><span class="ic" style="background:var(--hate-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--hate-500);display:block"></i></span>미움</div>
+    <div class="cat sel" style="border-color:var(--fear-500)"><span class="ic" style="background:var(--fear-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--fear-500);display:block"></i></span>공포</div>
+    <div class="cat"><span class="ic" style="background:var(--disgust-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--disgust-500);display:block"></i></span>혐오</div>
+  </div>
+<p class="note" style="margin-top:8px">격자 전체 높이는 <b>256px</b>로 아크 휠 380px보다 124px 짧습니다. 한편 <b>위 아크 휠에서는 9개 중 7개만 보이고 공포·혐오가 잘립니다</b>(끌면 도달은 됩니다) — 배치 결정 전 두 절을 나란히 보세요.</p>
+</section>
+
+<section>
 <h2>세부 감정 선택기 — 소프트 리스트</h2>
 <p class="note">복수 선택(D-037). 한글 감정 단어는 길이가 들쭉날쭉해 chip 격자에서는 줄이 어긋납니다. 1열 리스트는 길이와 무관하게 가지런하고, 초성 레일이 수십 개를 훑는 문제를 풉니다. 검색은 초성도 됩니다 — <b>ㅎㅈ</b>을 쳐 보세요.</p>
 <div class="pick">
