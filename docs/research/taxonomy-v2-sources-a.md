@@ -13,7 +13,7 @@
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | A | Emotional Expression: Advances in Basic Emotion Theory | Keltner, Sauter, Tracy, Cowen | 2019 | `10.1007/s10919-019-00293-3` (PMC6687086) | 원연구(서술 리뷰) | 영어 | 본문 전체. **공포 신설의 독립 근거 1편.** 사랑도 별도 양식에서 구별되는 표현 증거가 있어 **계열 유지 가능**. 단 이 계열은 놀람을 기본 정서로 유지하므로 우리 결정과 어긋난다(§3 상충 1). 표현이 구별되는 정서가 20종 이상이라는 서술은 **우리 8계열이 "정서의 총목록"이 아니라 "어휘 상위 범주"임을 문서에 명시해야 한다**는 뜻이다. 인용: "anger, fear, happiness, sadness, disgust, and surprise" | 2026-09-04 | ★ |
 | A | Affective neuroscience of the emotional BrainMind | Panksepp | 2010 | `10.31887/DCNS.2010.12.4/jpanksepp` (PMC3181986) | 원연구(리뷰) | 영어 | 본문 전체. **공포 신설의 독립 근거 2편째** — FEAR가 7개 1차 정서 시스템 중 하나인 **명시적 상위 범주**다. 이 계열에는 **놀람 시스템이 없어** 놀람 비카테고리화를 지지한다. 사랑·미움도 1차 시스템이 아니다(CARE/LUST, RAGE로 분해) → **두 계열은 "기본 정서"가 아니라 어휘 범주로 정당화하라.** SEEKING(기대·추구)이 1차 시스템이라 **바램 유지 쪽 반론 근거**가 된다(축 E로 이관). 인용: "The evolved FEAR circuit helps to unconditionally protect animals from pain and destruction" | 2026-09-04 | ★ |
-| A·B | Emotion knowledge: further exploration of a prototype approach | Shaver, Schwartz, Kirson, O'Connor | 1987 | `10.1037/0022-3514.52.6.1061` (PMID 3598857) | 원연구 | 영어 | **초록만**(전문 유료). 축 B의 핵심 근거. **공포 신설의 독립 근거 3편째**이고 **사랑도 기본 수준 범주**다(사랑 유지 2편째). **기쁨(joy)은 하나의 범주 — 즐거움/기쁨을 둘로 나눈 문헌 근거가 이 계열에 없다**(D-038 ③). **놀람만 "perhaps"로 유보**되어 놀람 비카테고리화의 가장 직접적인 근거다. T4 귀속 기준을 여기서 끌어온다(§2 축 B). 인용: "love, joy, anger, sadness, fear, and perhaps, surprise" | 2026-09-04 | 부분(§4-3) |
+| A·B | Emotion knowledge: further exploration of a prototype approach | Shaver, Schwartz, Kirson, O'Connor | 1987 | `10.1037/0022-3514.52.6.1061` (PMID 3598857) | 원연구 | 영어 | **초록만**(전문 유료). 축 B의 핵심 근거. **공포 신설의 독립 근거 3편째**이고 **사랑도 기본 수준 범주**다(사랑 유지 2편째). **기쁨(joy)은 하나의 범주 — 즐거움/기쁨을 둘로 나눈 문헌 근거가 이 계열에 없다**(D-038 ③). **놀람만 "perhaps"로 유보**되고 연구 2는 아예 **기본 정서 5개**의 원형만 다뤄 놀람 비카테고리화의 가장 직접적인 근거다(§4-3). T4 귀속 기준의 출처이나 그 전용에는 한계가 있다(§4-3). 인용: "love, joy, anger, sadness, fear, and perhaps, surprise" | 2026-09-04 | ★ |
 | A | The brain basis of emotion: a meta-analytic review | Lindquist, Wager, Kober, Bliss-Moreau, Barrett | 2012 | `10.1017/S0140525X11000446` (PMID 22617651) | 메타분석 | 영어 | **초록만**(전문 유료). 기본 정서 이론의 **반론 축**. 우리 목록이 이론 논쟁의 한쪽 편만 드는 것으로 보이지 않으려면 **taxonomy 문서에 "이 계열 구분은 신경학적 자연종 주장이 아니라 표현 어휘의 조직 방식"이라는 문구를 넣어야 한다.** PR-001 비진단 경계와 같은 방향이다. 인용: "little evidence that discrete emotion categories can be consistently and specifically localized" | 2026-09-04 | |
 | C | The circumplex model of affect | Posner, Russell, Peterson | 2005 | `10.1017/S0954579405050340` (PMC2367156) | 원연구(이론 리뷰) | 영어 | 본문 전체. 축 C 최소 근거. 2차원은 **정서가(쾌–불쾌)·각성**. **범주는 이 공간에 대한 해석이지 경계가 그어진 구획이 아니다** → §9.2의 계열 경계 정의는 *문헌이 정한 경계*가 아니라 **우리가 정한 운영 정의**로 표기해야 한다. 놀람 같은 정서가 모호 항목은 **다루지 않는다**(공백, writer 확인). 인용: "all affective states arise from cognitive interpretations of core neural sensations" | 2026-09-04 | ★ |
 | B·C | Self-report captures 27 distinct categories of emotion bridged by continuous gradients | Cowen, Keltner | 2017 | `10.1073/pnas.1702247114` (PMC5617253) | 원연구 | 영어 | **publisher 초록만**(본문 렌더링 신뢰 실패, §4-2). 초록 범위에서 확실한 것 셋: ① 정서가·각성만으로는 부족하고 범주 라벨이 더 잘 설명한다 → **계열(범주) + 강도 슬라이더(차원)를 겸용하는 D-037 설계를 지지.** ② 범주 경계가 흐릿하다 → **한 어휘의 복수 카테고리 배치를 허용**해야 하며 D-022가 이미 이를 표현한다. ③ 불안→공포→경악→혐오가 연속 기울기 → 공포 계열에 **강도 낮은 끝과 높은 끝을 함께** 두는 배치가 정당하다. 인용: "the boundaries between categories of emotion are fuzzy rather than discrete" | 2026-09-04 | |
@@ -85,11 +85,34 @@
 
 1. **Ekman 원전 직접 접근 실패.** Ekman & Cordaro 2011은 Sage 403, Semantic Scholar 초록 elided, Ekman 1992 PDF는 스캔 이미지본이라 텍스트 추출 불가. **직계 후속 open-access 논문(Keltner et al. 2019)으로 대체**했으나 Ekman이 제시한 basic 판정 기준 목록 자체는 미확인이다.
 2. **Cowen & Keltner 2017의 최종 27개 범주 구성 판정 불가.** 같은 PMC URL을 두 번 가져와 서로 모순된 답이 나왔고 Europe PMC full-text XML은 404였다. **따라서 "27개에 놀람이 있다/없다"는 어느 쪽 주장도 하지 않는다.** 이 논문에서 쓴 것은 publisher 초록 문장뿐이다.
-3. **Shaver 1987 — writer 재확인 부분 성공.** OpenAlex(`api.openalex.org/works/doi:10.1037/0022-3514.52.6.1061`)로 **제목·연도·저자 4명·학술지·DOI는 정확히 일치 확인**. 그러나 그 레코드에 초록이 없고(`abstract_inverted_index` null), PubMed는 쿠키 벽, Semantic Scholar는 404, 전문은 유료였다. **인용 "love, joy, anger, sadness, fear, and perhaps, surprise"와 초록의 위계 서술은 writer가 독립 확인하지 못했다.** 축 B의 핵심 근거이므로 T4 전에 전문 또는 초록 원문을 확보해 재확인해야 한다.
+3. **Shaver 1987 — writer 재확인 완료(2026-09-04 2차 시도).** 1차 시도는 부분 성공이었다: OpenAlex로 제목·연도·저자 4명·학술지·DOI는 일치했으나 그 레코드에 초록이 없고(`abstract_inverted_index` null), PubMed 웹 UI는 쿠키 벽, Semantic Scholar 404, 전문 유료였다.
+
+   **2차 시도에서 PubMed E-utilities `efetch` API로 초록 전문을 받아 대조했다** — 웹 UI의 쿠키 벽을 우회하는 공식 엔드포인트다(`eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&id=3598857&retmode=xml`). **대조 결과 불일치 0건:**
+
+   | 기록된 주장 | 초록 원문 대조 |
+   | --- | --- |
+   | 인용 "love, joy, anger, sadness, fear, and perhaps, surprise" | **일치**(문자 그대로) |
+   | 기본 수준에 "소수(handful)" 개념 | **일치** — "the handful of concepts … most useful for making everyday distinctions" |
+   | 추상–구체 위계 | **일치** — "abstract-to-concrete hierarchy" |
+   | Rosch 1978 prototype 틀 | **일치**(초록이 명시 인용) |
+   | Fehr & Russell 1984 자유 회상 | **일치**(초록이 명시 인용) |
+   | Bretherton & Beeghly 1982 아동 습득 | **일치**(초록이 명시 인용) |
+   | 이론가 기본 정서 목록 수렴 | **일치** — "what theorists have called basic or primary emotions" |
+   | 서지 JPSP 52(6), 1061–1086 | **일치** |
+
+   **새로 확인된 것 — 연구 2는 기본 정서 "다섯 개"의 원형만 다룬다**("specifying the prototypes, or scripts, of **five** basic emotions"). 초록이 이름을 여섯 개 들면서 실증 연구는 다섯 개만 다뤘다는 뜻이므로, **놀람은 "perhaps"라는 표현상 유보에 그치지 않고 실제 연구 대상에서 빠졌다.** 지적 ②(놀람 비카테고리화)의 근거가 기록보다 강하다.
+
+   **한계 두 가지를 그대로 남긴다.**
+   - **여전히 초록이다(L2).** 전문은 확보하지 못했으므로 등급은 A가 아니라 **B+**(PLAN-V2 §3 등급 표: V1 × L2).
+   - **귀속 기준으로의 전용은 초록이 지지하지 않는다.** 초록에서 Fehr & Russell·Bretherton & Beeghly·이론가 목록은 **기본 수준 범주 집합이 무엇인가에 수렴하는 근거**로 인용됐지 **개별 어휘를 어느 계열에 넣을지 판정하는 기준**으로 제시되지 않았다. §2 축 B가 이 셋을 T4 항목 귀속 기준 (b)(c)(d)로 옮겨 쓴 것은 **writer의 추론**이며 문헌의 직접 지지가 아니다. T4에서 이 기준으로 부여하는 등급은 그 사실을 반영해야 한다.
+   - 참고: PubMed 레코드의 DOI 표기는 `10.1037//0022-3514.52.6.1061`(슬래시 2개)로 PubMed 특유의 표기이며 실제 DOI와 같다. 불일치가 아니다.
 4. **Lindquist 2012 / Noordewier 2013 / Shiota 2017은 초록만**(전부 유료). 판정은 초록 범위 안에서만 성립한다.
 5. **Reisenzein, Horstmann & Schützwohl 2019(놀람 리뷰) 접근 실패** — Wiley 403, 기관 PDF 텍스트 추출 실패. 놀람 정서가 근거가 1편으로 남았다.
 6. **미움·바램은 이 축의 소관이 아니다.** 확인한 것은 부재 관찰뿐이다. 축 E·F로 넘긴 단서 2건: (a) Panksepp의 **SEEKING이 1차 시스템**이므로 "바램은 정서가 아니라 동기"라는 지적에 반론 근거가 된다(writer 재확인). (b) Keltner et al. 2019가 **contempt(경멸)의 구별되는 표현 증거**를 보고하므로 미움을 대인 적대 축으로 재정의할 때의 출발점이 된다.
 7. **라이선스**: 이번 8편에 심리측정 척도는 없다. PANAS/PANAS-X·GEW·DES·임상 척도는 열지 않았고 인용하지 않았다. 다만 **Shaver 1987과 Cowen & Keltner 2017은 본문에 대규모 어휘·범주 목록을 담고 있으므로, T4에서 전문을 확보하더라도 목록 복제는 §6.4 위반**이다.
+8. **A-1(Keltner 외 2019)·A-2(Panksepp 2010)·A-5(Posner 외 2005)의 전문 접근이 2026-09-04 독립 재검증됐다.** 방법: Europe PMC REST `fullTextXML` 엔드포인트를 세 PMC ID에 시도 — PMC3181986(Panksepp, A-2)**만 성공**했고 PMC6687086(Keltner, A-1)·PMC2367156(Posner, A-5)는 **404**였다. 두 편은 **PMC HTML 뷰**로 전환해 본문에 도달했다. **대조 항목 14개(세 문헌 합산 — 서지사항·핵심 주장·인용문 등) 전건 일치, 불일치 0건.** `verification`은 이미 V1(★, §1 표)이므로 `evidence_level`을 **L1**(전문 확인)로 올린다 — `taxonomy-v2-decisions.md` §6-1 정정의 2축 표에서 V1×L1 = 등급 **A**. 이로써 축 A가 확보한 L1 문헌은 A-1·A-2·A-5 세 편이고, `sources-b` §4-A의 B-1(손선주 외 2012)·B-2(박인조·민경환 2005)와 합쳐 **2026-09-04 기준 L1 확보 문헌은 총 5편**이다.
+
+   **알려진 모순 — `tasks/TASK-TAXONOMY.md` §13, 이 작업에서 고치지 않음.** 그 문서 §13 "T2 (2026-09-04)"의 "T2의 알려진 제한"은 **"전문 정독 0편. 20편 전부 초록 또는 초록+일부 구절이다"**라고 적는데, 이는 위 세 편에 대해 더는 사실이 아니다 — 이 항목이 그 정정 근거다. 게다가 **같은 §13 T2 절 안의 "재확인한 9건" 목록에 이미 Panksepp 2010·Posner 2005·Keltner 2019가 들어 있어**, "전문 정독 0편"이라는 문장과 **파일 내부에서도 모순된다.** `tasks/TASK-TAXONOMY.md`는 병행 세션 소유 파일이라 이 작업(소유 파일: `taxonomy-v2-decisions.md`·`taxonomy-v2-sources-a.md`)이 고치지 않았다. **T6 정본 병합 때 그 문서 §13을 이 사실에 맞춰 정정해야 한다.**
 
 ## 5. 발굴 후보 (한국어 감정 어휘)
 

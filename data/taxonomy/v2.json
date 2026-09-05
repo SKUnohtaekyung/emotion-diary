@@ -1,0 +1,2284 @@
+{
+  "version": "emotion-ko-v2",
+  "based_on": "emotion-ko-v1",
+  "review_status": "reviewed",
+  "disclaimer_ko": "이 목록은 기본 정서 분류표가 아니라 일기 표현을 위한 상위 범주다. 각 계열의 경계는 문헌이 그어 준 것이 아니라, 문헌상 구분되는 정서적 상태를 근거로 우리가 정한 운영 정의다. 계열 구분은 신경학적 자연종이나 진단 범주에 대한 주장이 아니다.",
+  "fulltext_sources": [
+    "A-1",
+    "A-2",
+    "A-5",
+    "B-1",
+    "B-2",
+    "C-4",
+    "C-6"
+  ],
+  "evidence_catalog": {
+    "A-1": {
+      "evidence_level": "L1",
+      "verification": "V1",
+      "label": "Keltner 외 2019"
+    },
+    "A-2": {
+      "evidence_level": "L1",
+      "verification": "V1",
+      "label": "Panksepp 2010"
+    },
+    "A-3": {
+      "evidence_level": "L2",
+      "verification": "V1",
+      "label": "Shaver 외 1987"
+    },
+    "A-4": {
+      "evidence_level": "L2",
+      "verification": "V2",
+      "label": "Lindquist 외 2012"
+    },
+    "A-5": {
+      "evidence_level": "L1",
+      "verification": "V1",
+      "label": "Posner 외 2005"
+    },
+    "A-6": {
+      "evidence_level": "L2",
+      "verification": "V2",
+      "label": "Cowen & Keltner 2017"
+    },
+    "A-7": {
+      "evidence_level": "L2",
+      "verification": "V2",
+      "label": "Noordewier & Breugelmans 2013"
+    },
+    "A-8": {
+      "evidence_level": "L2",
+      "verification": "V2",
+      "label": "Shiota 외 2017"
+    },
+    "B-1": {
+      "evidence_level": "L1",
+      "verification": "V1",
+      "label": "손선주 외 2012"
+    },
+    "B-2": {
+      "evidence_level": "L1",
+      "verification": "V1",
+      "label": "박인조·민경환 2005"
+    },
+    "B-3": {
+      "evidence_level": "L2",
+      "verification": "V1",
+      "label": "박만규 2024"
+    },
+    "B-4": {
+      "evidence_level": "L2",
+      "verification": "V2",
+      "label": "서신화 외 2016"
+    },
+    "B-5": {
+      "evidence_level": "L2",
+      "verification": "V2",
+      "label": "차운아 2009"
+    },
+    "B-6": {
+      "evidence_level": "L2",
+      "verification": "V2",
+      "label": "홍영지 외 2016"
+    },
+    "C-1": {
+      "evidence_level": "L2",
+      "verification": "V1",
+      "label": "Bruininks & Malle 2005"
+    },
+    "C-2": {
+      "evidence_level": "L2",
+      "verification": "V1",
+      "label": "Feldman & Jazaieri 2024"
+    },
+    "C-4": {
+      "evidence_level": "L1",
+      "verification": "V1",
+      "label": "Fischer 외 2018"
+    },
+    "C-5": {
+      "evidence_level": "L2",
+      "verification": "V2",
+      "label": "Steele & Roseman 2022"
+    },
+    "C-6": {
+      "evidence_level": "L1",
+      "verification": "V1",
+      "label": "Rozin 외 1999"
+    }
+  },
+  "scale_report": {
+    "acknowledged_categories": [
+      "disgust"
+    ],
+    "acknowledged_by": "user",
+    "acknowledged_at": "2026-09-05",
+    "note_ko": "원자료(v1) 194개 전수를 확인한 결과 오염·역겨움을 직접 표현하는 한국어 어휘는 '구역질나는'·'떫은' 둘뿐이었다. 손선주 외 2012(B-1)의 단어 목록은 라이선스상 재사용이 불가능해 문헌 발굴로 항목 수를 채울 수 없었다. 사용자가 이 규모를 인지한 상태에서 계열 유지를 택했다. 계열 근거 자체(category_grade)는 A등급이지만 실제 어휘 기반은 3개로 약하다."
+  },
+  "categories": [
+    {
+      "code": "enjoyment",
+      "label_ko": "즐거움",
+      "color_token": "color.emotion.enjoyment",
+      "character_asset": "design/characters/enjoyment.png",
+      "boundary_ko": "상태로서 지속되는 쾌",
+      "category_evidence_refs": [
+        "B-3"
+      ],
+      "category_grade": "B+",
+      "shortfall_note_ko": "즐거움을 기쁨과 별개 계열로 두는 독립 문헌은 박만규 2024(B-3) 한 편뿐이다. 손선주 외 2012(B-1)는 오히려 한국어 정서 범주화에서 '즐거움'을 별도 범주로 두지 않았다 — 반대 방향 증거다. 그럼에도 존치하는 것은 이 계열이 v2 신설이 아니라 원자료(v1)에 이미 있던 계열이기 때문이다(PR-004 원자료 보존). §7.1(B)의 '미달 카테고리는 신설하지 않는다'는 신설 계열에 적용되는 기준이라 이 존치를 막지 않는다.",
+      "emotions": [
+        {
+          "code": "enjoyment-light",
+          "label_ko": "가벼운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "joy-light"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-buoyant",
+          "label_ko": "가뿐한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-lively",
+          "label_ko": "경쾌한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-serene",
+          "label_ko": "고요한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-pleasant",
+          "label_ko": "기분좋은",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-composed",
+          "label_ko": "담담한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-cheerful",
+          "label_ko": "명랑한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-bright",
+          "label_ko": "밝은",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-fresh",
+          "label_ko": "산뜻한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-refreshed",
+          "label_ko": "상쾌한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-crisp",
+          "label_ko": "상큼한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-breathless",
+          "label_ko": "숨가쁜",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-thrilled",
+          "label_ko": "신나는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-merry",
+          "label_ko": "유쾌한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-confident",
+          "label_ko": "자신있는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-enjoyable",
+          "label_ko": "즐거운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-jovial",
+          "label_ko": "쾌활한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-comfortable",
+          "label_ko": "편안한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-unburdened",
+          "label_ko": "홀가분한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-energetic",
+          "label_ko": "활기있는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-vivacious",
+          "label_ko": "활발한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-gratified",
+          "label_ko": "흐뭇한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "joy-gratified"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-excited",
+          "label_ko": "흥분된",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "joy-excited"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "enjoyment-hopeful",
+          "label_ko": "희망찬",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    },
+    {
+      "code": "wish",
+      "label_ko": "희망",
+      "color_token": "color.emotion.wish",
+      "character_asset": "design/characters/wish.png",
+      "boundary_ko": "중요하지만 확실하지 않은 특정 결과를 바라는 상태로, 자신의 통제력이 낮을 때. 낙관·기대는 포함하지 않는다",
+      "category_evidence_refs": [
+        "C-1",
+        "C-2"
+      ],
+      "category_grade": "B+",
+      "emotions": [
+        {
+          "code": "wish-earnest",
+          "label_ko": "간절한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-craving",
+          "label_ko": "갈망하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-expectant",
+          "label_ko": "기대하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-wishing",
+          "label_ko": "바라는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-hoping",
+          "label_ko": "소망하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-yearning",
+          "label_ko": "애끓는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-desperate",
+          "label_ko": "절박한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-uneasy",
+          "label_ko": "찝찝한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-shabby",
+          "label_ko": "초라한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-anxious",
+          "label_ko": "초조한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-curiosity",
+          "label_ko": "호기심",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "wish-hopeful",
+          "label_ko": "희망하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    },
+    {
+      "code": "sadness",
+      "label_ko": "슬픔",
+      "color_token": "color.emotion.sadness",
+      "character_asset": "design/characters/sadness.png",
+      "boundary_ko": "상실·좌절에 대한 자기초점 부정 정서 (†)",
+      "category_evidence_refs": [
+        "A-3",
+        "A-2",
+        "B-1"
+      ],
+      "category_grade": "A",
+      "emotions": [
+        {
+          "code": "sadness-heartaching",
+          "label_ko": "가슴아픈",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-worried",
+          "label_ko": "걱정되는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-weary",
+          "label_ko": "고단한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-solitary",
+          "label_ko": "고독한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-troubled",
+          "label_ko": "고민스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-empty",
+          "label_ko": "공허한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-agonized",
+          "label_ko": "괴로운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "hate-tormented"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-mournful",
+          "label_ko": "구슬픈",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-jaded",
+          "label_ko": "권태로운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-apprehensive",
+          "label_ko": "근심되는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-feeling-bad",
+          "label_ko": "기분나쁜",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-disheartened",
+          "label_ko": "낙담한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-heavy-hearted",
+          "label_ko": "마음이무거운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-dazed",
+          "label_ko": "멍한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-choked-up",
+          "label_ko": "뭉클한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "joy-choked-up"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-wrenching",
+          "label_ko": "미어지는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-ashamed",
+          "label_ko": "부끄러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-pitiful",
+          "label_ko": "불쌍한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-uncomfortable",
+          "label_ko": "불편한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-miserable",
+          "label_ko": "비참한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-grief-stricken",
+          "label_ko": "비탄한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-sorrowful",
+          "label_ko": "서글픈",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-bleak",
+          "label_ko": "암담한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-dark-ahead",
+          "label_ko": "앞이깜깜한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-regrettable",
+          "label_ko": "애석한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-piteous",
+          "label_ko": "애처로운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-fretting",
+          "label_ko": "애태우는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-grieving",
+          "label_ko": "애통한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-displeased",
+          "label_ko": "언짢은",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-concerned",
+          "label_ko": "염려하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-lonely",
+          "label_ko": "외로운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-depressed",
+          "label_ko": "우울한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-gloomy",
+          "label_ko": "울적한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-melancholy",
+          "label_ko": "음울한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-dismal",
+          "label_ko": "음침한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-dispirited",
+          "label_ko": "의기소침한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-despairing",
+          "label_ko": "절망적인",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-frustrated",
+          "label_ko": "좌절하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-bored",
+          "label_ko": "지루한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-conflicted",
+          "label_ko": "착찹한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-devastated",
+          "label_ko": "참담한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-embarrassed",
+          "label_ko": "창피한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-forlorn",
+          "label_ko": "처량한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-wretched",
+          "label_ko": "처참한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-commiserating",
+          "label_ko": "측은한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-deeply-grieved",
+          "label_ko": "침통한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-defeated",
+          "label_ko": "패배스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-bitter-regret",
+          "label_ko": "한스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-hollow",
+          "label_ko": "허전한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-deflated",
+          "label_ko": "허탈한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-vacant",
+          "label_ko": "허한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-desolate",
+          "label_ko": "황량한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "hate-desolate"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "sadness-rueful",
+          "label_ko": "후회스런",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-5",
+          "level_downgrade_reason": "Posner 외 2005(A-5)는 정서가·각성 공간과 범주 해석의 관계를 다루는 카테고리 층위 문헌으로, 희망에 있던 '후회스런'이 슬픔으로 귀속된다는 것을 개별 한국어 어휘 수준에서 직접 지지하지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    },
+    {
+      "code": "anger",
+      "label_ko": "분노",
+      "color_token": "color.emotion.anger",
+      "character_asset": "design/characters/anger.png",
+      "boundary_ko": "목표를 가로막거나 정당한 것을 침해한 대상에 대한 반응. 대상의 행동은 바뀔 수 있다고 전제한다",
+      "category_evidence_refs": [
+        "A-3",
+        "A-2",
+        "C-6",
+        "B-1"
+      ],
+      "category_grade": "A",
+      "emotions": [
+        {
+          "code": "anger-painful",
+          "label_ko": "고통스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "hate-painful"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-vexing",
+          "label_ko": "골치아픈",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-reprehensible",
+          "label_ko": "괘씸한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-harsh",
+          "label_ko": "가혹한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-offended",
+          "label_ko": "기분이 상하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-unsightly",
+          "label_ko": "꼴사나운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-boiling",
+          "label_ko": "끓어오르는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-betrayal",
+          "label_ko": "배반감",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-insulting",
+          "label_ko": "모욕적",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-bad",
+          "label_ko": "나쁜",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-wrathful",
+          "label_ko": "노한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-vengeance",
+          "label_ko": "복수심",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-welling-up",
+          "label_ko": "북받침",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-indignant",
+          "label_ko": "분개한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-rage",
+          "label_ko": "분노",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-dissatisfied",
+          "label_ko": "불만스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-displeased",
+          "label_ko": "불쾌한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-upset",
+          "label_ko": "속상한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-suffocating",
+          "label_ko": "숨막히는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-disappointment",
+          "label_ko": "실망감",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-smarting",
+          "label_ko": "쓰라린",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-bitter",
+          "label_ko": "씁쓸한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "anger-galled",
+          "label_ko": "약오르는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    },
+    {
+      "code": "joy",
+      "label_ko": "기쁨",
+      "color_token": "color.emotion.joy",
+      "character_asset": "design/characters/joy.png",
+      "boundary_ko": "어떤 사건에 대해 순간적으로 솟아오르는 쾌",
+      "category_evidence_refs": [
+        "A-3",
+        "A-1",
+        "B-1"
+      ],
+      "category_grade": "A",
+      "emotions": [
+        {
+          "code": "joy-deeply-moved",
+          "label_ko": "감격스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-touching",
+          "label_ko": "감동적인",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-thankful",
+          "label_ko": "감사한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-grateful",
+          "label_ko": "고마운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-encouraging",
+          "label_ko": "고무적인",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-joy",
+          "label_ko": "기쁨",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-classic",
+          "label_ko": "고전적인",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-walking-on-air",
+          "label_ko": "날아갈듯한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-amazing",
+          "label_ko": "놀라운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-light",
+          "label_ko": "가벼운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "enjoyment-light"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-moving-to-tears",
+          "label_ko": "눈물겨운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-reassured",
+          "label_ko": "든든한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-satisfied",
+          "label_ko": "만족스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-choked-up",
+          "label_ko": "뭉클한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "sadness-choked-up"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-glad",
+          "label_ko": "반가운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-overflowing",
+          "label_ko": "벅찬",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-proud",
+          "label_ko": "뿌듯한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "love-proud"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-alive",
+          "label_ko": "살맛나는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-refreshing",
+          "label_ko": "시원한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-fresh",
+          "label_ko": "싱그러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-good",
+          "label_ko": "좋은",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-thrilling",
+          "label_ko": "짜릿한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-pleasant",
+          "label_ko": "쾌적한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-exhilarating",
+          "label_ko": "통쾌한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-cozy",
+          "label_ko": "포근한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "love-cozy"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-snug",
+          "label_ko": "푸근한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-happy",
+          "label_ko": "행복한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-fantastic",
+          "label_ko": "환상적인",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-relieved",
+          "label_ko": "후련한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-gratified",
+          "label_ko": "흐뭇한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "enjoyment-gratified"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-willing",
+          "label_ko": "흔쾌한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "joy-excited",
+          "label_ko": "흥분된",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "enjoyment-excited"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    },
+    {
+      "code": "love",
+      "label_ko": "사랑",
+      "color_token": "color.emotion.love",
+      "character_asset": "design/characters/love.png",
+      "boundary_ko": "특정 대상을 향한 애착·돌봄 (타인초점 †)",
+      "category_evidence_refs": [
+        "A-3",
+        "A-1"
+      ],
+      "category_grade": "B+",
+      "emotions": [
+        {
+          "code": "love-sweet",
+          "label_ko": "감미로운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-grateful",
+          "label_ko": "감사하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-longing",
+          "label_ko": "그리운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-affectionate",
+          "label_ko": "다정한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-warm",
+          "label_ko": "따사로운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-strange",
+          "label_ko": "묘한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-proud",
+          "label_ko": "뿌듯한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "joy-proud"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-lovely",
+          "label_ko": "사랑스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-gentle",
+          "label_ko": "상냥한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-pure",
+          "label_ko": "순수한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-tender",
+          "label_ko": "애틋한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-ardent",
+          "label_ko": "열렬한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-yearning",
+          "label_ko": "열망하는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-familiar",
+          "label_ko": "친숙한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-cozy",
+          "label_ko": "포근한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "joy-cozy"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-likable",
+          "label_ko": "호감이가는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-flushed",
+          "label_ko": "화끈거리는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "love-content",
+          "label_ko": "흡족한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    },
+    {
+      "code": "hate",
+      "label_ko": "미움",
+      "color_token": "color.emotion.hate",
+      "character_asset": "design/characters/hate.png",
+      "boundary_ko": "특정 사람·집단을 향한 지속적 적대. 대상의 성향이 잘 바뀌지 않는다고 볼 때",
+      "category_evidence_refs": [
+        "C-4",
+        "C-5"
+      ],
+      "category_grade": "C",
+      "shortfall_note_ko": "미움의 계열 근거는 2편(C-4, C-5)으로 편수 조건은 채우지만, 두 번째 근거인 Steele & Roseman 2022(C-5)는 초록 수준 확인에 그치고 그 논문 스스로도 증오와 분노를 가르는 통제가능성 차원이 설문 문항 하나에서만 지지됐다고 보고한다. 즉 편수는 채웠으나 두 번째 근거의 실질 강도는 낮다. 그럼에도 계열 자체는 PR-004(원자료 보존)와 §6.5 ③ 근거로 존치한다.",
+      "emotions": [
+        {
+          "code": "hate-painful",
+          "label_ko": "고통스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "anger-painful"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-tormented",
+          "label_ko": "괴로운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "sadness-agonized"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-bothersome",
+          "label_ko": "귀찮은",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-worrisome",
+          "label_ko": "근심스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-heartless",
+          "label_ko": "무정한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-hateful",
+          "label_ko": "미운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-burdensome",
+          "label_ko": "부담스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-let-down",
+          "label_ko": "서운한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-disliking",
+          "label_ko": "싫은",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-tired-of",
+          "label_ko": "싫증나는",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-unkind",
+          "label_ko": "야속한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-spiteful",
+          "label_ko": "얄미운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-aggrieved",
+          "label_ko": "억울한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-resentful",
+          "label_ko": "원망스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-guilt",
+          "label_ko": "죄책감",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-loathsome",
+          "label_ko": "증오스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-sick-of",
+          "label_ko": "지겨운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-irritating",
+          "label_ko": "짜증스러운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-cold",
+          "label_ko": "차가운",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-desolate",
+          "label_ko": "황량한",
+          "source": "raw",
+          "evidence_level": "L4",
+          "verification": "V1",
+          "evidence_grade": "B",
+          "also_in": [
+            "sadness-desolate"
+          ],
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "hate-hating",
+          "label_ko": "증오하는",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "C-4",
+          "level_downgrade_reason": "Fischer 외 2018(C-4)은 미움이 안정적 부정 성향 지각에 근거한 지속적 적대라는 카테고리 층위 주장을 뒷받침하지만, 슬픔에 있던 '증오하는'이 미움으로 귀속된다는 것을 개별 어휘 수준에서 직접 지지하지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    },
+    {
+      "code": "fear",
+      "label_ko": "공포",
+      "color_token": "color.emotion.fear",
+      "character_asset": "design/characters/fear.png",
+      "boundary_ko": "위협·위험 앞에서 물러서거나 몸이 굳는 상태",
+      "is_new_in_v2": true,
+      "category_evidence_refs": [
+        "A-1",
+        "A-2",
+        "A-3"
+      ],
+      "category_grade": "A",
+      "emotions": [
+        {
+          "code": "fear-terrified",
+          "label_ko": "공포에질린",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-1",
+          "level_downgrade_reason": "Keltner 외 2019(A-1)는 공포가 독립된 기본 정서 표현 범주라는 카테고리 층위 주장을 뒷받침하지만, 슬픔에 있던 '공포에질린'이 이 범주에 귀속된다는 것을 개별 어휘 수준에서 직접 지지하지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "fear-fearful",
+          "label_ko": "두려운",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-1",
+          "level_downgrade_reason": "Keltner 외 2019(A-1)는 공포 표현의 범주적 독립성을 뒷받침하지만, '두려운'이라는 개별 한국어 어휘가 그 범주에 속한다는 것까지 직접 검증하지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "fear-uneasy",
+          "label_ko": "불안한",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-1",
+          "level_downgrade_reason": "Keltner 외 2019(A-1)는 공포가 독립 범주로 성립한다는 카테고리 층위 근거이며, '불안한'이라는 어휘 하나하나의 귀속을 개별적으로 확인해 주는 근거는 아니다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "fear-frightening",
+          "label_ko": "무서운",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-1",
+          "level_downgrade_reason": "Keltner 외 2019(A-1)는 공포 표현이 분노 등 다른 정서와 구별되는 독립 범주라는 주장을 뒷받침하지만, 분노 계열에 있던 '무서운'이 공포로 귀속돼야 한다는 것을 직접 지지하지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "fear-chilling",
+          "label_ko": "섬뜩한",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-1",
+          "level_downgrade_reason": "Keltner 외 2019(A-1)는 공포의 범주적 독립성을 뒷받침하는 카테고리 층위 문헌이며, '섬뜩한'이라는 개별 어휘의 귀속까지 직접 검증한 것은 아니다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "fear-creepy",
+          "label_ko": "소름끼치는",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-1",
+          "level_downgrade_reason": "Keltner 외 2019(A-1)는 공포가 독립된 기본 정서 범주라는 주장의 근거이지만, '소름끼치는'이 그 범주에 속한다는 개별 어휘 수준의 근거를 직접 제공하지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "fear-shuddering",
+          "label_ko": "몸서리치는",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-1",
+          "level_downgrade_reason": "Keltner 외 2019(A-1)는 공포 표현이 독립 범주로 성립한다는 카테고리 층위 주장을 지지하지만, 미움에 있던 '몸서리치는'의 귀속을 개별적으로 확인해 주지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "fear-horrible",
+          "label_ko": "끔찍한",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "A-1",
+          "level_downgrade_reason": "Keltner 외 2019(A-1)는 공포의 범주적 독립성을 뒷받침하는 근거이며, '끔찍한'이라는 어휘가 공포로 귀속된다는 것은 이 문헌이 직접 지지하는 바가 아니다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    },
+    {
+      "code": "disgust",
+      "label_ko": "혐오",
+      "color_token": "color.emotion.disgust",
+      "character_asset": "design/characters/disgust.png",
+      "boundary_ko": "오염·역겨움에 대한 거부. 대인 적대와 구분한다",
+      "is_new_in_v2": true,
+      "category_evidence_refs": [
+        "C-6",
+        "B-1"
+      ],
+      "category_grade": "A",
+      "emotions": [
+        {
+          "code": "disgust-nauseating",
+          "label_ko": "구역질나는",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "C-6",
+          "level_downgrade_reason": "Rozin 외 1999(C-6)는 혐오가 오염·순수 축의 독립 도덕 정서라는 카테고리 층위 주장을 뒷받침하지만, 분노·미움 두 계열에 흩어져 있던 '구역질나는'이 혐오로 귀속된다는 것을 개별 어휘 수준에서 직접 검증하지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "disgust-astringent",
+          "label_ko": "떫은",
+          "source": "raw",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "C-6",
+          "level_downgrade_reason": "Rozin 외 1999(C-6)는 혐오의 범주적 독립성을 지지하는 근거이며, 분노에 있던 '떫은'이 혐오로 귀속돼야 한다는 것까지 개별적으로 확인해 주지는 않는다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        },
+        {
+          "code": "disgust-repulsive",
+          "label_ko": "혐오스러운",
+          "source": "literature",
+          "evidence_level": "L3",
+          "verification": "V1",
+          "evidence_grade": "C",
+          "evidence_ref": "B-1",
+          "level_downgrade_reason": "손선주 외 2012(B-1)는 혐오가 한국어 정서 어휘 범주화에서 독립 범주로 나타난다는 카테고리 층위 근거이지만, 신규 발굴 어휘 '혐오스러운'의 개별 귀속을 이 문헌이 직접 검증한 것은 아니다.",
+          "reviewer": "writer",
+          "reviewed_at": "2026-09-05"
+        }
+      ]
+    }
+  ],
+  "review": {
+    "first_pass_by": null,
+    "first_pass_date": null,
+    "second_pass_by": null,
+    "second_pass_date": null,
+    "user_cross_check_by": "user",
+    "user_cross_check_date": "2026-09-05"
+  }
+}

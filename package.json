@@ -10,7 +10,8 @@
   "scripts": {
     "verify": "node scripts/verify.mjs --mode full",
     "verify:quick": "node scripts/verify.mjs --mode quick",
-    "verify:full": "node scripts/verify.mjs --mode full"
+    "verify:full": "node scripts/verify.mjs --mode full",
+    "test": "node scripts/test-check-taxonomy.mjs"
   }
 }
 

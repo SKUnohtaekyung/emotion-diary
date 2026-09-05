@@ -93,8 +93,10 @@ nodes:
     gate: data-integrity
 
   - id: taxonomy-v1
-    status: blocked
+    status: done
     depends_on: [bootstrap-audit]
+    # 2026-09-04: transcribed to data/taxonomy/v1.json (7 categories, 194 items) and user-cross-checked
+    # (D-027 §7.8b). review_status: reviewed. Plan and procedure: tasks/TASK-TAXONOMY-V1.md.
     owns:
       - versioned taxonomy data
       - character and color tokens
@@ -104,8 +106,11 @@ nodes:
     gate: source-fidelity
 
   - id: taxonomy-v2-research
-    status: blocked
+    status: done
     depends_on: [bootstrap-audit]
+    # 2026-09-05: v2.json complete (9 categories, 194 items, data/taxonomy/v2.json), falsification
+    # table and evidence grading done (D-040), independent verification (T7a) 8/8 passed.
+    # review_status: reviewed -- final user cross-check (D-027) completed (user_cross_check_by: user, user_cross_check_date: 2026-09-05).
     owns:
       - docs/research/taxonomy-v2-*.md
       - data/taxonomy/v2.json and data/taxonomy/v1-to-v2.json

@@ -24,7 +24,8 @@ const required = [
   "references/README.md", "references/manifest.json", "harness/README.md", "harness/work-graph.yaml", "harness/quality-gates.yaml",
   "harness/runtime-profile.json", "harness/runtime-profile.template.json", "harness/loop-state.json", "scripts/claude-stop-hook.mjs", "schemas/README.md",
   "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json",
-  "schemas/evidence-card.schema.json", "schemas/analysis-output.schema.json", "schemas/export.schema.json"
+  "schemas/evidence-card.schema.json", "schemas/analysis-output.schema.json", "schemas/export.schema.json",
+  "schemas/taxonomy.schema.json", "scripts/check-taxonomy.mjs", "scripts/test-check-taxonomy.mjs"
 ];
 
 for (const relative of required) {
@@ -64,7 +65,7 @@ for (const absolute of files) {
   }
 }
 
-for (const jsonFile of ["package.json", "design/tokens.json", ".claude/settings.json", "harness/runtime-profile.json", "harness/runtime-profile.template.json", "harness/loop-state.json", "references/manifest.json", "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json", "schemas/evidence-card.schema.json", "schemas/analysis-output.schema.json", "schemas/export.schema.json"]) {
+for (const jsonFile of ["package.json", "design/tokens.json", ".claude/settings.json", "harness/runtime-profile.json", "harness/runtime-profile.template.json", "harness/loop-state.json", "references/manifest.json", "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json", "schemas/evidence-card.schema.json", "schemas/analysis-output.schema.json", "schemas/export.schema.json", "schemas/taxonomy.schema.json", "data/taxonomy/v1.json", "data/taxonomy/v2.json", "data/taxonomy/v1-to-v2.json"]) {
   const absolute = path.join(root, jsonFile);
   if (!fs.existsSync(absolute)) continue;
   try { JSON.parse(fs.readFileSync(absolute, "utf8")); }
@@ -130,6 +131,19 @@ function visit(node) {
 }
 for (const node of nodes.keys()) visit(node);
 
+// 추적성 표 §2의 "작업 그래프 노드" 열이 실재 node를 가리키는지 검사한다.
+// TASK-TAXONOMY T0이 끊어진 참조(PR-004 -> taxonomy-v2-research)를 임시 스크립트로만
+// 잡았고 quick/full은 이 종류를 검사하지 않았다 — 그 구멍을 여기서 막는다.
+for (const line of traceability.split(/\r?\n/)) {
+  if (!/^\| PR-\d{3}/.test(line)) continue;
+  const cells = line.split("|").map((cell) => cell.trim());
+  const nodeCell = cells[cells.length - 2] ?? "";
+  for (const reference of nodeCell.split(",").map((value) => value.trim()).filter(Boolean)) {
+    if (!/^[a-z0-9-]+$/.test(reference)) { failures.push(`추적성 표의 잘못된 node 표기: ${cells[1]} -> ${reference}`); continue; }
+    if (!nodes.has(reference)) failures.push(`추적성 표가 실재하지 않는 작업 그래프 node를 참조: ${cells[1]} -> ${reference}`);
+  }
+}
+
 // 디자인 토큰 색 검사: WCAG 대비(DESIGN_SYSTEM §9) + 감정 계열 색차 ΔE(§3.2)
 if (fs.existsSync(path.join(root, "scripts/check-contrast.mjs"))) {
   const contrast = spawnSync(process.execPath, [path.join(root, "scripts/check-contrast.mjs")], { cwd: root, encoding: "utf8" });
@@ -142,6 +156,13 @@ if (fs.existsSync(path.join(root, "scripts/check-characters.mjs"))) {
   if (chars.status !== 0) failures.push(`캐릭터 아이콘 검사 실패: ${(chars.stdout + chars.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
 }
 
+// taxonomy 데이터 검사(TASK-TAXONOMY §9.3): schema 대조 + 등급 도출·매핑 누락·인용 15단어.
+// data/taxonomy/가 없으면 검사기가 pending으로 통과한다.
+if (fs.existsSync(path.join(root, "scripts/check-taxonomy.mjs"))) {
+  const taxonomy = spawnSync(process.execPath, [path.join(root, "scripts/check-taxonomy.mjs")], { cwd: root, encoding: "utf8" });
+  if (taxonomy.status !== 0) failures.push(`taxonomy 검사 실패: ${(taxonomy.stdout + taxonomy.stderr).trim().split(/\r?\n/).filter((line) => line.startsWith("FAIL")).slice(0, 3).join(" | ")}`);
+}
+
 const loopState = JSON.parse(fs.readFileSync(path.join(root, "harness/loop-state.json"), "utf8"));
 if (!nodes.has(loopState.next_node)) failures.push(`loop-state의 알 수 없는 next_node: ${loopState.next_node}`);
 
@@ -150,9 +171,20 @@ if (mode === "full" && fs.existsSync(path.join(root, "package.json"))) {
   for (const name of ["lint", "typecheck", "test", "build"]) {
     if (!packageJson.scripts?.[name]) continue;
     console.log(`RUN: npm run ${name}`);
-    const executable = process.platform === "win32" ? "npm.cmd" : "npm";
-    const result = spawnSync(executable, ["run", name], { cwd: root, stdio: "inherit" });
-    if (result.status !== 0) failures.push(`npm run ${name} 실패`);
+    // Windows의 npm은 .cmd 배치 파일이다. Node가 CVE-2024-27980(명령 주입) 대응으로
+    // shell 없이 .cmd/.bat를 직접 spawn하면 EINVAL을 던지므로 Windows에서는 shell로
+    // 실행한다. args 배열을 shell과 함께 넘기면 이스케이프되지 않는다는 DEP0190 경고가
+    // 뜨므로 명령을 문자열 하나로 합친다 — name은 위 고정 목록(lint/typecheck/test/build)
+    // 에서만 오므로 주입 위험은 없다.
+    const isWindows = process.platform === "win32";
+    const result = isWindows
+      ? spawnSync(`npm.cmd run ${name}`, { cwd: root, stdio: "inherit", shell: true })
+      : spawnSync("npm", ["run", name], { cwd: root, stdio: "inherit" });
+    if (result.error) {
+      failures.push(`npm run ${name} 실행 실패: ${result.error.code ?? result.error.message}`);
+    } else if (result.status !== 0) {
+      failures.push(`npm run ${name} 실패`);
+    }
   }
 }
 

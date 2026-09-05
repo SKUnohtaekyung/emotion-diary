@@ -1,5 +1,6 @@
 > **진행 중인 작업 파일 (2026-09-04).** 이 파일의 아래 절들은 완료·보류된 세션 기록이다. 지금 진행 중인 작업은 각 파일을 정본으로 본다.
-> - [TASK-TAXONOMY](TASK-TAXONOMY.md) — 세부 감정 목록 심리학 리서치와 taxonomy v2 확정(D-038 종결). **T0·T2·T3·T5 완료(2026-09-04)**, 계열 9개 확정(공포·혐오 신설, 바램→희망). **T4는 v1 전사본이 없어 차단**(G3a 선행 필요). 결정 번호는 **D-040**을 선점했다. 탐색 중 **PR-005(카테고리 복수 선택) vs D-037 단일 선택 모순**을 발견해 별도 세션(`task_cb97a4a6`)이 D-037 재검토 중 — 카테고리 피커 관련 작업은 그쪽과 중복하지 말 것.
+> - [TASK-TAXONOMY](TASK-TAXONOMY.md) — 세부 감정 목록 심리학 리서치와 taxonomy v2 확정(D-038 종결). ~~**T0·T2·T3·T5 완료(2026-09-04)**, 계열 9개 확정(공포·혐오 신설, 바램→희망). **T4 착수 가능, 입력 확정됨(2026-09-04)**~~ **[정정, 2026-09-05] T0~T7 전부 완료** — taxonomy v2 9계열 194개 확정(공포·혐오 신설, 바램→희망), 사용자 최종 대조(D-027)까지 마쳐 `data/taxonomy/v2.json`의 `review_status`가 `reviewed`로 전환됐다(`user_cross_check_date: 2026-09-05`). D-038도 `accepted`로 종결됐다(`docs/DECISIONS.md`) — [TASK-TAXONOMY-V1](TASK-TAXONOMY-V1.md)이 `data/taxonomy/v1.json`을 만들고 사용자 최종 대조(D-027)까지 끝났다. 별도 세션이 이 리서치 계획 자체를 재검토해 `tasks/TASK-TAXONOMY-PLAN-V2.md`에 개정안을 썼다 — ~~T4 착수 전 그 파일부터 확인할 것(공포·혐오 신설 계열엔 §7.2-4의 "v1 2배 초과 시 보고" 기준선이 없다는 결함 지적 포함, 보완안 §10.1).~~ **[정정, 2026-09-05] T4는 이미 완료됐다** — 지적된 결함은 §10.1 보완안(발굴 개수가 이동 개수를 넘으면 임계)으로 반영됐다(`docs/DECISIONS.md` D-040). 결정 번호는 **D-040**을 선점했다. 탐색 중 발견한 **PR-005(카테고리 복수 선택) vs D-037 단일 선택 모순**은 별도 세션이 재검토를 마쳤다 — **D-041 accepted**(카테고리 선택기를 감정 별자리 지도로 교체, `DESIGN_SYSTEM` §6.2). 카테고리 피커 관련 작업은 이제 D-041을 정본으로 본다.
+> - [TASK-TAXONOMY-V1](TASK-TAXONOMY-V1.md) — 원자료 세부 감정 v1 전사. **완료(2026-09-04)** — 전사와 사용자 최종 대조(D-027 §7.8b) 모두 끝났다. `data/taxonomy/v1.json`은 7계열 194개, `review_status: reviewed`로 제품·T4 입력으로 확정 사용 가능하다.
 > - [TASK-DS-REF](TASK-DS-REF.md) — 외부 디자인 시스템 참조 검토. **D-039는 이 작업 몫으로 비워 두었다.**
 > - [TASK-MOBILE](TASK-MOBILE.md) — 모바일 구현 명세.
 
@@ -107,7 +108,7 @@
 
 ## 상태
 
-`done(결정)` — 2026-09-02 사용자 요청("디자인 시스템 잡아야 할 것 같다", "새 세션에서 대화하며 정하고, 프리뷰로 계속 확인하고 싶다"). 2026-09-04 세션에서 체크리스트 10건을 모두 확정하고(D-034·D-035·D-036) **D-033을 accepted로 전환**했다. 이어서 사용자가 레퍼런스를 제시해 감정 입력 방식을 다시 정했다 — **D-037**: 강도 슬라이더(세그먼트 대체), 카테고리 아크 휠(2줄 격자 대체), 세부 감정 소프트 리스트(chip은 표시 전용). 세부 감정 목록의 심리학적 타당성은 **D-038**(provisional)로 분리했다. 남은 것은 결정이 아니라 실행·리서치다.
+`done(결정)` — 2026-09-02 사용자 요청("디자인 시스템 잡아야 할 것 같다", "새 세션에서 대화하며 정하고, 프리뷰로 계속 확인하고 싶다"). 2026-09-04 세션에서 체크리스트 10건을 모두 확정하고(D-034·D-035·D-036) **D-033을 accepted로 전환**했다. 이어서 사용자가 레퍼런스를 제시해 감정 입력 방식을 다시 정했다 — **D-037**: 강도 슬라이더(세그먼트 대체), 카테고리 아크 휠(2줄 격자 대체), 세부 감정 소프트 리스트(chip은 표시 전용). 세부 감정 목록의 심리학적 타당성은 ~~**D-038**(provisional)로 분리했다.~~ **[정정, 2026-09-05]** **D-038**로 분리했었고, TASK-TAXONOMY의 taxonomy v2 리서치가 끝나 **D-038은 accepted로 종결됐다**(9계열 194개, 사용자 최종 대조 2026-09-05, `docs/DECISIONS.md`). 남은 것은 결정이 아니라 실행·리서치다.
 
 ## 정본과 산출물
 
@@ -127,7 +128,7 @@
 
 - [x] 7개 감정 색 계열 — **결정(D-034)**: 바램·미움이 ΔE 3.3~7.0으로 사실상 같은 색이던 결함을 발견해 원자료의 밝기 관계로 되돌렸다(바램 = 가장 옅은 라일락 `#A855CE`, 미움 = 가장 짙은 남색·보라 `#4750A6`). 기쁨 light 강조는 `#9A7A08`(올리브) → `#B08A00`(3.24:1).
 - [x] chip 규칙과 선택 표시 — **결정(D-035 → D-037로 역할 변경)**: 값(fill 100 / border 300 / text 900)은 그대로지만, chip은 **선택 조작에서 빠지고 표시 전용**이 됐다(트레이·기록 카드·범례·AI 후보). 세부 감정 선택은 소프트 리스트가 맡는다.
-- [x] 카테고리 선택기와 캐릭터 아이콘 — **결정(D-035 → D-037로 대체)**: 2줄 격자 대신 **아크 휠**(반지름 460, 간격 7.6°, 회전 45%, 관성 스냅). 2줄 격자는 큰 글자 폴백 규격으로만 남는다. 아이콘 40px는 유효. 캐릭터는 원자료와 같은 손그림 수채 무드로 codex imagegen 생성, 투명 PNG(원본 1024 / 배포 120). 프롬프트·규격·검수는 `design/characters/`. **자산 생성은 아직 안 했다 — taxonomy v1 검수와 함께 진행.**
+- [x] 카테고리 선택기와 캐릭터 아이콘 — **결정(D-035 → D-037로 대체)**: 2줄 격자 대신 **아크 휠**(반지름 460, 간격 7.6°, 회전 45%, 관성 스냅). 2줄 격자는 큰 글자 폴백 규격으로만 남는다. 아이콘 40px는 유효. 캐릭터는 원자료와 같은 손그림 수채 무드로 codex imagegen 생성, 투명 PNG(원본 1024 / 배포 120). 프롬프트·규격·검수는 `design/characters/`. **자산 생성은 아직 안 했다 —** ~~taxonomy v1 검수와 함께 진행.~~ **[정정, 2026-09-05] taxonomy v2 확정(9종, 공포·혐오 신설, 2026-09-05 사용자 최종 대조 완료)으로 선행 조건이 바뀌었고 이제 충족됐다 — 생성 자체는 여전히 TASK-DESIGN 실행 몫이다(`design/characters/prompts.json`은 아직 7개 항목).**
 - [x] 강도 선택기 — **결정(D-036 → D-037로 대체)**: 2줄 세그먼트 대신 **슬라이더 + 숫자 + −/+ 원형 스테퍼**(감정 3개 기준 536px → 380px). 앵커 문구 한 줄 규칙(1~3 / 4~7 / 8~10)은 그대로 유지.
 - [x] 글꼴 — **결정(D-034)**: 웹폰트를 싣지 않고 시스템 한글 글꼴만 쓴다. 스택이 Pretendard를 먼저 찾으므로 나중에 `@font-face`만 추가하면 토큰 변경 없이 전환된다.
 - [x] 다크 모드 — **결정(D-034)**: MVP는 light 전용. dark 토큰과 대비 검사는 유지하되 화면에는 적용하지 않고, 나중에 적용해도 앱 내 토글은 두지 않는다.
@@ -139,7 +140,7 @@
 ## 후속 작업(선택)
 
 - `design/style-guide.html`이 `design/tokens.json`을 fetch해 CSS 변수를 생성하도록 바꾸면 값 이중 관리가 사라진다(Artifact는 외부 fetch가 막히므로 발행 시 인라인 필요). 지금은 손으로 맞추며, 값이 어긋나도 하네스가 잡아 주지 못한다 — 이중 관리가 남은 유일한 자리다.
-- 캐릭터 단색 아이콘 7종(`design/characters/`)은 taxonomy v1 검수와 함께 제작.
+- 캐릭터 단색 아이콘 ~~7종(`design/characters/`)은 taxonomy v1 검수와 함께 제작.~~ **[정정, 2026-09-05] 목표가 9종으로 바뀌었다**(공포·혐오 신설). taxonomy v2 확정(2026-09-05 사용자 최종 대조 완료)에 따라 이제 제작 가능하며, 시점·절차는 아래 "다음(실행·리서치)" 2번을 따른다(`design/characters/prompts.json`은 아직 7개 항목).
 - 실기기(iPhone Safari·Android Chrome)에서 chip 대비와 44px 터치 영역 확인.
 
 ## 체크포인트
@@ -151,8 +152,8 @@
 - 완료(2026-09-04, 4차): 사용자 레퍼런스(아크 휠·range slider) 검토 → **D-037** accepted. 시안 2종을 만들어 실측 비교했다(세그먼트 536px vs 슬라이더 380px, 아크 7개 중 5개 가독, 세부 감정 51개 중 아크는 5개만 노출·복수 선택 불가). 아크는 반지름 560→460·간격 8.6°→7.6°로 조정해 7개가 모두 화면에 들어오게 하고, 회전을 접선의 45%로 낮춰 한글 가독성을 확보했으며, listbox·activedescendant·aria-live·화살표 키·reduced-motion 대응을 넣었다. 스타일 가이드에 세 구성요소를 동작하는 형태로 이식했다. 세부 감정 목록의 심리학적 타당성은 **D-038**(provisional)로 분리 기록.
 - 다음(실행·리서치):
   1. **아크 휠 큰 글자 폴백** — 확대 배율이 크면 2줄 격자(D-035 규격)로 전환. §9의 200% 확대 기준이 여기 걸려 있는 유일한 미해결 항목이다.
-  2. **캐릭터 생성** — 3번(taxonomy v2) **뒤에** 한다. 공포가 추가되면 7종이 8종이 되는데 일관성 때문에 같은 seed로 한 번에 만들어야 하므로, 먼저 만들면 전부 다시 만들어야 한다(D-038). 확정 후 codex imagegen → `node scripts/check-characters.mjs` 통과 → README §3 눈 검수.
-  3. **taxonomy v2 심리학 리서치(D-038)** — G3 원자료 전사(v1) 후 진행. **사용자가 방향을 확정했다(2026-09-04): 공포/두려움 카테고리 신설, 놀람은 기쁨 전용이 아님.** 나머지 세부 감정 귀속은 리서치로 정한다. 색 수용 가능성은 미리 재어 뒀다 — 8~9계열까지 가능하지만 쓸 수 있는 구역이 **초록~청록과 어두운 갈색뿐이고 보라는 포화**다(D-038). `emotion_code`(D-022) 마이그레이션 매핑도 함께 만든다.
+  2. **캐릭터 생성** — ~~3번(taxonomy v2) **뒤에** 한다. 공포가 추가되면 7종이 8종이 되는데~~ **[정정, 2026-09-05] 3번(taxonomy v2)이 확정됐다 — 공포·혐오가 둘 다 신설되어 7종이 9종이 되는데** 일관성 때문에 같은 seed로 한 번에 만들어야 하므로, 먼저 만들면 전부 다시 만들어야 한다(D-038). 확정 후 codex imagegen → `node scripts/check-characters.mjs` 통과 → README §3 눈 검수. **생성 자체는 아직 시작하지 않았다**(`design/characters/prompts.json` 7개 항목 그대로).
+  3. **taxonomy v2 심리학 리서치(D-038)** — G3 원자료 전사(v1) 후 진행. **사용자가 방향을 확정했다(2026-09-04): 공포/두려움 카테고리 신설, 놀람은 기쁨 전용이 아님.** 나머지 세부 감정 귀속은 리서치로 정한다. 색 수용 가능성은 미리 재어 뒀다 — 8~9계열까지 가능하지만 쓸 수 있는 구역이 **초록~청록과 어두운 갈색뿐이고 보라는 포화**다(D-038). `emotion_code`(D-022) 마이그레이션 매핑도 함께 만든다. **[정정, 2026-09-05] 완료됐다** — taxonomy v2 9계열 194개 확정, 사용자 최종 대조(D-027)까지 마쳐 `review_status: reviewed`(위 TASK-TAXONOMY 안내, `docs/PROCESS_LOG.md` 참고). `emotion_code` 마이그레이션 매핑(`data/taxonomy/v1-to-v2.json`)도 함께 완료됐다.
   4. **실기기 확인** — chip 대비, 40px 아이콘 판독성, 44px 터치, 아크 조작감(iPhone Safari·Android Chrome).
   5. **위기 안내 연락처 값** 검수.
 - 주의: 색의 의미(어떤 계열이 어떤 감정인지)는 원자료를 따르므로 사용자 승인 없이 바꾸지 않는다(PR-010). 감정 색으로 위험·순위를 표현하지 않는다.
@@ -207,7 +208,7 @@
 - [x] **G1**: 계획 교정(아래 파일별 목록) → `verify:quick`/`verify:full` PASS → 교정 commit(해시는 검증 증거 절)
 - [ ] G2a hosting/identity 스파이크(B-02/B-03/B-08) → G2b D1 스파이크(B-04/B-05)
 - [ ] G2c 구독 기반 모델 호출 경로 확인(B-06 재정의) / G2d Vector search(B-07) — RAG 트랙, critical path 밖
-- [ ] G3 taxonomy-v1 전사+사용자 검수(G2와 병렬 가능)
+- [x] G3 taxonomy-v1 전사+사용자 검수(G2와 병렬 가능) — **완료**(`data/taxonomy/v1.json`, 7계열 194개, 전사+사용자 최종 대조 D-027 §7.8b 모두 2026-09-04) → [TASK-TAXONOMY-V1](TASK-TAXONOMY-V1.md)
 - [ ] runtime profile·Decisions 최종 갱신, 첫 구현 task 생성
 
 ## 체크포인트
@@ -223,7 +224,7 @@
 - 추가(정리, 2026-09-02): 스파이크 토큰 회전(`wrangler secret put APP_ACCESS_TOKEN_HASH`) → 직후 요청에서는 옛 토큰이 아직 200, 약 20초 뒤부터 옛 토큰 401·새 토큰 200(secret 변경 전파 지연 존재, 회전 절차에 반영 필요). 원격 D1 합성 데이터 전부 삭제(entries/emotions/jobs 0). 새 토큰은 `work/…/.spike-secrets.json`에만 있다.
 - 추가(rate limit, 2026-09-02): Workers Rate Limiting binding(`[[ratelimits]]` 10/60s)을 무료 플랜에 배포는 됐으나 같은 key 30회(HKG/NRT 분산)에서 429가 0건 → 문서의 "permissive, eventually consistent, per location"대로 보안 경계 부적합, 기각. 대신 migration `0002_auth_failures`로 D1 전역 잠금(60초 10회 → 5분) 구현·배포: 실패 반복 시 429, 잠금 중 올바른 토큰도 429(`Retry-After: 300`), 카운터 초기화 후 200. Cloudflare Access는 JWT 헤더(`Cf-Access-Jwt-Assertion`)·certs 검증 방식만 문서로 확인, 무료 한도·workers.dev 적용은 확인 불가 → 선택 사항으로 보류.
 - 추가(G2c 실제 왕복, 2026-09-02): `work/spikes/g2a-cloudflare/pc-worker.mjs`(Node, Bearer worker secret, `--once`/5초 폴링)가 원격 `ai_jobs`를 lease → Git Bash로 `claude -p --model claude-sonnet-5 --json-schema` 실행 → 결과 POST → owner 조회 `done`·payload NULL. 첫 시도는 Windows `spawnSync(shell:true)` 인용 문제로 `--json-schema is not valid JSON` 실패 → prompt/schema를 환경변수로 넘겨 bash에서 실행하도록 수정 후 성공. 합성 발화 11회 모두 사건만 반영·감정 코드 비움·`safetySignal=none`. **지연 10회**(worker 측 = claude 기동+API): min 7.7초 / p50 8.4초 / p95 12.1초 / max 12.1초, API만 p50 4.9초 / p95 9.4초. UX 목표(첫 응답 p95 8초)를 초과하므로 대화 UI는 "생각 중" 상태와 20초 timeout fallback을 전제로 설계하고, 기동 오버헤드(약 3.5초) 절감 방법은 후속 검토(RK-009). 스파이크 한계: 실패 job을 `failed`가 아니라 error 결과로 `done` 처리(실제 구현에서 분리), 만료 처리 미검증, Haiku가 보조 모델로 함께 호출됨(Claude Code 내부 동작, 비용 없음).
-- 다음: Safari 본체/standalone/Android는 사용자가 가능할 때 추가 확인(차단 아님). G2c 잔여: 보존/학습 설정 확인, verifier 독립 2회 호출, 위기 케이스, job 만료·`failed` 전환. **G3 taxonomy-v1** 착수 가능. Phase 1 app-scaffold는 G2a/G2b partial PASS를 근거로 사용자 승인 시 시작. → rate limit 구현·Cloudflare Access 무료 적용 검토 → 스파이크 D1 데이터 비우기/토큰 회전. 이어서 G2c 실제 PC worker 프로세스+`claude -p` 결합. G3 taxonomy-v1은 병렬 가능. G3 taxonomy-v1 전사(D-022 code, D-027 검수)는 G2와 병렬 가능. G2b는 G2a 통과 후, G2c/G2d는 RAG 트랙으로 critical path 밖.
+- 다음: Safari 본체/standalone/Android는 사용자가 가능할 때 추가 확인(차단 아님). G2c 잔여: 보존/학습 설정 확인, verifier 독립 2회 호출, 위기 케이스, job 만료·`failed` 전환. ~~**G3 taxonomy-v1** 착수 가능.~~ **[정정, 2026-09-05] G3 taxonomy-v1은 2026-09-04에 완료됐다**(`data/taxonomy/v1.json`, 7계열 194개, `review_status: reviewed`; 이어서 taxonomy v2도 2026-09-05에 사용자 최종 대조까지 마쳤다 — 상단 TASK-TAXONOMY 안내 참고). Phase 1 app-scaffold는 G2a/G2b partial PASS를 근거로 사용자 승인 시 시작. → rate limit 구현·Cloudflare Access 무료 적용 검토 → 스파이크 D1 데이터 비우기/토큰 회전. 이어서 G2c 실제 PC worker 프로세스+`claude -p` 결합. ~~G3 taxonomy-v1은 병렬 가능. G3 taxonomy-v1 전사(D-022 code, D-027 검수)는 G2와 병렬 가능.~~ **[정정, 2026-09-05] (위와 동일 — 이미 완료됨)** G2b는 G2a 통과 후, G2c/G2d는 RAG 트랙으로 critical path 밖.
 - 결정: D-017~D-027 기록 완료(`docs/DECISIONS.md`). 이번 세션에서 제품 핵심(PR-001~PR-015, 원형 6영역, taxonomy, 두 작성 흐름)은 변경하지 않았다. `emotion_code` 형식만 D-022로 카테고리 접두어 규칙을 확정했다.
 - 실패: 없음. 이전 체크포인트의 "safe-directory 이 정확한 경로만 등록함"은 옛 경로 기준이었고, TASK-CBM(D-028)이 이후 현 경로를 전역 `safe.directory`에 추가한 상태였다. G0 재초기화 후 `.git` 소유자가 현 계정이므로 그 항목 없이도 동작하며, 전역 설정은 변경하지 않았다.
 - 주의: `outputs/`·`work/`는 비정본. Git 전역 `user.name=admin`/`user.email`은 기존 전역 설정 그대로 사용했고(지시: 없을 때만 repo-local 설정), 커밋 푸터는 실제 모델 표기 `Claude Fable 5.1`을 사용했다. 파일 교정은 모두 Decision과 연결. 유료 API 호출·외부 자원 생성 금지(D-019). TASK-CBM 기록은 원문 보존.
@@ -290,4 +291,4 @@
 - G1 명령: `npm run verify:quick` → PASS, `npm run verify:full` → PASS(앱 script가 없어 문서 하네스만 검사; 앱 기능 검증이 아님). 교정 commit 해시는 완료 보고와 `git log`로 확인.
 - 로컬 스파이크 명령(2026-09-02, `work/spikes/g2a-cloudflare`): `npx wrangler d1 migrations apply DB --local` → PASS; `npx wrangler d1 execute DB --local --command ...` 9건; `node spike-test.mjs`(wrangler dev 기동 후 fetch 22건) → `SUMMARY 22/22 PASS`.
 - 원격 스파이크 명령(2026-09-02): `npx wrangler d1 create emotion-diary-spike`, `npx wrangler d1 migrations apply DB --remote` → PASS, `npx wrangler deploy` ×2, `npx wrangler secret put` ×3, `node remote-test.mjs` → `SUMMARY 22/22 PASS`, `npx wrangler d1 execute DB --remote --command ...` 거부 4건+cascade 1건, `npx wrangler d1 info`, `npx wrangler d1 time-travel info`.
-- 미검증/알려진 제한: B-02/B-03/B-04/B-06 큐는 로컬·원격 `partial`. 휴대폰 실기기(B-08), rate limit, 무료 한도 수치, Time Travel 복구 실습, 실제 PC worker 프로세스, 검색 계층(B-07), Web Push는 `unknown`. 스파이크 Worker는 공개 URL이며 토큰 없이는 HTML 안내 페이지 외 데이터를 주지 않는다. D-024의 D1 trigger/batch 지원, D-025의 identity 헤더·custom header 통과는 G2a/G2b 실검증 전까지 가설. `schemas/*`는 Ajv 등 실제 validator로 아직 검증하지 않았다(JSON 구문만 하네스 확인). taxonomy-v1 전사와 D-027 검수는 미착수. Codebase Memory MCP는 이 세션에서 연결 실패(CONNECTION_CLOSED)하여 Graph 탐색 없이 직접 Read/Grep으로 진행했다.
+- 미검증/알려진 제한: B-02/B-03/B-04/B-06 큐는 로컬·원격 `partial`. 휴대폰 실기기(B-08), rate limit, 무료 한도 수치, Time Travel 복구 실습, 실제 PC worker 프로세스, 검색 계층(B-07), Web Push는 `unknown`. 스파이크 Worker는 공개 URL이며 토큰 없이는 HTML 안내 페이지 외 데이터를 주지 않는다. D-024의 D1 trigger/batch 지원, D-025의 identity 헤더·custom header 통과는 G2a/G2b 실검증 전까지 가설. `schemas/*`는 Ajv 등 실제 validator로 아직 검증하지 않았다(JSON 구문만 하네스 확인). ~~taxonomy-v1 전사와 D-027 검수는 미착수.~~ **[정정, 2026-09-05] 완료됐다**(`data/taxonomy/v1.json`, 7계열 194개, `review_status: reviewed`, 2026-09-04; taxonomy v2도 2026-09-05에 사용자 최종 대조까지 마쳤다 — 상단 TASK-TAXONOMY 안내 참고). Codebase Memory MCP는 이 세션에서 연결 실패(CONNECTION_CLOSED)하여 Graph 탐색 없이 직접 Read/Grep으로 진행했다.

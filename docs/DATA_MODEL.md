@@ -49,7 +49,7 @@ DB 불변조건:
 | 필드 | 계약 |
 | --- | --- |
 | `id`, `diary_id` | PK/FK, diary hard delete 시 cascade |
-| `category_code` | 7개 상위 감정의 안정 코드 |
+| `category_code` | ~~7개~~ **[정정, 2026-09-05] 9개**(taxonomy v2, §4.1) 상위 감정의 안정 코드 |
 | `emotion_code` | taxonomy의 세부 감정 안정 코드. 카테고리별 독립 발급 `<category_code>-<slug>`(D-022) |
 | `label_snapshot` | 기록 당시 한글 표시명. 카테고리가 다르면 같은 label이라도 다른 code |
 | `intensity` | 정수 1~10, `CHECK (intensity BETWEEN 1 AND 10)` |
@@ -166,6 +166,41 @@ taxonomy v2에서 계열이 7개에서 **9개**가 되고(`공포`·`혐오` 신
 7. `drop`된 항목은 code를 재사용하지 않는다. 새 항목에 같은 slug를 붙이더라도 code는 새로 발급한다.
 
 `emotion_code` 형식은 D-022 그대로 `<category_code>-<slug>`이며, 카테고리 간 같은 한글 label이 서로 다른 code인 것도 그대로다.
+
+### 4.2 v2 파일과 provenance 필드 (D-038, D-040)
+
+taxonomy v2는 3개의 versioned JSON 파일로 구성되며, `schemas/taxonomy.schema.json`(strict schema, `additionalProperties: false`)이 각 파일 형태를 강제한다. `scripts/check-taxonomy.mjs`가 구조와 등급 도출 규칙(D-040)을 함께 검사하고 `scripts/verify.mjs`(quick/full)에 연결돼 있다. `data/taxonomy/`가 없으면 두 검사기 모두 pending으로 통과한다.
+
+| 파일 | 내용 |
+| --- | --- |
+| [`../data/taxonomy/v1.json`](../data/taxonomy/v1.json) | 원자료 전사본(PR-004 아카이브). provenance 필드 없음 |
+| [`../data/taxonomy/v2.json`](../data/taxonomy/v2.json) | 문헌 근거를 붙인 정본. 항목·계열별 provenance 포함 |
+| [`../data/taxonomy/v1-to-v2.json`](../data/taxonomy/v1-to-v2.json) | v1→v2 마이그레이션 매핑표(§4.1) |
+
+v2 항목(`categories[].emotions[]`) 필드:
+
+- `source` — `raw`(v1 원자료) | `literature`(문헌 발굴) | `korean_lexicon`(한국어 사전·어휘 자료)
+- `evidence_level` — `L1`(전문 확인) | `L2`(초록 확인) | `L3`(2차 경유) | `L4`(근거 없음)
+- `verification` — `V1`(writer가 원문 URI를 직접 열어 대조) | `V2`(조사자 보고만)
+- `evidence_grade` — **파생 필드.** writer가 매기지 않고 `(verification, evidence_level)`에서 기계적으로 결정된다(D-040): `V1×L1=A`, `V1×L2=B+`, `V2×L1=B`, 나머지 `C`. 예외로 `source=raw`이고 `evidence_level=L4`인 항목(v1을 그대로 유지)은 `B`다 — 유지는 주장이 아니라는 PR-004 논리이며, `v1-to-v2.json`의 매핑 `action`이 실제로 `keep`일 때만 인정된다
+- `evidence_ref` — `evidence_catalog`의 키(예: `A-1`)를 가리키는 근거 참조
+- `level_downgrade_reason` — 이 항목의 `evidence_level`이 `evidence_catalog`가 그 출처에 선언한 확인 수준보다 약할 때(정당한 하향) 그 사유. 항목은 `evidence_catalog`보다 강한 수준을 주장할 수 없다(천장 규칙)
+- `also_in` — D-022 복수 배치. 같은 한글 라벨이 다른 계열에도 있을 때 그 계열의 `emotion_code`
+
+v2 계열(`categories[]`) 필드:
+
+- `boundary_ko` — 계열 경계 한 문장(제품 운영 정의이며 문헌이 그어 준 경계가 아님)
+- `category_evidence_refs` — §7.1(B) 독립 문헌 참조 목록
+- `category_grade` — **파생 필드.** `category_evidence_refs`를 `evidence_catalog`로 등급화해 강한 순서(A>B+>B>C)로 정렬한 뒤 **두 번째로 강한 등급**을 쓴다(독립 문헌 2편 요건이 계열의 실질 강도를 결정한다는 판단)
+- `shortfall_note_ko` — `category_evidence_refs`가 2편 미만일 때 그 사실과 존치 근거(숨기지 않는다)
+
+v2 루트 필드:
+
+- `evidence_catalog` — 출처(`evidence_ref`)마다 실제 확인 수준(`evidence_level`, `verification`)을 **한 번만** 선언하는 표. 항목·계열은 이 값을 베낄 뿐이며 이보다 강하게 주장할 수 없다
+- `fulltext_sources` — 전문(full text)을 실제로 확보한 `evidence_ref` 목록. `evidence_catalog`에서 `evidence_level: L1`인 항목 집합과 정확히 일치해야 한다
+- `scale_report` — §7.2-4(TASK-TAXONOMY) 규모 보고. v1 대비 2배를 넘거나(신설 계열은 발굴>이동) 임계를 넘은 계열은 `acknowledged_categories`에 기록돼야 검사를 통과한다 — "사용자에게 알린다"는 절차를 기계로 강제하는 필드
+
+등급 도출 규칙과 교차 검사의 전체 근거는 D-040과 `tasks/TASK-TAXONOMY-PLAN-V2.md`를 따른다.
 
 ## 5. 상태 전이
 

@@ -1,0 +1,320 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/schemas/taxonomy.schema.json",
+  "title": "Emotion taxonomy (v1 archive, v2 with provenance, v1-to-v2 migration map)",
+  "description": "TASK-TAXONOMY §9.3의 strict schema. v1은 원자료 전사본(PR-004), v2는 항목별 provenance를 붙인 정본, map은 마이그레이션 표다. evidence_grade는 파생 필드이며 도출 규칙은 scripts/check-taxonomy.mjs가 강제한다(TASK-TAXONOMY-PLAN-V2 §3).",
+  "oneOf": [
+    { "$ref": "#/$defs/taxonomyV1" },
+    { "$ref": "#/$defs/taxonomyV2" },
+    { "$ref": "#/$defs/migrationMap" }
+  ],
+  "$defs": {
+    "emotionCode": {
+      "description": "D-022: <category_code>-<slug>. 카테고리마다 독립 발급하므로 같은 한글 라벨이라도 code는 다르다.",
+      "type": "string",
+      "pattern": "^[a-z]+(-[a-z0-9]+)+$",
+      "minLength": 3,
+      "maxLength": 64
+    },
+    "categoryCode": {
+      "type": "string",
+      "pattern": "^[a-z]+$",
+      "minLength": 2,
+      "maxLength": 32
+    },
+    "labelKo": {
+      "type": "string",
+      "pattern": "\\S",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "isoDate": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "nullableDate": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+    },
+    "nullableName": {
+      "type": ["string", "null"],
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "sourceHash": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "bytes", "sha256"],
+      "properties": {
+        "path": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "bytes": { "type": "integer", "minimum": 1 },
+        "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "reviewBlock": {
+      "description": "D-027 1인 검수 대체 절차. 시간 분리 2회(first/second) 또는 사용자 최종 대조(user_cross_check) 중 하나가 채워져야 reviewed로 올릴 수 있다.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "first_pass_by", "first_pass_date",
+        "second_pass_by", "second_pass_date",
+        "user_cross_check_by", "user_cross_check_date"
+      ],
+      "properties": {
+        "first_pass_by": { "$ref": "#/$defs/nullableName" },
+        "first_pass_date": { "$ref": "#/$defs/nullableDate" },
+        "second_pass_by": { "$ref": "#/$defs/nullableName" },
+        "second_pass_date": { "$ref": "#/$defs/nullableDate" },
+        "user_cross_check_by": { "$ref": "#/$defs/nullableName" },
+        "user_cross_check_date": { "$ref": "#/$defs/nullableDate" }
+      }
+    },
+
+    "taxonomyV1": {
+      "description": "원자료 전사본. 순수 아카이브이므로 provenance 필드가 없다(PR-004).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "source_files", "source_hashes", "review_status", "categories", "review"],
+      "properties": {
+        "version": { "const": "emotion-ko-v1" },
+        "source_files": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+        },
+        "source_hashes": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/sourceHash" }
+        },
+        "review_status": { "enum": ["pending_user_review", "reviewed"] },
+        "transcription_notes": {
+          "type": "array",
+          "maxItems": 20,
+          "items": { "type": "string", "minLength": 1, "maxLength": 2000 }
+        },
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 9,
+          "items": { "$ref": "#/$defs/categoryV1" }
+        },
+        "review": { "$ref": "#/$defs/reviewBlock" }
+      }
+    },
+    "categoryV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label_ko", "color_token", "character_asset", "emotions"],
+      "properties": {
+        "code": { "$ref": "#/$defs/categoryCode" },
+        "label_ko": { "$ref": "#/$defs/labelKo" },
+        "source_file": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "color_token": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "character_asset": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "emotions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/emotionV1" }
+        }
+      }
+    },
+    "emotionV1": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label_ko"],
+      "properties": {
+        "code": { "$ref": "#/$defs/emotionCode" },
+        "label_ko": { "$ref": "#/$defs/labelKo" }
+      }
+    },
+
+    "taxonomyV2": {
+      "description": "문헌 근거를 붙인 정본. 항목마다 evidence_level·verification을 기록하면 evidence_grade가 도출된다.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "based_on", "review_status", "fulltext_sources", "evidence_catalog", "categories", "review"],
+      "properties": {
+        "version": { "const": "emotion-ko-v2" },
+        "based_on": { "const": "emotion-ko-v1" },
+        "review_status": { "enum": ["pending_user_review", "reviewed"] },
+        "disclaimer_ko": {
+          "description": "§0 성격 규정. 머리말 전용이며 반증 표의 해소 근거로 쓰지 않는다(PLAN-V2 §8.1).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1000
+        },
+        "fulltext_sources": {
+          "description": "전문(full text)을 실제로 확보한 출처의 evidence_ref 목록. A 완전성 조건의 기준이 된다 — evidence_level: L1을 주장하는 항목은 반드시 그 evidence_ref가 이 목록에 있어야 한다(항목이 L1이라고 카탈로그까지 L1이 되는 것은 아니다 — 카탈로그는 항목 evidence_level의 천장일 뿐이다). check-taxonomy.mjs가 evidence_catalog에서 evidence_level=L1인 ref 집합과 정확히 일치하는지도 대조한다.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/evidenceRef" }
+        },
+        "evidence_catalog": {
+          "description": "출처 참조(evidence_ref)마다 그 출처의 실제 확인 수준을 한 번만 선언하는 표. 항목(emotionV2)과 계열(categoryV2)이 적는 evidence_level·verification은 여기 대조된다(check-taxonomy.mjs). 키는 evidence_ref 형식이고 값은 evidenceCatalogEntry다.",
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/evidenceCatalogEntry" },
+          "propertyNames": { "pattern": "^[ABC]-[0-9]{1,2}$" }
+        },
+        "scale_report": {
+          "description": "§7.2-4 규모 보고. 임계를 넘은 계열은 여기 기록돼 있어야 하며, 없으면 check-taxonomy가 실패시킨다 — '알린다'는 의무를 기계로 강제하기 위한 필드다(PLAN-V2 §10.1).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["acknowledged_categories", "acknowledged_by", "acknowledged_at"],
+          "properties": {
+            "acknowledged_categories": {
+              "type": "array",
+              "uniqueItems": true,
+              "items": { "$ref": "#/$defs/categoryCode" }
+            },
+            "acknowledged_by": { "type": "string", "minLength": 1, "maxLength": 64 },
+            "acknowledged_at": { "$ref": "#/$defs/isoDate" },
+            "note_ko": { "type": "string", "minLength": 1, "maxLength": 1000 }
+          }
+        },
+        "categories": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 9,
+          "items": { "$ref": "#/$defs/categoryV2" }
+        },
+        "review": { "$ref": "#/$defs/reviewBlock" }
+      }
+    },
+    "evidenceRef": {
+      "description": "조사 기록(TASK-TAXONOMY §9.1)의 행 참조. 예: A-3 = taxonomy-v2-sources-a.md의 3번째 출처.",
+      "type": "string",
+      "pattern": "^[ABC]-[0-9]{1,2}$"
+    },
+    "evidenceCatalogEntry": {
+      "description": "evidence_catalog 한 행. 그 evidence_ref의 실제 확인 수준을 선언한다 — 항목이나 계열이 무엇이라 적었는지가 아니라 조사 기록이 실제로 확인한 수준이다.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_level", "verification", "label"],
+      "properties": {
+        "evidence_level": {
+          "description": "L1 전문 확인 / L2 초록 확인 / L3 2차 경유 / L4 문헌 근거 없음.",
+          "enum": ["L1", "L2", "L3", "L4"]
+        },
+        "verification": {
+          "description": "V1 writer가 원문 URI를 직접 열어 대조 / V2 조사자 보고만.",
+          "enum": ["V1", "V2"]
+        },
+        "label": { "type": "string", "minLength": 1, "maxLength": 120 }
+      }
+    },
+    "categoryV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label_ko", "color_token", "character_asset", "boundary_ko", "category_evidence_refs", "category_grade", "emotions"],
+      "properties": {
+        "code": { "$ref": "#/$defs/categoryCode" },
+        "label_ko": { "$ref": "#/$defs/labelKo" },
+        "color_token": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "character_asset": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "boundary_ko": {
+          "description": "계열 경계 한 문장. 제품 운영 정의이며 문헌이 그어 준 경계가 아니다(TASK-TAXONOMY §9.2).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 400
+        },
+        "is_new_in_v2": { "type": "boolean" },
+        "category_evidence_refs": {
+          "description": "§7.1(B) 독립 문헌. 2편 미만이면 미달이며 check-taxonomy가 경고한다.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/evidenceRef" }
+        },
+        "category_grade": { "enum": ["A", "B+", "B", "C"] },
+        "shortfall_note_ko": {
+          "description": "category_evidence_refs가 2편 미만이거나 category_grade가 C 또는 B(근거가 약한 상태)일 때 그 사실과 존치 근거를 적는다. 숨기지 않는다(PLAN-V2 §4, 레드팀 결함 1 수정 — 편수만이 아니라 등급도 본다).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600
+        },
+        "emotions": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/emotionV2" }
+        }
+      }
+    },
+    "emotionV2": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "label_ko", "source", "evidence_level", "verification", "evidence_grade", "reviewer", "reviewed_at"],
+      "properties": {
+        "code": { "$ref": "#/$defs/emotionCode" },
+        "label_ko": { "$ref": "#/$defs/labelKo" },
+        "source": {
+          "description": "raw = v1 원자료, literature = 문헌 발굴, korean_lexicon = 한국어 사전·어휘 자료.",
+          "enum": ["raw", "literature", "korean_lexicon"]
+        },
+        "evidence_level": {
+          "description": "L1 전문 확인 / L2 초록 확인 / L3 2차 경유 / L4 문헌 근거 없음.",
+          "enum": ["L1", "L2", "L3", "L4"]
+        },
+        "verification": {
+          "description": "V1 writer가 원문 URI를 직접 열어 대조 / V2 조사자 보고만.",
+          "enum": ["V1", "V2"]
+        },
+        "evidence_grade": {
+          "description": "파생 필드. (verification, evidence_level)에서 기계적으로 결정되며 check-taxonomy.mjs가 대조한다.",
+          "enum": ["A", "B+", "B", "C"]
+        },
+        "evidence_ref": { "$ref": "#/$defs/evidenceRef" },
+        "level_downgrade_reason": {
+          "description": "이 항목의 evidence_level이 evidence_catalog상 그 evidence_ref의 확인 수준보다 약할 때(하향) 그 사유를 적는다 — 예: 출처가 범주(category) 층위 주장은 강하게 지지하지만 이 개별 어휘의 귀속까지는 지지하지 않는 경우. evidence_level이 카탈로그 값과 같으면 이 필드를 두면 안 된다. 선택 필드이며 check-taxonomy.mjs가 양방향으로 강제한다(카탈로그는 항목 evidence_level의 천장이지 고정값이 아니다).",
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300
+        },
+        "also_in": {
+          "description": "D-022 복수 배치. 같은 한글 라벨이 다른 계열에도 있을 때 그 계열의 code를 적는다.",
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/emotionCode" }
+        },
+        "reviewer": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "reviewed_at": { "$ref": "#/$defs/isoDate" }
+      }
+    },
+
+    "migrationMap": {
+      "description": "v1→v2 매핑표. v1의 모든 항목이 정확히 한 번 처리돼야 하고(누락 0), 발굴 어휘는 전부 add다.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "from", "to", "mappings"],
+      "properties": {
+        "version": { "const": "emotion-ko-v1-to-v2" },
+        "from": { "const": "emotion-ko-v1" },
+        "to": { "const": "emotion-ko-v2" },
+        "generated_at": { "$ref": "#/$defs/isoDate" },
+        "mappings": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/mappingRow" }
+        }
+      }
+    },
+    "mappingRow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["v1_code", "v2_code", "action", "reason"],
+      "properties": {
+        "v1_code": {
+          "description": "action이 add면 null이고, 그 밖에는 v1의 실재 code여야 한다.",
+          "oneOf": [{ "$ref": "#/$defs/emotionCode" }, { "type": "null" }]
+        },
+        "v2_code": {
+          "description": "action이 drop이면 null이고, 그 밖에는 v2의 실재 code여야 한다.",
+          "oneOf": [{ "$ref": "#/$defs/emotionCode" }, { "type": "null" }]
+        },
+        "action": { "enum": ["keep", "move", "rename", "drop", "add"] },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 600 },
+        "evidence_ref": { "$ref": "#/$defs/evidenceRef" }
+      }
+    }
+  }
+}

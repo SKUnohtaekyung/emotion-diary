@@ -9,7 +9,7 @@
   "characters": [
     { "key": "enjoyment", "label": "즐거움", "alt": "즐거움 캐릭터", "accent": "#5E9C2E",
       "subject_prompt": "A small white cartoon dinosaur with a round belly, short arms and a gently curved tail, standing on two legs in the middle of a dance step with one foot lifted. Head tilted, eyes closed in happy upward curves, mouth a small open smile. Two tiny music notes float near its head. Pencil line and note accents in yellow-green." },
-    { "key": "wish", "label": "바램", "alt": "바램 캐릭터", "accent": "#A855CE",
+    { "key": "wish", "label": "희망", "alt": "희망 캐릭터", "accent": "#A855CE",
       "subject_prompt": "A small round-faced grey cat seen head-on, ears up and alert, eyes wide and hopeful looking slightly upward, front paws held together in front of its chest. Fur suggested with fine parallel pencil hatching. Pencil line accents in soft lilac." },
     { "key": "sadness", "label": "슬픔", "alt": "슬픔 캐릭터", "accent": "#3F8FD6",
       "subject_prompt": "A small grey cat sitting hunched with its head lowered and ears drooping, tail curled around its front paws, sitting in a shallow pale-blue puddle that reaches its paws. One small round water droplet near its cheek. Quiet, not distressed. Pencil line accents in sky blue." },

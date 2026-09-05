@@ -1,0 +1,1191 @@
+{
+  "version": "emotion-ko-v1-to-v2",
+  "from": "emotion-ko-v1",
+  "to": "emotion-ko-v2",
+  "generated_at": "2026-09-05",
+  "mappings": [
+    {
+      "v1_code": "enjoyment-light",
+      "v2_code": "enjoyment-light",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-buoyant",
+      "v2_code": "enjoyment-buoyant",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-lively",
+      "v2_code": "enjoyment-lively",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-serene",
+      "v2_code": "enjoyment-serene",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-pleasant",
+      "v2_code": "enjoyment-pleasant",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-composed",
+      "v2_code": "enjoyment-composed",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-cheerful",
+      "v2_code": "enjoyment-cheerful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-bright",
+      "v2_code": "enjoyment-bright",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-fresh",
+      "v2_code": "enjoyment-fresh",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-refreshed",
+      "v2_code": "enjoyment-refreshed",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-crisp",
+      "v2_code": "enjoyment-crisp",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-breathless",
+      "v2_code": "enjoyment-breathless",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-thrilled",
+      "v2_code": "enjoyment-thrilled",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-merry",
+      "v2_code": "enjoyment-merry",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-confident",
+      "v2_code": "enjoyment-confident",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-enjoyable",
+      "v2_code": "enjoyment-enjoyable",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-jovial",
+      "v2_code": "enjoyment-jovial",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-comfortable",
+      "v2_code": "enjoyment-comfortable",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-unburdened",
+      "v2_code": "enjoyment-unburdened",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-energetic",
+      "v2_code": "enjoyment-energetic",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-vivacious",
+      "v2_code": "enjoyment-vivacious",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-gratified",
+      "v2_code": "enjoyment-gratified",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-excited",
+      "v2_code": "enjoyment-excited",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "enjoyment-hopeful",
+      "v2_code": "enjoyment-hopeful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-earnest",
+      "v2_code": "wish-earnest",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-craving",
+      "v2_code": "wish-craving",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-expectant",
+      "v2_code": "wish-expectant",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-wishing",
+      "v2_code": "wish-wishing",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-hoping",
+      "v2_code": "wish-hoping",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-yearning",
+      "v2_code": "wish-yearning",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-desperate",
+      "v2_code": "wish-desperate",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-uneasy",
+      "v2_code": "wish-uneasy",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-shabby",
+      "v2_code": "wish-shabby",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-anxious",
+      "v2_code": "wish-anxious",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-curiosity",
+      "v2_code": "wish-curiosity",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "wish-regretful",
+      "v2_code": "sadness-rueful",
+      "action": "move",
+      "reason": "독립 판정자 2명이 각각 확신도 최상으로 지적했다. 희망 경계('중요하지만 확실하지 않은 특정 결과를 바라는' 상태)는 미래·현재 지향인데 후회는 과거 지향이라 시제 방향이 반대다. 슬픔 경계('상실·좌절에 대한 자기초점 부정 정서')에 부합해 슬픔으로 이동한다."
+    },
+    {
+      "v1_code": "wish-hopeful",
+      "v2_code": "wish-hopeful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-heartaching",
+      "v2_code": "sadness-heartaching",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-worried",
+      "v2_code": "sadness-worried",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-weary",
+      "v2_code": "sadness-weary",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-solitary",
+      "v2_code": "sadness-solitary",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-troubled",
+      "v2_code": "sadness-troubled",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-terrified",
+      "v2_code": "fear-terrified",
+      "action": "move",
+      "reason": "공포 계열 신설(D-038)에 따라 슬픔에 있던 공포 표현 어휘 '공포에질린'을 공포로 이동한다(taxonomy-v2-decisions.md §2 지적①, §3).",
+      "evidence_ref": "A-1"
+    },
+    {
+      "v1_code": "sadness-empty",
+      "v2_code": "sadness-empty",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-agonized",
+      "v2_code": "sadness-agonized",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-mournful",
+      "v2_code": "sadness-mournful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-jaded",
+      "v2_code": "sadness-jaded",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-apprehensive",
+      "v2_code": "sadness-apprehensive",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-feeling-bad",
+      "v2_code": "sadness-feeling-bad",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-disheartened",
+      "v2_code": "sadness-disheartened",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-fearful",
+      "v2_code": "fear-fearful",
+      "action": "move",
+      "reason": "공포 계열 신설(D-038)에 따라 슬픔에 있던 공포 표현 어휘 '두려운'을 공포로 이동한다(taxonomy-v2-decisions.md §2 지적①, §3).",
+      "evidence_ref": "A-1"
+    },
+    {
+      "v1_code": "sadness-heavy-hearted",
+      "v2_code": "sadness-heavy-hearted",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-dazed",
+      "v2_code": "sadness-dazed",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-choked-up",
+      "v2_code": "sadness-choked-up",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-wrenching",
+      "v2_code": "sadness-wrenching",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-ashamed",
+      "v2_code": "sadness-ashamed",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-pitiful",
+      "v2_code": "sadness-pitiful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-uneasy",
+      "v2_code": "fear-uneasy",
+      "action": "move",
+      "reason": "공포 계열 신설(D-038)에 따라 슬픔에 있던 공포 표현 어휘 '불안한'을 공포로 이동한다(taxonomy-v2-decisions.md §2 지적①, §3).",
+      "evidence_ref": "A-1"
+    },
+    {
+      "v1_code": "sadness-uncomfortable",
+      "v2_code": "sadness-uncomfortable",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-miserable",
+      "v2_code": "sadness-miserable",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-grief-stricken",
+      "v2_code": "sadness-grief-stricken",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-sorrowful",
+      "v2_code": "sadness-sorrowful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-bleak",
+      "v2_code": "sadness-bleak",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-dark-ahead",
+      "v2_code": "sadness-dark-ahead",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-regrettable",
+      "v2_code": "sadness-regrettable",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-piteous",
+      "v2_code": "sadness-piteous",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-fretting",
+      "v2_code": "sadness-fretting",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-grieving",
+      "v2_code": "sadness-grieving",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-displeased",
+      "v2_code": "sadness-displeased",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-concerned",
+      "v2_code": "sadness-concerned",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-lonely",
+      "v2_code": "sadness-lonely",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-depressed",
+      "v2_code": "sadness-depressed",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-gloomy",
+      "v2_code": "sadness-gloomy",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-melancholy",
+      "v2_code": "sadness-melancholy",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-dismal",
+      "v2_code": "sadness-dismal",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-dispirited",
+      "v2_code": "sadness-dispirited",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-despairing",
+      "v2_code": "sadness-despairing",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-frustrated",
+      "v2_code": "sadness-frustrated",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-hating",
+      "v2_code": "hate-hating",
+      "action": "move",
+      "reason": "미움 경계를 특정 대상을 향한 지속적 적대로 재정의하면서(지적⑤, §3) 슬픔에 있던 '증오하는'을 미움으로 이동한다.",
+      "evidence_ref": "C-4"
+    },
+    {
+      "v1_code": "sadness-bored",
+      "v2_code": "sadness-bored",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-conflicted",
+      "v2_code": "sadness-conflicted",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-devastated",
+      "v2_code": "sadness-devastated",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-embarrassed",
+      "v2_code": "sadness-embarrassed",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-forlorn",
+      "v2_code": "sadness-forlorn",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-wretched",
+      "v2_code": "sadness-wretched",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-commiserating",
+      "v2_code": "sadness-commiserating",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-deeply-grieved",
+      "v2_code": "sadness-deeply-grieved",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-defeated",
+      "v2_code": "sadness-defeated",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-bitter-regret",
+      "v2_code": "sadness-bitter-regret",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-hollow",
+      "v2_code": "sadness-hollow",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-deflated",
+      "v2_code": "sadness-deflated",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-vacant",
+      "v2_code": "sadness-vacant",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "sadness-desolate",
+      "v2_code": "sadness-desolate",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-painful",
+      "v2_code": "anger-painful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-vexing",
+      "v2_code": "anger-vexing",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-reprehensible",
+      "v2_code": "anger-reprehensible",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-harsh",
+      "v2_code": "anger-harsh",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-nauseating",
+      "v2_code": "disgust-nauseating",
+      "action": "move",
+      "reason": "미움 경계를 대인 적대로 재정의하고 혐오 계열을 신설하면서(지적⑤, §3) 분노에 있던 오염·역겨움 어휘 '구역질나는'을 혐오로 이동한다. 미움에 있던 동일 라벨(hate-nauseating)과 같은 v2 code로 병합한다.",
+      "evidence_ref": "C-6"
+    },
+    {
+      "v1_code": "anger-offended",
+      "v2_code": "anger-offended",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-unsightly",
+      "v2_code": "anger-unsightly",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-boiling",
+      "v2_code": "anger-boiling",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-betrayal",
+      "v2_code": "anger-betrayal",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-insulting",
+      "v2_code": "anger-insulting",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-frightening",
+      "v2_code": "fear-frightening",
+      "action": "move",
+      "reason": "공포 계열 신설(D-038)에 따라 분노에 있던 공포 표현 어휘 '무서운'을 공포로 이동한다(taxonomy-v2-decisions.md §2 지적①, §3).",
+      "evidence_ref": "A-1"
+    },
+    {
+      "v1_code": "anger-bad",
+      "v2_code": "anger-bad",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-wrathful",
+      "v2_code": "anger-wrathful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-vengeance",
+      "v2_code": "anger-vengeance",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-welling-up",
+      "v2_code": "anger-welling-up",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-indignant",
+      "v2_code": "anger-indignant",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-rage",
+      "v2_code": "anger-rage",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-dissatisfied",
+      "v2_code": "anger-dissatisfied",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-displeased",
+      "v2_code": "anger-displeased",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-astringent",
+      "v2_code": "disgust-astringent",
+      "action": "move",
+      "reason": "혐오 계열 신설(지적⑤, §3)에 따라 분노에 있던 오염·역겨움 성격의 어휘 '떫은'을 혐오로 이동한다.",
+      "evidence_ref": "C-6"
+    },
+    {
+      "v1_code": "anger-chilling",
+      "v2_code": "fear-chilling",
+      "action": "move",
+      "reason": "공포 계열 신설(D-038)에 따라 분노에 있던 공포 표현 어휘 '섬뜩한'을 공포로 이동한다(taxonomy-v2-decisions.md §2 지적①, §3).",
+      "evidence_ref": "A-1"
+    },
+    {
+      "v1_code": "anger-creepy",
+      "v2_code": "fear-creepy",
+      "action": "move",
+      "reason": "공포 계열 신설(D-038)에 따라 분노에 있던 공포 표현 어휘 '소름끼치는'을 공포로 이동한다(taxonomy-v2-decisions.md §2 지적①, §3).",
+      "evidence_ref": "A-1"
+    },
+    {
+      "v1_code": "anger-upset",
+      "v2_code": "anger-upset",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-suffocating",
+      "v2_code": "anger-suffocating",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-disappointment",
+      "v2_code": "anger-disappointment",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-smarting",
+      "v2_code": "anger-smarting",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-bitter",
+      "v2_code": "anger-bitter",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "anger-galled",
+      "v2_code": "anger-galled",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-deeply-moved",
+      "v2_code": "joy-deeply-moved",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-touching",
+      "v2_code": "joy-touching",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-thankful",
+      "v2_code": "joy-thankful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-grateful",
+      "v2_code": "joy-grateful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-encouraging",
+      "v2_code": "joy-encouraging",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-joy",
+      "v2_code": "joy-joy",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-classic",
+      "v2_code": "joy-classic",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-walking-on-air",
+      "v2_code": "joy-walking-on-air",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-amazing",
+      "v2_code": "joy-amazing",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-light",
+      "v2_code": "joy-light",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-moving-to-tears",
+      "v2_code": "joy-moving-to-tears",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-reassured",
+      "v2_code": "joy-reassured",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-satisfied",
+      "v2_code": "joy-satisfied",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-choked-up",
+      "v2_code": "joy-choked-up",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-glad",
+      "v2_code": "joy-glad",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-overflowing",
+      "v2_code": "joy-overflowing",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-proud",
+      "v2_code": "joy-proud",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-alive",
+      "v2_code": "joy-alive",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-refreshing",
+      "v2_code": "joy-refreshing",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-fresh",
+      "v2_code": "joy-fresh",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-good",
+      "v2_code": "joy-good",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-thrilling",
+      "v2_code": "joy-thrilling",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-pleasant",
+      "v2_code": "joy-pleasant",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-exhilarating",
+      "v2_code": "joy-exhilarating",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-cozy",
+      "v2_code": "joy-cozy",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-snug",
+      "v2_code": "joy-snug",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-happy",
+      "v2_code": "joy-happy",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-fantastic",
+      "v2_code": "joy-fantastic",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-relieved",
+      "v2_code": "joy-relieved",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-gratified",
+      "v2_code": "joy-gratified",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-willing",
+      "v2_code": "joy-willing",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "joy-excited",
+      "v2_code": "joy-excited",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-sweet",
+      "v2_code": "love-sweet",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-grateful",
+      "v2_code": "love-grateful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-longing",
+      "v2_code": "love-longing",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-affectionate",
+      "v2_code": "love-affectionate",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-warm",
+      "v2_code": "love-warm",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-strange",
+      "v2_code": "love-strange",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-proud",
+      "v2_code": "love-proud",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-lovely",
+      "v2_code": "love-lovely",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-gentle",
+      "v2_code": "love-gentle",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-pure",
+      "v2_code": "love-pure",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-tender",
+      "v2_code": "love-tender",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-ardent",
+      "v2_code": "love-ardent",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-yearning",
+      "v2_code": "love-yearning",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-familiar",
+      "v2_code": "love-familiar",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-cozy",
+      "v2_code": "love-cozy",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-likable",
+      "v2_code": "love-likable",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-flushed",
+      "v2_code": "love-flushed",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "love-content",
+      "v2_code": "love-content",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-painful",
+      "v2_code": "hate-painful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-tormented",
+      "v2_code": "hate-tormented",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-nauseating",
+      "v2_code": "disgust-nauseating",
+      "action": "move",
+      "reason": "미움 경계를 대인 적대로 재정의하고 혐오 계열을 신설하면서(지적⑤, §3) 미움에 있던 오염·역겨움 어휘 '구역질나는'을 혐오로 이동한다. 분노에 있던 동일 라벨(anger-nauseating)과 같은 v2 code로 병합한다.",
+      "evidence_ref": "C-6"
+    },
+    {
+      "v1_code": "hate-bothersome",
+      "v2_code": "hate-bothersome",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-worrisome",
+      "v2_code": "hate-worrisome",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-horrible",
+      "v2_code": "fear-horrible",
+      "action": "move",
+      "reason": "공포 계열 신설(D-038)에 따라 미움에 있던 공포 표현 어휘 '끔찍한'을 공포로 이동한다(taxonomy-v2-decisions.md §2 지적①, §3).",
+      "evidence_ref": "A-1"
+    },
+    {
+      "v1_code": "hate-shuddering",
+      "v2_code": "fear-shuddering",
+      "action": "move",
+      "reason": "공포 계열 신설(D-038)에 따라 미움에 있던 공포 표현 어휘 '몸서리치는'을 공포로 이동한다(taxonomy-v2-decisions.md §2 지적①, §3).",
+      "evidence_ref": "A-1"
+    },
+    {
+      "v1_code": "hate-heartless",
+      "v2_code": "hate-heartless",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-hateful",
+      "v2_code": "hate-hateful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-burdensome",
+      "v2_code": "hate-burdensome",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-let-down",
+      "v2_code": "hate-let-down",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-disliking",
+      "v2_code": "hate-disliking",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-tired-of",
+      "v2_code": "hate-tired-of",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-unkind",
+      "v2_code": "hate-unkind",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-spiteful",
+      "v2_code": "hate-spiteful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-aggrieved",
+      "v2_code": "hate-aggrieved",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-resentful",
+      "v2_code": "hate-resentful",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-guilt",
+      "v2_code": "hate-guilt",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-loathsome",
+      "v2_code": "hate-loathsome",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-sick-of",
+      "v2_code": "hate-sick-of",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-irritating",
+      "v2_code": "hate-irritating",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-cold",
+      "v2_code": "hate-cold",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": "hate-desolate",
+      "v2_code": "hate-desolate",
+      "action": "keep",
+      "reason": "PR-004 원자료 보존 취지에 따라 v1 표기(계열·code·label)를 변경 없이 그대로 유지한다."
+    },
+    {
+      "v1_code": null,
+      "v2_code": "disgust-repulsive",
+      "action": "add",
+      "reason": "혐오 계열 신설에 따른 문헌 발굴 어휘. 손선주 외 2012(B-1)를 근거로 '혐오스러운'을 신규 추가한다(taxonomy-v2-decisions.md §4 표, §3 disgust 행).",
+      "evidence_ref": "B-1"
+    }
+  ]
+}
