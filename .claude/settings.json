@@ -14,6 +14,17 @@
             "statusMessage": "커밋 확인"
           }
         ]
+      },
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/scripts/claude-scope-guard.mjs\"",
+            "timeout": 10,
+            "statusMessage": "소유 파일 확인"
+          }
+        ]
       }
     ],
     "Stop": [

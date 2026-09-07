@@ -25,7 +25,8 @@ const required = [
   "harness/runtime-profile.json", "harness/runtime-profile.template.json", "harness/loop-state.json", "scripts/claude-stop-hook.mjs", "schemas/README.md",
   "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json",
   "schemas/evidence-card.schema.json", "schemas/analysis-output.schema.json", "schemas/export.schema.json",
-  "schemas/taxonomy.schema.json", "scripts/check-taxonomy.mjs", "scripts/test-check-taxonomy.mjs"
+  "schemas/taxonomy.schema.json", "scripts/check-taxonomy.mjs", "scripts/test-check-taxonomy.mjs",
+  "scripts/claude-scope-guard.mjs", "scripts/test-claude-scope-guard.mjs"
 ];
 
 for (const relative of required) {

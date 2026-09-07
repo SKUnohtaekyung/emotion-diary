@@ -160,3 +160,46 @@ taxonomy 작업 중 하위 에이전트가 프롬프트에 적힌 커밋 금지�
 ### 2.5 설계 세부
 
 접두어 매칭(예: `Bash(git commit *)` 형태의 허용 목록)으로는 `cd docs && git commit`이나 `git -C /path commit`을 놓친다. 그래서 명령 문자열 전체를 정규식(`/\bgit\b[^;&|]*\b(commit|push)\b/`)으로 본다. 오탐(예: `git log --grep=commit`)이 날 수 있으나 확인 한 번이 되돌릴 커밋보다 싸다고 판단해 그쪽으로 기울였다 — 코드 주석에 같은 근거를 남겼다. 설정에 넣기 전 파이프 테스트 10건으로 확인했다 — 커밋·푸시 5종은 확인을 요구하고, 읽기 전용 명령 5종은 통과한다. 이 테스트는 수동으로 실행했고 `scripts/test-check-taxonomy.mjs`와 달리 저장소에 별도 테스트 파일로 남기지는 않았다.
+
+## 3. 소유 파일 밖 쓰기 감지 훅과 worktree 요구 재검토 (2026-09-06)
+
+정본: [../AGENTS.md](../AGENTS.md) §2·§2.2, [../scripts/claude-scope-guard.mjs](../scripts/claude-scope-guard.mjs), [../scripts/test-claude-scope-guard.mjs](../scripts/test-claude-scope-guard.mjs), [DECISIONS.md](DECISIONS.md) D-042, [../tasks/CURRENT_TASK.md](../tasks/CURRENT_TASK.md) TASK-ISSUE-27.
+
+GitHub 이슈 #27(`https://github.com/SKUnohtaekyung/emotion-diary/issues/27`)에 대한 조치다. §2.1의 커밋 훅이 지키지 못하는 자리를 지적한 이슈였다.
+
+### 3.1 무슨 일이 있었나
+
+이슈 #25 작업 중, **지시하지 않았고 어느 에이전트의 소유 파일도 아닌** `docs/PROCESS_LOG.md`에 73줄이 추가돼 있는 것을 발견했다. 사용자는 작성하지 않았고 내용도 모르는 상태였다. 타임라인상 하위 에이전트 1이 이미 종료한 뒤이고 하위 에이전트 2가 시작하기 6초 전이었으며, 두 하위 에이전트 모두 명시된 소유 파일(각각 `data/taxonomy/v2.json` 하나 / `taxonomy-v2-decisions.md` 하나)과 커밋 금지 지시를 받은 상태였다. 병행 Codex 세션도 그날 로그 전부에서 `emotion-diary` 등장 0회로 배제됐다. **작성 주체는 끝내 특정하지 못했다** — 이슈 자체의 요지가 그것이었다. 추가된 내용의 검증 가능한 주장 10건은 전수 대조 결과 전부 사실이어서 되돌리지 않고 남겼다(드리프트한 숫자 2곳만 갱신).
+
+### 3.2 왜 기존 장치로 안 잡히나
+
+`claude-git-guard.mjs`(§2.1)와 그 훅은 `git commit`/`git push`로 보이는 **Bash 명령**만 사용자 확인 대상으로 만든다. 이번 변경은 **커밋되지 않고 작업 트리에만** 존재했다 — 훅이 통과할 일 자체가 없었다. `AGENTS.md` §2의 "한 파일에는 한 명의 writer만" 규칙은 문서로만 적혀 있었고 어떤 도구도 대조하지 않았다. `docs/PROCESS_LOG.md` §2.4가 스스로 적은 교훈("적힌 것은 드리프트하고, 검사되는 것은 하지 않는다")이 이번에도 그대로 적용됐다.
+
+추가로, `git worktree list`는 `main` 하나뿐이고 `.claude/worktrees/`도 비어 있었다 — `AGENTS.md` §2가 요구하는 "병렬 writer는 서로 다른 worktree를 사용한다"는 실제로 한 번도 지켜진 적이 없었다. 다만 이번 사고 자체는 진짜 동시 실행이 아니라 하위 에이전트 1 종료와 하위 에이전트 2 시작 **사이**, 즉 순차 배치 도중에 났다 — worktree 격리가 있었어도 막았을지는 불확실하다.
+
+### 3.3 조치 — 소유 파일 확인 훅
+
+**[`scripts/claude-scope-guard.mjs`](../scripts/claude-scope-guard.mjs) + `.claude/settings.json`의 `PreToolUse`(matcher `Write|Edit`) 훅**을 추가했다. `tasks/CURRENT_TASK.md`의 `- 소유 파일: ...` 선언 줄에서 backtick 경로·글롭을 모아 허용 목록으로 삼고, `Write`/`Edit` 대상이 그 목록 밖이면 `permissionDecision: "ask"`로 사용자 확인을 요구한다. 커밋 훅과 같은 설계 — 차단이 아니라 확인이므로 지시받은 작업은 그대로 진행된다.
+
+이번에는 이슈 #27의 완료 조건이 명시적으로 요구한 대로, 파이프 테스트를 **`scripts/test-claude-scope-guard.mjs`로 저장소에 남겼다** — §2.5가 "수동 10건만 하고 파일로 남기지 않았다"고 스스로 지적한 것을 이번엔 반복하지 않았다. 실행 결과 11/11 PASS: 선언된 경로·글롭·디렉터리 접두 선언·"이 파일" 특례가 통과 4건, 미선언 경로·프로젝트 root 밖 경로가 확인 요구 2건, matcher 밖 도구·손상된 JSON 입력이 판단 보류(fail-open) 2건, 다른(완료된) 섹션의 소유 파일도 통과하는 과다허용 한계 확인 1건, 그리고 아래 3.4의 회귀 테스트 1건이다.
+
+### 3.4 파이프 테스트 중 발견해 고친 결함
+
+초안 구현은 `line.includes("소유 파일")`로 판단했다 — 즉 그 낱말이 줄 어디에 있든 backtick 토큰을 전부 허용 목록에 넣었다. 실제 저장소로 수동 sanity check(PowerShell)을 해 보니, 방금 작성한 이 작업의 "상태" 설명 문단("누구의 **소유 파일**도 아니었던 `docs/PROCESS_LOG.md`에...")처럼 **선언이 아니라 산문 속 언급**까지 걸려, 그 문단이 예시로 든 `git worktree list`·`main` 같은 backtick 토큰까지 허용 목록에 새는 것을 발견했다. 이번 사례는 우연히 무해했지만(이미 정당하게 소유한 경로이거나 URL·명령어였다), 이 훅의 존재 이유가 "출처 불명 쓰기를 잡는 것"인데 정작 그 훅 자신이 산문 서술 때문에 과다허용되는 것은 목적에 정면으로 어긋나는 결함이었다.
+
+원인은 판별 조건이 너무 느슨했던 것이다. 줄 앞머리가 실제 선언 형식(`^[-*]\s*소유\s*파일\s*[:：]`, 기존 TASK-CBM·TASK-BOOTSTRAP 섹션이 쓰던 `- 소유 파일: ...` 관용구)과 일치할 때만 인정하도록 좁혔고, 이 결함을 재현하는 fixture(산문 속 "소유 파일" 언급 + decoy 경로)를 회귀 테스트로 추가했다. 수정 전에는 이 회귀 케이스가 실패했고(decoy 경로가 통과로 잘못 판정), 수정 후 통과를 확인했다.
+
+교훈은 `check-taxonomy.mjs`가 이미 여러 번 보여준 것과 같다(§1.4) — 문자열 부분일치는 "그 낱말이 어디 있든" 잡기 때문에 산문과 선언을 구분하지 못한다. 검사기를 만드는 문서 자신이 그 검사기가 찾는 낱말을 언급하면, 검사기가 자기 자신의 설명문에 걸려 넘어질 수 있다는 것도 이번에 실제로 확인했다.
+
+### 3.5 조치 — worktree 요구를 좁힌다 (D-042)
+
+`AGENTS.md` §2의 "병렬 writer는 서로 다른 worktree/branch를 사용한다"를 **진짜 동시(병렬) 실행 writer**에만 적용되도록 좁혔다. 순차로 배치되는 하위 에이전트(§3.2에서 확인했듯 이 저장소의 실제 패턴)는 별도 worktree 생성을 요구하지 않고, 소유 파일 선언 + 3.3의 훅으로 대응한다.
+
+사용자에게 "강제한다 / 좁힌다 / 보류" 세 선택지를 제시했고 **"좁힌다"(권장)를 선택**했다. 근거: (1) `git worktree list`가 실제로 `main` 하나뿐이라 이 요구가 지켜진 적이 없다, (2) 이번 사고도 진짜 동시 실행이 아니라 순차 배치 사이에서 났다, (3) Windows 환경에서 하위 에이전트마다 실제 `git worktree add`를 만들고 병합해 되돌리는 운영 오버헤드가, 실제로 벌어지지 않는 위험(진짜 병렬 실행)에 비해 크다. 문서와 실제가 다른 채로 두는 것보다, 실제 위험(출처 불명 쓰기)에 맞는 기계적 장치(3.3)를 두고 규칙 문구를 현실에 맞추는 쪽을 택했다. `docs/RISK_REGISTER.md` RK-011의 완화 열도 같은 변경에서 갱신했다.
+
+### 3.6 알려진 한계
+
+- **작업 상태를 가리지 않는다.** 훅은 `tasks/CURRENT_TASK.md` 전체의 모든 `- 소유 파일:` 선언을 합쳐 허용 목록으로 쓴다 — 지금 이 작업(TASK-ISSUE-27)과 무관하게, `partial` 상태로 멈춰 있는 TASK-CBM과 `in_progress`인 TASK-BOOTSTRAP 두 섹션이 선언한 파일(`harness/runtime-profile.json`, `harness/*.yaml`, `.claude/agents/`, `docs/AGENT_WORKFLOW.md` 등)도 실제로 함께 허용 목록에 들어가는 것을 수동 확인으로 검증했다. 작업 단위로 좁히지 않았다.
+- **Bash 경유 쓰기는 잡지 못한다.** matcher가 `Write|Edit`뿐이라 리다이렉션·heredoc 등으로 셸을 통해 쓰면 지나간다. 이슈 #27이 조합 가능하다고 제안한 "세션 경계 스냅샷"(세션 시작/종료 `git status --short` 대조)이 이 경로의 사후 그물이며, 이번 변경 범위에는 넣지 않았다.
+- **글롭은 `*` 한 조각만 지원한다**(경로 구분자 `/`를 넘지 않음). 더 복잡한 패턴이 필요해지면 별도로 확장해야 한다.
+- 이 훅은 Claude Code `.claude/settings.json` 전용이다(`CLAUDE.md`의 어댑터 구분과 동일). Codex 쪽에 대응하는 장치는 없다.

@@ -11,7 +11,7 @@
     "verify": "node scripts/verify.mjs --mode full",
     "verify:quick": "node scripts/verify.mjs --mode quick",
     "verify:full": "node scripts/verify.mjs --mode full",
-    "test": "node scripts/test-check-taxonomy.mjs"
+    "test": "node scripts/test-check-taxonomy.mjs && node scripts/test-claude-scope-guard.mjs"
   }
 }
 
