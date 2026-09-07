@@ -4,6 +4,37 @@
 > - [TASK-DS-REF](TASK-DS-REF.md) — 외부 디자인 시스템 참조 검토. **D-039는 이 작업 몫으로 비워 두었다.**
 > - [TASK-MOBILE](TASK-MOBILE.md) — 모바일 구현 명세.
 
+# TASK-ISSUE-27 — 소유 파일 밖 쓰기 감지
+
+## 상태
+
+`done` — 2026-09-06 사용자 요청(이슈 #27, `https://github.com/SKUnohtaekyung/emotion-diary/issues/27`). 이슈 #25 작업 중 하위 에이전트 1 종료와 하위 에이전트 2 시작 사이, 누구의 소유 파일도 아니었던 `docs/PROCESS_LOG.md`에 출처 불명 73줄이 추가된 사고(작성 주체 미특정)를 계기로, 소유 파일 밖 쓰기를 최소 한 지점에서 기계적으로 감지하는 장치를 추가했다. `claude-git-guard.mjs`(§2.1)는 git commit/push만 사용자 확인 대상으로 만들 뿐 커밋되지 않고 작업 트리에만 남는 쓰기는 애초에 지나갈 통로가 없어 잡지 못했다. 완료 조건 4건 모두 증거와 함께 충족(아래), `verify:quick`/`verify:full` PASS.
+
+**사용자 결정(2026-09-06)**: AGENTS.md §2의 worktree 격리 요구는 **좁힌다**(현재처럼 실제 worktree 생성을 강제하지 않음). 근거: `git worktree list` 결과는 `main` 하나뿐이고 실제로 격리가 쓰인 적이 없으며, 이번 사고도 진짜 동시 실행이 아니라 순차 하위 에이전트 배치 사이에서 났다. 대신 소유 파일 선언 + 이번에 추가하는 기계적 확인 훅으로 실제 위험(출처 불명 쓰기)에 대응한다. 상세는 `docs/DECISIONS.md` D-042.
+
+## 소유권
+
+- 소유 파일: `scripts/claude-scope-guard.mjs`(신규 훅), `scripts/test-claude-scope-guard.mjs`(신규 파이프 테스트), `.claude/settings.json`(훅 등록), `scripts/verify.mjs`(required 목록), `package.json`(`test` 스크립트에 연결), `AGENTS.md`(§2 worktree 문구 좁힘), `docs/DECISIONS.md`(신규 D-042), `docs/PROCESS_LOG.md`(신규 §3), `docs/RISK_REGISTER.md`(RK-011 갱신), 이 파일
+
+## 인수 조건 (이슈 #27 완료 조건)
+
+- [x] 소유 파일 밖 쓰기가 최소 한 지점에서 기계적으로 감지된다(문서 규칙만으로 두지 않는다) — `scripts/claude-scope-guard.mjs`, `PreToolUse`(matcher `Write|Edit`), `.claude/settings.json`.
+- [x] 훅에 대해 파이프 테스트로 오탐·미탐을 확인하고 `scripts/`에 테스트 파일로 남긴다 — `scripts/test-claude-scope-guard.mjs`, 11건 전부 PASS(선언 경로/글롭/디렉터리 접두/"이 파일" 특례 통과 4건, 미선언·root 밖 확인 요구 3건, matcher 밖 도구·손상 입력·과다허용 한계 방어 3건, 산문 오탐 회귀 1건). `package.json`의 `test` 스크립트와 `scripts/verify.mjs`의 `--mode full`에 연결해 매번 자동 실행되게 했다.
+- [x] AGENTS.md §2의 worktree 요구를 지킬지 내릴지 결정하고, 결정과 이유를 `docs/DECISIONS.md`에 남긴다 — D-042.
+- [x] `docs/PROCESS_LOG.md`에 이번 사고를 기록한다(§2와 같은 형식 — 무슨 일이, 왜, 조치).
+
+## 알려진 제한(과다 허용 쪽 — false negative 여지, 후속 과제)
+
+- 훅은 `tasks/CURRENT_TASK.md` 전체의 모든 "소유 파일" 선언을 작업 상태와 무관하게 하나로 합친다. 완료·보류된 과거 작업이 선언한 파일도 계속 허용된다 — 작업 단위로 좁히지 않는다.
+- Bash를 통한 파일 쓰기(리다이렉션, heredoc 등)는 matcher(`Write|Edit`) 밖이라 잡지 못한다. 이슈 #27이 조합 가능하다고 제안한 "세션 경계 스냅샷"(세션 시작/종료 `git status --short` 대조)이 이 경로의 사후 그물이며, 이번 변경에는 포함하지 않았다 — 필요해지면 별도 작업으로 추가한다.
+- 글롭은 `*`(경로 구분자 `/`를 넘지 않는 한 조각) 하나만 지원한다.
+
+## 체크포인트
+
+- 착수(2026-09-06): 이슈 #27 원문 확인, 기존 `claude-git-guard.mjs`/`.claude/settings.json` 구조 파악, worktree 요구 사용자 결정 수령("좁힌다").
+- 진행(2026-09-06): `scripts/claude-scope-guard.mjs` 작성 → `scripts/test-claude-scope-guard.mjs` 10건 작성·실행 PASS(`10/10 PASS, 0 FAIL`). 실제 저장소로 수동 sanity check(PowerShell)하던 중 결함 발견: `line.includes("소유 파일")`가 산문 속 언급까지 잡아 backtick 토큰이 허용 목록에 새고 있었다 — 줄 앞머리가 `- 소유 파일:` 선언 형식과 일치할 때만 인정하도록 좁히고, 이 결함을 재현하는 회귀 테스트(decoy 경로)를 추가해 11/11 PASS로 확인했다(수정 전 재현 실패 확인 후 수정 → 통과 확인).
+- 완료(2026-09-06): `.claude/settings.json`에 훅 등록(matcher `Write|Edit`), `scripts/verify.mjs`의 `required` 목록과 `package.json`의 `test` 스크립트에 새 파일 2개 연결. `AGENTS.md` §2 worktree 문구를 진짜 동시 병렬 writer로 좁히고 §2.2 신설, `docs/DECISIONS.md` D-042, `docs/PROCESS_LOG.md` §3(3.1~3.6), `docs/RISK_REGISTER.md` RK-011 갱신. `node scripts/verify.mjs --mode quick` PASS, `node scripts/verify.mjs --mode full` PASS(taxonomy 41/41 + scope-guard 11/11 포함).
+
 # TASK-CBM — Codebase Memory 통합
 
 ## 현재 상태와 승인 범위
@@ -105,10 +136,19 @@
 > - D-036의 **강도 2줄 세그먼트** → **슬라이더 + 숫자 + −/+ 스테퍼**
 >
 > 그리고 세부 감정 선택이 **chip 격자 → 소프트 리스트**로 바뀌었고 chip은 표시 전용이다. §6 구성요소 규칙을 보강할 때 정본(`docs/DESIGN_SYSTEM.md` §6.2/§6.3/§6.3.1/§6.4)을 기준으로 하고 TASK-DS-REF 파일의 요약을 기준으로 삼지 않는다. D-034(색·글꼴·light 전용)와 D-036의 나머지(앵커 한 줄, 위기 톤, 브랜드, 탐색 아이콘, 4pt 밀도·달력 `1fr`)는 그대로 유효하다.
+>
+> **Codex 세션 인계 (2026-09-07, 이미지 생성).** 캐릭터 9종의 컨셉·프롬프트·근거 조사가 전부 끝났다 — **남은 건 실행뿐이다.** Claude Code 세션에는 이미지 생성 도구가 없어(`codex` CLI가 이 컴퓨터의 PATH에 없고, 전역 `~/.codex/config.toml`은 있지만 Claude Code에서 호출할 권한·이유가 없음) 이 단계부터 Codex가 이어받는다.
+> 1. `design/characters/prompts.json`을 그대로 정본으로 쓴다 — `common_style_prompt` + 각 `characters[].subject_prompt`를 이어 붙이고 `negative_prompt`를 부정 프롬프트로 준다. **9개를 한 번에, 같은 seed로** codex imagegen에 넘긴다(하나만 나중에 다시 만들면 선 굵기·채도가 어긋난다 — `design/characters/README.md` §1).
+> 2. 결과를 `design/characters/src/<key>-1024.png`(원본, 1024×1024)에 저장하고, `design/characters/<key>.png`(배포용, 120×120, 투명 배경 유지)로 축소해 저장한다. `<key>`는 `enjoyment wish sadness anger joy love hate fear disgust` 9개(`prompts.json`의 `characters` 배열 순서).
+> 3. `node scripts/check-characters.mjs`로 파일 유무·크기·투명 배경을 기계 검사한다. 이어서 `design/characters/README.md` §3의 눈 검수 체크리스트(40px 판독성, 9종 통일감, 흑백 구별, 표정 안전성)를 직접 확인한다.
+> 4. 통과하면 `npm run verify:quick`을 실행하고, 결과를 이 파일의 체크포인트에 짧게 남긴다. **커밋은 사용자가 지시할 때만** 한다(AGENTS.md §2.1 — 이 규칙은 Claude Code 전용 훅이 아니라 두 에이전트 공통 계약이다).
+> 생성 도구는 **codex imagegen 직접 호출 하나뿐**이고 다른 이미지 생성 스킬·플러그인·외부 API는 쓰지 않는다(D-035). 9종의 동물·자세·색 결정 근거는 `docs/research/character-animal-evidence.md`, 결정 기록은 `docs/DECISIONS.md` D-043·D-044 — 자세를 임의로 바꾸지 말고, 바꿔야 할 이유를 발견하면 결정 기록부터 갱신한다.
 
 ## 상태
 
 `done(결정)` — 2026-09-02 사용자 요청("디자인 시스템 잡아야 할 것 같다", "새 세션에서 대화하며 정하고, 프리뷰로 계속 확인하고 싶다"). 2026-09-04 세션에서 체크리스트 10건을 모두 확정하고(D-034·D-035·D-036) **D-033을 accepted로 전환**했다. 이어서 사용자가 레퍼런스를 제시해 감정 입력 방식을 다시 정했다 — **D-037**: 강도 슬라이더(세그먼트 대체), 카테고리 아크 휠(2줄 격자 대체), 세부 감정 소프트 리스트(chip은 표시 전용). 세부 감정 목록의 심리학적 타당성은 ~~**D-038**(provisional)로 분리했다.~~ **[정정, 2026-09-05]** **D-038**로 분리했었고, TASK-TAXONOMY의 taxonomy v2 리서치가 끝나 **D-038은 accepted로 종결됐다**(9계열 194개, 사용자 최종 대조 2026-09-05, `docs/DECISIONS.md`). 남은 것은 결정이 아니라 실행·리서치다.
+
+- 소유 파일: `docs/DESIGN_SYSTEM.md`, `design/tokens.json`, `design/characters/prompts.json`, `design/characters/README.md`, `design/characters/src/*.png`, `design/characters/*.png`, `design/style-guide.html`, `scripts/check-contrast.mjs`, `scripts/check-characters.mjs`, `docs/DECISIONS.md`, `docs/research/character-animal-evidence.md`, 이 파일. **[정정, 2026-09-06]** 이슈 #26(캐릭터 9종) 작업 시작 시 선언했어야 했는데 누락돼 `claude-scope-guard.mjs`가 매번 확인을 요구했다 — 뒤늦게 추가. **[추가, 2026-09-07]** 이미지 출력 경로(`src/*.png`, `*.png`) 추가 — Codex가 생성할 산출물.
 
 ## 정본과 산출물
 
@@ -150,9 +190,11 @@
 - 완료(2026-09-04, 2차): 체크리스트 3건 추가 확정 → D-035 accepted. 캐릭터 자산 파이프라인 세팅(`design/characters/prompts.json` 공통 프롬프트 + 7종, `README.md` 규격·검수, `scripts/check-characters.mjs` 자동 검사를 quick 하네스에 연결). 검사는 4개 경로(pending / 7종 정상 / 크기 불일치 / 투명도 없음)를 합성 PNG로 확인했다.
 - 완료(2026-09-04, 3차): 남은 체크리스트 4건 + 탐색 아이콘 확정 → D-036 accepted, **D-033 accepted 전환**. 밀도 감사로 4pt 이탈을 정정하고 달력 가로 넘침 결함을 고쳤다. `DESIGN_SYSTEM`에 §7 브랜드를 신설(이후 절 8~12로 재조정, 상호 참조 동반 수정), 스타일 가이드에 하단 탐색 절 추가.
 - 완료(2026-09-04, 4차): 사용자 레퍼런스(아크 휠·range slider) 검토 → **D-037** accepted. 시안 2종을 만들어 실측 비교했다(세그먼트 536px vs 슬라이더 380px, 아크 7개 중 5개 가독, 세부 감정 51개 중 아크는 5개만 노출·복수 선택 불가). 아크는 반지름 560→460·간격 8.6°→7.6°로 조정해 7개가 모두 화면에 들어오게 하고, 회전을 접선의 45%로 낮춰 한글 가독성을 확보했으며, listbox·activedescendant·aria-live·화살표 키·reduced-motion 대응을 넣었다. 스타일 가이드에 세 구성요소를 동작하는 형태로 이식했다. 세부 감정 목록의 심리학적 타당성은 **D-038**(provisional)로 분리 기록.
+- 완료(2026-09-06, 2차, 이슈 #26): 공포·혐오 캐릭터 컨셉을 사용자와 대화로 확정한 뒤(1차, 위 항목 2 참고), 사용자가 "심리학 전문 지식 근거가 있는지" 직접 질문해 **9종 전체의 행동과학 근거를 조사자 에이전트 3개(백그라운드)로 사후 점검**했다 — 상세는 `docs/research/character-animal-evidence.md`, 결정은 **D-043** accepted(이후 D-044로 대체, 아래). 결과: 공포=토끼(얼어붙음)는 실제로 잘 뒷받침됨(Fanselow 1994 등). **혐오=너구리(코 막기)는 근거가 전혀 없었고 너구리 상징 연구가 오히려 미움 쪽(트릭스터·도둑)을 가리켜, 침팬지(gape+거부 동작)로 교체했다** — 대체 후보 포괄 조사에서 가장 넓은 근거(Steiner 외 2001, Sarabian 외 2017). 원자료 7종(고양이 5·공룡 2)도 사후 점검했으나 이때는 D-035 원자료 보존 원칙에 따라 근거 유무와 무관하게 바꾸지 않았다.
+- 완료(2026-09-07, 3차, 이슈 #26): 사용자가 "9개 감정이 각각 다른 동물이었으면 좋겠다"고 요청 — **D-035의 원자료 보존 전제를 사용자 스스로 대체**했다. 고양이 5종·공룡 2종 중복 때문에 7개 계열의 동물을 다시 정해야 했고, 사용자가 "근거 우선"을 선택해 조사자 에이전트 2개(병렬 백그라운드, 즐거움·희망·기쁨 / 슬픔·사랑·미움)로 조사했다. 결과는 **D-044** accepted. **분노=고양이만 유지**(5개 고양이 포즈 중 유일한 (a)등급이라 근거 우선 기준으로도 최선). 나머지 6종 중 5종은 실제 (a)등급 문헌을 찾아 확정: 즐거움=양(Reefmann 외 2009), 슬픔=기니피그(Herman & Panksepp 1978, PANIC/GRIEF 창시 실험), 기쁨=쥐(Panksepp & Burgdorf 2003; Ishiyama & Brecht 2016 *Science*), 사랑=개(Nagasawa 외 2015 *Science*, 프레리들쥐가 과학적으론 더 유명했으나 마스코트 친숙도로 개 선택), 미움=까마귀(Marzluff 외 2010·2012, 단 논문은 "학습된 위협 인식"이라 부르지 "미움"이라 하지 않음 — 프레이밍 유보 명시). **희망=거북이만 예외로 (c) 근거 없음** — taxonomy 희망 정의 자체가 동물 모델 없는 사람 대상 연구(Bruininks & Malle 2005)에서 왔음을 조사로 확인, 순수 창작 선택으로 명시. 중간에 사용자가 "사랑도 개, 희망도 개"를 골라 종 중복이 발생했는데, 재확인 질문으로 사랑=개·희망=거북이로 해소했다(9종 전부 서로 다른 동물 확인 완료). `prompts.json`(6개 항목 교체, `version` → `characters-v4-draft`)·`README.md` §5·`docs/DECISIONS.md`(D-043→superseded, D-044 신규)·`docs/research/character-animal-evidence.md`(전면 개정, 폐기된 원안은 §4로 보존)를 같은 세션에서 갱신. **실제 이미지 생성은 여전히 미실행**(Codex CLI 필요, 이 환경에 없음을 확인함).
 - 다음(실행·리서치):
   1. **아크 휠 큰 글자 폴백** — 확대 배율이 크면 2줄 격자(D-035 규격)로 전환. §9의 200% 확대 기준이 여기 걸려 있는 유일한 미해결 항목이다.
-  2. **캐릭터 생성** — ~~3번(taxonomy v2) **뒤에** 한다. 공포가 추가되면 7종이 8종이 되는데~~ **[정정, 2026-09-05] 3번(taxonomy v2)이 확정됐다 — 공포·혐오가 둘 다 신설되어 7종이 9종이 되는데** 일관성 때문에 같은 seed로 한 번에 만들어야 하므로, 먼저 만들면 전부 다시 만들어야 한다(D-038). 확정 후 codex imagegen → `node scripts/check-characters.mjs` 통과 → README §3 눈 검수. **생성 자체는 아직 시작하지 않았다**(`design/characters/prompts.json` 7개 항목 그대로).
+  2. **캐릭터 생성** — ~~3번(taxonomy v2) **뒤에** 한다. 공포가 추가되면 7종이 8종이 되는데~~ **[정정, 2026-09-05] 3번(taxonomy v2)이 확정됐다 — 공포·혐오가 둘 다 신설되어 7종이 9종이 되는데** 일관성 때문에 같은 seed로 한 번에 만들어야 하므로, 먼저 만들면 전부 다시 만들어야 한다(D-038). 확정 후 codex imagegen → `node scripts/check-characters.mjs` 통과 → README §3 눈 검수. ~~생성 자체는 아직 시작하지 않았다(`design/characters/prompts.json` 7개 항목 그대로).~~ **[정정, 2026-09-06, 이슈 #26]** 공포·혐오 캐릭터 컨셉을 사용자와 대화로 확정(원자료가 없는 신설 계열이라 매 단계 질문으로 방향을 잡음): **공포=토끼**(제자리에 얼어붙어 귀를 뒤로 접은 자세, 크림색), **혐오=너구리**(앞발로 코를 막고 몸을 트는 자세, 자연색 회색+마스크). 동물 재사용(공룡/고양이) 대신 새 동물을 쓰기로 했다 — 프로젝트 규칙이 아니라 사용자의 창작 선택(근거는 `design/characters/README.md` §5). `prompts.json`에 두 항목의 `subject_prompt`·`accent`(fear `#199A8C`, disgust `#918C37` — tokens.json 500과 동일, override 불필요) 추가 완료, `version`을 `characters-v2-draft`로 올림, `README.md` §1·§2·§3을 9종 기준으로 갱신. `node scripts/check-characters.mjs` → `PENDING: 캐릭터 아이콘 9종 미제작` 정상 확인, `npm run verify:quick` PASS. **실제 PNG 9종 생성은 아직 안 했다** — `codex imagegen`은 Codex CLI 전용 기능이라 이 작업을 수행한 Claude Code 세션에는 실행 도구가 없다. Codex CLI에서 생성 → 여기서 `check-characters.mjs` 통과·README §3 눈 검수로 이어받아야 한다.
   3. **taxonomy v2 심리학 리서치(D-038)** — G3 원자료 전사(v1) 후 진행. **사용자가 방향을 확정했다(2026-09-04): 공포/두려움 카테고리 신설, 놀람은 기쁨 전용이 아님.** 나머지 세부 감정 귀속은 리서치로 정한다. 색 수용 가능성은 미리 재어 뒀다 — 8~9계열까지 가능하지만 쓸 수 있는 구역이 **초록~청록과 어두운 갈색뿐이고 보라는 포화**다(D-038). `emotion_code`(D-022) 마이그레이션 매핑도 함께 만든다. **[정정, 2026-09-05] 완료됐다** — taxonomy v2 9계열 194개 확정, 사용자 최종 대조(D-027)까지 마쳐 `review_status: reviewed`(위 TASK-TAXONOMY 안내, `docs/PROCESS_LOG.md` 참고). `emotion_code` 마이그레이션 매핑(`data/taxonomy/v1-to-v2.json`)도 함께 완료됐다.
   4. **실기기 확인** — chip 대비, 40px 아이콘 판독성, 44px 터치, 아크 조작감(iPhone Safari·Android Chrome).
   5. **위기 안내 연락처 값** 검수.
