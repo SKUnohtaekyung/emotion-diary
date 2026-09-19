@@ -5,6 +5,9 @@ source_of_truth: docs/AGENT_WORKFLOW.md
 # limited-mvp-release 노드를 추가했다. 형식은 scripts/verify.mjs 파서(id/depends_on/gate 줄)를 따른다.
 # 2026-09-04 TASK-TAXONOMY T0: taxonomy-v2-research 노드를 신설했다(D-038). docs/TRACEABILITY.md PR-004 행이
 # 이 id를 이미 참조했으나 노드가 없어 끊어진 참조였다. verify.mjs quick은 이 종류를 검사하지 않는다.
+# 2026-09-20 TASK-INFRA-01: status가 9/5부터 멈춰 STATUS §3(스파이크 pass/partial)과 어긋나 있었다.
+# 실제 증거에 맞춰 고쳤고, 앞으로는 scripts/check-harness.mjs가 "선행이 done이 아닌데 후행이
+# in_progress·verifying·done"인 모순과 loop-state와의 불일치를 quick에서 잡는다.
 
 statuses:
   allowed: [blocked, ready, in_progress, verifying, done]
@@ -12,8 +15,12 @@ statuses:
 
 nodes:
   - id: bootstrap-audit
-    status: in_progress
+    status: done
     depends_on: []
+    # 2026-09-20: 이 노드의 gate bootstrap-facts는 [B-01, source-files-present, runtime-profile-complete,
+    # quick]만 요구한다. B-01 pass(STATUS §3), 원자료 3개 byte·SHA-256은 Windows·Linux CI 양쪽에서 PASS
+    # (PR #28), runtime-profile은 실제 명령으로 채웠고 unknown은 근거와 함께 남겼다. TASK-BOOTSTRAP에
+    # 남아 있는 미완 항목(B-02~B-08 판정)은 이 gate가 아니라 아래 스파이크 노드들의 gate 몫이다.
     owns:
       - harness/runtime-profile.json
       - tasks/CURRENT_TASK.md
@@ -24,8 +31,11 @@ nodes:
     gate: bootstrap-facts
 
   - id: hosting-identity-spike
-    status: blocked
+    status: verifying
     depends_on: [bootstrap-audit]
+    # 2026-09-20: 스파이크는 2026-09-02에 실행됐다. gate security-foundation의 B-02·B-03·B-08이 모두
+    # partial이라 done이 아니다 — 남은 것: iPhone Safari 본체·홈 화면·Android Chrome, bundle/log secret
+    # scan, Cloudflare Access 적용 가능성, 무료 한도 수치(STATUS §3, runtime-profile hosting).
     owns:
       - docs/ARCHITECTURE.md §5, §6, §10 hosting/identity rows
       - docs/DECISIONS.md hosting/identity decisions
@@ -38,6 +48,10 @@ nodes:
   - id: data-store-spike
     status: blocked
     depends_on: [hosting-identity-spike]
+    # 2026-09-20: blocked로 둔 것은 의도다. G2a와 같은 스파이크에서 B-04·B-05 증거(원격 D1의 CHECK·
+    # UNIQUE·trigger 거부, 조건부 UPDATE, 부모 우선 cascade, Time Travel bookmark)를 이미 partial로
+    # 모았지만(STATUS §3), 선행 hosting-identity-spike의 gate가 아직 통과하지 않았다. harness/README의
+    # "선행 gate 통과 전에는 시작 상태로 바꾸지 않는다"를 지키고, 증거가 있다는 사실은 여기 적는다.
     owns:
       - docs/DATA_MODEL.md §3 SQL-level contracts
       - docs/DECISIONS.md storage decisions
@@ -47,8 +61,11 @@ nodes:
     gate: data-contract
 
   - id: model-access-spike
-    status: blocked
+    status: verifying
     depends_on: [bootstrap-audit]
+    # 2026-09-20: PC worker → 원격 ai_jobs → claude -p 왕복은 2026-09-02 PASS. gate model-access의 B-06이
+    # partial이라 done이 아니다 — 남은 것: job 만료·failed 전환, verifier 독립 2회 호출, 위기 케이스,
+    # 구독 경로의 보존 설정(STATUS §4-8, RK-016).
     owns:
       - docs/AI_RAG_SPEC.md §1, §4 model access sections
       - docs/DECISIONS.md model access decisions

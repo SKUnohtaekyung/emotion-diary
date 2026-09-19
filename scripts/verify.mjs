@@ -26,7 +26,9 @@ const required = [
   "schemas/diary-entry.schema.json", "schemas/journal-assist-output.schema.json",
   "schemas/evidence-card.schema.json", "schemas/analysis-output.schema.json", "schemas/export.schema.json",
   "schemas/taxonomy.schema.json", "scripts/check-taxonomy.mjs", "scripts/test-check-taxonomy.mjs",
-  "scripts/claude-scope-guard.mjs", "scripts/test-claude-scope-guard.mjs"
+  "scripts/claude-scope-guard.mjs", "scripts/test-claude-scope-guard.mjs",
+  // .gitattributes가 사라지면 원자료가 다시 LF로 저장돼 Linux에서 해시 검사가 깨진다(2026-09-20 CI 복구).
+  ".gitattributes", "scripts/check-harness.mjs", "scripts/test-check-harness.mjs"
 ];
 
 for (const relative of required) {
@@ -154,7 +156,10 @@ if (fs.existsSync(path.join(root, "scripts/check-contrast.mjs"))) {
 // 캐릭터 아이콘 규격 검사(DESIGN_SYSTEM §8). 자산 미제작이면 pending으로 통과한다.
 if (fs.existsSync(path.join(root, "scripts/check-characters.mjs"))) {
   const chars = spawnSync(process.execPath, [path.join(root, "scripts/check-characters.mjs")], { cwd: root, encoding: "utf8" });
-  if (chars.status !== 0) failures.push(`캐릭터 아이콘 검사 실패: ${(chars.stdout + chars.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
+  // 의존성을 설치하지 않은 환경(새 clone, 2026-09-19까지의 CI)에서는 스택 트레이스의 꼬리
+  // "} |  | Node.js v22…"만 보여 원인을 알 수 없었다. 검사를 건너뛰지는 않고 원인만 밝힌다.
+  if (chars.status !== 0 && /ERR_MODULE_NOT_FOUND[\s\S]*'sharp'|Cannot find package 'sharp'/.test(chars.stderr)) failures.push("캐릭터 아이콘 검사 실패: sharp가 설치돼 있지 않다 — `npm ci`를 먼저 실행한다(package-lock.json에 생기는 libc diff는 커밋하지 않는다)");
+  else if (chars.status !== 0) failures.push(`캐릭터 아이콘 검사 실패: ${(chars.stdout + chars.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
 }
 
 // taxonomy 데이터 검사(TASK-TAXONOMY §9.3): schema 대조 + 등급 도출·매핑 누락·인용 15단어.
@@ -162,6 +167,18 @@ if (fs.existsSync(path.join(root, "scripts/check-characters.mjs"))) {
 if (fs.existsSync(path.join(root, "scripts/check-taxonomy.mjs"))) {
   const taxonomy = spawnSync(process.execPath, [path.join(root, "scripts/check-taxonomy.mjs")], { cwd: root, encoding: "utf8" });
   if (taxonomy.status !== 0) failures.push(`taxonomy 검사 실패: ${(taxonomy.stdout + taxonomy.stderr).trim().split(/\r?\n/).filter((line) => line.startsWith("FAIL")).slice(0, 3).join(" | ")}`);
+}
+
+// harness 상태 파일·기계 계약의 어긋남 검사(TASK-INFRA-01). 결정론적 모순만 FAIL이고
+// 시간·커밋 거리 신호는 WARN이다 — WARN은 보여 주기만 하고 실패로 세지 않는다(harness/README).
+if (fs.existsSync(path.join(root, "scripts/check-harness.mjs"))) {
+  const harness = spawnSync(process.execPath, [path.join(root, "scripts/check-harness.mjs")], { cwd: root, encoding: "utf8" });
+  const lines = (harness.stdout + harness.stderr).trim().split(/\r?\n/);
+  for (const line of lines.filter((value) => value.startsWith("WARN"))) console.log(line);
+  if (harness.status !== 0) {
+    const reported = lines.filter((line) => line.startsWith("FAIL"));
+    failures.push(`harness·계약 드리프트 검사 실패: ${(reported.length ? reported.slice(0, 5) : lines.slice(-3)).join(" | ")}`);
+  }
 }
 
 const loopState = JSON.parse(fs.readFileSync(path.join(root, "harness/loop-state.json"), "utf8"));

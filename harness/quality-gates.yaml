@@ -16,6 +16,10 @@ policies:
 gates:
   quick:
     blocking: true
+    # quick이 실제로 하는 일(2026-09-20 TASK-INFRA-01에서 정의를 현실에 맞춤, 정본 AGENT_WORKFLOW §6):
+    # 필수 파일·내부 링크·충돌 표식·비밀값·JSON 구문·원자료 SHA-256·PR/추적성/작업 그래프 구조에 더해
+    # 데이터·자산 계약 검사 네 개(check-contrast, check-characters, check-taxonomy, check-harness)를 돈다.
+    # check-characters가 sharp를 쓰므로 quick도 npm ci가 선행돼야 한다(로컬 약 2초).
     commands:
       - name: repository-document-check
         command: node scripts/verify.mjs --mode quick
@@ -34,8 +38,10 @@ gates:
         command: null
         status: configure_after_bootstrap
       - name: unit-and-integration
-        command: null
-        status: configure_after_bootstrap
+        command: npm test
+        # 지금은 검사기 자체 테스트뿐이다(check-taxonomy, scope-guard, check-characters, check-harness,
+        # git-guard). 앱의 unit/integration 테스트는 app-scaffold에서 같은 script에 이어 붙인다.
+        status: ready_harness_tests_only
       - name: production-build
         command: null
         status: configure_after_bootstrap

@@ -37,6 +37,11 @@
 ## 체크포인트
 
 - 가설 판정(2026-09-20, 편집 전): ① `journal-template.txt` 원본은 **CRLF 221B** — git baseline보다 앞선 `outputs/emotion-diary-agent-seed.zip` 내부 바이트가 manifest SHA-256과 일치, 저장소 blob(LF 204B)이 변형본이다. ② `.gitattributes`는 `references/source/**`만 — 줄 단위 파서는 전부 `/\r?\n/`이고 작업 트리는 이미 CRLF·LF 혼재로 PASS 중이다. ③ quick의 sharp 검사는 유지(2.0초 중 1.7초, full로 옮기면 검사 완화)하고 네 곳의 quick 정의를 현실에 맞춘다. ④ RISK는 open 17 + accepted 2(감사의 "open 19"는 틀림). ⑤ 감사의 "정상" 분류가 틀렸다 — `schemas/diary-entry`·`journal-assist-output`의 카테고리 enum/pattern이 7개로 남아 있다. ⑥ style-guide `:root` 63개 값은 현재 tokens와 전부 일치, 기계 검사 가능. ⑦ Codex는 Stop 훅만 동등 이식 가능하고 PreToolUse는 `ask` 미지원. ⑧ `npm ci`도 npm 10.9.2에서는 lockfile의 `libc`를 지운다(가설 기각). CI는 15회 전부 실패였다.
+- 완료(2026-09-20, 묶음 1 · commit `7149b84`): `.gitattributes`(`references/source/** -text`)와 blob renormalize(204B→원본 221B), 워크플로에 `npm ci`·full·Ubuntu/Windows 매트릭스. LF checkout 모사 트리에서 quick·full PASS를 먼저 확인했고, **PR #28에서 두 OS 모두 초록불 — 이 저장소의 첫 CI 성공**이다.
+- 완료(2026-09-20, 묶음 2·3): `scripts/check-harness.mjs`를 harness 동기화보다 **먼저** 만들어 낡은 상태에서 FAIL 11건·WARN 2건을 재현한 뒤(AGENTS §5.1) 고쳤다. 결정론적 모순만 FAIL, 시간·커밋 거리 신호는 WARN(exit 0) — quick을 Stop 훅이 매 턴 돌리므로 날짜가 지났다거나 CI가 얕은 clone이라는 이유로 실패하면 검사가 새 고장 지점이 된다. 테스트 `test-check-harness.mjs` 28/28(CRLF fixture, 엉뚱한 이유의 실패를 막는 문구 대조 포함). harness: `bootstrap-audit`은 자기 gate(`bootstrap-facts`) 기준으로 `done`, `hosting-identity-spike`·`model-access-spike`는 증거가 partial이라 `verifying`, `data-store-spike`는 선행 미완이라 계약대로 `blocked`(증거 수집 사실은 주석). `loop-state`는 이 작업 기준으로 다시 썼고 옛 서사는 git 이력에 있다. `runtime-profile`의 commands·unknowns·evidence, `quality-gates`의 `unit-and-integration`(`npm test`), `harness/README`의 낡은 현재형 서술을 고쳤다.
+- 완료(2026-09-20, 묶음 4 일부): `schemas/diary-entry`·`journal-assist-output`의 카테고리 enum/pattern 7→9. v2의 감정 code 194개가 새 pattern을 전부 통과함을 따로 확인했다. `scripts/test-claude-git-guard.mjs` 15/15(받아들인 오탐·미탐은 `known`으로 고정), sharp 미설치 시 verify가 원인(`npm ci`)을 말하도록 수정, `verify.mjs` 필수 목록에 `.gitattributes`·새 검사기 추가.
+- 주의: verify의 충돌 표식 검사(`^=======`)는 Markdown setext 머리글 밑줄도 충돌로 본다. 지금 추적 파일에는 해당 줄이 없지만 누가 그 문법을 쓰면 quick이 깨진다(후속 후보).
+- 다음: quick 정의 나머지 세 곳(README·AGENT_WORKFLOW §6·EVAL §3), 오도 위험 문서 줄, RK-007, D-039 reserved, AGENTS §2.1 푸터·"공통 계약", PRD 초안 → `CURRENT_TASK` 분할 → `[정정]` 흡수와 STATUS 재작성.
 
 # TASK-ISSUE-26 — 캐릭터 9종 포즈·잔잔한 애니메이션
 

@@ -2,6 +2,7 @@
   "schema_version": "1.1",
   "generated_at": "2026-09-02T11:30:00+09:00",
   "verified_by": "Claude Code (Fable 5.1), TASK-BOOTSTRAP G0/G1",
+  "last_synced": "2026-09-20 TASK-INFRA-01 — runtime, commands, evidence, unknowns re-checked against package.json, CI and docs/STATUS.md §3; hosting/storage/model_access blocks are the 2026-09-02 spike record and were not re-run",
   "repository": {
     "root": "<local-project-root>",
     "git_repository": true,
@@ -19,6 +20,9 @@
     "npm_version": "10.9.2",
     "git_version": "2.49.0.windows.1",
     "package_manager": "npm",
+    "dev_dependencies": "sharp ^0.35.4 — scripts/check-characters.mjs (runs inside verify quick), scripts/build-character-animations.mjs, scripts/extract-ui-static-poses.mjs. Without node_modules, quick fails; run npm ci first",
+    "lockfile_policy": "package-lock.json was written by a newer npm (libc fields on the Linux sharp binaries). npm 10.9.x — this PC and the npm bundled with Node 22 on CI — drops those 48 lines on both npm install and npm ci (verified 2026-09-20). Install works either way; do not commit that diff (git checkout -- package-lock.json). User decision 2026-09-20",
+    "ci": "GitHub Actions .github/workflows/harness.yml: npm ci → verify quick → verify full on ubuntu-latest and windows-latest, Node 22. First green run 2026-09-20 (PR #28); all 15 earlier runs failed",
     "framework": null,
     "language": "JavaScript/TypeScript candidate; not selected"
   },
@@ -57,11 +61,11 @@
     "vector_search_filter_confirmed": "unknown"
   },
   "commands": {
-    "install": null,
+    "install": "npm ci",
     "dev": null,
     "lint": null,
     "typecheck": null,
-    "test": null,
+    "test": "npm test (harness script self-tests only: check-taxonomy, scope-guard, check-characters, check-harness, git-guard; no app tests exist yet)",
     "build": null,
     "e2e": null,
     "verify_quick": "npm run verify:quick",
@@ -75,15 +79,19 @@
     "node --version => v22.16.0",
     "npm --version => 10.9.2",
     "git --version => 2.49.0.windows.1",
-    "references/manifest.json SHA-256 verification is enforced by scripts/verify.mjs"
+    "references/manifest.json SHA-256 verification is enforced by scripts/verify.mjs",
+    "2026-09-20 unzip -p outputs/emotion-diary-agent-seed.zip .../journal-template.txt | sha256 => 221B b1d77d38991c… (CRLF x17), equal to manifest; repo blob was LF 204B 0eb5580714ef… until .gitattributes (references/source/** -text)",
+    "2026-09-20 git cat-file -s :references/source/journal-template.txt => 221 after git add --renormalize",
+    "2026-09-20 gh pr checks 28 => verify (ubuntu-latest) pass, verify (windows-latest) pass",
+    "2026-09-20 npm ci (npm 10.9.2) => git status shows package-lock.json modified, 48 deletions of libc fields; reverted"
   ],
   "unknowns": [
-    "Cloudflare Pages/Workers minimal deployment, phone access, free-tier limits (B-08, G2a)",
-    "Access-token cookie, rate limit, Cloudflare Access applicability, custom-header CSRF from phone browser, worker-only Bearer route (B-02/B-03, G2a)",
-    "D1 conditional UPDATE/CHECK/trigger/batch behavior, wrangler migration, Time Travel/export backup (B-04/B-05, G2b)",
-    "PC worker ai_jobs lease/result round trip and offline fallback (B-06, G2c)",
-    "claude -p subscription path remaining checks: retention/training settings, independent verifier call, latency p95 over 10 runs, subscription quota impact, crisis-signal cases (B-06, G2c)",
-    "Retrieval layer on subscription or free path (B-07, G2d)",
-    "Web Push and PWA support"
+    "B-08: iPhone Safari proper, home-screen standalone, Android Chrome (only KakaoTalk in-app WebView and desktop Chrome were confirmed 2026-09-02)",
+    "B-02/B-03: Cloudflare Access free-plan applicability and identity header, bundle/log secret scan, free-tier limit numbers",
+    "B-05: Time Travel restore not exercised, worker export backup procedure and deletion-lag notice wording (I-17)",
+    "B-06: job expiry/failed transition, independent verifier double call, crisis-signal cases, subscription retention/training settings, subscription quota impact",
+    "B-07: retrieval layer on subscription or free path (G2d, not started)",
+    "Web Push and PWA support (Post-MVP, issue #9)",
+    "Whether Codex hooks and rules behave as documented on this machine — docs say Stop hook is portable but PreToolUse has no 'ask' decision; not runtime-verified (TASK-INFRA-01 follow-up)"
   ]
 }
