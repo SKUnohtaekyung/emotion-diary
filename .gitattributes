@@ -1,0 +1,7 @@
+# 사용자 제공 원자료는 바이트 단위로 보존한다(PR-004, references/manifest.json의 byte·SHA-256).
+# core.autocrlf=true인 Windows에서 journal-template.txt(원본 CRLF 221B)가 LF 204B blob으로
+# 저장돼, LF로 checkout하는 Linux CI에서 해시 검사가 첫 실행부터 계속 실패했다.
+# 원본 판정 근거: git baseline보다 앞서 만든 이식 패키지 zip 내부 바이트가 manifest와 일치.
+# 범위를 이 폴더로만 좁힌 이유: 나머지 텍스트 파일은 해시로 고정돼 있지 않고 줄 단위
+# 파서가 모두 /\r?\n/을 쓰므로, 전체 eol 정규화는 이득 없이 작업 트리만 흔든다.
+references/source/** -text

@@ -2,6 +2,8 @@
 
 이 파일은 Claude Code와 Codex가 공유하는 저장소 작업 계약이다. 제품 세부사항은 해당 정본 문서를 읽고, 이 파일에는 모든 작업에 항상 필요한 규칙만 둔다.
 
+**규칙은 두 에이전트 공통이지만 기계적 강제는 공통이 아니다.** §2.1·§2.2·§5의 훅(`.claude/settings.json`)은 Claude Code에만 걸려 있고, Codex 세션에는 같은 규칙이 문서로만 적용된다(2026-09-19의 Codex 커밋 `98bbe4e`는 §2.1의 메시지 규칙을 따르지 않았다). 도구와 무관하게 걸리는 장치는 GitHub Actions(`npm ci` → quick → full, Ubuntu·Windows)뿐이다. Codex 쪽 대응 수단과 그 한계는 §2.3에 적는다.
+
 ## 1. 작업 시작
 
 1. `tasks/CURRENT_TASK.md`에서 승인 범위, 완료 조건, 소유 파일, 차단 사항을 확인한다.
@@ -31,13 +33,24 @@
 - **하위 에이전트는 어떤 경우에도 커밋하지 않는다.** `git commit`·`git add`·`git push`를 실행하지 않고 작업 결과만 보고한다. 사용자 승인은 주 에이전트에게 온 것이고, 하위 에이전트의 커밋은 사용자 눈에 보이지 않는다.
 - 이 규칙은 `.claude/settings.json`의 `PreToolUse` 훅(`scripts/claude-git-guard.mjs`)이 강제한다 — 커밋·푸시로 보이는 Bash 명령은 사용자 확인을 거친다. 차단이 아니라 확인이므로 지시받은 작업은 그대로 진행된다.
 - 근거: 2026-09-05 taxonomy 작업에서 하위 에이전트가 프롬프트의 커밋 금지를 어기고 커밋해 되돌려야 했다(`docs/PROCESS_LOG.md`). 프롬프트에 적은 금지는 지켜지지 않았고 기계 검사만 지켜졌다.
+- **커밋 메시지**: 한국어로 쓰고 "무엇을"보다 "왜"를 적는다. 마지막 줄은 `Co-Authored-By: <그 커밋을 실제로 만든 에이전트·모델> <noreply 주소>`다 — 예: `Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>`. 모델 이름을 고정하지 않는다. 세션마다 모델이 다르므로 푸터가 서로 다른 것이 정상이고, 푸터가 없는 에이전트 커밋이 위반이다. 이 규칙의 정본은 이 줄 하나다(2026-09-20 사용자 결정). 다른 문서에 복제하지 않는다.
+- PR 병합·이슈 닫기처럼 `gh`로 하는 되돌리기 어려운 작업은 위 훅이 잡지 못한다(`scripts/test-claude-git-guard.mjs`의 known 미탐). 커밋과 똑같이 사용자 지시가 있을 때만 한다.
 
 ### 2.2 소유 파일 확인 훅
 
 - `.claude/settings.json`의 `PreToolUse` 훅(matcher `Write|Edit`, `scripts/claude-scope-guard.mjs`)이 `tasks/CURRENT_TASK.md`의 `- 소유 파일: ...` 선언과 대조해, 목록 밖 경로에 쓰면 사용자 확인을 요구한다. 커밋 훅(§2.1)과 같은 방식(차단이 아니라 확인)이라 지시받은 작업은 그대로 진행된다.
 - 새 작업을 시작하면 `CURRENT_TASK`에 `- 소유 파일: ...` 형식으로 먼저 선언한다(기존 섹션과 동일한 표기). 선언하지 않은 경로에 쓰면 이 훅이 매번 확인을 요구한다.
-- 알려진 한계(과다 허용 쪽): 작업 상태와 무관하게 파일 전체의 모든 선언을 합치고, Bash를 통한 파일 쓰기는 matcher 밖이라 잡지 못한다. `tasks/CURRENT_TASK.md`의 TASK-ISSUE-27 섹션에 상세.
+- 알려진 한계(과다 허용 쪽): 작업 상태와 무관하게 파일 전체의 모든 선언을 합치고, Bash를 통한 파일 쓰기는 matcher 밖이라 잡지 못한다. 첫 번째 한계는 끝난 작업의 절을 `tasks/archive/`로 옮기면 줄어든다(훅은 `CURRENT_TASK.md`만 읽는다). 상세는 `tasks/archive/TASK-ISSUE-27.md`.
 - 근거: 이슈 #27 — 하위 에이전트 사이에 누구의 소유 파일도 아닌 `docs/PROCESS_LOG.md`에 출처 불명 변경이 생겼는데, §2의 소유 파일 규칙이 문서로만 있고 기계로 검사되지 않아 잡지 못했다(`docs/PROCESS_LOG.md`, D-042).
+
+### 2.3 Codex 세션에서의 강제 수단(미구성)
+
+2026-09-20 공식 문서 조사 결과다(`learn.chatgpt.com/docs/hooks`, `…/agent-configuration/rules`). **이 저장소의 Codex 런타임에서 검증하지 않았으므로 구성 전에 실제 동작을 확인한다**(§3의 마지막 규칙).
+
+- Stop 훅은 동등하게 옮길 수 있다고 문서가 말한다(`decision: "block"` 또는 exit 2, `stop_hook_active` 제공). `.codex/hooks.json`은 `.gitignore` 대상이 아니라 커밋해 공유할 수 있다.
+- `PreToolUse`는 `deny`만 되고 **`ask`(사용자 확인)를 지원하지 않는다.** `scripts/claude-git-guard.mjs`·`claude-scope-guard.mjs`를 Codex 훅에 그대로 연결하면 `ask` 출력이 무시되고 도구 호출이 그대로 진행된다 — 가드가 조용히 뚫리므로 그대로 연결하지 않는다.
+- "확인 후 진행"에 가장 가까운 것은 `.codex/rules/`의 `prefix_rule(pattern=["git","commit"], decision="prompt")`인데 문서가 실험 기능이라고 밝힌다.
+- 프로젝트 단위 훅·규칙은 그 프로젝트가 trusted일 때만 로드된다. 구성은 후속 작업이다.
 
 ## 3. 구현 규칙
 

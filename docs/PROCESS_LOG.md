@@ -203,3 +203,52 @@ GitHub 이슈 #27(`https://github.com/SKUnohtaekyung/emotion-diary/issues/27`)�
 - **Bash 경유 쓰기는 잡지 못한다.** matcher가 `Write|Edit`뿐이라 리다이렉션·heredoc 등으로 셸을 통해 쓰면 지나간다. 이슈 #27이 조합 가능하다고 제안한 "세션 경계 스냅샷"(세션 시작/종료 `git status --short` 대조)이 이 경로의 사후 그물이며, 이번 변경 범위에는 넣지 않았다.
 - **글롭은 `*` 한 조각만 지원한다**(경로 구분자 `/`를 넘지 않음). 더 복잡한 패턴이 필요해지면 별도로 확장해야 한다.
 - 이 훅은 Claude Code `.claude/settings.json` 전용이다(`CLAUDE.md`의 어댑터 구분과 동일). Codex 쪽에 대응하는 장치는 없다.
+
+## 4. 개발 인프라 정비 — 만들어 놓고 아무도 보지 않던 장치들 (2026-09-20)
+
+정본: [../harness/README.md](../harness/README.md) "어긋남 검사", [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md) §6, [../scripts/check-harness.mjs](../scripts/check-harness.mjs), [../.gitattributes](../.gitattributes), PR #28. 작업 기록은 `tasks/CURRENT_TASK.md`의 TASK-INFRA-01(끝난 뒤에는 `tasks/archive/`).
+
+### 4.1 무슨 일이 있었나
+
+제품이 아니라 제품을 만드는 장치를 감사했다. 세 가지가 드러났다.
+
+- **CI는 한 번도 통과한 적이 없었다.** 2026-09-02 첫 실행부터 9-19까지 15회 전부 실패였다. 로컬 Stop 훅이 통과하니 아무도 Actions 탭을 보지 않았다.
+- **`harness/`의 상태 파일 세 개가 9-03에 멈춰 있었다.** `loop-state.json`은 47커밋 전을 가리켰고 `work-graph.yaml`은 끝난 스파이크를 `blocked`로 적고 있었다. `harness/README`가 "루프마다 갱신한다"고 했지만 16일 동안 0회였다.
+- **schema가 taxonomy를 따라오지 않았다.** v2가 9계열로 확정된 뒤에도 `diary-entry`·`journal-assist-output`의 카테고리 enum은 7개였다. 그대로 구현에 들어갔으면 공포·혐오 일기가 전부 검증에서 거부됐다.
+
+### 4.2 공통 원인
+
+세 가지 모두 **"있는지"는 검사했고 "맞는지"는 검사하지 않았다.** `verify.mjs`는 harness 파일의 존재와 JSON 문법, schema 파일의 존재만 봤다. §2.4(커밋 훅)와 §3(소유 파일 훅)에서 얻은 교훈 — 문서에 적은 약속은 지켜지지 않고 기계 검사만 지켜진다 — 이 그대로 되풀이됐다. 이번에는 위반한 쪽이 하위 에이전트가 아니라 주 에이전트들과 문서 자신이었다.
+
+CI의 원인은 둘이었다. ① `references/source/journal-template.txt`의 원본은 CRLF 221B인데 `core.autocrlf=true`인 Windows에서 LF 204B로 저장돼, Linux에서 manifest의 SHA-256과 어긋났다. "원자료는 변경 금지 보존"(PR-004)이 git 단에서 이미 깨져 있었던 셈이다. ② `sharp` 설치 단계가 없었다(9-19부터).
+
+### 4.3 감사 자체도 틀렸다
+
+직전 세션의 감사 요약에는 단정이 섞여 있었고, 이 작업은 그것을 지시가 아니라 가설로 다뤘다. 확인해 보니:
+
+| 감사의 주장 | 실제 |
+| --- | --- |
+| DATA_MODEL·UX_SPEC·EVAL_PLAN·AI_RAG_SPEC·schemas는 "정상" | 커밋 날짜만 본 분류였다. 내용을 대조하니 schema enum 7개(높음), PRD §6.1 표 7행·바램·고양이/공룡, export 필드명 불일치, UX_SPEC "7개 색 계열" 등이 나왔다 |
+| RISK `open` 19건 | open 17 + accepted 2 |
+| `[정정]` 43건 | 표기가 든 줄은 34줄(`grep -c`의 파일별 합을 잘못 읽음) |
+| `.gitattributes`에 전체 `eol=lf`를 걸자 | 불필요했다. 줄 단위 파서는 전부 `/\r?\n/`이고 해시로 고정된 텍스트는 파일 하나뿐이라 `references/source/** -text` 한 줄이면 됐다 |
+| (이 작업의 가설) `npm ci`면 lockfile이 안전하다 | 기각. npm 10.9.2는 `npm ci`로도 `libc` 48줄을 지운다 |
+
+원본이 CRLF인지 LF인지는 추측하지 않았다. git baseline보다 11시간 앞서 만들어진 이식 패키지 zip(`outputs/`, 비추적) 안의 바이트가 manifest의 SHA-256과 일치하는 것을 확인하고서야 "고칠 것은 manifest가 아니라 git 저장 방식"이라고 판정했다.
+
+### 4.4 조치와 순서
+
+1. **CI 복구를 맨 앞에** — 이후 모든 변경의 독립 판정자가 되기 때문이다. 브랜치 + draft PR로 main을 건드리지 않고 Ubuntu·Windows 초록불을 확인했다. 푸시 전에 LF checkout을 모사한 트리에서 quick·full을 먼저 돌렸다.
+2. **검사를 harness 동기화보다 먼저 만들었다.** 낡은 상태에서 FAIL 11건·WARN 2건이 나오는 것을 본 뒤에 고쳤다(AGENTS §5.1). 순서를 뒤집었다면 검사가 아무것도 잡지 못해도 알 수 없었다.
+3. **FAIL과 WARN의 경계** — 같은 커밋이면 언제 어디서 돌려도 결과가 같은 모순만 FAIL이다. 커밋 거리·날짜는 WARN이다. quick은 Stop 훅이 매 턴 돌리므로, 아무것도 고치지 않았는데 날짜가 지나서 또는 CI의 얕은 clone이라서 실패하면 검사가 새 고장 지점이 된다.
+4. **검사를 완화해서 초록불을 만들지 않았다.** quick의 sharp 검사(2.0초 중 1.7초)를 full로 옮기자는 안은 기각했다 — 옮기면 턴이 끝날 때 자산 회귀를 못 잡는다. 대신 낡아 있던 quick의 정의 네 곳을 현실에 맞추고, 미설치일 때 스택 꼬리 대신 원인을 말하게 했다.
+5. `CURRENT_TASK.md`(90KB)의 끝난 절 다섯 개를 `tasks/archive/`로 옮겼다. 본문은 스크립트로 바이트 그대로 옮기고 절별 SHA-256과 바이트 합계로 검산했다. 새로 쓰는 글만 손으로 썼다. 부수 효과로 scope-guard의 "끝난 작업의 선언까지 허용" 한계(§3.6 첫 항목)가 줄었다.
+
+### 4.5 과정에서 낸 실수
+
+- 아카이브 스크립트의 링크 재작성 정규식이 두 번 적용돼 `../../TASK-TAXONOMY-V1.md`가 됐다. 직전 커밋에서 절을 다시 잘라 대조하는 **독립 검산**이 "불일치"를 냈고 그 자리에서 고쳤다. 스크립트 자신의 바이트 합계 검산은 이 오류를 잡지 못했다 — 합계는 재작성 전의 원문으로 계산했기 때문이다. 검산은 산출물을 다시 읽어서 해야 한다.
+- 셸 한 줄에 정규식 리터럴을 넣었다가 인용이 깨졌다(9-17 별자리 세션의 heredoc 실패와 같은 종류). 스크래치패드에 스크립트 파일로 두고 실행하는 쪽으로 바꿨다.
+
+### 4.6 남긴 것과 남은 것
+
+결정론적 어긋남은 이제 quick에서 잡힌다(테스트 28건). 잡히지 않는 것: 문서 산문끼리의 모순(이번에 사람 눈과 조사자로 찾은 종류), Codex 세션의 규칙 위반(CI 말고는 장치가 없다 — AGENTS §2.3), `gh`로 하는 병합·이슈 닫기. `docs/DECISIONS.md` 행 안의 취소선은 결정 기록이 덧붙임 이력이라는 이유로 흡수하지 않았다.

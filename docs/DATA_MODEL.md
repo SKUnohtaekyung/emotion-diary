@@ -49,7 +49,7 @@ DB 불변조건:
 | 필드 | 계약 |
 | --- | --- |
 | `id`, `diary_id` | PK/FK, diary hard delete 시 cascade |
-| `category_code` | ~~7개~~ **[정정, 2026-09-05] 9개**(taxonomy v2, §4.1) 상위 감정의 안정 코드 |
+| `category_code` | 9개(taxonomy v2, §4.1) 상위 감정의 안정 코드 |
 | `emotion_code` | taxonomy의 세부 감정 안정 코드. 카테고리별 독립 발급 `<category_code>-<slug>`(D-022) |
 | `label_snapshot` | 기록 당시 한글 표시명. 카테고리가 다르면 같은 label이라도 다른 code |
 | `intensity` | 정수 1~10, `CHECK (intensity BETWEEN 1 AND 10)` |
@@ -248,7 +248,7 @@ completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편
 ### 내보내기
 
 - MVP는 UTF-8 `application/json` 한 파일이다.
-- 최상위에 `schema_version`, `exported_at`, `timezone`, `diaries`, `analyses`(선택)를 둔다.
+- 최상위에 `schemaVersion`, `exportedAt`, `timezone`, `diaries`, `analyses`(선택)를 둔다. 이 문서의 표와 SQL 계약은 저장 컬럼 이름(snake_case)으로 적고, 내보내기 파일과 API의 JSON 키는 [../schemas/export.schema.json](../schemas/export.schema.json)·[../schemas/diary-entry.schema.json](../schemas/diary-entry.schema.json)의 camelCase를 따른다. 같은 필드의 두 표기는 기계적으로 대응한다(`entry_date` ↔ `entryDate`).
 - 비밀값, 내부 owner key, raw model prompt, verifier 내부 판정 전문은 제외한다.
 - JSON Schema로 자동 검증하고 재수입 가능 여부는 별도 범위다. CSV는 향후 기능이다.
 

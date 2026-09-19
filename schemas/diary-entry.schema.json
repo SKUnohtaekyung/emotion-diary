@@ -40,8 +40,8 @@
         "additionalProperties": false,
         "required": ["categoryCode", "emotionCode", "labelSnapshot", "intensity", "displayOrder"],
         "properties": {
-          "categoryCode": { "enum": ["enjoyment", "wish", "sadness", "anger", "joy", "love", "hate"] },
-          "emotionCode": { "type": "string", "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate)-[a-z0-9][a-z0-9-]{0,55}$" },
+          "categoryCode": { "enum": ["enjoyment", "wish", "sadness", "anger", "joy", "love", "hate", "fear", "disgust"] },
+          "emotionCode": { "type": "string", "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate|fear|disgust)-[a-z0-9][a-z0-9-]{0,55}$" },
           "labelSnapshot": { "type": "string", "pattern": "\\S", "minLength": 1, "maxLength": 100 },
           "intensity": { "type": "integer", "minimum": 1, "maximum": 10 },
           "displayOrder": { "type": "integer", "minimum": 0 }

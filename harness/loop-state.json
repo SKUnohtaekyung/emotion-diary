@@ -1,18 +1,19 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-BOOTSTRAP",
-  "phase": "spike-preparation",
-  "iteration": 4,
+  "task_id": "TASK-INFRA-01",
+  "phase": "dev-infrastructure-maintenance",
+  "iteration": 1,
   "status": "in_progress",
-  "current_hypothesis": "Own backend on free cloud (Cloudflare Pages + Workers + D1, access-token cookie, D-032) with a PC-side AI worker pulling ai_jobs and calling claude -p on the Claude subscription (D-029, D-031) can pass G2a/G2b/G2c spikes; the limited MVP ships first (D-018).",
+  "current_hypothesis": "The development apparatus (CI, harness state files, machine contracts, task docs) drifted because verify.mjs checked existence and syntax but not agreement with reality. Restoring CI on both OSes and adding deterministic drift checks (scripts/check-harness.mjs) makes the same drift visible the next time it happens.",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "02dadf0",
-  "completed_nodes": [],
-  "next_node": "bootstrap-audit",
+  "last_verified_commit": "b54a0a2",
+  "completed_nodes": ["bootstrap-audit", "taxonomy-v1", "taxonomy-v2-research"],
+  "next_node": "hosting-identity-spike",
   "blockers": [
-    "G2a: Cloudflare account/project creation is an external resource (free); re-confirm with the user right before creating it",
-    "G2c remaining: ai_jobs queue round trip with the PC worker, retention/training settings, independent verifier double call, latency p95 over 10 runs, subscription quota, crisis-signal cases (RK-016)"
+    "hosting-identity-spike gate (B-02/B-03/B-08 partial): iPhone Safari proper, home-screen standalone, Android Chrome, bundle/log secret scan, Cloudflare Access applicability, free-tier numbers",
+    "model-access-spike gate (B-06 partial): job expiry/failed handling, independent verifier double call, crisis-signal cases, subscription retention settings (RK-016)",
+    "app-scaffold stays blocked until hosting-identity-spike and data-store-spike are done; TASK-MOBILE (single Worker + Static Assets proposal) is on hold until Phase 1 starts"
   ],
-  "last_checkpoint": "2026-09-02 G2c real round trip PASS: PC worker + claude -p Sonnet 5 via remote ai_jobs, 11 synthetic jobs, latency p50 8.4s / p95 12.1s (exceeds 8s target → thinking UI + fallback). Remaining B-06: retention settings, independent verifier double call, crisis cases, expiry/failed handling. Next: G3 taxonomy-v1; Phase 1 app-scaffold on user approval. Earlier: B-02 lockout: Rate Limiting binding rejected (never blocked), D1 global lockout verified remotely; iPhone (KakaoTalk WebView) and PC Chrome real-browser PASS; spike token rotated, synthetic data cleared. Next: G2c real PC worker + claude -p. Earlier: REMOTE spike PASS: user did wrangler login; D1 emotion-diary-spike (APAC) created + migrated; Worker <spike-worker>.workers.dev deployed with 3 secrets via wrangler secret put; remote HTTP 22/22 PASS, remote D1 trigger/CHECK/UNIQUE rejections + parent-first cascade confirmed; Time Travel bookmark available. Pending: phone real-device test (token given to user in chat), rate limit, free-tier numbers, real PC worker + claude -p. Earlier: G2a/G2b local spike PASS (22 HTTP + 9 SQL checks, work/spikes/g2a-cloudflare, no account): token cookie, CSRF, D1 CHECK/trigger/conditional UPDATE/cascade, ai_jobs queue. Findings: delete parent first (child-first hits completed-guard trigger); meta.changes over-counts with cascade. Waiting on user: wrangler login (browser OAuth by the user) before remote deploy. Earlier: D-032 accepted (Cloudflare Pages/Workers/D1 + PC AI worker via ai_jobs queue); D-030 superseded. PRD, README, ARCHITECTURE (§4.6 worker, §5 job routes), DATA_MODEL §3.8 ai_jobs, SAFETY, EVAL B-02~B-08, RISK (RK-001/002/003/010/018 rewritten, RK-019 new), ROADMAP, TRACEABILITY, work-graph (data-store-spike), runtime-profile updated. Next: G2a hosting-identity-spike on Cloudflare after user re-confirms project creation; G3 taxonomy-v1 in parallel."
+  "last_checkpoint": "2026-09-20 TASK-INFRA-01: CI green for the first time on ubuntu and windows (PR #28, first at 7149b84, latest verified b54a0a2) after preserving references/source bytes via .gitattributes and adding npm ci. check-harness.mjs reproduced 11 FAIL + 2 WARN on the stale state, then harness files were synced. Schemas moved to 9 categories, canon docs aligned, CURRENT_TASK split into tasks/archive (byte-verified). Pending user decisions: merge PR #28, close issue #27, republish the design-preview artifact. History of the 2026-09-02 spikes that used to live in this field is in git (harness/loop-state.json before this commit), docs/STATUS.md section 3 and harness/runtime-profile.json."
 }
