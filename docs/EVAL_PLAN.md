@@ -19,7 +19,7 @@
 
 | 층 | 내용 | 시점 |
 | --- | --- | --- |
-| quick harness | 문서·링크·secret·conflict·필수 구조 | 매 변경/Claude Stop hook |
+| quick harness | 문서·링크·secret·conflict·필수 구조·원자료 해시 + 데이터·자산 계약 검사(색 대비, 캐릭터 자산, taxonomy, harness·schema·style-guide 어긋남). 정의의 정본은 [AGENT_WORKFLOW.md](AGENT_WORKFLOW.md) §6 | 매 변경/Claude Stop hook, CI(Ubuntu·Windows) |
 | unit | schema, 날짜, 통계, Gate code rule, export | 관련 코드 변경 |
 | integration | server auth, D1 조건부 statement/batch/trigger, 모델 접근 어댑터(후행), idempotency | PR/작업 완료 |
 | browser E2E | 직접/AI 작성, 저장, dashboard, delete/export | PR/릴리스 |

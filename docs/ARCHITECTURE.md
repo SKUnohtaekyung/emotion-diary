@@ -10,6 +10,8 @@
 
 ## 2. 후보 기준 아키텍처
 
+> **미결 제안(2026-09-04, 보류 중).** [../tasks/TASK-MOBILE.md](../tasks/TASK-MOBILE.md)가 아래의 "Pages(UI) + Workers(API)" 분리 구성을 **단일 origin Worker + Static Assets**(설치형 홈 화면 웹앱, service worker 없음)로 교정하자고 제안했다. `DECISIONS`에 기록되지 않았으므로 현재 정본은 아래 그림(D-032)이다. Phase 1 `app-scaffold`를 시작하기 전에 이 제안을 결정으로 받아들일지 먼저 정한다.
+
 ```text
 모바일 브라우저 / 홈 화면 바로가기
                  |

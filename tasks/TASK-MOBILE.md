@@ -2,7 +2,9 @@
 
 ## 상태
 
-`planned` — 2026-09-04 분석 세션 결과. 사용자가 "PWA가 적합한지 검증하고 아니면 더 나은 방식을 찾아라"고 요청했고, 분석 결론은 **service worker·오프라인 없는 설치형 홈 화면 웹앱(manifest `display: standalone`)**이다. 이 결론은 아직 `docs/DECISIONS.md`에 기록되지 않은 **제안**이며, 정본(PRD §4, ARCHITECTURE §2, D-032)은 여전히 "Cloudflare Pages(UI) + Workers(API)" 분리 구성을 서술한다. 새 세션에서 "tasks/TASK-MOBILE.md 이어서"라고 말하면 §9 절차로 시작한다.
+`on_hold` — **2026-09-20 사용자 결정으로 보류, Phase 1(app-scaffold) 착수 시 재개.** 이슈 #1~#9는 열어 둔다. 이 파일의 결론은 여전히 `docs/DECISIONS.md`에 기록되지 않은 제안이고, `docs/ARCHITECTURE.md` §2에 "미결 제안" 표시만 달아 두었다. 재개할 때 쓸 결정 번호는 `docs/DECISIONS.md` 마지막 행으로 확인한다(2026-09-20 기준 다음 번호 D-047 — 이 파일 본문의 "D-038"은 9월 4일 기준의 낡은 번호다).
+
+이전 상태: `planned` — 2026-09-04 분석 세션 결과. 사용자가 "PWA가 적합한지 검증하고 아니면 더 나은 방식을 찾아라"고 요청했고, 분석 결론은 **service worker·오프라인 없는 설치형 홈 화면 웹앱(manifest `display: standalone`)**이다. 이 결론은 아직 `docs/DECISIONS.md`에 기록되지 않은 **제안**이며, 정본(PRD §4, ARCHITECTURE §2, D-032)은 여전히 "Cloudflare Pages(UI) + Workers(API)" 분리 구성을 서술한다. 새 세션에서 "tasks/TASK-MOBILE.md 이어서"라고 말하면 §9 절차로 시작한다.
 
 다른 세션이 `docs/DECISIONS.md`·`docs/DESIGN_SYSTEM.md`·`design/style-guide.html`·`tasks/CURRENT_TASK.md`를 수정 중일 수 있다(TASK-DS-REF 참조). 이 파일은 그 파일들을 건드리지 않고 자체 완결로 작성했다.
 

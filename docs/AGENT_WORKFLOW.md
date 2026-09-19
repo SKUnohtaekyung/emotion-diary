@@ -101,8 +101,10 @@ Claude용 읽기 전용 역할은 `.claude/agents/`에 정의한다. Codex에서
 
 ## 6. 검증 하네스 계약
 
-- `quick`: 필수 문서, 내부 링크, 병합 충돌 표식, 명백한 비밀값을 검사한다.
-- `full`: `quick` 이후 `package.json`에 존재하는 `lint`, `typecheck`, `test`, `build`를 순서대로 실행한다.
+- `quick`: 필수 파일, 내부 링크, 병합 충돌 표식, 명백한 비밀값, JSON 구문, 원자료 byte·SHA-256, PRD·추적성·작업 그래프의 구조를 검사하고, 이어서 데이터·자산 계약 검사 네 개를 실행한다 — `check-contrast`(색 대비·계열 색차), `check-characters`(캐릭터 자산 규격), `check-taxonomy`(taxonomy 데이터), `check-harness`(harness 상태 파일과 schema·style-guide의 어긋남, [../harness/README.md](../harness/README.md)). `check-characters`가 `sharp`를 쓰므로 `quick`도 `npm ci`가 선행돼야 한다. 이 검사들을 `full`로 옮기지 않은 이유: 로컬 약 2초로 Stop 훅에 부담이 없고, 옮기면 자산·계약의 회귀를 턴이 끝날 때 잡지 못하게 된다.
+- `full`: `quick` 이후 `package.json`에 존재하는 `lint`, `typecheck`, `test`, `build`를 순서대로 실행한다. 지금 `test`는 검사기 자체 테스트다.
+- GitHub Actions(`.github/workflows/harness.yml`)가 `npm ci` → `quick` → `full`을 Ubuntu와 Windows에서 실행한다. 로컬 Stop 훅이 통과해도 CI가 빨간불이면 완료가 아니다 — 2026-09-02부터 9-19까지 CI는 15회 전부 실패였는데 로컬만 보고 아무도 알지 못했다.
+- `check-harness`의 `WARN`은 실패가 아니다. 시간·커밋 거리에 기대는 신호라 보여 주기만 한다.
 - Claude Stop 훅은 `quick`만 실행해 명백히 깨진 상태에서 한 번 더 작업하게 한다. 재진입(`stop_hook_active`)에도 실패하면 무한 루프를 피하기 위해 종료를 허용하되 실패를 명시하도록 한다.
 - 사람과 에이전트의 최종 완료 선언은 `full` 통과를 요구한다.
 - 아직 코드가 없는 단계에서 `full`은 문서 하네스만 검사하고 성공할 수 있다. 이것은 앱 기능 검증을 뜻하지 않는다.
