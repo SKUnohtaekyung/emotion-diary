@@ -29,7 +29,7 @@
       "type": "array",
       "maxItems": 5,
       "uniqueItems": true,
-      "items": { "type": "string", "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate)-[a-z0-9][a-z0-9-]{0,55}$" }
+      "items": { "type": "string", "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate|fear|disgust)-[a-z0-9][a-z0-9-]{0,55}$" }
     },
     "draftPatch": {
       "type": "object",
@@ -45,7 +45,7 @@
             "additionalProperties": false,
             "required": ["emotionCode", "intensity"],
             "properties": {
-              "emotionCode": { "type": "string", "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate)-[a-z0-9][a-z0-9-]{0,55}$" },
+              "emotionCode": { "type": "string", "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate|fear|disgust)-[a-z0-9][a-z0-9-]{0,55}$" },
               "intensity": { "type": ["integer", "null"], "minimum": 1, "maximum": 10 }
             }
           }
