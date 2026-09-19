@@ -4,7 +4,7 @@
 
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
-| TASK-INFRA-01 개발 인프라 정비 | 진행 중 | 이 파일 |
+| TASK-INFRA-01 개발 인프라 정비 | 완료(2026-09-20, PR #28 병합) — 다음 작업 착수 시 archive로 | 이 파일 |
 | TASK-WEB-UI-01 브라우저 우선 UI 프로토타입 | planned, 사용자 승인 대기 | 이 파일 |
 | [TASK-MOBILE](TASK-MOBILE.md) 설치형 홈 화면 웹앱 | 보류 — Phase 1 착수 시 재개(이슈 #1~#9) | 별도 파일 |
 | [TASK-DS-REF](TASK-DS-REF.md) TDS 규칙 참고 | 보류(이슈 #10~#14, D-039 reserved) | 별도 파일 |
@@ -15,7 +15,7 @@
 
 ## 상태와 범위
 
-`in_progress` — 2026-09-20 사용자 지시. 대상은 제품이 아니라 제품을 개발하는 장치(문서·하네스·훅·검증 스크립트·CI)다. 직전 감사 요약은 작업 지시가 아니라 검증할 가설로 다뤘고, 판정 결과와 근거는 아래 체크포인트에 있다. 브랜치 `infra/maintenance` + PR로 진행하며 커밋·푸시·병합·이슈 닫기는 묶음마다 사용자 승인을 받는다.
+`done` — 2026-09-20. PR #28이 `main`에 병합됐고(`59caa78`) **`main`의 GitHub Actions가 Ubuntu·Windows 양쪽에서 success**다. 인수 조건 다섯 개 모두 충족. 다음 작업을 시작할 때 이 절을 `archive/`로 옮기고 `harness/loop-state.json`의 `task_id`를 바꾼다. 아래는 착수 당시의 범위 서술이다 — 2026-09-20 사용자 지시. 대상은 제품이 아니라 제품을 개발하는 장치(문서·하네스·훅·검증 스크립트·CI)다. 직전 감사 요약은 작업 지시가 아니라 검증할 가설로 다뤘고, 판정 결과와 근거는 아래 체크포인트에 있다. 브랜치 `infra/maintenance` + PR로 진행하며 커밋·푸시·병합·이슈 닫기는 묶음마다 사용자 승인을 받는다.
 
 - 포함: CI 복구, 하네스 낡음 검사와 테스트, `harness/` 동기화, 계약 드리프트(schema 9계열·quick 정의·오도 위험이 있는 문서 줄), `CURRENT_TASK` 분할, 손댄 정본의 `[정정]`·취소선 흡수, git-guard 테스트, AGENTS "공통 계약" 문구.
 - 제외(후속): 전체 `eol=lf` 정규화, `docs/DECISIONS.md` 행 안의 취소선 흡수(결정 기록은 덧붙임 이력이 본질), 완료된 TASK-TAXONOMY 3종 재작성, Codex 훅 실제 구성(런타임 검증 불가), `AI_RAG_SPEC` 표기법 통일(후행 단계), 스파이크 노드 `done` 처리(증거가 `partial`).
@@ -51,7 +51,8 @@
 - 완료(2026-09-20, 묶음 4 · commit `b54a0a2`): PRD PR-004·§6.1(사용자가 초안 diff 확인 후 승인), UX_SPEC 2곳·ROADMAP·DATA_MODEL export 필드명, quick 정의 네 곳, AGENTS §2.1 커밋 메시지 규칙 일원화·서두의 "강제는 Claude 전용" 단서·§2.3 Codex, D-039 reserved 행과 끊긴 표 머리글 복구, RK-007 closed, DS-REF·MOBILE `on_hold`, BOOTSTRAP 감사 완료 표시, `[정정]` 6곳 흡수. CI 두 OS 초록불.
 - 완료(2026-09-20, 묶음 5·6): 이 파일 90,026B → 약 10KB. 끝난 절 다섯 개를 `tasks/archive/`로 옮겼다 — 본문은 스크립트로 바이트 그대로, 새 글(머리말·색인·`archive/README.md`)만 손으로 썼다. **독립 검산**(직전 커밋 `b54a0a2`에서 절을 다시 잘라 대조)이 스크립트의 링크 재작성 버그(`../../`)를 잡아 고쳤고, 재검산은 5개 절 + 옛 머리말 모두 동일. 산문 참조 3곳(AGENTS §2.2, STATUS §5, TRACEABILITY AG-CBM-001) 갱신. `docs/STATUS.md` 재작성(`[정정]` 4겹 흡수, 9/2 이후 완료 사항 반영, 커밋 규칙은 AGENTS §2.1을 가리킴), `docs/PROCESS_LOG.md` §4 회고. quick·full PASS, WARN 0건.
 - 손대지 않은 것과 이유: `docs/DECISIONS.md`·`docs/PROCESS_LOG.md` 안의 `[정정]`·취소선(덧붙임 기록이 본질), `references/README.md`의 `[정정]` 1곳과 `tasks/TASK-TAXONOMY*.md`(끝난 작업 문서, 다른 문서가 경로로 인용), `AI_RAG_SPEC`의 snake_case 예시·`EVAL_PLAN`의 "1:1 대조" 대상 모호함·`ARCHITECTURE`의 "transaction" 표기(후행 단계이거나 표기 수준 — `docs/STATUS.md` §4 후속 목록), `SAFETY_POLICY`(조사자가 참조와 핵심 줄만 확인, 전문 미대조).
-- 남은 사용자 결정: PR #28의 main 병합, 이슈 #27 닫기, 디자인 미리보기 Artifact 재발행.
+- 완료(2026-09-20, 마감): 사용자 지시로 PR #28을 merge commit으로 병합(`59caa78`, 묶음별 커밋 5개 보존)하고 `main` CI success를 확인한 뒤 이슈 #27을 닫았다(해결된 것과 남긴 한계를 코멘트로 기록). 병합·닫기로 낡게 된 서술(아카이브의 "#27 열려 있음", 이 절의 상태, `loop-state`)을 같은 날 고쳤다.
+- 결정(2026-09-20, 사용자): 디자인 미리보기 Artifact는 **재발행하지 않는다.** 공유 링크는 2026-09-17 별자리 지도 구현 이전 상태로 남고, 저장소의 로컬 미리보기(`node scripts/preview.mjs 4173`)가 정본이다(`docs/STATUS.md` §5). 이 작업에 남은 사용자 결정은 없다.
 
 # TASK-WEB-UI-01 — 브라우저 우선 직접 작성 UI 프로토타입
 
