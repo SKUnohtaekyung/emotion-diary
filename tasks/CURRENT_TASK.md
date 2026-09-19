@@ -4,6 +4,40 @@
 > - [TASK-DS-REF](TASK-DS-REF.md) — 외부 디자인 시스템 참조 검토. **D-039는 이 작업 몫으로 비워 두었다.**
 > - [TASK-MOBILE](TASK-MOBILE.md) — 모바일 구현 명세.
 
+# TASK-INFRA-01 — 개발 인프라 정비(CI·하네스·계약 드리프트·작업 문서)
+
+## 상태와 범위
+
+`in_progress` — 2026-09-20 사용자 지시. 대상은 제품이 아니라 제품을 개발하는 장치(문서·하네스·훅·검증 스크립트·CI)다. 직전 감사 요약은 작업 지시가 아니라 검증할 가설로 다뤘고, 판정 결과와 근거는 아래 체크포인트에 있다. 브랜치 `infra/maintenance` + PR로 진행하며 커밋·푸시·병합·이슈 닫기는 묶음마다 사용자 승인을 받는다.
+
+- 포함: CI 복구, 하네스 낡음 검사와 테스트, `harness/` 동기화, 계약 드리프트(schema 9계열·quick 정의·오도 위험이 있는 문서 줄), `CURRENT_TASK` 분할, 손댄 정본의 `[정정]`·취소선 흡수, git-guard 테스트, AGENTS "공통 계약" 문구.
+- 제외(후속): 전체 `eol=lf` 정규화, `docs/DECISIONS.md` 행 안의 취소선 흡수(결정 기록은 덧붙임 이력이 본질), 완료된 TASK-TAXONOMY 3종 재작성, Codex 훅 실제 구성(런타임 검증 불가), `AI_RAG_SPEC` 표기법 통일(후행 단계), 스파이크 노드 `done` 처리(증거가 `partial`).
+
+## 소유권
+
+- Main/Writer: 현재 Claude Code 세션 1명. 읽기 전용 researcher 2회 사용(Codex 훅 공식 문서, 정본 내용 대조). 하위 에이전트는 쓰지 않고 커밋하지 않는다.
+- 소유 파일: `.gitattributes`, `.github/workflows/harness.yml`, `harness/*`, `scripts/verify.mjs`, `scripts/check-harness.mjs`, `scripts/test-check-harness.mjs`, `scripts/test-claude-git-guard.mjs`, `scripts/check-taxonomy.mjs`, `scripts/test-check-taxonomy.mjs`, `scripts/check-contrast.mjs`, `scripts/check-characters.mjs`, `schemas/diary-entry.schema.json`, `schemas/journal-assist-output.schema.json`, `package.json`, `README.md`, `AGENTS.md`, `BOOTSTRAP.md`, `PRD.md`, `docs/STATUS.md`, `docs/ROADMAP.md`, `docs/TRACEABILITY.md`, `docs/DATA_MODEL.md`, `docs/UX_SPEC.md`, `docs/EVAL_PLAN.md`, `docs/AGENT_WORKFLOW.md`, `docs/DECISIONS.md`, `docs/RISK_REGISTER.md`, `docs/PROCESS_LOG.md`, `docs/ARCHITECTURE.md`, `references/README.md`, `tasks/*`, `tasks/archive/*`.
+
+## 사용자 결정(2026-09-20)
+
+- TASK-WEB-UI-01의 Codex 세션은 종료됨 → `CURRENT_TASK` 분할까지 진행.
+- TASK-DS-REF·TASK-MOBILE은 **보류**(MOBILE은 Phase 1 착수 시 재개). D-039는 `reserved` 행으로 명시해 번호 구멍을 메운다. 이슈 #1~#14는 열어 둔다.
+- 커밋 푸터 정본: **그 커밋을 만든 실제 에이전트·모델명**. 규칙은 `AGENTS.md` §2.1 한 곳에만 둔다.
+- `PRD.md` 본문 수정 승인(초안 diff를 먼저 보이고 확정). `BOOTSTRAP.md`는 유지하고 상단에 감사 완료 표시.
+- `package-lock.json`은 현행 유지. 구버전 npm이 만드는 `libc` 삭제 diff는 커밋하지 않는다.
+
+## 인수 조건
+
+- PR의 GitHub Actions가 Windows·Linux 양쪽에서 초록불이다.
+- `harness/` 6개 파일이 현재 상태를 반영하고, 같은 어긋남이 다시 생기면 기계가 알려 준다(검사와 그 테스트로 확인).
+- `tasks/CURRENT_TASK.md`가 한 번에 읽히는 크기이고 과거 기록은 `tasks/archive/`로 옮겨졌으며 내부 링크가 깨지지 않았다.
+- 손댄 정본에서 `[정정]`·취소선이 본문에 흡수됐고 변경 이력은 `DECISIONS`/`PROCESS_LOG`에 남았다.
+- `verify --mode quick`·`--mode full` PASS, `package-lock.json` 무변경.
+
+## 체크포인트
+
+- 가설 판정(2026-09-20, 편집 전): ① `journal-template.txt` 원본은 **CRLF 221B** — git baseline보다 앞선 `outputs/emotion-diary-agent-seed.zip` 내부 바이트가 manifest SHA-256과 일치, 저장소 blob(LF 204B)이 변형본이다. ② `.gitattributes`는 `references/source/**`만 — 줄 단위 파서는 전부 `/\r?\n/`이고 작업 트리는 이미 CRLF·LF 혼재로 PASS 중이다. ③ quick의 sharp 검사는 유지(2.0초 중 1.7초, full로 옮기면 검사 완화)하고 네 곳의 quick 정의를 현실에 맞춘다. ④ RISK는 open 17 + accepted 2(감사의 "open 19"는 틀림). ⑤ 감사의 "정상" 분류가 틀렸다 — `schemas/diary-entry`·`journal-assist-output`의 카테고리 enum/pattern이 7개로 남아 있다. ⑥ style-guide `:root` 63개 값은 현재 tokens와 전부 일치, 기계 검사 가능. ⑦ Codex는 Stop 훅만 동등 이식 가능하고 PreToolUse는 `ask` 미지원. ⑧ `npm ci`도 npm 10.9.2에서는 lockfile의 `libc`를 지운다(가설 기각). CI는 15회 전부 실패였다.
+
 # TASK-ISSUE-26 — 캐릭터 9종 포즈·잔잔한 애니메이션
 
 ## 상태와 승인 범위

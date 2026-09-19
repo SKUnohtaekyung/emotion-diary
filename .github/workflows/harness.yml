@@ -3,17 +3,28 @@ name: Repository harness
 on:
   pull_request:
   push:
+    branches: [main]
 
 permissions:
   contents: read
 
 jobs:
-  quick:
-    runs-on: ubuntu-latest
+  verify:
+    # 두 OS에서 돌린다. Windows runner는 core.autocrlf=true라 .gitattributes의 원자료 보존
+    # (references/source/** -text)이 실제로 지켜지는지, Linux runner는 LF checkout에서
+    # 해시와 줄 단위 파서가 버티는지를 각각 확인한다.
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      # check-characters.mjs가 sharp를 쓴다. lockfile 그대로 설치한다.
+      - run: npm ci
       - run: node scripts/verify.mjs --mode quick
-
+      - run: node scripts/verify.mjs --mode full
