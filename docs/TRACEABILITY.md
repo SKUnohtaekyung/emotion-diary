@@ -67,4 +67,4 @@
 | 요구 ID | 설계/운영 정본 | 실제 검증 증거 | 제품 범위 영향 |
 | --- | --- | --- | --- |
 | AG-HARNESS-001 | AGENT_WORKFLOW §6; `harness/README` 어긋남 검사; `.gitattributes`; `.github/workflows/harness.yml` | `scripts/check-harness.mjs`(quick)와 `test-check-harness.mjs` 28건, `test-claude-git-guard.mjs` 15건, GitHub Actions Ubuntu·Windows 초록불(PR #28, 2026-09-20 — 이전 15회는 전부 실패). 낡은 상태에서 FAIL 11건을 먼저 재현한 기록은 TASK-INFRA-01 체크포인트(`tasks/CURRENT_TASK.md`, 끝난 뒤에는 `tasks/archive/`) | PR-004(원자료 byte 보존)를 CI에서 실제로 강제하게 됨. 그 밖의 제품 범위·출시 게이트는 변경하지 않음 |
-| AG-CBM-001 | D-028; AGENTS 코드 구조 탐색; AGENT_WORKFLOW §9; 로컬 Claude/Codex MCP 설정 | CURRENT_TASK의 binary/양 client 실제 MCP/index/Graph-source 대조/ignore·scope/설정 보존/quick·full/효율 비교 결과. 원시 중간물은 로컬 `work/cbm-integration/` | PR-001~PR-015와 출시 게이트는 변경하지 않음 |
+| AG-CBM-001 | D-028; AGENTS 코드 구조 탐색; AGENT_WORKFLOW §9; 로컬 Claude/Codex MCP 설정 | `tasks/archive/TASK-CBM.md`의 binary/양 client 실제 MCP/index/Graph-source 대조/ignore·scope/설정 보존/quick·full/효율 비교 결과. 원시 중간물은 로컬 `work/cbm-integration/` | PR-001~PR-015와 출시 게이트는 변경하지 않음 |

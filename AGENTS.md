@@ -40,7 +40,7 @@
 
 - `.claude/settings.json`의 `PreToolUse` 훅(matcher `Write|Edit`, `scripts/claude-scope-guard.mjs`)이 `tasks/CURRENT_TASK.md`의 `- 소유 파일: ...` 선언과 대조해, 목록 밖 경로에 쓰면 사용자 확인을 요구한다. 커밋 훅(§2.1)과 같은 방식(차단이 아니라 확인)이라 지시받은 작업은 그대로 진행된다.
 - 새 작업을 시작하면 `CURRENT_TASK`에 `- 소유 파일: ...` 형식으로 먼저 선언한다(기존 섹션과 동일한 표기). 선언하지 않은 경로에 쓰면 이 훅이 매번 확인을 요구한다.
-- 알려진 한계(과다 허용 쪽): 작업 상태와 무관하게 파일 전체의 모든 선언을 합치고, Bash를 통한 파일 쓰기는 matcher 밖이라 잡지 못한다. `tasks/CURRENT_TASK.md`의 TASK-ISSUE-27 섹션에 상세.
+- 알려진 한계(과다 허용 쪽): 작업 상태와 무관하게 파일 전체의 모든 선언을 합치고, Bash를 통한 파일 쓰기는 matcher 밖이라 잡지 못한다. 첫 번째 한계는 끝난 작업의 절을 `tasks/archive/`로 옮기면 줄어든다(훅은 `CURRENT_TASK.md`만 읽는다). 상세는 `tasks/archive/TASK-ISSUE-27.md`.
 - 근거: 이슈 #27 — 하위 에이전트 사이에 누구의 소유 파일도 아닌 `docs/PROCESS_LOG.md`에 출처 불명 변경이 생겼는데, §2의 소유 파일 규칙이 문서로만 있고 기계로 검사되지 않아 잡지 못했다(`docs/PROCESS_LOG.md`, D-042).
 
 ### 2.3 Codex 세션에서의 강제 수단(미구성)
