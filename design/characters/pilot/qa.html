@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>캐릭터 시범 애니메이션 QA</title>
+<style>
+  :root{font-family:system-ui,sans-serif;color:#24231f;background:#f7f6f1}body{margin:0;padding:24px}h1{font-size:22px;margin:0 0 8px}p{margin:0 0 20px;color:#5f5d55}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}.card{background:white;border:1px solid #d8d5ca;border-radius:12px;padding:16px}.samples{display:flex;gap:16px;align-items:end;flex-wrap:wrap}.sample{display:grid;gap:6px;justify-items:center;font-size:12px}.stage{display:grid;place-items:center;width:144px;height:144px;border:1px dashed #aaa}.stage img{display:block;object-fit:contain}.s120{width:120px;height:120px}.s40{width:40px;height:40px}.white{background:#fff}.neutral{background:#f7f6f1}.tint{background:#e3f4f0}.dark{background:#121211}.checker{background-color:#fff;background-image:linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%);background-size:16px 16px;background-position:0 0,0 8px,8px -8px,-8px 0}.format{font-weight:700;margin-bottom:12px}.status{padding:8px 12px;border-radius:8px;background:#fff;border:1px solid #d8d5ca;display:inline-block;margin-bottom:16px}@media(prefers-reduced-motion:reduce){.motion-note::after{content:'정적 PNG 사용 중';color:#166b5f}.motion-note>span{display:none}}
+</style>
+<h1>공포–토끼 v2 pilot</h1>
+<div class="status motion-note"><span>애니메이션 사용 중</span></div>
+<p>12fps · 24 frames · 2초 loop · 실제 120px/40px. 움직임 줄이기에서는 정적 PNG로 대체합니다.</p>
+<main class="grid" id="grid"></main>
+<script>
+const formats=[['lossless animated WebP','build/fear--idle-loop-v1.webp','image/webp'],['APNG','build/fear--idle-loop-v1.apng','image/apng']];
+const backgrounds=[['white','흰색'],['neutral','중립'],['tint','공포 50'],['dark','어두움'],['checker','체크보드']];
+const grid=document.getElementById('grid');
+for(const [format,src,type] of formats){const card=document.createElement('section');card.className='card';card.innerHTML='<div class="format">'+format+'</div><div class="samples"></div>';const samples=card.querySelector('.samples');for(const [klass,label] of backgrounds){const box=document.createElement('div');box.className='sample';box.innerHTML='<div class="stage '+klass+'"><picture><source media="(prefers-reduced-motion: reduce)" srcset="fear--idle-v1-120.png" type="image/png"><source srcset="'+src+'" type="'+type+'"><img class="s120" src="fear--idle-v1-120.png" alt="공포 캐릭터"></picture></div><b>'+label+' · 120px</b><picture><source media="(prefers-reduced-motion: reduce)" srcset="fear--idle-v1-120.png" type="image/png"><source srcset="'+src+'" type="'+type+'"><img class="s40" src="fear--idle-v1-120.png" alt=""></picture><span>40px</span>';samples.appendChild(box)}grid.appendChild(card)}
+</script>
+</html>

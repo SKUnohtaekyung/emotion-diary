@@ -1,0 +1,202 @@
+{
+  "version": 1,
+  "generated_from": "design/characters/mood-preview-v2.png",
+  "format": "lossless animated WebP",
+  "canvas_px": 120,
+  "color": "RGBA 8-bit sRGB",
+  "alpha": "straight alpha; fully transparent RGB cleared",
+  "idle": {
+    "source_frames": 24,
+    "fps": 12,
+    "target_duration_ms": 2000,
+    "loop": "infinite"
+  },
+  "acknowledge": {
+    "source_frames": 16,
+    "fps": 12,
+    "target_duration_ms": 1333,
+    "loop": "once; final frame is idle; encoder may merge duplicate adjacent frames"
+  },
+  "files": [
+    {
+      "key": "enjoyment",
+      "motion": "idle-loop",
+      "file": "motion/enjoyment--idle-loop.webp",
+      "bytes": 327752,
+      "sha256": "0e4627833136f26755f1dae7a9e8126122c7a2179f3af0d882fbc4a8b5248c85",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "enjoyment",
+      "motion": "acknowledge-once",
+      "file": "motion/enjoyment--acknowledge-once.webp",
+      "bytes": 190120,
+      "sha256": "d08ef12d9328c4e2d0ce76d5aea371d191e195aa85490e8ac845515cbb7a168a",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    },
+    {
+      "key": "wish",
+      "motion": "idle-loop",
+      "file": "motion/wish--idle-loop.webp",
+      "bytes": 251508,
+      "sha256": "464b97935069c2a1622aba0414f5afabea684fb4657dc0abf0b03ba74e944bf2",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "wish",
+      "motion": "acknowledge-once",
+      "file": "motion/wish--acknowledge-once.webp",
+      "bytes": 144698,
+      "sha256": "1ae6fa28d47316cf6517745f42bc6f672bc44167119c0050141cde6eaf5e6be8",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    },
+    {
+      "key": "sadness",
+      "motion": "idle-loop",
+      "file": "motion/sadness--idle-loop.webp",
+      "bytes": 288904,
+      "sha256": "75e2082e86c717b4241e86451701d2049fc7d259ef5d16af5201212d475bca08",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "sadness",
+      "motion": "acknowledge-once",
+      "file": "motion/sadness--acknowledge-once.webp",
+      "bytes": 168044,
+      "sha256": "b3046a1ae399a99e9ede5ec42c92410a62eb6043c24321b7ae0a91dea850efc6",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    },
+    {
+      "key": "anger",
+      "motion": "idle-loop",
+      "file": "motion/anger--idle-loop.webp",
+      "bytes": 274922,
+      "sha256": "b41834ab798e7068f723810e21b690d2c5c114b4eef792c28b4cbba9722349c3",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "anger",
+      "motion": "acknowledge-once",
+      "file": "motion/anger--acknowledge-once.webp",
+      "bytes": 178306,
+      "sha256": "fbab2d6b4e9748e8dd7b323d42ec6e96cd456a374f950aad26e330250859af32",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    },
+    {
+      "key": "joy",
+      "motion": "idle-loop",
+      "file": "motion/joy--idle-loop.webp",
+      "bytes": 239416,
+      "sha256": "59432ad46f49163c05fa03e35aea9cdbbb141cf1ef89a0490346684d66972158",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "joy",
+      "motion": "acknowledge-once",
+      "file": "motion/joy--acknowledge-once.webp",
+      "bytes": 148796,
+      "sha256": "4f26aff6dad1af5ca183eacb2e784dd744af4683e342543c63e18d8d2d044417",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    },
+    {
+      "key": "love",
+      "motion": "idle-loop",
+      "file": "motion/love--idle-loop.webp",
+      "bytes": 286752,
+      "sha256": "bf41b9ec361442478428785fb9b522721f713ce1824b5a8730ade39d6649a1b1",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "love",
+      "motion": "acknowledge-once",
+      "file": "motion/love--acknowledge-once.webp",
+      "bytes": 167396,
+      "sha256": "1c0036d185da81e9a7ed85c10ec2b067828e9484c5921d2de5447833dd5147c8",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    },
+    {
+      "key": "hate",
+      "motion": "idle-loop",
+      "file": "motion/hate--idle-loop.webp",
+      "bytes": 228418,
+      "sha256": "a5b1f78c2f4ba8ec0d15393977ff5b8cc3dbbdda3b20072056d13878d83c67eb",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "hate",
+      "motion": "acknowledge-once",
+      "file": "motion/hate--acknowledge-once.webp",
+      "bytes": 139556,
+      "sha256": "fc0d60c5ef1ae5c3def71a2031408055fb3fd2cda412f469bfea49d1d944ca3e",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    },
+    {
+      "key": "fear",
+      "motion": "idle-loop",
+      "file": "motion/fear--idle-loop.webp",
+      "bytes": 255178,
+      "sha256": "8a850357e7c5bc558ebd5653d8e8409aa18fd5a3c7d784914e03c09e116756ac",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "fear",
+      "motion": "acknowledge-once",
+      "file": "motion/fear--acknowledge-once.webp",
+      "bytes": 147860,
+      "sha256": "809a3a4eb7d80087cc7cedc8c561035fdd1c336ae7c5e0a6551d034328426ba4",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    },
+    {
+      "key": "disgust",
+      "motion": "idle-loop",
+      "file": "motion/disgust--idle-loop.webp",
+      "bytes": 276814,
+      "sha256": "9cbec292ca78226baef8bedecec469c808d069eec3035166b87eb7195ed7fd80",
+      "encoded_pages": 24,
+      "duration_ms": 1992,
+      "loop": 0
+    },
+    {
+      "key": "disgust",
+      "motion": "acknowledge-once",
+      "file": "motion/disgust--acknowledge-once.webp",
+      "bytes": 158080,
+      "sha256": "403eb45aa61d34ecd3746ea13e7a1bfc9205ebf32b77cf2d40811050425048a0",
+      "encoded_pages": 16,
+      "duration_ms": 1328,
+      "loop": 1
+    }
+  ]
+}

@@ -55,6 +55,11 @@ section{scroll-margin-top:16px}
 .dark-panel{background:#121211;color:#F0EFEA;border:1px solid #33322E;border-radius:var(--radius-card);padding:16px}
 .dark-panel .cap{color:#B5B3AA}
 .cap{font-size:12px;color:var(--subtle);margin-bottom:8px}
+/* 캐릭터 무드 시안 */
+.mood-preview{max-width:640px;margin-top:16px;padding:16px;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--raised)}
+.mood-preview img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain}
+.mood-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.mood-tags span{display:inline-flex;align-items:center;min-height:32px;padding:4px 10px;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--muted);font-size:12px}
 /* 카테고리 토글 */
 .cats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;max-width:400px}
 .cat{height:80px;border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:14px;background:var(--raised)}
@@ -94,16 +99,27 @@ section{scroll-margin-top:16px}
 .slots{display:grid;gap:8px}
 .slot{height:44px;border:1px solid var(--border);border-radius:var(--radius);background:var(--raised);padding:0 12px;display:flex;align-items:center;color:var(--subtle);font-size:16px}
 .slot.filled{color:var(--text)}
-/* 카테고리 아크 휠 (D-037) */
-.arc{position:relative;height:380px;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--raised);touch-action:none;cursor:grab;user-select:none;max-width:360px}
-.arc:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.arc-guide{position:absolute;right:14px;top:50%;width:6px;height:28px;border-radius:999px;background:var(--text);transform:translateY(-50%);opacity:.7}
-.arc-item{position:absolute;right:44px;top:50%;display:flex;align-items:center;gap:12px;transform-origin:right center;white-space:nowrap;margin-top:-24px;will-change:transform,opacity}
-.arc-label{font-size:16px;color:var(--muted)}
-.arc-tile{width:48px;height:48px;border-radius:var(--radius-sheet);background:var(--tint);display:flex;align-items:center;justify-content:center;flex:none}
-.arc-tile i{width:24px;height:24px;border-radius:50%;background:var(--c);display:block}
-.arc-item.cur .arc-label{color:var(--text);font-weight:600;background:var(--bg);border:1px solid var(--border);border-radius:999px;padding:4px 12px}
-.arc-item.cur .arc-tile{outline:2px solid var(--c)}
+/* 감정 별자리 지도 (D-041) */
+.sky{position:relative;width:320px;max-width:100%;height:260px;overflow:hidden;border:1px solid var(--border);border-radius:var(--radius-card);background:var(--raised)}
+.sky-lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.sky-lines polyline{fill:none;stroke:var(--border-strong);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.star{position:absolute;left:calc(var(--x) * 1% - 22px);top:calc(var(--y) * 1px - 22px);width:44px;height:44px;padding:0;border:0;border-radius:50%;background:transparent;color:var(--text);font-family:inherit;cursor:pointer;touch-action:manipulation;display:flex;align-items:center;justify-content:center}
+.star:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.star-core{width:16px;height:16px;border-radius:50%;background:var(--c);border:2px solid transparent;transition:transform .2s ease,box-shadow .2s ease}
+.star:hover .star-core{transform:scale(1.12)}
+.star:active .star-core{transform:scale(.92)}
+.star[aria-pressed="true"] .star-core{box-shadow:0 0 0 2px var(--raised),0 0 0 4px var(--text)}
+.star-label{position:absolute;left:50%;top:calc(50% + 22px);transform:translateX(-50%);white-space:nowrap;font-size:14px;line-height:20px;color:var(--muted);pointer-events:none}
+.star[aria-pressed="true"] .star-label{color:var(--text);font-weight:700}
+.star.twinkle .star-core{animation:twinkle 1.6s ease-in-out 1}
+@keyframes twinkle{0%,100%{transform:scale(1);opacity:1}45%{transform:scale(1.35);opacity:.72}}
+.sky.grid{height:auto;min-height:256px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0;border-color:transparent;background:transparent;overflow:visible}
+.sky.grid .sky-lines{display:none}
+.sky.grid .star{position:relative;left:auto;top:auto;width:100%;height:80px;border:1px solid var(--border);border-radius:var(--radius);background:var(--raised);display:flex;flex-direction:column;gap:4px}
+.sky.grid .star[aria-pressed="true"]{border:2px solid var(--c)}
+.sky.grid .star-core{width:24px;height:24px}
+.sky.grid .star-label{position:static;transform:none;line-height:20px}
+@media (prefers-reduced-motion:reduce){.star-core{transition:none}.star:hover .star-core,.star:active .star-core{transform:none}.star.twinkle .star-core{animation:none}}
 .sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 /* 세부 감정 소프트 리스트 (D-037) */
 .pick{max-width:360px}
@@ -115,12 +131,14 @@ section{scroll-margin-top:16px}
 .tray button b{width:18px;height:18px;border-radius:50%;background:#0000000f;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:400}
 .listwrap{position:relative;margin-top:12px}
 .list{max-height:264px;overflow-y:auto;padding-right:28px}
-.ghead{font-size:12px;font-weight:700;color:var(--subtle);padding:8px 4px 4px;position:sticky;top:0;background:var(--bg)}
+.cathead{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);padding:10px 4px 6px;position:sticky;top:0;background:var(--bg);z-index:1}
+.cathead i{width:10px;height:10px;border-radius:50%;background:var(--c);flex:none}
+.ghead{font-size:12px;font-weight:700;color:var(--subtle);padding:4px 4px;position:sticky;top:36px;background:var(--bg);z-index:1}
 .row{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:8px 12px;margin-bottom:8px;border-radius:var(--radius-card);border:1px solid transparent;background:var(--surface);font-size:16px;font-family:inherit;color:var(--text);text-align:left;cursor:pointer}
 .row:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
 .row .ck{margin-left:auto;width:22px;height:22px;border-radius:50%;border:1px solid var(--border-strong);flex:none;display:flex;align-items:center;justify-content:center;color:transparent;font-size:13px}
-.row.on{background:var(--sadness-50);border-color:var(--sadness-300)}
-.row.on .ck{background:var(--sadness-500);border-color:var(--sadness-500);color:#fff}
+.row.on{background:var(--row-bg);border-color:var(--row-border)}
+.row.on .ck{background:var(--row-accent);border-color:var(--row-accent);color:#fff}
 .rail{position:absolute;right:0;top:0;bottom:0;width:24px;display:flex;flex-direction:column;justify-content:center;gap:2px}
 .rail button{border:0;background:none;font-size:10px;line-height:1;color:var(--subtle);cursor:pointer;font-family:inherit;padding:1px 0;border-radius:4px}
 .rail button:focus-visible{outline:2px solid var(--focus)}
@@ -198,55 +216,37 @@ section{scroll-margin-top:16px}
 </section>
 
 <section>
-<h2>카테고리 선택기 — 아크 휠</h2>
-<p class="note">9개 상위 감정, 단일 선택(D-037). 끌면 관성으로 미끄러지다 스냅합니다. 글자 회전은 접선 각도의 45%만 적용해 한글이 읽히게 합니다. 아이콘 자리(원)는 원자료와 같은 손그림 무드로 생성한 투명 PNG로 교체합니다 — 프롬프트 정본은 design/characters/prompts.json.</p>
-<div class="arc" id="arc" tabindex="0" role="listbox" aria-label="감정 카테고리"><div class="arc-guide"></div></div>
-<p class="sr" id="arcLive" aria-live="polite"></p>
-<p class="note" style="margin-top:8px">선택: <b id="arcOut">–</b> · <kbd>Tab</kbd> 포커스, <kbd>↑</kbd><kbd>↓</kbd> 이동, <kbd>Home</kbd>/<kbd>End</kbd> 양 끝. 움직임 줄이기 설정이면 회전·흐림·관성을 끄고 세로 목록처럼 동작합니다. <b>글자를 크게 키우면 2줄 격자(4열 고정, 칸 80, 아이콘 40 — D-035 규격)로 폴백해야 합니다(구현 과제)</b>.</p>
+<h2>캐릭터 이미지 무드</h2>
+<p class="note"><b>D-045 확정 스타일</b>은 참고 이미지의 엉뚱하고 포근한 손맛을 살린 <b>크레용 + 색연필</b>입니다. 얼굴 중심의 납작한 실루엣, 복슬하고 고르지 않은 검은 외곽선, 불투명한 색면과 단순한 표정을 쓰고, 광택 있는 3D·날카로운 벡터·사실적인 털·과한 공포 표현은 쓰지 않습니다.</p>
+<figure class="mood-preview">
+  <img src="characters/mood-preview-v2.png" alt="양, 거북이, 기니피그, 고양이, 쥐, 개, 까마귀, 토끼, 침팬지를 복슬한 크레용 선과 납작한 색면으로 그린 얼굴 중심 3열 3행 캐릭터 무드 시안">
+  <figcaption class="note" style="margin-top:12px"><b>무드 시안 v2 · 스타일 기준 이미지.</b> 9종의 크레용 질감·복슬한 선·단순한 표정·한 벌 같은 통일감을 잠그는 참조이며 v1은 비교 이력으로 보존합니다. 이 시트의 alpha 연결 영역을 분리해 1024px/120px 정적 자산을 만들고 화면 40px까지 검수했습니다. 공포=토끼 동일 24프레임 비교 결과 lossless animated WebP를 우선 형식으로 선택했고, 정적 PNG를 reduced-motion 대체로 유지합니다. 종별 세부 포즈는 아직 진행 중입니다.</figcaption>
+  <div class="mood-tags" aria-label="캐릭터 스타일 핵심어"><span>v2 확정</span><span>크레용·색연필</span><span>복슬한 검은 외곽선</span><span>납작한 색면</span><span>얼굴 중심</span><span>엉뚱한 표정</span><span>포근하고 안전함</span><span>투명 배경</span><span>reduced-motion 정적 대체</span></div>
+</figure>
 </section>
 
 <section>
-<h2>큰 글자 폴백 — 2줄 격자를 9계열에 적용</h2>
-<p class="note">아크 휠은 반지름이 고정이라 글자를 크게 키우면 격자로 폴백해야 합니다(D-035 규격: 칸 높이 80, 아이콘 40, 최소 폭 88). <b>계열이 9개가 되면서 2줄로는 끝나지 않고 3줄이 됩니다.</b> 아래 두 격자는 <b>360px 화면의 콘텐츠 폭 320px</b>로 고정했고, 선택 상태는 공포입니다.</p>
-<p class="note" style="margin-top:12px;opacity:.55"><b>A · 4열</b> — 칸이 <b>74px</b>로 D-035의 최소 폭 88에 못 미치고, 마지막 줄에 한 칸만 남습니다. <b>기각.</b></p>
-  <div class="cats" style="grid-template-columns:repeat(4,1fr);width:320px;max-width:100%;opacity:.55">
-    <div class="cat"><span class="ic" style="background:var(--enjoyment-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--enjoyment-500);display:block"></i></span>즐거움</div>
-    <div class="cat"><span class="ic" style="background:var(--wish-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--wish-500);display:block"></i></span>희망</div>
-    <div class="cat"><span class="ic" style="background:var(--sadness-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--sadness-500);display:block"></i></span>슬픔</div>
-    <div class="cat"><span class="ic" style="background:var(--anger-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--anger-500);display:block"></i></span>분노</div>
-    <div class="cat"><span class="ic" style="background:var(--joy-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--joy-700);display:block"></i></span>기쁨</div>
-    <div class="cat"><span class="ic" style="background:var(--love-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--love-500);display:block"></i></span>사랑</div>
-    <div class="cat"><span class="ic" style="background:var(--hate-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--hate-500);display:block"></i></span>미움</div>
-    <div class="cat sel" style="border-color:var(--fear-500)"><span class="ic" style="background:var(--fear-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--fear-500);display:block"></i></span>공포</div>
-    <div class="cat"><span class="ic" style="background:var(--disgust-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--disgust-500);display:block"></i></span>혐오</div>
-  </div>
-<p class="note" style="margin-top:16px"><b>B · 3열 — 채택(2026-09-04 사용자 결정)</b>. 칸 <b>101px</b>로 88을 넘고 3×3으로 빈칸 없이 채워집니다.</p>
-  <div class="cats" style="grid-template-columns:repeat(3,1fr);width:320px;max-width:100%;outline:2px solid var(--fear-500);outline-offset:6px;border-radius:12px">
-    <div class="cat"><span class="ic" style="background:var(--enjoyment-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--enjoyment-500);display:block"></i></span>즐거움</div>
-    <div class="cat"><span class="ic" style="background:var(--wish-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--wish-500);display:block"></i></span>희망</div>
-    <div class="cat"><span class="ic" style="background:var(--sadness-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--sadness-500);display:block"></i></span>슬픔</div>
-    <div class="cat"><span class="ic" style="background:var(--anger-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--anger-500);display:block"></i></span>분노</div>
-    <div class="cat"><span class="ic" style="background:var(--joy-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--joy-700);display:block"></i></span>기쁨</div>
-    <div class="cat"><span class="ic" style="background:var(--love-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--love-500);display:block"></i></span>사랑</div>
-    <div class="cat"><span class="ic" style="background:var(--hate-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--hate-500);display:block"></i></span>미움</div>
-    <div class="cat sel" style="border-color:var(--fear-500)"><span class="ic" style="background:var(--fear-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--fear-500);display:block"></i></span>공포</div>
-    <div class="cat"><span class="ic" style="background:var(--disgust-50);display:flex;align-items:center;justify-content:center"><i style="width:24px;height:24px;border-radius:50%;background:var(--disgust-500);display:block"></i></span>혐오</div>
-  </div>
-<p class="note" style="margin-top:8px">격자 전체 높이는 <b>256px</b>로 아크 휠 380px보다 124px 짧습니다. 한편 <b>위 아크 휠에서는 9개 중 7개만 보이고 공포·혐오가 잘립니다</b>(끌면 도달은 됩니다) — 배치 결정 전 두 절을 나란히 보세요.</p>
+<h2>카테고리 선택기 — 감정 별자리 지도</h2>
+<p class="note">9개 상위 감정을 복수로 고릅니다(D-041). 위치와 연결선은 선택을 돕는 장식이며 심리 축이나 분석 결과가 아닙니다. 저장되는 값은 고른 카테고리 코드뿐입니다.</p>
+<div class="sky" id="sky" role="group" aria-label="감정 카테고리, 복수 선택">
+  <svg class="sky-lines" viewBox="0 0 320 260" preserveAspectRatio="none" aria-hidden="true"><polyline id="skyLine" points=""></polyline></svg>
+</div>
+<p class="sr" id="skyLive" aria-live="polite"></p>
+<p class="note" style="margin-top:8px"><kbd>Tab</kbd>으로 점 사이를 이동하고 <kbd>Enter</kbd> 또는 <kbd>Space</kbd>로 켜고 끕니다. 선택 상태는 링과 굵은 라벨로 함께 표시됩니다. 라벨이 겹치거나 프레임을 벗어나면 자동으로 3×3 격자(칸 101px)로 바뀝니다.</p>
 </section>
 
 <section>
 <h2>세부 감정 선택기 — 소프트 리스트</h2>
-<p class="note">복수 선택(D-037). 한글 감정 단어는 길이가 들쭉날쭉해 chip 격자에서는 줄이 어긋납니다. 1열 리스트는 길이와 무관하게 가지런하고, 초성 레일이 수십 개를 훑는 문제를 풉니다. 검색은 초성도 됩니다 — <b>ㅎㅈ</b>을 쳐 보세요.</p>
+<p class="note">별자리에서 고른 카테고리별로 세부 감정을 복수 선택합니다(D-041). 1열 목록은 단어 길이와 무관하게 가지런하고, 검색은 초성도 됩니다 — 슬픔을 고른 뒤 <b>ㄱㄷ</b>을 입력해 보세요.</p>
 <div class="pick">
   <input class="search" id="q" placeholder="감정 검색 — 허전, ㅎㅈ" aria-label="세부 감정 검색">
   <div class="tray" id="tray" aria-label="고른 감정"></div>
   <div class="listwrap">
-    <div class="list" id="list" role="listbox" aria-multiselectable="true" aria-label="슬픔 세부 감정"></div>
+    <div class="list" id="list" role="listbox" aria-multiselectable="true" aria-label="선택한 카테고리의 세부 감정"></div>
     <div class="rail" id="rail" aria-label="초성 바로가기"></div>
   </div>
 </div>
-<p class="note" style="margin-top:8px">아래 단어는 배치 확인용 표본이며 taxonomy 정본이 아닙니다 — 심리학 문헌 기반 목록 제작은 D-038.</p>
+<p class="note" style="margin-top:8px">아래 단어는 검수 완료된 <code>data/taxonomy/v2.json</code>(emotion-ko-v2)의 앞부분을 옮긴 미리보기 스냅샷입니다. 정본을 자동으로 불러오지는 않으므로 taxonomy 변경 시 함께 갱신합니다.</p>
 </section>
 
 <section>
@@ -404,54 +404,48 @@ const ACC=k=>V(k,k==='joy'?'700':'500');            // 기쁨은 흰 배경 대�
 const RM=()=>matchMedia('(prefers-reduced-motion: reduce)').matches;
 const band=v=>v<=3?'거의 스쳐 지나간 감정':v<=7?'분명히 느껴졌고 하루에 영향을 준 감정':'매우 커서 일상 행동에 큰 영향을 준 감정';
 
-/* ── 카테고리 아크 휠 ── */
+/* ── 감정 별자리 지도 ── */
 const CATS=[['enjoyment','즐거움'],['wish','희망'],['sadness','슬픔'],['anger','분노'],['joy','기쁨'],['love','사랑'],['hate','미움'],['fear','공포'],['disgust','혐오']];
+const CAT_WORDS={
+ enjoyment:['가벼운','가뿐한','경쾌한','고요한','기분좋은','담담한','명랑한','밝은'],
+ wish:['간절한','갈망하는','기대하는','바라는','소망하는','애끓는','절박한','찝찝한'],
+ sadness:['가슴아픈','걱정되는','고단한','고독한','고민스러운','공허한','괴로운','구슬픈'],
+ anger:['고통스러운','골치아픈','괘씸한','가혹한','기분이 상하는','꼴사나운','끓어오르는','배반감'],
+ joy:['감격스러운','감동적인','감사한','고마운','고무적인','기쁨','고전적인','날아갈듯한'],
+ love:['감미로운','감사하는','그리운','다정한','따사로운','묘한','뿌듯한','사랑스러운'],
+ hate:['고통스러운','괴로운','귀찮은','근심스러운','무정한','미운','부담스러운','서운한'],
+ fear:['공포에질린','두려운','불안한','무서운','섬뜩한','소름끼치는','몸서리치는','끔찍한'],
+ disgust:['구역질나는','떫은','혐오스러운']
+};
+const selectedCats=[];
 (function(){
- const host=document.getElementById('arc'); if(!host) return;
- const R=460,STEP=7.6,ROT=.45; let off=3,vel=0,raf=null,last=-1;
- const live=document.getElementById('arcLive'),out=document.getElementById('arcOut');
- const els=CATS.map(([k,n],i)=>{const el=document.createElement('div');
-  el.className='arc-item'; el.id='arc-'+i; el.setAttribute('role','option');
-  el.style.setProperty('--c',ACC(k)); el.style.setProperty('--tint',V(k,'50'));
-  el.innerHTML='<span class="arc-label">'+n+'</span><span class="arc-tile"><i></i></span>';
-  host.appendChild(el); return el;});
- const clamp=v=>Math.min(CATS.length-1,Math.max(0,v));
- function render(){const rm=RM(),cur=Math.round(off);
-  els.forEach((el,i)=>{const a=(i-off)*STEP,rad=a*Math.PI/180,d=Math.abs(a);
-   const x=rm?0:R-R*Math.cos(rad), y=rm?(i-off)*56:R*Math.sin(rad);
-   el.style.transform='translate('+(-x)+'px,'+y+'px) rotate('+(rm?0:a*ROT)+'deg)';
-   el.style.opacity=rm?(d>26?0:1):Math.max(0,1-d/36);
-   el.style.filter=(!rm&&d>6)?'blur('+Math.min(1.6,(d-6)/14)+'px)':'none';
-   el.classList.toggle('cur',cur===i); el.setAttribute('aria-selected',cur===i);});
-  host.setAttribute('aria-activedescendant','arc-'+cur);
-  out.textContent=CATS[cur][1];
-  if(cur!==last){last=cur; live.textContent=CATS[cur][1]+', '+(cur+1)+'/'+CATS.length;}}
- const set=v=>{off=clamp(v);render()};
- function glide(){cancelAnimationFrame(raf);
-  const tick=()=>{ if(Math.abs(vel)>0.002){off=clamp(off-vel);vel*=0.93;render();raf=requestAnimationFrame(tick);return;}
-   const t=Math.round(off),d=t-off;
-   if(Math.abs(d)>0.002){off+=d*0.22;render();raf=requestAnimationFrame(tick);} else set(t);};
-  raf=requestAnimationFrame(tick);}
- let drag=null;
- host.addEventListener('pointerdown',e=>{cancelAnimationFrame(raf);vel=0;
-  drag={y:e.clientY,o:off,t:performance.now(),ly:e.clientY}; host.setPointerCapture(e.pointerId); host.focus();});
- host.addEventListener('pointermove',e=>{if(!drag)return;
-  const now=performance.now(),dt=Math.max(1,now-drag.t);
-  vel=((e.clientY-drag.ly)/46)/dt*16; drag.t=now; drag.ly=e.clientY;
-  set(drag.o-(e.clientY-drag.y)/46);});
- host.addEventListener('pointerup',()=>{if(!drag)return; drag=null; RM()?set(Math.round(off)):glide();});
- host.addEventListener('wheel',e=>{e.preventDefault();cancelAnimationFrame(raf);set(Math.round(off)+Math.sign(e.deltaY));},{passive:false});
- host.addEventListener('keydown',e=>{const m={ArrowDown:1,ArrowRight:1,ArrowUp:-1,ArrowLeft:-1};
-  if(m[e.key]){e.preventDefault();cancelAnimationFrame(raf);set(Math.round(off)+m[e.key]);}
-  else if(e.key==='Home'){e.preventDefault();set(0);}
-  else if(e.key==='End'){e.preventDefault();set(CATS.length-1);}});
- render();
+ const host=document.getElementById('sky'); if(!host) return;
+ const line=document.getElementById('skyLine'),live=document.getElementById('skyLive');
+ const points=CATS.map((_,i)=>{const a=(-90+i*40)*Math.PI/180;return [160+88*Math.cos(a),120+88*Math.sin(a)];});
+ const els=CATS.map(([k,n],i)=>{const [x,y]=points[i],el=document.createElement('button');
+  el.type='button';el.className='star';el.style.setProperty('--x',x/3.2);el.style.setProperty('--y',y);el.style.setProperty('--c',ACC(k));
+  el.dataset.cat=k;el.setAttribute('aria-pressed','false');el.setAttribute('aria-label',n);
+  el.innerHTML='<span class="star-core" aria-hidden="true"></span><span class="star-label" aria-hidden="true">'+n+'</span>';
+  host.appendChild(el);return el;});
+ function renderLine(){line.setAttribute('points',selectedCats.map(k=>points[CATS.findIndex(c=>c[0]===k)].join(',')).join(' '));}
+ function toggle(el){const k=el.dataset.cat,[,name]=CATS.find(c=>c[0]===k),i=selectedCats.indexOf(k),on=i<0;
+  if(on)selectedCats.push(k);else selectedCats.splice(i,1);
+  el.setAttribute('aria-pressed',String(on));el.classList.remove('twinkle');void el.offsetWidth;if(on&&!RM())el.classList.add('twinkle');
+  renderLine();live.textContent=name+(on?' 선택됨':' 선택 해제됨')+', 총 '+selectedCats.length+'개 선택';
+  document.dispatchEvent(new CustomEvent('categorychange',{detail:{removed:on?null:k}}));}
+ els.forEach(el=>el.addEventListener('click',()=>toggle(el)));
+ function overlap(a,b){return !(a.right+2<=b.left||b.right+2<=a.left||a.bottom+2<=b.top||b.bottom+2<=a.top);}
+ function needsGrid(){host.classList.remove('grid');const box=host.getBoundingClientRect(),labels=els.map(el=>el.querySelector('.star-label').getBoundingClientRect());
+  if(parseFloat(getComputedStyle(document.documentElement).fontSize)>19.2)return true;
+  if(labels.some(r=>r.left<box.left||r.right>box.right||r.top<box.top||r.bottom>box.bottom))return true;
+  return labels.some((r,i)=>labels.slice(i+1).some(s=>overlap(r,s)));}
+ let pending=0;function fit(){cancelAnimationFrame(pending);pending=requestAnimationFrame(()=>host.classList.toggle('grid',needsGrid()));}
+ new ResizeObserver(fit).observe(host);window.addEventListener('resize',fit);document.fonts&&document.fonts.ready.then(fit);fit();
 })();
 
 /* ── 세부 감정 소프트 리스트 ── */
 (function(){
  const list=document.getElementById('list'); if(!list) return;
- const WORDS='가슴 아픈,걱정되는,고단한,고독한,고민스러운,공허한,괴로운,구슬픈,권태로운,근심되는,기분 나쁜,낙담한,두려운,마음이 무거운,멍한,뭉클한,미어지는,부끄러운,불쌍한,불안한,불편한,비참한,비탄한,서글픈,안달한,앞이 깜깜한,애석한,애처로운,애태우는,애통한,언짢은,염려하는,외로운,우울한,울적한,음울한,의기소침한,절망적인,좌절하는,지루한,착잡한,참담한,창피한,처량한,처참한,측은한,침통한,한스러운,허전한,허탈한,황량한'.split(',');
  const CHO='ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ', BASE={'ㄲ':'ㄱ','ㄸ':'ㄷ','ㅃ':'ㅂ','ㅆ':'ㅅ','ㅉ':'ㅈ'};
  const choOf=ch=>{const c=ch.charCodeAt(0)-0xAC00; return c>=0&&c<11172?CHO[Math.floor(c/588)]:ch;};
  const choStr=s=>[...s].filter(c=>c!==' ').map(choOf).join('');
@@ -460,27 +454,28 @@ const CATS=[['enjoyment','즐거움'],['wish','희망'],['sadness','슬픔'],['a
  const match=(w,q)=>{if(!q)return true; const nq=q.replace(/\s/g,'');
   return isCho(nq)?choStr(w).includes(nq):w.replace(/\s/g,'').includes(nq);};
  const q=document.getElementById('q'),tray=document.getElementById('tray'),rail=document.getElementById('rail');
- const sel=new Set(['허전한']);
+ const sel=new Set();
  function draw(){
-  const shown=WORDS.filter(w=>match(w,q.value.trim()));
-  let html='',cur='';
-  if(!shown.length) html='<p class="note" style="padding:8px 4px">일치하는 감정이 없습니다.</p>';
-  else for(const w of shown){const h=head(w);
-   if(h!==cur){cur=h; html+='<div class="ghead" data-head="'+h+'">'+h+'</div>';}
-   const on=sel.has(w);
-   html+='<button class="row'+(on?' on':'')+'" role="option" aria-selected="'+on+'" data-n="'+w+'" aria-label="슬픔, '+w+', '+(on?'선택됨':'선택 안 됨')+'">'+w+'<span class="ck" aria-hidden="true">✓</span></button>';}
+  const active=CATS.filter(([k])=>selectedCats.includes(k));let html='',heads=[];
+  if(!active.length)html='<p class="note" style="padding:12px 4px">위에서 카테고리를 먼저 골라 주세요.</p>';
+  else for(const [k,name] of active){const shown=CAT_WORDS[k].filter(w=>match(w,q.value.trim()));if(!shown.length)continue;
+   html+='<div class="cathead" style="--c:'+ACC(k)+'"><i aria-hidden="true"></i>'+name+'</div>';let cur='';
+   for(const w of shown){const h=head(w),code=k+'|'+w;if(h!==cur){cur=h;heads.push(h);html+='<div class="ghead" data-head="'+h+'">'+h+'</div>';}
+    const on=sel.has(code);
+    html+='<button class="row'+(on?' on':'')+'" style="--row-bg:'+V(k,'50')+';--row-border:'+V(k,'300')+';--row-accent:'+ACC(k)+'" role="option" aria-selected="'+on+'" data-code="'+code+'" data-cat="'+k+'" data-n="'+w+'" aria-label="'+name+', '+w+', '+(on?'선택됨':'선택 안 됨')+'">'+w+'<span class="ck" aria-hidden="true">✓</span></button>';}}
+  if(active.length&&!html)html='<p class="note" style="padding:12px 4px">일치하는 감정이 없습니다.</p>';
   list.innerHTML=html;
-  tray.innerHTML=[...sel].map(n=>'<button data-n="'+n+'" aria-label="'+n+' 선택 해제">'+n+'<b aria-hidden="true">×</b></button>').join('');
-  const heads=[...new Set(shown.map(head))];
-  rail.innerHTML=heads.map(h=>'<button data-g="'+h+'" aria-label="'+h+' 그룹으로 이동">'+h+'</button>').join('');
+  tray.innerHTML=[...sel].map(code=>{const [k,n]=code.split('|'),name=CATS.find(c=>c[0]===k)[1];return '<button style="border-color:'+V(k,'300')+';background:'+V(k,'100')+';color:'+V(k,'900')+'" data-code="'+code+'" aria-label="'+name+', '+n+' 선택 해제">'+n+'<b aria-hidden="true">×</b></button>';}).join('');
+  rail.innerHTML=[...new Set(heads)].map(h=>'<button data-g="'+h+'" aria-label="'+h+' 그룹으로 이동">'+h+'</button>').join('');
  }
- list.addEventListener('click',e=>{const b=e.target.closest('[data-n]'); if(!b)return;
-  sel.has(b.dataset.n)?sel.delete(b.dataset.n):sel.add(b.dataset.n); draw();});
- tray.addEventListener('click',e=>{const b=e.target.closest('[data-n]'); if(!b)return; sel.delete(b.dataset.n); draw();});
+ list.addEventListener('click',e=>{const b=e.target.closest('[data-code]'); if(!b)return;
+  sel.has(b.dataset.code)?sel.delete(b.dataset.code):sel.add(b.dataset.code); draw();});
+ tray.addEventListener('click',e=>{const b=e.target.closest('[data-code]'); if(!b)return; sel.delete(b.dataset.code); draw();});
  q.addEventListener('input',draw);
  rail.addEventListener('click',e=>{const b=e.target.closest('[data-g]'); if(!b)return;
   const t=list.querySelector('[data-head="'+b.dataset.g+'"]');
   if(t) t.scrollIntoView({block:'start',behavior:RM()?'auto':'smooth'});});
+ document.addEventListener('categorychange',e=>{if(e.detail.removed)for(const code of [...sel])if(code.startsWith(e.detail.removed+'|'))sel.delete(code);draw();});
  draw();
 })();
 

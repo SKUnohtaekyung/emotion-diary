@@ -1,29 +1,128 @@
 {
-  "version": "characters-v4-draft",
-  "source": "references/source/*.jpg 의 손그림 캐릭터. 원자료를 자르거나 그대로 쓰지 않고 같은 무드로 다시 생성한다(D-035).",
-  "generator": "codex imagegen",
-  "output": { "master": "design/characters/src/<key>-1024.png", "delivered": "design/characters/<key>.png", "master_px": 1024, "delivered_px": 120, "format": "PNG, 투명 배경(alpha)" },
-  "usage_note": "9개를 한 번에, 같은 seed·같은 공통 프롬프트로 생성한다. 한 개만 다시 만들면 선 굵기와 채도가 어긋나 나란히 놓았을 때 티가 난다.",
-  "common_style_prompt": "Hand-drawn children's-book illustration in soft watercolor and colored pencil on lightly textured paper. Simple rounded shapes with visible, slightly wobbly pencil outlines of even weight. Gentle pastel washes with soft bleeding edges and faint paper grain. Minimal detail. Flat and friendly, calm and warm, never slick. A single character centered, full body, facing the viewer at a slight three-quarter angle, occupying about 80% of the frame with even margins on all sides. Fully transparent background. Square 1:1 composition at 1024x1024.",
-  "negative_prompt": "no text, no words, no letters, no Korean characters, no watermark, no signature, no frame, no border, no background scenery, no ground, no drop shadow, no photorealism, no 3D render, no glossy highlights, no vector-sharp edges, no heavy outlines, no weapons, no blood, no explosion, no mushroom cloud, no fire, no menacing or frightening expression, no tears streaming, no human figures, no logos",
+  "version": "characters-v7-v2-ui-static-poses",
+  "source": "스타일 기준은 design/characters/mood-preview-v2.png(D-045). references/source/*.jpg는 역사적 원자료이며, mood-preview-v1.png는 비교 이력으로만 보존한다.",
+  "generator": "Codex built-in imagegen",
+  "style_reference": "design/characters/mood-preview-v2.png",
+  "pilot": {
+    "key": "fear",
+    "reason": "크림색 토끼의 긴 귀와 밝은 가장자리로 종 실루엣, 중심 고정, 흰 halo, 공포의 정서 안전성을 한 번에 검증한다.",
+    "output_dir": "design/characters/pilot",
+    "counts_as_final": false
+  },
+  "output": {
+    "master": "design/characters/src/<key>-1024.png",
+    "pose_master": "design/characters/poses/<key>--<pose>-1024.png",
+    "delivered": "design/characters/<key>.png",
+    "motion": "design/characters/motion/<key>--<motion>.<webp|apng>",
+    "ui_static_pose": "design/characters/ui-poses/<key>--expressive-static-<1024|120>.png",
+    "master_px": 1024,
+    "delivered_px": 120,
+    "static_format": "PNG, RGBA 8-bit sRGB, transparent background",
+    "animation_candidates": ["lossless animated WebP", "APNG"],
+    "animation_format": "webp"
+  },
+  "ui_static_pose_set": {
+    "source": "design/characters/pilot/not-selected-fullbody-reference.png",
+    "purpose": "전체 UI에서 쓸 수 있는 사용자 제공 전신·감정 표현 정적 보조 자산. 대표 아이콘·reduced-motion fallback·animation 프레임을 대체하지 않는다.",
+    "pose_name": "expressive-static",
+    "keys": ["enjoyment", "wish", "sadness", "anger", "joy", "love", "hate", "fear", "disgust"],
+    "master_px": 1024,
+    "delivered_px": 120,
+    "animated": false,
+    "format": "PNG, RGBA 8-bit sRGB, transparent background"
+  },
+  "usage_note": "동물 매핑·배열 순서·accent를 바꾸지 않는다. 최종 idle 원본은 승인된 v2 3x3 시트의 같은 순서 셀을 분리해 정체성을 고정한다. 새 포즈를 imagegen으로 만들 때는 v2 참조 이미지와 해당 idle 원본, 동일한 잠금 프롬프트를 사용하며 seed가 노출된다고 가정하지 않는다. 사용자 제공 전신 포즈 시트는 UI 보조 정적 세트로만 분리하며 idle·motion 자산을 덮어쓰지 않는다.",
+  "common_style_prompt": "Naive hand-drawn crayon and colored-pencil animal character matching the approved mood-preview-v2 style. Fuzzy uneven black crayon outline, flat opaque hand-colored shapes, subtle paper grain, compact face-forward chibi proportions, tiny paws, simple quirky expression, gentle and emotionally safe. Preserve the species-specific silhouette and the assigned emotion. No polished vector edges, no glossy 3D, no photorealistic fur, no elaborate background, no text, no props unless explicitly required, transparent background.",
+  "consistency_lock": "Keep the facial proportions and head silhouette, species-identifying ears, muzzle, beak or shell, eye and nose positions, base colors and markings, outline thickness and crayon texture, 1024x1024 canvas, scale, alpha bounds, and character center point unchanged across every pose and frame. Face forward with a compact low body and tiny visible paws. Use the approved mood-preview-v2 only as a style reference; do not copy its 3x3 layout.",
+  "negative_prompt": "no text, no words, no letters, no Korean characters, no watermark, no signature, no frame, no border, no background scenery, no ground, no drop shadow, no white matte, no edge halo, no photorealism, no 3D render, no glossy highlights, no polished vector edges, no realistic fur, no elaborate gradient, no weapons, no blood, no explosion, no mushroom cloud, no fire, no menacing or frightening expression, no streaming tears, no human figures, no logos, no jump, no spin, no large translation, no camera shake, no fast bounce, no exaggerated squash and stretch",
+  "pose_set": {
+    "idle": "Canonical neutral waiting pose and reduced-motion representative frame.",
+    "breathe": "Same pose at the gentle inhale extreme; body expansion is minimal and the center stays fixed.",
+    "blink": "Same pose with one slow soft blink; no other facial feature moves.",
+    "tilt": "Same pose with a 2 to 3 degree head tilt; body and center stay fixed.",
+    "emotion": "One species-specific small gesture that preserves the assigned emotion without exaggeration.",
+    "acknowledge": "A gentle selection or record-complete response that returns to idle; no jump or large movement."
+  },
+  "motion_spec": {
+    "canvas_px": 120,
+    "fps": 12,
+    "idle_frames": 24,
+    "idle_duration_ms": 2000,
+    "idle_loop": "infinite seamless loop without a duplicated terminal frame",
+    "acknowledge_frames": "12-16",
+    "acknowledge_loop": "play once and finish on idle",
+    "max_center_drift_px_at_120": 1,
+    "allowed": "slow breathing, one slow blink, tiny ear/tail/whisker/feather movement, 2-3 degree head movement",
+    "blink_pose_keys": ["wish", "sadness", "anger", "hate", "fear"],
+    "emotion_pose_keys": ["enjoyment", "wish", "sadness", "anger", "joy", "love", "hate", "fear", "disgust"],
+    "emotion_rigs": {
+      "enjoyment": [{"anchor": [22, 80], "delta": [-6, -4], "radius": [12, 12]}],
+      "wish": [{"anchor": [78, 52], "delta": [0, -5], "radius": [15, 20]}],
+      "sadness": [{"anchor": [96, 47], "delta": [-4, 0], "radius": [14, 14]}],
+      "anger": [{"anchor": [94, 31], "delta": [4, -4], "radius": [14, 14]}, {"anchor": [20, 76], "delta": [-4, 0], "radius": [15, 10]}],
+      "joy": [{"anchor": [94, 37], "delta": [0, -4], "radius": [16, 16]}, {"anchor": [104, 69], "delta": [4, 0], "radius": [13, 14]}],
+      "love": [{"anchor": [24, 64], "delta": [-4, 0], "radius": [16, 18]}],
+      "hate": [{"anchor": [32, 78], "delta": [-4, 1], "radius": [18, 16]}],
+      "fear": [{"anchor": [44, 24], "delta": [0, 4], "radius": [16, 19]}, {"anchor": [74, 26], "delta": [0, 4], "radius": [16, 19]}],
+      "disgust": [{"anchor": [45, 84], "delta": [0, -6], "radius": [13, 13]}]
+    },
+    "resting_eyelid_keys": ["enjoyment", "joy", "love", "disgust"],
+    "reduced_motion": "use design/characters/<key>.png and change state immediately without animation"
+  },
   "characters": [
-    { "key": "enjoyment", "label": "즐거움", "alt": "즐거움 캐릭터", "accent": "#5E9C2E",
-      "subject_prompt": "A small cream-colored cartoon sheep with a soft fluffy body, standing calmly on all four legs, ears held low and loosely relaxed (neither pricked up nor flattened back), a fluffy tail swaying gently. Eyes in soft relaxed curves, a small content smile. Calm and quiet, not excited or sleepy. Pencil line accents in yellow-green." },
-    { "key": "wish", "label": "희망", "alt": "희망 캐릭터", "accent": "#A855CE",
-      "subject_prompt": "A small green cartoon turtle with its head and neck stretched far out of its shell, craning upward and forward, front feet slightly lifted off the ground as if leaning eagerly forward. Eyes wide, round, and hopeful, looking toward something out of frame. Patient but eager, not anxious. Pencil line accents in soft lilac." },
-    { "key": "sadness", "label": "슬픔", "alt": "슬픔 캐릭터", "accent": "#3F8FD6",
-      "subject_prompt": "A small round cartoon guinea pig sitting alone, body slightly hunched, ears folded close to its head, head tilted upward slightly as if calling out quietly. Quiet, not distressed. One small round water droplet near its cheek. Pencil line accents in sky blue." },
-    { "key": "anger", "label": "분노", "alt": "분노 캐릭터", "accent": "#E8663C",
-      "subject_prompt": "A small dark grey cat standing side-on with its back arched and fur bristling, ears flattened back, brows furrowed, mouth a small flat line, tail up and puffed. A soft orange watercolor glow blooms behind its shoulders. Grumpy and comical, never threatening. Pencil line accents in orange-red." },
-    { "key": "joy", "label": "기쁨", "alt": "기쁨 캐릭터", "accent": "#B08A00",
-      "subject_prompt": "A small grey cartoon rat leaping playfully with all four paws off the ground, body arched mid-air, mouth open in a delighted chirp, whiskers splayed outward. A few small motion lines trail beneath its paws. Pencil line accents in golden yellow." },
-    { "key": "love", "label": "사랑", "alt": "사랑 캐릭터", "accent": "#E1609B",
-      "subject_prompt": "A small warm-brown cartoon dog sitting upright, head tilted slightly, looking up with soft gentle eyes in a steady warm gaze, ears relaxed and forward. Three small pink hearts of different sizes float up from its chest. Pencil line accents in pink." },
-    { "key": "hate", "label": "미움", "alt": "미움 캐릭터", "accent": "#4750A6",
-      "subject_prompt": "A small black cartoon crow perched upright, feathers slightly ruffled at the neck, head tilted and turned to one side with a fixed, narrow-eyed stare in one direction. Watchful and unmoving, not aggressive. Pencil line accents in deep indigo." },
-    { "key": "fear", "label": "공포", "alt": "공포 캐릭터", "accent": "#199A8C",
-      "subject_prompt": "A small cream-colored cartoon rabbit crouching low with its body tucked in, both long ears folded flat back against its head, front paws held together close to its chest, perfectly still. Eyes wide and round, looking straight ahead. Quiet and frozen, not panicked. Pencil line accents in deep teal." },
-    { "key": "disgust", "label": "혐오", "alt": "혐오 캐릭터", "accent": "#918C37",
-      "subject_prompt": "A small young cartoon chimpanzee with dark brown-black fur and a lighter tan face, body leaning back and twisting to one side, mouth open in a gape with lips pulled back, one hand raised in front of its chest as if pushing something away. Eyes scrunched into tight lines. Mildly repulsed and a little dramatic, never gross or grotesque. Pencil line accents in deep olive." }
+    {
+      "key": "enjoyment", "label": "즐거움", "species": "sheep", "alt": "즐거움 캐릭터", "accent": "#5E9C2E",
+      "subject_prompt": "A small cream-colored sheep, face-forward and resting low with a fluffy cloud-like head and body, relaxed low ears, tiny dark front hooves together, eyes in soft curves, and a small content smile. Calm low-arousal enjoyment, not excited or sleepy.",
+      "emotion_pose": "The tail tip and one relaxed ear move only a tiny amount.",
+      "acknowledge_pose": "Close the eyes softly and make one very small nod, then return to idle."
+    },
+    {
+      "key": "wish", "label": "희망", "species": "turtle", "alt": "희망 캐릭터", "accent": "#A855CE",
+      "subject_prompt": "A small green turtle, face-forward with a compact round shell, head and short neck extended slightly upward and forward, tiny front feet visible, wide hopeful eyes, and a small open smile. Patient expectation, not anxious.",
+      "emotion_pose": "Extend the neck a few pixels while the shell and center remain fixed.",
+      "acknowledge_pose": "Lift the chin very slightly and settle back to idle."
+    },
+    {
+      "key": "sadness", "label": "슬픔", "species": "guinea pig", "alt": "슬픔 캐릭터", "accent": "#3F8FD6",
+      "subject_prompt": "A small round tri-color guinea pig, face-forward and sitting low with ears held close, tiny front paws together, eyes looking slightly upward, and a quiet downturned mouth. Gentle sadness, not distressed, with no tears or symbols.",
+      "emotion_pose": "The ears tuck a fraction closer and the gaze lifts slightly while the body stays still.",
+      "acknowledge_pose": "Bring the paws a little closer and soften the mouth before returning to idle."
+    },
+    {
+      "key": "anger", "label": "분노", "species": "cat", "alt": "분노 캐릭터", "accent": "#E8663C",
+      "subject_prompt": "A small dark charcoal cat, face-forward and resting low with a cream muzzle and paws, ears angled back, compact fuzzy cheeks, lowered brows, and a tiny flat mouth. Grumpy and comical, never threatening; no claws, teeth, glow, or fire.",
+      "emotion_pose": "Only the tail tip and one ear make a restrained movement; no arched leap or lunge.",
+      "acknowledge_pose": "Let the brows relax briefly and blink once, then return to idle."
+    },
+    {
+      "key": "joy", "label": "기쁨", "species": "mouse", "alt": "기쁨 캐릭터", "accent": "#B08A00",
+      "subject_prompt": "A small round grey mouse, face-forward and resting low with very large round ears, tiny pink paws, whiskers, closed happy crescent eyes, and a small delighted open smile. Bright joy without jumping or motion lines.",
+      "emotion_pose": "The whiskers and one ear move a tiny amount while the body remains centered.",
+      "acknowledge_pose": "Lift one tiny front paw slightly and place it back down without moving the body."
+    },
+    {
+      "key": "love", "label": "사랑", "species": "dog", "alt": "사랑 캐릭터", "accent": "#E1609B",
+      "subject_prompt": "A small warm orange-brown dog, face-forward and resting low with a cream muzzle and paws, relaxed floppy ears, soft steady eyes, and a gentle smile. Warm affectionate attention without floating hearts or props.",
+      "emotion_pose": "One floppy ear and the tail tip make a very small relaxed movement.",
+      "acknowledge_pose": "Tilt the head 2 to 3 degrees and make one slow eye-smile, then return to idle."
+    },
+    {
+      "key": "hate", "label": "미움", "species": "crow", "alt": "미움 캐릭터", "accent": "#4750A6",
+      "subject_prompt": "A small deep indigo-black crow, face-forward but with the beak and gaze turned slightly to one side, resting low with folded wings, a compact ruffled silhouette, and one narrow watchful eye. Guarded and wary, not aggressive.",
+      "emotion_pose": "Shift the eye sideways and ruffle the neck feathers by a tiny amount; no pecking or wing spread.",
+      "acknowledge_pose": "Turn the head 2 to 3 degrees toward center and return to the watchful idle pose."
+    },
+    {
+      "key": "fear", "label": "공포", "species": "rabbit", "alt": "공포 캐릭터", "accent": "#199A8C",
+      "subject_prompt": "A small cream-colored rabbit, face-forward and crouched low with both long ears laid gently back along the head, tiny front paws together, wide round black eyes, a tiny pink nose, and a small uncertain mouth. Quietly frozen and cautious, not panicked, shaking, or distressed.",
+      "emotion_pose": "The ear tips relax a fraction and the paws loosen slightly while the body remains completely centered.",
+      "acknowledge_pose": "Make one slow blink and let the ears ease upward by only a few pixels, then return to idle."
+    },
+    {
+      "key": "disgust", "label": "혐오", "species": "chimpanzee", "alt": "혐오 캐릭터", "accent": "#918C37",
+      "subject_prompt": "A small young dark brown chimpanzee, face-forward and resting low with a lighter tan face, tiny hands visible, body leaning back only slightly, eyes softly scrunched, and a small displeased mouth. Mildly repulsed and a little dramatic, never gross or grotesque.",
+      "emotion_pose": "Raise one hand a small distance in a gentle stop gesture while the face and center stay fixed.",
+      "acknowledge_pose": "Lower the raised hand and soften the mouth briefly, then return to idle."
+    }
   ]
 }

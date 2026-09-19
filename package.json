@@ -8,10 +8,13 @@
     "node": ">=22"
   },
   "scripts": {
+    "characters:build": "node scripts/build-character-animations.mjs",
     "verify": "node scripts/verify.mjs --mode full",
     "verify:quick": "node scripts/verify.mjs --mode quick",
     "verify:full": "node scripts/verify.mjs --mode full",
-    "test": "node scripts/test-check-taxonomy.mjs && node scripts/test-claude-scope-guard.mjs"
+    "test": "node scripts/test-check-taxonomy.mjs && node scripts/test-claude-scope-guard.mjs && node scripts/test-check-characters.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.35.4"
   }
 }
-

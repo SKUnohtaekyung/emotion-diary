@@ -4,6 +4,62 @@
 > - [TASK-DS-REF](TASK-DS-REF.md) — 외부 디자인 시스템 참조 검토. **D-039는 이 작업 몫으로 비워 두었다.**
 > - [TASK-MOBILE](TASK-MOBILE.md) — 모바일 구현 명세.
 
+# TASK-ISSUE-26 — 캐릭터 9종 포즈·잔잔한 애니메이션
+
+## 상태와 승인 범위
+
+`complete` — 2026-09-19 사용자 승인. `design/characters/mood-preview-v2.png`를 최종 스타일 기준으로 삼아 9종 최종 자산·포즈·애니메이션·UI 정적 보조 세트와 자동/Chromium 검증을 마쳤다. iPhone Safari·Android Chrome 실기기와 실제 OS reduced-motion 검수는 웹 구현 뒤의 확장 게이트로 보류하며, 사용자 지시에 따라 이 자산 이슈의 완료를 막지 않는다.
+
+## 소유권
+
+- Main/Writer: 현재 Codex 세션 1명. 별도 하위 에이전트 없음.
+- 소유 파일: `tasks/CURRENT_TASK.md`, `docs/DECISIONS.md`, `docs/DESIGN_SYSTEM.md`, `docs/EVAL_PLAN.md`, `docs/TRACEABILITY.md`, `design/tokens.json`, `design/style-guide.html`, `design/characters/prompts.json`, `design/characters/README.md`, `design/characters/qa.html`, `design/characters/src/*.png`, `design/characters/poses/*.png`, `design/characters/motion/*`, `design/characters/pilot/*`, `design/characters/*.png`, `scripts/build-character-animations.mjs`, `scripts/check-characters.mjs`, `scripts/test-check-characters.mjs`, `package.json`, `package-lock.json`, 이 파일.
+
+## 불변조건과 인수 조건
+
+- 동물 매핑은 D-044의 양·거북이·기니피그·고양이·쥐·개·까마귀·토끼·침팬지를 그대로 유지한다.
+- 승인 스타일은 복슬하고 고르지 않은 검은 크레용·색연필 외곽선, 불투명하고 납작한 색면, 은은한 종이결, 얼굴 중심의 짧고 둥근 비율, 단순하고 엉뚱하지만 안전한 표정이다. 광택 3D·매끈한 벡터·사실적인 털·과도한 그라데이션은 금지한다.
+- `mood-preview-v1.png`와 `mood-preview-v2.png`를 덮어쓰거나 삭제하지 않는다. v2는 스타일 참조이며 최종 개별 자산으로 세지 않는다.
+- 공포=토끼 시범 산출물은 `pilot/`에 격리하고 최종 9종 일부로 세지 않는다. 시범 전에는 9종 전체를 생성하지 않는다.
+- 정적 대표 PNG, 포즈 세트, 약 2초 idle loop, 1회 acknowledge 반응, 정적 reduced-motion 대체를 정의한다. 점프·회전·큰 이동·화면 흔들기·빠른 탄성·과장된 squash/stretch는 금지한다.
+- animated WebP와 APNG는 동일 프레임으로 비교하고, 질감·알파 경계·브라우저·파일 크기 증거로 하나를 선택한다.
+- `node scripts/check-characters.mjs`, quick/full 검증, 40px·120px와 투명 halo 브라우저 검수를 모두 통과해야 완료다.
+
+## 체크포인트
+
+- 착수(2026-09-17): 사용자 실행 계획 승인. 시작 상태는 `main...origin/main`, 기존 수정 `design/style-guide.html`·`design/tokens.json`·이 파일, 기존 미추적 `mood-preview-v1.png`·`mood-preview-v2.png`. `check-characters`는 9종 미제작 PENDING, quick PASS, `git diff --check` 이상 없음. 기존 변경을 보존한다.
+- 진행(2026-09-18): 공포=토끼 시범에서 120px 24프레임/12fps/2초 loop를 만들고 동일 프레임 WebP/APNG를 비교했다. 최초 WebP가 10,928 bytes였으나 메타데이터가 1프레임인 인코딩 결함을 발견해 폐기하고 Sharp의 animated join 방식으로 수정했다. 유효 출력은 WebP 261,298 bytes, APNG 389,709 bytes이며 Chromium에서 질감·alpha 차이가 없어 D-046으로 WebP를 선택했다.
+- 진행(2026-09-18): 단순 3×3 crop이 이웃 캐릭터 조각을 섞는 결함을 브라우저 QA에서 발견해 폐기했다. alpha 연결 영역 9개를 분리·중앙 등록하는 방식으로 재생성해 `src/*-1024.png` 9개, 120px 정적 PNG 9개, idle/acknowledge WebP 18개와 manifest를 만들었다. `check-characters`는 실제 투명 픽셀·투명 RGB·크기·pages/pageHeight·delay·loop·총 길이·alpha 중심 이동을 검사하며 현재 정적 18/동적 18 PASS. Chromium `qa.html`에서 40px/120px와 흰색·어두움·체크보드 halo를 확인했다.
+- 진행(2026-09-18): 9종 `idle`·`breathe`·`tilt`과 감정별 작은 `emotion` 정적 포즈, 열린 눈 5종의 blink 원본을 추가했다. 감정 포즈는 기준 idle을 imagegen으로 제약 편집한 뒤 1024px로 정규화해 canvas·alpha 중심·종 식별 요소를 비교했다. 사랑 개의 첫 결과는 원본에 없던 꼬리를 더해 탈락·보존했고, 꼬리 없이 귀만 유지한 두 번째 결과를 채택했다. `tilt`는 분리 리깅의 이음선 대신 1.8° 전신 미세 기울임으로 한정한다.
+- 진행(2026-09-18): 9종 acknowledge를 `motion_spec.emotion_rigs`의 국소 워프로 재인코딩했다. 전체 imagegen 포즈를 crossfade하면 종이결이 깜빡이므로, 각 원본을 premultiplied-alpha bilinear 재표본화해 지정 부위 외곽선을 4~6px 범위로 왕복시키고 peak를 3프레임 유지한다. blink는 눈 동작만 부각하지 않도록 acknowledge가 아닌 idle loop에만 둔다. Chromium에서 시작·중간·종료 프레임을 확인해 white matte·halo·질감 전환이 없음을 확인했다.
+- 수정(2026-09-18): 시각 피드백에서 acknowledge가 blink처럼만 읽히는 것을 확인했다. acknowledge 프레임의 blink 합성을 제거하고, 종별 `emotion_rigs`만으로 귀·머리·앞발·꼬리·날개 등 지정 부위를 4~6px 국소 왕복시킨다. peak 부근도 서로 다른 3프레임으로 유지해 WebP 인코더의 중복 프레임 병합 없이 실제 16프레임을 보존했다. 120px Chromium QA에서 새 파일의 국소 움직임과 정적 중심, 투명 가장자리를 재확인했다.
+- 재검증(2026-09-18): 수정 뒤 `build-all`로 18개 WebP와 manifest를 다시 생성했다. `check-characters` PASS(정적 18, 기본 27, blink 5, emotion 9, 동적 18; acknowledge 16프레임·1.328초), `test-check-characters` 5/5 PASS, `verify --mode quick` 및 `verify --mode full` PASS(taxonomy 41/41, scope guard 11/11, character checker 5/5), `git diff --check` PASS. 커밋·푸시·이슈 변경 없음.
+- 진행(2026-09-18): 사용자가 제공한 3×3 전신·감정 포즈 시트를 UI 전용 정적 보조 세트로 채택했다. 원본은 `pilot/not-selected-fullbody-reference.png`에 보존된 것을 사용하고, canonical 대표 PNG·포즈·WebP는 덮어쓰지 않는다. `ui-poses/<key>--expressive-static-{1024,120}.png` 18개를 분리했다. 기니피그 crop에 섞인 거북이 표시 조각은 시각 검수에서 발견해 경계를 조정했고, 9종 접촉 시트에서 재확인했다. 이 세트는 애니메이션·reduced-motion fallback이 아니며, UI 장식/온보딩/빈 상태에만 안전하게 쓴다.
+- 후속 보류(2026-09-19, 사용자 지시): iPhone Safari·Android Chrome 실기기, 실제 OS reduced-motion, 회색조/label 없음 사용자 판독은 웹페이지 구현 뒤의 확장 검수로 옮긴다. #26 자산 이슈의 완료 조건에서는 제외하며, 아래 `TASK-WEB-UI-01`의 브라우저 우선 정적 UI 프로토타입에서 이어서 다룬다.
+- 완료(2026-09-19): 9종 대표 PNG·기본/감정 포즈·24프레임 idle 및 16프레임 acknowledge WebP·UI 정적 포즈 18개·manifest·검수 스크립트와 문서를 모두 갖췄다. full 검증과 GitHub 이슈 본문 갱신/종료는 이 체크포인트 뒤에 실행한다.
+- 재검증(2026-09-18): `node scripts/build-character-animations.mjs build-all design/characters/prompts.json design/characters`로 18개 WebP/manifest를 재생성했다. `node scripts/check-characters.mjs` PASS(정적 18, 기본 27, blink 5, emotion 9, 동적 18), `node scripts/test-check-characters.mjs` 5/5 PASS(누락된 acknowledge 국소 리그 거부 포함), `node scripts/verify.mjs --mode quick` PASS, `node scripts/verify.mjs --mode full` PASS(taxonomy 41/41, scope guard 11/11, character checker 5/5), `git diff --check` PASS. 커밋·푸시·이슈 변경 없음.
+- 검증(2026-09-18): `node scripts/check-characters.mjs` PASS(정적 18, 기본 27, blink 5, emotion 9, 동적 18), `node scripts/test-check-characters.mjs` 4/4 PASS, `node scripts/verify.mjs --mode quick` PASS, `node scripts/verify.mjs --mode full` PASS(taxonomy 41/41, scope guard 11/11, character checker 4/4), `git diff --check` PASS. Chromium `qa.html`에서 9종 emotion 포즈를 정적 대표와 함께 120px/40px, 흰색·어두움·체크보드로 렌더링해 halo·matte·가독성 이상이 없음을 확인했다. 커밋·푸시·이슈 변경 없음.
+- 검증(2026-09-18): `node scripts/check-characters.mjs` PASS(정적 18, 동적 18), `node scripts/test-check-characters.mjs` 4/4 PASS, `node scripts/verify.mjs --mode quick` PASS, `node scripts/verify.mjs --mode full` PASS(taxonomy 41/41, scope guard 11/11, character checker 4/4), `git diff --check` PASS. 커밋·푸시·이슈 변경 없음.
+
+# TASK-WEB-UI-01 — 브라우저 우선 직접 작성 UI 프로토타입
+
+## 상태와 범위
+
+`planned` — 2026-09-19 사용자 지시. 앱 코드가 아직 없는 Phase 0 저장소에서, Cloudflare/DB/인증/AI를 앞당기지 않고 브라우저에서 직접 작성 흐름과 캐릭터 배치를 검토할 수 있는 정적 웹 프로토타입을 만든다. 데이터는 저장하거나 전송하지 않는다. 직접 작성 MVP의 화면 순서·비진단·접근성 규칙은 `UX_SPEC` §2~4, `DESIGN_SYSTEM` §6·§8~9를 따른다. 사용자 승인 전에는 구현 파일을 만들지 않는다.
+
+## 소유권
+
+- Main/Writer: 현재 Codex 세션 1명. 별도 하위 에이전트 없음.
+- 소유 파일: `web/*`, `scripts/web-preview.mjs`, `tasks/CURRENT_TASK.md`.
+
+## 인수 조건
+
+- 오늘/달력/통계/설정 하단 탐색과 직접 작성 화면을 브라우저에서 전환할 수 있다.
+- 날짜·사건·상위 카테고리 다중 선택·세부 감정 선택·감정별 강도·이유·칭찬/감사 3개·검토/완료의 UI 흐름을 구현한다.
+- 대표 캐릭터는 카테고리 식별 보조로, UI 정적 포즈는 온보딩/빈 상태 장식으로만 사용한다.
+- 실제 저장·로그인·AI·분석·내보내기·삭제는 구현하지 않고, 프로토타입임을 분명히 표시한다.
+- 360px와 데스크톱 Chromium에서 키보드·초점·44px 조작 영역·가로 넘침·reduced-motion 스타일을 확인하고 `verify`를 통과한다.
+
 # TASK-ISSUE-27 — 소유 파일 밖 쓰기 감지
 
 ## 상태
@@ -201,11 +257,14 @@
   - **설계한 것(다음 세션이 그대로 구현)**: 320×260 `.sky` 프레임에 `.star` 버튼 9개(44×44 히트존, 16px 코어에 `--c` 계열색, 라벨은 점 아래 22px, `aria-pressed`로 토글). 연결선은 프레임 위에 얹은 SVG `<polyline>`으로 그리되 좌표·순서는 어떤 필드로도 저장하지 않는다(§6.2 요구사항). 선택 시 코어에 `twinkle` keyframe을 1회만 재생하고 `prefers-reduced-motion`이면 끈다. 큰 글자 폴백은 기존 3열 격자(칸 101px, D-038 폴백 결정)를 그대로 재사용하되 클래스를 `.sky.grid`로 토글하고, 라벨 겹침·프레임 이탈을 실측해 자동 전환하는 스크립트를 붙인다. JS의 `CATS` 배열은 taxonomy 선언 순서(enjoyment/wish/sadness/anger/joy/love/hate/fear/disgust)를 그대로 쓰고 심리 축으로 재정렬하지 않는다(PR-001). 세부 감정 소프트 리스트는 고른 카테고리별로 sticky 그룹 머리글(계열 색 점 10px+이름)을 붙이고, 카테고리를 하나도 안 고르면 "위에서 카테고리를 먼저 골라 주세요" 안내로 바꾸며, 카테고리를 끄면 그 계열에서 골랐던 세부 감정도 함께 내려놓는다(D-041). 목록 표본 단어는 taxonomy v2 스냅샷으로 교체하고(기존 하드코딩된 슬픔 51개 목록은 정본과 무관한 임의 표본이었다), 이 페이지는 정본을 자동으로 따라가지 않는 스냅샷임을 note로 명시한다. `design/tokens.json`의 `motion.note`에 남은 "아크 스냅" 문구도 함께 정리한다.
   - **왜 못 끝냈나**: 패치를 한 번에 적용하려 bash heredoc(`cat > file <<'EOF' ... EOF`)으로 큰 Node 스크립트를 밀어넣다가 따옴표/EOF 매칭이 깨져(`unexpected EOF while looking for matching` 오류) 셸이 통째로 실패했고, 그 직후 사용자가 작업을 멈추고 인계 기록만 요청해 재시도하지 않았다. 스크래치패드에도 부분 파일이 남지 않았다(빈 디렉터리 확인함) — 즉 되돌릴 것도, 정리할 잔재도 없는 완전한 백지 상태다.
   - **다음 세션 절차**: (1) 위 설계대로 `Edit` 도구로 CSS·HTML·JS 세 블록을 각각 정확한 old_string/new_string으로 치환한다(한 번의 거대한 heredoc 대신 여러 개의 작은 Edit 호출을 쓸 것 — 이번 실패의 원인 회피). (2) `node scripts/check-contrast.mjs --verbose` → `npm run verify:quick`. (3) `design-preview` 브라우저 탭을 열어 9개 점이 320×260 안에서 잘리지 않는지 스크린샷으로 실측 확인(기존 아크가 깨졌던 바로 그 결함을 되풀이하지 않는지가 핵심 검증 항목). (4) 큰 글자 폴백 전환도 확인. (5) `npm run verify:full` → Artifact 재발행(`read` 먼저) → 이 인계 절 전체를 완료 체크포인트로 교체.
+- **완료(2026-09-17, Codex): D-041 별자리 미리보기 구현.** `design/style-guide.html`에서 폐기된 아크 CSS·HTML·JS와 별도 4열/3열 비교 절을 제거하고, 320×260 별자리(9개 독립 토글, 44×44 히트존, 선택 링+굵은 라벨, 선택 순서 연결선, 1회 명멸, reduced-motion)를 구현했다. 라벨 겹침·프레임 이탈·루트 글자 120% 초과를 실측해 3×3 격자로 자동 전환한다. 별자리 선택과 taxonomy v2 스냅샷 기반 세부 감정 그룹을 연결했고, 카테고리 해제 시 그 계열의 세부 선택도 제거한다. 로컬 브라우저에서 일반 별자리 9개 무잘림, 즐거움+슬픔 다중 선택/연결선, 그룹 목록/트레이, 카테고리 해제 연쇄 정리, 테스트용 루트 20px에서 3×3 폴백을 확인한 뒤 테스트 값을 원복했다. `design/tokens.json`의 아크 스냅 문구도 D-041 명멸 규칙으로 교정했다. `check-contrast --verbose` 216/216 PASS, `verify:quick`·`verify:full` PASS(분류표 41/41, scope guard 11/11 포함). 기존 Claude Artifact 재발행은 현재 Codex 환경에 해당 도구가 없어 미실행이며 저장소 로컬 미리보기가 정본이다.
+- **추가(2026-09-17, Codex): 캐릭터 무드 시안 v1.** 사용자가 기존 이미지 스타일 설정을 다시 확인할 수 있도록 `prompts.json`의 공통 스타일과 원자료 JPG 2장을 스타일 참조로 사용해 9종 합본 무드 시안을 imagegen으로 생성하고 `design/characters/mood-preview-v1.png`에 보존했다. `design/style-guide.html`에 “캐릭터 이미지 무드” 절을 추가해 수채·색연필·흔들리는 연필선·종이결·둥근 실루엣·안전한 표정이라는 확정 방향과 금지 요소를 함께 표시했다. 이 합본은 스타일 승인용이며 개별 1024/120px 최종 자산이나 이슈 #26 완료 증거로 세지 않는다.
+- **추가(2026-09-17, Codex): 캐릭터 무드 시안 v2.** 사용자 참고 이미지의 복슬한 크레용 외곽선, 납작한 불투명 색면, 얼굴 중심의 짧은 비율과 엉뚱한 단순 표정을 반영해 9종 합본을 `design/characters/mood-preview-v2.png`로 생성하고 스타일 가이드의 대표 시안을 교체했다. v1은 비교용으로 보존했다. 이번 변경은 스타일 탐색이며 `prompts.json`과 이슈 #26의 개별 최종 자산은 사용자 승인 전까지 바꾸거나 완료 처리하지 않는다.
 - 다음(실행·리서치):
-  1. ~~**아크 휠 큰 글자 폴백**~~ **[무효, 2026-09-10] D-041로 아크 휠 자체가 폐기됐다.** 별자리 지도의 큰 글자 폴백(3열 격자, 칸 101px)은 `DESIGN_SYSTEM` §6.2에 이미 규정돼 있다. 남은 실제 과제는 **스타일 가이드에 별자리 절을 구현하고 아크 절을 걷어내는 것**이다(위 2026-09-17 인계 항목에 상세 설계가 있음 — 그대로 구현하면 됨).
+  1. [x] **감정 별자리 지도 구현** — 2026-09-17 완료. 폐기된 아크 휠을 제거하고 D-041 다중 선택·3열 큰 글자 폴백·세부 목록 연동을 스타일 가이드에 반영했다(바로 위 완료 체크포인트).
   2. **캐릭터 생성** — ~~3번(taxonomy v2) **뒤에** 한다. 공포가 추가되면 7종이 8종이 되는데~~ **[정정, 2026-09-05] 3번(taxonomy v2)이 확정됐다 — 공포·혐오가 둘 다 신설되어 7종이 9종이 되는데** 일관성 때문에 같은 seed로 한 번에 만들어야 하므로, 먼저 만들면 전부 다시 만들어야 한다(D-038). 확정 후 codex imagegen → `node scripts/check-characters.mjs` 통과 → README §3 눈 검수. ~~생성 자체는 아직 시작하지 않았다(`design/characters/prompts.json` 7개 항목 그대로).~~ **[정정, 2026-09-06, 이슈 #26]** 공포·혐오 캐릭터 컨셉을 사용자와 대화로 확정(원자료가 없는 신설 계열이라 매 단계 질문으로 방향을 잡음): **공포=토끼**(제자리에 얼어붙어 귀를 뒤로 접은 자세, 크림색), **혐오=너구리**(앞발로 코를 막고 몸을 트는 자세, 자연색 회색+마스크). 동물 재사용(공룡/고양이) 대신 새 동물을 쓰기로 했다 — 프로젝트 규칙이 아니라 사용자의 창작 선택(근거는 `design/characters/README.md` §5). `prompts.json`에 두 항목의 `subject_prompt`·`accent`(fear `#199A8C`, disgust `#918C37` — tokens.json 500과 동일, override 불필요) 추가 완료, `version`을 `characters-v2-draft`로 올림, `README.md` §1·§2·§3을 9종 기준으로 갱신. `node scripts/check-characters.mjs` → `PENDING: 캐릭터 아이콘 9종 미제작` 정상 확인, `npm run verify:quick` PASS. **실제 PNG 9종 생성은 아직 안 했다** — `codex imagegen`은 Codex CLI 전용 기능이라 이 작업을 수행한 Claude Code 세션에는 실행 도구가 없다. Codex CLI에서 생성 → 여기서 `check-characters.mjs` 통과·README §3 눈 검수로 이어받아야 한다.
   3. **taxonomy v2 심리학 리서치(D-038)** — G3 원자료 전사(v1) 후 진행. **사용자가 방향을 확정했다(2026-09-04): 공포/두려움 카테고리 신설, 놀람은 기쁨 전용이 아님.** 나머지 세부 감정 귀속은 리서치로 정한다. 색 수용 가능성은 미리 재어 뒀다 — 8~9계열까지 가능하지만 쓸 수 있는 구역이 **초록~청록과 어두운 갈색뿐이고 보라는 포화**다(D-038). `emotion_code`(D-022) 마이그레이션 매핑도 함께 만든다. **[정정, 2026-09-05] 완료됐다** — taxonomy v2 9계열 194개 확정, 사용자 최종 대조(D-027)까지 마쳐 `review_status: reviewed`(위 TASK-TAXONOMY 안내, `docs/PROCESS_LOG.md` 참고). `emotion_code` 마이그레이션 매핑(`data/taxonomy/v1-to-v2.json`)도 함께 완료됐다.
-  4. **실기기 확인** — chip 대비, 40px 아이콘 판독성, 44px 터치, 아크 조작감(iPhone Safari·Android Chrome).
+  4. **실기기 확인** — chip 대비, 40px 아이콘 판독성, 44px 터치, 별자리 다중 선택 조작감(iPhone Safari·Android Chrome).
   5. **위기 안내 연락처 값** 검수.
 - 주의: 색의 의미(어떤 계열이 어떤 감정인지)는 원자료를 따르므로 사용자 승인 없이 바꾸지 않는다(PR-010). 감정 색으로 위험·순위를 표현하지 않는다.
 

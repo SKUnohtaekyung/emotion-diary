@@ -101,6 +101,18 @@
 
 접근성 자동 검사만으로 합격하지 않고 keyboard와 적어도 한 screen reader 수동 증거를 포함한다.
 
+### 캐릭터 정적·동적 자산 (PR-010, D-045·D-046)
+
+- `design/characters/mood-preview-v2.png`를 스타일 기준으로 사용하고 v1을 비교 이력으로 보존한다. 시범 공포=토끼가 통과하기 전에는 9종 전체를 생성하지 않는다.
+- 정적 PNG는 1024 원본·120 앱 파일·RGBA 8-bit sRGB·실제 투명 픽셀을 검사한다. 40px와 120px에서 실루엣·표정·크레용 선·종이결을 각각 눈으로 확인한다.
+- 동일 프레임의 lossless animated WebP와 APNG를 흰색·중립색·계열 50·`#121211`·체크보드에 합성해 반투명 가장자리, 흰 matte, halo, 색 번짐, 파일 크기를 비교한다. 토끼 시범은 WebP 261,298 bytes/APNG 389,709 bytes와 Chromium 동등 표시를 근거로 WebP를 선택했다.
+- idle은 120×120, 12fps, 24프레임, 약 2초 seamless loop, 중심 이동 1px 이하를 요구한다. acknowledge는 12~16프레임을 한 번 재생하고 idle로 끝난다.
+- 9종별 `idle`·`breathe`·`tilt`·`emotion` 원본과 열린 눈 5종 `blink` 원본을 정적 계약 검사에 포함한다. 40px/120px QA에는 대표 PNG뿐 아니라 `emotion` 포즈도 함께 표시해, 작은 몸짓이 색·텍스트·움직임에 의존하지 않고 과장 없이 읽히는지 본다.
+- 사용자 제공 전신·감정 표현을 분리한 `ui-poses/*--expressive-static-{1024,120}.png` 9종은 별도 정적 UI 보조 세트다. 18개 PNG의 RGBA·크기·완전 투명 RGB·40px/120px 실루엣을 검사하며, 애니메이션 계약이나 reduced-motion 대체에는 넣지 않는다.
+- acknowledge는 9종 각자의 `emotion_rigs`를 왕복하고 peak를 3프레임 유지한다. blink는 눈 동작만 부각하지 않도록 idle loop에만 둔다. 자동 검사는 리그 좌표 계약, frame/page/delay/loop/재생 시간, 120px alpha 중심 이동(최대 1px)을 확인하고, Chromium QA에서 시작·중간·종료 프레임에 halo·matte·질감 깜빡임이 없는지 확인한다.
+- 웹 구현 뒤 iPhone Safari와 Android Chrome에서 투명도·속도·loop를 확인하고, `prefers-reduced-motion: reduce`에서는 동일 캐릭터의 정적 PNG가 대신 보이는지 검증한다. 이는 후속 웹 확장 게이트이며 2026-09-19 사용자 지시에 따라 #26 자산 이슈 종료의 차단 조건이 아니다.
+- 9종을 label 있음/없음과 회색조로 나란히 놓아 색에 기대지 않고 구별되는지, 분노·미움·공포·혐오가 위협적·조롱·진단적으로 읽히지 않는지 사용자 눈 검수를 기록한다.
+
 ## 7. AI 대화 작성 평가
 
 최소 50개 versioned 합성 대화로 다음을 균형 있게 포함한다.

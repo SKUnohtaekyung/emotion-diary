@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>캐릭터 9종 QA</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, sans-serif; background: #f7f4ec; color: #24221f; }
+    body { margin: 0; padding: 24px; }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    p { margin: 0 0 20px; color: #666158; }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(260px, 1fr)); gap: 14px; }
+    article { padding: 14px; border: 1px solid #d8d2c8; border-radius: 14px; background: white; }
+    h2 { margin: 0 0 10px; font-size: 15px; }
+    .samples { display: flex; align-items: end; gap: 12px; flex-wrap: wrap; }
+    figure { margin: 0; text-align: center; font-size: 11px; }
+    .tile { display: grid; place-items: center; width: 128px; height: 128px; border: 1px dashed #bdb7ae; }
+    .tile.dark { background: #121211; }
+    .tile.checker { background-color: #fff; background-image: linear-gradient(45deg,#ddd 25%,transparent 25%),linear-gradient(-45deg,#ddd 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#ddd 75%),linear-gradient(-45deg,transparent 75%,#ddd 75%); background-size: 16px 16px; background-position: 0 0,0 8px,8px -8px,-8px 0; }
+    img.large { width: 120px; height: 120px; image-rendering: auto; }
+    img.small { width: 40px; height: 40px; image-rendering: auto; }
+    .small-wrap { width: 48px; height: 48px; display: grid; place-items: center; border: 1px solid #ddd; }
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+    @media (prefers-reduced-motion: reduce) { .motion { display: none; } .static { display: block; } }
+    @media (prefers-reduced-motion: no-preference) { .motion { display: block; } .static { display: none; } }
+  </style>
+</head>
+<body>
+  <h1>v2 캐릭터 9종 실표시 QA</h1>
+  <p>lossless animated WebP · 정적 대표와 emotion 포즈 120px/40px · acknowledge 재생 · 흰색/어두움/체크보드. reduced-motion에서는 정적 PNG.</p>
+  <main class="grid" id="grid"></main>
+  <script>
+    const characters = [
+      ["enjoyment","즐거움·양"],["wish","희망·거북이"],["sadness","슬픔·기니피그"],
+      ["anger","분노·고양이"],["joy","기쁨·쥐"],["love","사랑·개"],
+      ["hate","미움·까마귀"],["fear","공포·토끼"],["disgust","혐오·침팬지"]
+    ];
+    document.querySelector("#grid").innerHTML = characters.map(([key,label]) => `
+      <article><h2>${label}</h2><div class="samples">
+        <figure><div class="tile"><img class="large motion" src="motion/${key}--idle-loop.webp" alt="${label}"><img class="large static" src="${key}.png" alt="${label}"></div><figcaption>흰색 120px</figcaption></figure>
+        <figure><div class="tile dark"><img class="large" src="${key}.png" alt=""></div><figcaption>어두움 120px</figcaption></figure>
+        <figure><div class="tile checker"><img class="large" src="${key}.png" alt=""></div><figcaption>체크보드</figcaption></figure>
+        <figure><div class="small-wrap"><img class="small" src="${key}.png" alt=""></div><figcaption>40px</figcaption></figure>
+        <figure><div class="tile"><img class="large" src="poses/${key}--emotion-1024.png" alt="${label} 작은 감정 몸짓"></div><figcaption>emotion 120px</figcaption></figure>
+        <figure><div class="small-wrap"><img class="small" src="poses/${key}--emotion-1024.png" alt=""></div><figcaption>emotion 40px</figcaption></figure>
+        <figure><div class="tile"><img class="large" src="motion/${key}--acknowledge-once.webp" alt="${label} 선택 또는 기록 완료 반응"></div><figcaption>acknowledge 120px</figcaption></figure>
+      </div></article>`).join("");
+  </script>
+</body>
+</html>
