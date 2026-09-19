@@ -3,11 +3,11 @@
   "task_id": "TASK-INFRA-01",
   "phase": "dev-infrastructure-maintenance",
   "iteration": 1,
-  "status": "in_progress",
+  "status": "done",
   "current_hypothesis": "The development apparatus (CI, harness state files, machine contracts, task docs) drifted because verify.mjs checked existence and syntax but not agreement with reality. Restoring CI on both OSes and adding deterministic drift checks (scripts/check-harness.mjs) makes the same drift visible the next time it happens.",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "b54a0a2",
+  "last_verified_commit": "59caa78",
   "completed_nodes": ["bootstrap-audit", "taxonomy-v1", "taxonomy-v2-research"],
   "next_node": "hosting-identity-spike",
   "blockers": [
@@ -15,5 +15,5 @@
     "model-access-spike gate (B-06 partial): job expiry/failed handling, independent verifier double call, crisis-signal cases, subscription retention settings (RK-016)",
     "app-scaffold stays blocked until hosting-identity-spike and data-store-spike are done; TASK-MOBILE (single Worker + Static Assets proposal) is on hold until Phase 1 starts"
   ],
-  "last_checkpoint": "2026-09-20 TASK-INFRA-01: CI green for the first time on ubuntu and windows (PR #28, first at 7149b84, latest verified b54a0a2) after preserving references/source bytes via .gitattributes and adding npm ci. check-harness.mjs reproduced 11 FAIL + 2 WARN on the stale state, then harness files were synced. Schemas moved to 9 categories, canon docs aligned, CURRENT_TASK split into tasks/archive (byte-verified). Pending user decisions: merge PR #28, close issue #27, republish the design-preview artifact. History of the 2026-09-02 spikes that used to live in this field is in git (harness/loop-state.json before this commit), docs/STATUS.md section 3 and harness/runtime-profile.json."
+  "last_checkpoint": "2026-09-20 TASK-INFRA-01: CI green for the first time on ubuntu and windows (PR #28, first at 7149b84, latest verified b54a0a2) after preserving references/source bytes via .gitattributes and adding npm ci. check-harness.mjs reproduced 11 FAIL + 2 WARN on the stale state, then harness files were synced. Schemas moved to 9 categories, canon docs aligned, CURRENT_TASK split into tasks/archive (byte-verified). PR #28 merged to main as 59caa78 (merge commit, five batch commits kept) and main CI succeeded on both OSes; issue #27 closed on user instruction. TASK-INFRA-01 is done — when the next task starts, move its section to tasks/archive and change task_id here (check-harness fails otherwise). User decided not to republish the design-preview artifact; the local preview is canonical. No pending user decisions. History of the 2026-09-02 spikes that used to live in this field is in git (harness/loop-state.json before this commit), docs/STATUS.md section 3 and harness/runtime-profile.json."
 }

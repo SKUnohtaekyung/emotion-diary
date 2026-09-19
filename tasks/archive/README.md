@@ -14,7 +14,7 @@
 | 파일 | 상태 | 남은 일이 간 곳 |
 | --- | --- | --- |
 | [TASK-ISSUE-26.md](TASK-ISSUE-26.md) 캐릭터 9종 포즈·애니메이션 | complete(2026-09-19), 이슈 #26 closed | 실기기·OS reduced-motion·회색조 판독 → `CURRENT_TASK`의 TASK-WEB-UI-01 |
-| [TASK-ISSUE-27.md](TASK-ISSUE-27.md) 소유 파일 밖 쓰기 감지 | done(2026-09-06), 이슈 #27은 열려 있음 | 알려진 한계 → AGENTS §2.2, 재검토 조건 → D-042 |
+| [TASK-ISSUE-27.md](TASK-ISSUE-27.md) 소유 파일 밖 쓰기 감지 | done(2026-09-06), 이슈 #27 closed(2026-09-20) | 알려진 한계 → AGENTS §2.2, 재검토 조건 → D-042 |
 | [TASK-CBM.md](TASK-CBM.md) Codebase Memory 통합 | partial(2026-09-02) | 운영 규칙 → AGENT_WORKFLOW §9, 추적 → TRACEABILITY AG-CBM-001 |
 | [TASK-DESIGN.md](TASK-DESIGN.md) 디자인 시스템 검수와 확정 | done(결정 2026-09-04, 실행 1~3 완료 2026-09-19) | 실기기 확인, 위기 안내 연락처 값 검수 → `docs/STATUS.md` §4 |
 | [TASK-BOOTSTRAP.md](TASK-BOOTSTRAP.md) 기술 감사와 구현 기반 확정 | 보류 | B-02~B-08 판정 → `harness/work-graph.yaml` 스파이크 노드, `docs/STATUS.md` §3·§4 |
