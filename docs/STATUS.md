@@ -7,7 +7,7 @@
 | 단계 | 상태 | 요약 |
 | --- | --- | --- |
 | Phase 0 — 부트스트랩 | 마무리 중 | 정본 문서, Git baseline, 계획 교정(D-017~D-027), 배포·AI 경로 확정(D-029~D-032), 기술 스파이크 실행(판정은 partial), taxonomy v1·v2, 디자인 시스템, 캐릭터 9종, 개발 인프라 정비까지 끝났다. 남은 것은 스파이크 잔여 판정(§3)이다 |
-| 브라우저 우선 UI 프로토타입 | planned | `TASK-WEB-UI-01` — 저장·인증·AI 없이 직접 작성 흐름과 캐릭터 배치를 브라우저에서 검토하는 정적 프로토타입. 사용자 승인 대기 |
+| 브라우저 우선 UI 프로토타입 | 구현·PC 검수 완료, 사용자 확인 대기 | `TASK-WEB-UI-01` — `web/`의 정적 시안(D-047). 하단 탐색 4칸과 직접 작성 흐름(단계형 + 긴 한 장)을 브라우저에서 눌러 볼 수 있다. 저장·인증·AI는 없다. 실기기 검수는 하지 않았다 |
 | Phase 1 — 기반·데이터 무결성 | 대기 | 앱 뼈대(Workers API, D1 migration, 테스트). `work-graph`의 `app-scaffold`는 `hosting-identity-spike`·`data-store-spike`가 `done`이 돼야 열린다. 착수 전에 TASK-MOBILE의 단일 Worker 제안을 결정으로 받을지 먼저 정한다 |
 | Phase 2 — 직접 작성 MVP | 대기 | 선행 조건이던 taxonomy는 끝났다(v1 2026-09-04, v2 9계열 194개 2026-09-05, 둘 다 `review_status: reviewed`) |
 | Phase 4 — 대시보드·알림 | 대기 | — |
@@ -44,7 +44,7 @@
 
 ## 4. 다음 할 일 (우선순위 순)
 
-1. **TASK-WEB-UI-01 브라우저 우선 UI 프로토타입** — 사용자 승인 뒤 착수. 재료(별자리 지도 구현, taxonomy v2, 토큰, 캐릭터 9종)는 갖춰져 있다. 이슈 #26에서 넘어온 검수(iPhone Safari·Android Chrome 실기기, OS reduced-motion, 회색조·label 없음 판독)를 여기서 한다.
+1. **TASK-WEB-UI-02 사용자 QA와 디자인 수정**(planned, 새 세션에서 착수) — 사용자가 시안을 직접 눌러 보며 고칠 곳을 말하고, 확정된 모양을 디자인 시스템에 되돌려 적는다. 착수 절차·점검표·"어디를 고치면 무엇이 바뀌나" 표는 `tasks/CURRENT_TASK.md`의 해당 절. 아래 남은 검수도 이 작업에서 한다. **TASK-WEB-UI-01 화면 시안의 남은 검수** — 시안은 `web/`에 있다(D-047). 이슈 #26에서 넘어온 검수 가운데 Chromium에서 할 수 있는 것(360px·1280px 가로 넘침 0, 44px 측정, 200% 글자에서 3열 격자, 회색조 캡처, 움직이는 WebP→정적 PNG 대체 구조)은 끝났다. **남은 것**: iPhone Safari·Android Chrome 실기기, 실제 OS reduced-motion 설정, 회색조·label 없음 상태의 사람 눈 판독, 초성 레일 버튼(360px에서 32×24.6px — WCAG 2.5.8의 24px는 넘지만 이 제품의 44px 기준에는 못 미친다)의 처리 방향.
 2. **디자인 시스템 잔여 실행 항목** — 실기기에서 chip 대비·40px 아이콘 판독성·44px 터치·별자리 다중 선택 조작감 확인, 위기 안내 **연락처 값** 검수(문구 톤은 D-036으로 확정).
 3. **스파이크 잔여 판정(Phase 1의 선행)** — B-02/B-03/B-08: iPhone Safari 본체·홈 화면·Android Chrome, bundle/log secret scan, Cloudflare Access 적용 가능성, 무료 한도 수치. B-05: 백업 절차와 삭제 지연 고지 문구. B-06(병렬 가능): job 만료·`failed` 전환, verifier 독립 2회 호출, 위기 케이스, 구독 경로의 보존 설정.
 4. **TASK-MOBILE 제안의 결정**(보류 중, Phase 1 착수 직전) — 단일 origin Worker + Static Assets로 D-032를 교정할지.
@@ -57,7 +57,7 @@
 ## 5. 다른 컴퓨터에서 이어가기
 
 1. **준비**: Node.js 22 이상, Git, `gh`(선택). `git clone https://github.com/SKUnohtaekyung/emotion-diary.git` → `npm ci` → `npm run verify:quick`이 PASS인지 확인한다. 구버전 npm이 `package-lock.json`의 `libc` 줄을 지우면 `git checkout -- package-lock.json`으로 되돌린다(README "검증").
-2. **디자인 미리보기**: `node scripts/preview.mjs 4173` → `http://localhost:4173/`. Claude Code에서는 `.claude/launch.json`의 `design-preview`를 브라우저 pane으로 연다. 공유 링크: https://claude.ai/code/artifact/8673a33c-900c-4273-8592-0fb3bdcc36a9 — 이 링크는 2026-09-17의 별자리 지도 구현 이후 재발행되지 않았다. 저장소의 로컬 미리보기가 정본이다.
+2. **디자인 미리보기**: `node scripts/preview.mjs 4173` → `http://localhost:4173/`. Claude Code에서는 `.claude/launch.json`의 `design-preview`를 브라우저 pane으로 연다. **화면 시안**은 `node scripts/web-preview.mjs 4174` → `http://localhost:4174/`(launch 이름 `web-prototype`)이며, 값을 정본에서 읽으므로 파일을 직접 열면 동작하지 않는다. 공유 링크: https://claude.ai/code/artifact/8673a33c-900c-4273-8592-0fb3bdcc36a9 — 이 링크는 2026-09-17의 별자리 지도 구현 이후 재발행되지 않았다. 저장소의 로컬 미리보기가 정본이다.
 3. **이어서 할 작업 읽기**: [../AGENTS.md](../AGENTS.md) → `tasks/CURRENT_TASK.md`(진행 중인 작업만 있다) → 이 문서 §4.
 4. **값을 바꿀 때**: `design/tokens.json`·`docs/DESIGN_SYSTEM.md`·`design/style-guide.html`의 `:root`를 함께 고친다. 어긋나면 quick이 실패한다. `node scripts/check-contrast.mjs --verbose`로 대비와 계열 색차를 본다.
 5. **커밋 규칙**은 [../AGENTS.md](../AGENTS.md) §2.1 한 곳에만 있다.
@@ -71,7 +71,7 @@
 
 ## 6. 알려진 제한
 
-- 앱 코드는 아직 없다. 스파이크 코드는 `work/`(비추적)에 있고, 정본은 문서와 스키마다.
+- 앱 코드는 아직 없다. `web/`은 눌러 보는 화면 시안일 뿐 저장·인증·API가 없고, Phase 1에서 구조만 옮기고 코드는 버린다(D-047). 스파이크 코드는 `work/`(비추적)에 있고, 정본은 문서와 스키마다.
 - 스파이크 자원(Workers·D1)에는 합성 데이터만 넣었고 검증 후 비웠다. 실제 앱은 별도 프로젝트로 배포한다.
 - 무료 플랜 한도 수치, Cloudflare Access 적용 가능성, Time Travel 복구 실습은 확인하지 않았다.
 - 검증 하네스 `full`의 `test`는 검사기 자체 테스트뿐이다. 앱 script가 생기면 lint/typecheck/test/build가 자동으로 포함된다.

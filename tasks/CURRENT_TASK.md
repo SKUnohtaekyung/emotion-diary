@@ -4,67 +4,51 @@
 
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
-| TASK-INFRA-01 개발 인프라 정비 | 완료(2026-09-20, PR #28 병합) — 다음 작업 착수 시 archive로 | 이 파일 |
-| TASK-WEB-UI-01 브라우저 우선 UI 프로토타입 | planned, 사용자 승인 대기 | 이 파일 |
+| TASK-WEB-UI-01 브라우저 우선 UI 프로토타입 | verifying(2026-09-20 구현·PC 검수 완료, PR 진행 중 — 병합되면 archive로) | 이 파일 |
+| TASK-WEB-UI-02 사용자 QA와 디자인 수정 | planned(2026-09-20 사용자 지시 — 새 세션에서 착수) | 이 파일 맨 아래 |
 | [TASK-MOBILE](TASK-MOBILE.md) 설치형 홈 화면 웹앱 | 보류 — Phase 1 착수 시 재개(이슈 #1~#9) | 별도 파일 |
 | [TASK-DS-REF](TASK-DS-REF.md) TDS 규칙 참고 | 보류(이슈 #10~#14, D-039 reserved) | 별도 파일 |
 | [TASK-TAXONOMY](TASK-TAXONOMY.md) · [V1](TASK-TAXONOMY-V1.md) · [PLAN-V2](TASK-TAXONOMY-PLAN-V2.md) | 완료(2026-09-05, D-038·D-040 accepted) | 별도 파일(다른 문서가 경로로 인용해 옮기지 않았다) |
-| TASK-ISSUE-26 · ISSUE-27 · CBM · DESIGN · BOOTSTRAP | 완료·보류 기록 | [archive/](archive/README.md) |
-
-# TASK-INFRA-01 — 개발 인프라 정비(CI·하네스·계약 드리프트·작업 문서)
-
-## 상태와 범위
-
-`done` — 2026-09-20. PR #28이 `main`에 병합됐고(`59caa78`) **`main`의 GitHub Actions가 Ubuntu·Windows 양쪽에서 success**다. 인수 조건 다섯 개 모두 충족. 다음 작업을 시작할 때 이 절을 `archive/`로 옮기고 `harness/loop-state.json`의 `task_id`를 바꾼다. 아래는 착수 당시의 범위 서술이다 — 2026-09-20 사용자 지시. 대상은 제품이 아니라 제품을 개발하는 장치(문서·하네스·훅·검증 스크립트·CI)다. 직전 감사 요약은 작업 지시가 아니라 검증할 가설로 다뤘고, 판정 결과와 근거는 아래 체크포인트에 있다. 브랜치 `infra/maintenance` + PR로 진행하며 커밋·푸시·병합·이슈 닫기는 묶음마다 사용자 승인을 받는다.
-
-- 포함: CI 복구, 하네스 낡음 검사와 테스트, `harness/` 동기화, 계약 드리프트(schema 9계열·quick 정의·오도 위험이 있는 문서 줄), `CURRENT_TASK` 분할, 손댄 정본의 `[정정]`·취소선 흡수, git-guard 테스트, AGENTS "공통 계약" 문구.
-- 제외(후속): 전체 `eol=lf` 정규화, `docs/DECISIONS.md` 행 안의 취소선 흡수(결정 기록은 덧붙임 이력이 본질), 완료된 TASK-TAXONOMY 3종 재작성, Codex 훅 실제 구성(런타임 검증 불가), `AI_RAG_SPEC` 표기법 통일(후행 단계), 스파이크 노드 `done` 처리(증거가 `partial`).
-
-## 소유권
-
-- Main/Writer: 현재 Claude Code 세션 1명. 읽기 전용 researcher 2회 사용(Codex 훅 공식 문서, 정본 내용 대조). 하위 에이전트는 쓰지 않고 커밋하지 않는다.
-- 소유 파일: `.gitattributes`, `.github/workflows/harness.yml`, `harness/*`, `scripts/verify.mjs`, `scripts/check-harness.mjs`, `scripts/test-check-harness.mjs`, `scripts/test-claude-git-guard.mjs`, `scripts/check-taxonomy.mjs`, `scripts/test-check-taxonomy.mjs`, `scripts/check-contrast.mjs`, `scripts/check-characters.mjs`, `schemas/diary-entry.schema.json`, `schemas/journal-assist-output.schema.json`, `package.json`, `README.md`, `AGENTS.md`, `BOOTSTRAP.md`, `PRD.md`, `docs/STATUS.md`, `docs/ROADMAP.md`, `docs/TRACEABILITY.md`, `docs/DATA_MODEL.md`, `docs/UX_SPEC.md`, `docs/EVAL_PLAN.md`, `docs/AGENT_WORKFLOW.md`, `docs/DECISIONS.md`, `docs/RISK_REGISTER.md`, `docs/PROCESS_LOG.md`, `docs/ARCHITECTURE.md`, `references/README.md`, `tasks/*`, `tasks/archive/*`.
-
-## 사용자 결정(2026-09-20)
-
-- TASK-WEB-UI-01의 Codex 세션은 종료됨 → `CURRENT_TASK` 분할까지 진행.
-- TASK-DS-REF·TASK-MOBILE은 **보류**(MOBILE은 Phase 1 착수 시 재개). D-039는 `reserved` 행으로 명시해 번호 구멍을 메운다. 이슈 #1~#14는 열어 둔다.
-- 커밋 푸터 정본: **그 커밋을 만든 실제 에이전트·모델명**. 규칙은 `AGENTS.md` §2.1 한 곳에만 둔다.
-- `PRD.md` 본문 수정 승인(초안 diff를 먼저 보이고 확정). `BOOTSTRAP.md`는 유지하고 상단에 감사 완료 표시.
-- `package-lock.json`은 현행 유지. 구버전 npm이 만드는 `libc` 삭제 diff는 커밋하지 않는다.
-
-## 인수 조건
-
-- PR의 GitHub Actions가 Windows·Linux 양쪽에서 초록불이다.
-- `harness/` 6개 파일이 현재 상태를 반영하고, 같은 어긋남이 다시 생기면 기계가 알려 준다(검사와 그 테스트로 확인).
-- `tasks/CURRENT_TASK.md`가 한 번에 읽히는 크기이고 과거 기록은 `tasks/archive/`로 옮겨졌으며 내부 링크가 깨지지 않았다.
-- 손댄 정본에서 `[정정]`·취소선이 본문에 흡수됐고 변경 이력은 `DECISIONS`/`PROCESS_LOG`에 남았다.
-- `verify --mode quick`·`--mode full` PASS, `package-lock.json` 무변경.
-
-## 체크포인트
-
-- 가설 판정(2026-09-20, 편집 전): ① `journal-template.txt` 원본은 **CRLF 221B** — git baseline보다 앞선 `outputs/emotion-diary-agent-seed.zip` 내부 바이트가 manifest SHA-256과 일치, 저장소 blob(LF 204B)이 변형본이다. ② `.gitattributes`는 `references/source/**`만 — 줄 단위 파서는 전부 `/\r?\n/`이고 작업 트리는 이미 CRLF·LF 혼재로 PASS 중이다. ③ quick의 sharp 검사는 유지(2.0초 중 1.7초, full로 옮기면 검사 완화)하고 네 곳의 quick 정의를 현실에 맞춘다. ④ RISK는 open 17 + accepted 2(감사의 "open 19"는 틀림). ⑤ 감사의 "정상" 분류가 틀렸다 — `schemas/diary-entry`·`journal-assist-output`의 카테고리 enum/pattern이 7개로 남아 있다. ⑥ style-guide `:root` 63개 값은 현재 tokens와 전부 일치, 기계 검사 가능. ⑦ Codex는 Stop 훅만 동등 이식 가능하고 PreToolUse는 `ask` 미지원. ⑧ `npm ci`도 npm 10.9.2에서는 lockfile의 `libc`를 지운다(가설 기각). CI는 15회 전부 실패였다.
-- 완료(2026-09-20, 묶음 1 · commit `7149b84`): `.gitattributes`(`references/source/** -text`)와 blob renormalize(204B→원본 221B), 워크플로에 `npm ci`·full·Ubuntu/Windows 매트릭스. LF checkout 모사 트리에서 quick·full PASS를 먼저 확인했고, **PR #28에서 두 OS 모두 초록불 — 이 저장소의 첫 CI 성공**이다.
-- 완료(2026-09-20, 묶음 2·3): `scripts/check-harness.mjs`를 harness 동기화보다 **먼저** 만들어 낡은 상태에서 FAIL 11건·WARN 2건을 재현한 뒤(AGENTS §5.1) 고쳤다. 결정론적 모순만 FAIL, 시간·커밋 거리 신호는 WARN(exit 0) — quick을 Stop 훅이 매 턴 돌리므로 날짜가 지났다거나 CI가 얕은 clone이라는 이유로 실패하면 검사가 새 고장 지점이 된다. 테스트 `test-check-harness.mjs` 28/28(CRLF fixture, 엉뚱한 이유의 실패를 막는 문구 대조 포함). harness: `bootstrap-audit`은 자기 gate(`bootstrap-facts`) 기준으로 `done`, `hosting-identity-spike`·`model-access-spike`는 증거가 partial이라 `verifying`, `data-store-spike`는 선행 미완이라 계약대로 `blocked`(증거 수집 사실은 주석). `loop-state`는 이 작업 기준으로 다시 썼고 옛 서사는 git 이력에 있다. `runtime-profile`의 commands·unknowns·evidence, `quality-gates`의 `unit-and-integration`(`npm test`), `harness/README`의 낡은 현재형 서술을 고쳤다.
-- 완료(2026-09-20, 묶음 4 일부): `schemas/diary-entry`·`journal-assist-output`의 카테고리 enum/pattern 7→9. v2의 감정 code 194개가 새 pattern을 전부 통과함을 따로 확인했다. `scripts/test-claude-git-guard.mjs` 15/15(받아들인 오탐·미탐은 `known`으로 고정), sharp 미설치 시 verify가 원인(`npm ci`)을 말하도록 수정, `verify.mjs` 필수 목록에 `.gitattributes`·새 검사기 추가.
-- 주의: verify의 충돌 표식 검사(`^=======`)는 Markdown setext 머리글 밑줄도 충돌로 본다. 지금 추적 파일에는 해당 줄이 없지만 누가 그 문법을 쓰면 quick이 깨진다(후속 후보).
-- 완료(2026-09-20, 묶음 4 · commit `b54a0a2`): PRD PR-004·§6.1(사용자가 초안 diff 확인 후 승인), UX_SPEC 2곳·ROADMAP·DATA_MODEL export 필드명, quick 정의 네 곳, AGENTS §2.1 커밋 메시지 규칙 일원화·서두의 "강제는 Claude 전용" 단서·§2.3 Codex, D-039 reserved 행과 끊긴 표 머리글 복구, RK-007 closed, DS-REF·MOBILE `on_hold`, BOOTSTRAP 감사 완료 표시, `[정정]` 6곳 흡수. CI 두 OS 초록불.
-- 완료(2026-09-20, 묶음 5·6): 이 파일 90,026B → 약 10KB. 끝난 절 다섯 개를 `tasks/archive/`로 옮겼다 — 본문은 스크립트로 바이트 그대로, 새 글(머리말·색인·`archive/README.md`)만 손으로 썼다. **독립 검산**(직전 커밋 `b54a0a2`에서 절을 다시 잘라 대조)이 스크립트의 링크 재작성 버그(`../../`)를 잡아 고쳤고, 재검산은 5개 절 + 옛 머리말 모두 동일. 산문 참조 3곳(AGENTS §2.2, STATUS §5, TRACEABILITY AG-CBM-001) 갱신. `docs/STATUS.md` 재작성(`[정정]` 4겹 흡수, 9/2 이후 완료 사항 반영, 커밋 규칙은 AGENTS §2.1을 가리킴), `docs/PROCESS_LOG.md` §4 회고. quick·full PASS, WARN 0건.
-- 손대지 않은 것과 이유: `docs/DECISIONS.md`·`docs/PROCESS_LOG.md` 안의 `[정정]`·취소선(덧붙임 기록이 본질), `references/README.md`의 `[정정]` 1곳과 `tasks/TASK-TAXONOMY*.md`(끝난 작업 문서, 다른 문서가 경로로 인용), `AI_RAG_SPEC`의 snake_case 예시·`EVAL_PLAN`의 "1:1 대조" 대상 모호함·`ARCHITECTURE`의 "transaction" 표기(후행 단계이거나 표기 수준 — `docs/STATUS.md` §4 후속 목록), `SAFETY_POLICY`(조사자가 참조와 핵심 줄만 확인, 전문 미대조).
-- 완료(2026-09-20, 마감): 사용자 지시로 PR #28을 merge commit으로 병합(`59caa78`, 묶음별 커밋 5개 보존)하고 `main` CI success를 확인한 뒤 이슈 #27을 닫았다(해결된 것과 남긴 한계를 코멘트로 기록). 병합·닫기로 낡게 된 서술(아카이브의 "#27 열려 있음", 이 절의 상태, `loop-state`)을 같은 날 고쳤다.
-- 결정(2026-09-20, 사용자): 디자인 미리보기 Artifact는 **재발행하지 않는다.** 공유 링크는 2026-09-17 별자리 지도 구현 이전 상태로 남고, 저장소의 로컬 미리보기(`node scripts/preview.mjs 4173`)가 정본이다(`docs/STATUS.md` §5). 이 작업에 남은 사용자 결정은 없다.
+| TASK-INFRA-01 · ISSUE-26 · ISSUE-27 · CBM · DESIGN · BOOTSTRAP | 완료·보류 기록 | [archive/](archive/README.md) |
 
 # TASK-WEB-UI-01 — 브라우저 우선 직접 작성 UI 프로토타입
 
 ## 상태와 범위
 
-`planned` — 2026-09-19 사용자 지시. 앱 코드가 아직 없는 Phase 0 저장소에서, Cloudflare/DB/인증/AI를 앞당기지 않고 브라우저에서 직접 작성 흐름과 캐릭터 배치를 검토할 수 있는 정적 웹 프로토타입을 만든다. 데이터는 저장하거나 전송하지 않는다. 직접 작성 MVP의 화면 순서·비진단·접근성 규칙은 `UX_SPEC` §2~4, `DESIGN_SYSTEM` §6·§8~9를 따른다. 사용자 승인 전에는 구현 파일을 만들지 않는다.
+`in_progress` — 2026-09-19 사용자 지시, 2026-09-20 계획 승인. 앱 코드가 아직 없는 Phase 0 저장소에서, Cloudflare/DB/인증/AI를 앞당기지 않고 브라우저에서 직접 작성 흐름과 캐릭터 배치를 검토할 수 있는 정적 웹 프로토타입을 만든다. 데이터는 저장하거나 전송하지 않는다. 직접 작성 MVP의 화면 순서·비진단·접근성 규칙은 `UX_SPEC` §2~4, `DESIGN_SYSTEM` §6·§8~9를 따른다. 브랜치 `web-ui/prototype` + PR로 진행하며 커밋·푸시·병합은 묶음마다 사용자 승인을 받는다.
+
+- 제외: 저장·임시저장·revision 충돌·offline 상태 연출, 다크 모드(D-034), AI 대화, 홈 화면 설치·자체 뒤로 가기(TASK-MOBILE의 미결 제안), `최근 사용` 묶음의 실제 동작(저장이 전제 — 자리만 표시), 실기기 검수(사용자 결정으로 이번에는 PC만).
 
 ## 소유권
 
-- Main/Writer: 착수할 때 지정한다(2026-09-19에 이 절을 등록한 Codex 세션은 종료됐다 — 2026-09-20 사용자 확인). 별도 하위 에이전트 없음.
-- 소유 파일: `web/*`, `scripts/web-preview.mjs`, `tasks/CURRENT_TASK.md`.
-- 넘겨받은 검수(이슈 #26에서 이관): iPhone Safari·Android Chrome 실기기, 실제 OS reduced-motion, 회색조·label 없음 판독. 상세는 [archive/TASK-ISSUE-26.md](archive/TASK-ISSUE-26.md)의 "후속 보류" 체크포인트.
+- Main/Writer: 2026-09-20 Claude Code 세션 1명. 하위 에이전트는 읽기 전용이며 쓰지 않고 커밋하지 않는다. 사용 기록: verifier(Sonnet) 1회 — 저장·전송·경로 조작·캐릭터 자리·비진단 문구를 작성자와 다른 눈으로 판정받기 위해(T5). Opus는 쓰지 않았다.
+- 소유 파일: `web/`, `scripts/web-preview.mjs`, `.claude/launch.json`, `harness/loop-state.json`, `tasks/CURRENT_TASK.md`, `tasks/archive/*`, `docs/STATUS.md`, `docs/DECISIONS.md`, `docs/TRACEABILITY.md`, `docs/DESIGN_SYSTEM.md`, `design/characters/README.md`(뒤 두 개는 검증자 지적으로 추가 — 캐릭터 자리 서술 동기화).
+- 넘겨받은 검수(이슈 #26에서 이관): iPhone Safari·Android Chrome 실기기, 실제 OS reduced-motion, 회색조·label 없음 판독. 상세는 [archive/TASK-ISSUE-26.md](archive/TASK-ISSUE-26.md)의 "후속 보류" 체크포인트. 이 환경에서 가능한 것은 Chromium의 reduced-motion 에뮬레이션과 회색조 렌더 캡처까지다. 실기기와 실제 OS 설정, 사람 눈의 판독은 사용자 기기가 있어야 한다.
+
+## 사용자 결정(2026-09-20)
+
+- 작성 흐름: **단계형을 먼저** 만들고, 같은 내용을 **긴 한 장으로도** 볼 수 있게 한다(UX_SPEC §4가 둘 다 허용).
+- 캐릭터 자리: 별자리 지도의 점 9개는 DESIGN_SYSTEM §6.2 규격 그대로 두고, **지도 바로 아래에 고른 계열의 대표 캐릭터(40px)+이름이 고른 순서로 쌓이는 줄**을 둔다. 기록 카드의 카테고리 표시에도 대표 캐릭터를 쓴다.
+- 실기기 검수는 이번에 하지 않고 미검증으로 남긴다.
+
+## 설계 판단(근거는 D-047)
+
+- 의존성·빌드 없는 정적 HTML/CSS/ES module. UI 프레임워크 결정(Phase 1)을 앞당기지 않는다. `package.json`을 건드리지 않는다.
+- 값의 출처는 하나: `scripts/web-preview.mjs`가 `web/`과 함께 `design/tokens.json`·`design/characters/`·`data/taxonomy/v2.json`을 읽기 전용 경로로 제공하고, 시안이 실행 중에 원본을 읽는다. `web/` 안에 색 값·감정 목록의 사본을 두지 않는다.
+- AI 진입점은 직접 작성과 같은 위계의 비활성 버튼("현재 제공되지 않음", UX_SPEC §5). 위기 연락처는 값 없이 "검수 후 채워짐" 자리만 둔다.
+
+## Task와 완료 기준
+
+| # | 내용 | 관찰 가능한 완료 기준 | 선행 |
+| --- | --- | --- | --- |
+| T0 | INFRA-01 절 아카이브, loop-state 교체, 브랜치 | 옮긴 본문을 되끼우면 `9131f53`의 원문과 동일 · quick PASS | — |
+| T1 | 미리보기 서버, 하단 탐색 4칸, 시안 띠, tokens 실행 중 로드 | 4칸이 클릭·키보드로 전환되고 `aria-current`가 따라감 · 360px에서 `scrollWidth == clientWidth` · `web/`에 `#RRGGBB` 색 리터럴 0건 | T0 |
+| T2 | 작성 흐름(단계형 → 긴 한 장 보기) | 9계열 전부 선택 시 option 194개 · 미래 날짜 선택 불가 · 필수 누락으로 완료 시 누락 필드로 초점 이동 · Tab/Enter/Space/화살표만으로 완료 도달 · `localStorage`/`sessionStorage`/`indexedDB`/cookie 쓰기 0, 같은 origin GET 외 요청 0 | T1 |
+| T3 | 캐릭터 배치 | 대표 캐릭터는 지도 아래 줄·목록 머리·기록 카드에만, `ui-poses`는 시작·빈 상태·완료 장식에만 · 강도·위기 안내에 `img` 0 · reduced-motion 에뮬레이션에서 `currentSrc`가 `.png` · 모든 `img`에 alt | T2 |
+| T4 | 달력·통계·설정(빈 상태 + 합성 예시) | 비활성 동작마다 보이는 "시안" 표기 · 설정에 자동 분석 없음 고지와 연락처 자리 | T1 |
+| T5 | 검수 | 360px·데스크톱 조작 요소 크기 측정표(44px 미만은 목록으로 공개) · 글자 200%에서 3열 격자 · 초점 링·회색조 캡처 · 독립 검증자(Sonnet, 읽기 전용)의 통과/실패/미검증 판정 | T2~T4 |
+| T6 | D-047, STATUS, 이 파일 증거, PR | quick·full PASS · PR CI 두 OS success · `package-lock.json` 무변경 | T5 |
+| T7 | 사용자가 브라우저에서 직접 확인 | 사용자 승인 | T6 |
 
 ## 인수 조건
 
@@ -74,3 +58,89 @@
 - 실제 저장·로그인·AI·분석·내보내기·삭제는 구현하지 않고, 프로토타입임을 분명히 표시한다.
 - 360px와 데스크톱 Chromium에서 키보드·초점·44px 조작 영역·가로 넘침·reduced-motion 스타일을 확인하고 `verify`를 통과한다.
 
+## 체크포인트
+
+- 완료(2026-09-20, T0): TASK-INFRA-01 절 9,420B(SHA-256 앞 12자리 `ea1586bf865b`)를 스크립트로 잘라 `tasks/archive/TASK-INFRA-01.md`로 옮겼다. 검산: 옮긴 본문을 새 `CURRENT_TASK.md`의 같은 자리에 되끼우면 `git show 9131f53:tasks/CURRENT_TASK.md`와 동일(줄 끝을 LF로 맞춘 뒤 비교 — 작업 트리는 CRLF, blob은 LF). 본문에 상대 링크는 없었다.
+- 완료(2026-09-20, T1~T4): `web/`(index.html, css/app.css, js/ 9개 모듈)과 `scripts/web-preview.mjs`, launch 구성 `web-prototype`(4174). `package.json` 무변경. 계획과 달라진 점 — ① 단계는 7개(날짜·사건 / 감정 계열 / 세부 감정 / 강도 / 이유 / 칭찬·감사 / 검토): 지도와 목록을 한 단계에 두면 360×740에서 목록이 화면 밖으로 밀려 나눴다. ② 세부 감정 목록은 행 194개가 전부 Tab 정지점이 되지 않게 listbox 안을 화살표로 이동하게 했다(style-guide는 행마다 Tab). ③ 강도는 "고르기 전(값 없음)" 상태를 갖는다 — 기본값을 채워 두면 사용자가 정하지 않은 강도가 기록처럼 보인다. ④ 글자 크기를 rem으로 올려 기기 글자 확대를 따르게 했다. ⑤ `최근 사용` 묶음은 목록 맨 위에 자리만 있다.
+- 검수 증거(2026-09-20, T5, Chromium 브라우저 pane에서 스크립트로 측정): **360×740** — 오늘·달력·통계·설정·작성 7단계·긴 한 장 12개 화면 전부 `scrollWidth - clientWidth = 0`, 화면 밖으로 나간 요소 0. **1280×800** — 5개 경로 가로 넘침 0, 앱 폭 480 가운데 정렬. **44px**: 미만은 초성 레일 버튼뿐(9계열 전부 선택 시 13개, 32×24.6px — WCAG 2.5.8의 24px는 충족, 제품 기준 44px 미달. 같은 일을 검색·스크롤로 할 수 있다). 나머지 조작 요소는 전부 44px 이상. **목록**: 9계열 선택 시 option 194개, Tab 정지점 1개, ArrowDown×2 + Enter로 "공포, 두려운, 선택됨", 초성 검색 `ㅎㅈ` → 허전한·흡족한. **완료 검사**: 빈 상태로 완료 → 1단계로 이동·`#event`에 초점·오류 문구 표시, 긴 한 장에서는 빠진 강도 칸(`intensity-anger-harsh`)에 초점. **저장·전송**: 전 흐름 뒤 localStorage 0·sessionStorage 0·cookie 0, 다른 origin 요청 0. **캐릭터**: 강도 화면 img 0, 모든 img에 alt, 방금 고른 친구만 `fear--acknowledge-once.webp`, source의 media가 맞지 않으면 `fear.png`로 대체됨을 확인. **큰 글자**: root 200%에서 별자리가 3열 격자로 바뀌고 가로 넘침 0. **회색조**: 선택 점은 링+굵은 라벨로, 캐릭터는 실루엣으로 구분됨(캡처). **값 사본**: `web/`의 `#hex`·`rgb(`·`hsl(` 0건.
+- 미검증(이 환경에서 할 수 없었음): ① native 버튼의 Enter/Space 활성화 — 브라우저 pane의 키 입력 도구가 keydown만 보내 click이 생기지 않는다(링크와 직접 처리한 listbox 키는 동작). 브라우저 기본 동작이지만 증거는 없다 → 사용자 확인(T7). ② 실제 OS의 reduced-motion 설정(에뮬레이션 도구 없음 — 대체 구조만 확인). ③ iPhone Safari·Android Chrome 실기기, 화면 키보드, safe-area, 회전. ④ 회색조·label 없음 상태의 사람 눈 판독. ⑤ 스크린리더 실제 낭독.
+- 독립 검증(2026-09-20, verifier·Sonnet·읽기 전용 1회 — 작성자 결론 없이 조건 10개와 산출물만 전달): 통과 9, **실패 1(C5)**. C5 — 세부 감정 목록의 그룹 머리글에 대표 캐릭터를 그렸는데 DESIGN_SYSTEM §6.3은 "색 점 10px + 이름"이고, "고른 친구들" 줄이 §8·캐릭터 README §5에 반영돼 있지 않았다. 직접 대조해 사실임을 확인하고 고쳤다: 머리글을 색 점 10px로 되돌림(재측정 `.list img` 0, `.catdot` 10px), §8·README §5·D-047에 친구들 줄을 기록. 조건 밖 지적 1건(중간)도 수용 — 미리보기 서버가 `design/characters/` 전체(pilot·src·qa.html)를 내주던 것을 시안이 쓰는 경로(`prompts.json`, `<key>.png`, `motion/`, `ui-poses/`)로 좁혔다. 재현: `qa.html`·`pilot/`·`/package.json`·`motion/../../tokens.json` → 404/null, `fear.png` → 200, POST → 405.
+- quick·full PASS(2026-09-20, 위 수정 뒤 재실행), `package-lock.json`·`package.json` 무변경.
+- 다음: 사용자에게 묶음 요약을 보이고 커밋·푸시·PR 승인을 받는다(T6). PR CI 두 OS 확인 뒤 사용자가 브라우저에서 직접 확인(T7). 문서 밖 후속: `tasks/TASK-MOBILE.md`·`tasks/TASK-DS-REF.md`의 "2026-09-20 기준 다음 번호 D-047" 문구는 소유 파일 밖이라 두었다(정본은 `docs/DECISIONS.md`의 D-039 행, D-048로 갱신함).
+
+# TASK-WEB-UI-02 — 사용자 QA와 디자인 수정
+
+## 상태
+
+`planned` — 2026-09-20 사용자 지시("다음 작업은 내가 QA 및 디자인 수정할 거야"). 새 세션에서 착수한다. **사용자가 눈으로 보고 판단하는 사람이고, 에이전트는 그 판단을 받아 고치고 다시 보여 주는 손이다.** 사용자는 개발 용어를 모른다 — 고칠 곳은 화면을 보며 일상어로 말하고, 에이전트가 그것을 파일·값으로 옮긴다.
+
+## 목표
+
+사용자가 `web/` 화면 시안을 직접 눌러 보며 찾은 어색한 점을 고치고, 그 과정에서 확정된 모양을 디자인 시스템(문서·값·전시장)에 되돌려 기록한다.
+
+## 범위
+
+- 포함: 사용자 QA에서 나온 시안 수정(배치·문구·크기·둥글기·색 쓰임), TASK-WEB-UI-01이 남긴 미검증 항목의 사용자 확인, 시안을 만들며 규칙 없이 임시로 정한 부품의 규칙화(아래 "임시 부품 목록"), 값 변경 시 `tokens.json`·`DESIGN_SYSTEM.md`·`style-guide.html` 동시 갱신.
+- 제외: 저장·로그인·AI·분석·내보내기·삭제 구현, UI 프레임워크·부품 코드 묶음(Phase 1 결정, D-047), 다크 모드 적용(D-034), 로고(D-036), 감정 계열 색의 의미 변경(PR-010 — 사용자 승인 없이는 금지), 캐릭터 그림 재생성.
+- 부품 규칙을 크게 보강하게 되면 보류 중인 [TASK-DS-REF](TASK-DS-REF.md)(D-039 reserved)를 재개할지 사용자에게 먼저 묻는다. 이 작업이 그 결정을 은근히 대신하지 않는다.
+
+## 소유권
+
+- Main/Writer: 착수하는 세션 1명. 하위 에이전트는 읽기 전용.
+- 소유 파일: `web/`, `scripts/web-preview.mjs`, `design/tokens.json`, `design/style-guide.html`, `docs/DESIGN_SYSTEM.md`, `docs/UX_SPEC.md`, `docs/DECISIONS.md`, `docs/STATUS.md`, `harness/loop-state.json`, `tasks/CURRENT_TASK.md`, `tasks/archive/*`.
+
+## 착수 절차
+
+1. `main`이 TASK-WEB-UI-01 PR을 포함하는지 확인한다(`web/index.html` 존재). 새 브랜치(예: `web-ui/qa`)를 만든다.
+2. TASK-WEB-UI-01 절을 `tasks/archive/TASK-WEB-UI-01.md`로 옮기고(규칙 `archive/README.md` — 본문 바이트 그대로, 옮긴 뒤 원문과 대조. 작업 트리는 CRLF·blob은 LF라 줄 끝을 맞춘 뒤 비교한다) `harness/loop-state.json`의 `task_id`를 `TASK-WEB-UI-02`로 바꾼다. 둘이 어긋나면 quick이 실패한다.
+3. 미리보기 두 개를 연다: `web-prototype`(4174, 시안)과 `design-preview`(4173, 부품 전시장). 서버는 Bash가 아니라 `preview_start`로 띄운다. 사용자에게는 Viewport 메뉴의 Mobile을 안내한다.
+4. 사용자에게 QA 방법을 제안하고(화면별로 같이 보기 / 사용자가 먼저 둘러보고 한꺼번에 말하기) 고른 방식으로 진행한다.
+
+## 고치는 순환(한 건마다)
+
+1. 사용자가 말한 것을 "어느 화면의 무엇이 어떻게 보이면 좋겠다"로 되물어 확인한다. 모양 선택지는 말이 아니라 **시안에서 바꿔 보인 화면**으로 비교하게 한다.
+2. 바꾸기 전 화면을 캡처하고, 가장 작은 변경을 넣고, 같은 자리의 바꾼 뒤 화면을 보여 준다.
+3. 값(색·글자·간격·둥글기)이면 `design/tokens.json`을 고친다 — 시안은 실행 중에 읽으므로 바로 반영된다. 같은 변경에서 `docs/DESIGN_SYSTEM.md`와 `design/style-guide.html`의 `:root`도 고친다(어긋나면 quick 실패). 색을 바꿨으면 `node scripts/check-contrast.mjs --verbose`.
+4. 모양 규칙이면 `web/css/app.css`를 고치고, 확정되면 `DESIGN_SYSTEM.md` §6에 부품 규칙으로 적는다. 기존 결정(D-033~D-037, D-041, D-047)을 뒤집는 변경은 `DECISIONS.md`에 새 행을 먼저 남긴다(다음 번호는 그 파일의 D-039 행에서 확인).
+5. 360px에서 가로 넘침 0과 조작 요소 44px를 다시 잰다. 측정 방법은 `tasks/archive/TASK-WEB-UI-01.md`의 "검수 증거".
+
+## 어디를 고치면 무엇이 바뀌나
+
+| 바꾸고 싶은 것 | 고칠 곳 |
+| --- | --- |
+| 색, 글자 크기, 간격, 모서리 둥글기(버튼 8·카드 12·시트 16·알약 999), 최소 터치 크기 | `design/tokens.json`(+ `DESIGN_SYSTEM.md`, `style-guide.html`) |
+| 부품 모양(버튼, 전환 버튼, 카드, 목록 행, 슬라이더, 하단 탐색) | `web/css/app.css` |
+| 오늘·달력·통계·설정 화면의 구성과 문구 | `web/js/views/tabs.js` |
+| 작성 단계의 순서·제목·안내 문구, 검토·완료 화면 | `web/js/views/write.js` |
+| 별자리 지도와 "고른 친구들" 줄 | `web/js/components/sky.js` |
+| 세부 감정 목록·검색·초성 줄 | `web/js/components/picker.js` |
+| 강도 슬라이더와 앵커 문구 | `web/js/components/slider.js` |
+| 기록 카드 | `web/js/components/record-card.js` |
+| 감정 단어 자체 | 시안이 아니라 `data/taxonomy/v2.json`(검수된 정본 — 이 작업 범위 밖) |
+
+## 사용자 QA 점검표(TASK-WEB-UI-01이 확인하지 못한 것부터)
+
+- [ ] 키보드: Tab으로 "다음"까지 간 뒤 Enter, Space로 눌린다(자동 도구로는 확인 불가였다).
+- [ ] PC의 "움직임 줄이기"(Windows 설정 → 접근성 → 시각 효과 → 애니메이션 효과 끔)를 켜면 고른 친구가 움직이지 않는 그림으로 나온다.
+- [ ] 회색조로 봐도(또는 이름표를 가리고 봐도) 9종 캐릭터와 고른 점이 구별된다.
+- [ ] 분노·미움·공포·혐오 캐릭터가 무섭거나 조롱하는 것처럼 보이지 않는다.
+- [ ] 초성 줄(오른쪽 ㄱㄴㄷ)이 작아서 누르기 어려운가 — 32×24.6px, 제품 기준 44px 미달. 없애기/넓히기/그대로 가운데 정한다.
+- [ ] 단계형과 긴 한 장 가운데 실제로 쓰고 싶은 쪽, 둘 다 남길지.
+- [ ] 화면별 인상: 오늘(시작) / 날짜·사건 / 감정 계열 / 세부 감정 / 강도 / 이유 / 칭찬·감사 / 검토 / 완료 / 달력 / 통계 / 설정.
+- [ ] (기기가 있을 때) iPhone Safari·Android Chrome에서 같은 흐름 — 같은 와이파이로 열려면 미리보기 서버를 집 안 네트워크에 여는 변경이 필요하고, 이는 사용자 승인 뒤에만 한다.
+
+## 임시 부품 목록(규칙 없이 시안에서 정한 것 — 규칙화 후보)
+
+두 칸 전환 버튼(`.segmented`), 진행 막대(`.progress`), 스위치(`.switch`), 작은 표지(`.proto-tag`·`.badge`), 묶음 상자(`.panel`)와 빈 상태 상자(`.empty-box`), 글자 링크 버튼(`.link`), 입력 오류 문구(`.field-error`), 아래 고정 버튼 줄(`.step-footer`), 지우기 달린 알약(`.pill`). 버튼의 눌림·hover·처리 중 상태는 `DESIGN_SYSTEM.md` §6.1에 한 줄씩만 있고 견본이 없다.
+
+## 인수 조건
+
+- [ ] 사용자가 말한 수정 요청마다 "전/후 화면"과 처리 결과(반영·보류·기각과 이유)가 이 파일에 남아 있다.
+- [ ] 값이나 부품 규칙이 바뀌었으면 `tokens.json`·`DESIGN_SYSTEM.md`·`style-guide.html`이 같은 변경에서 맞춰졌고 대비 검사가 통과한다.
+- [ ] 360px·데스크톱에서 가로 넘침 0, 44px 미만 요소 목록이 갱신돼 있다.
+- [ ] quick·full PASS, PR CI 두 OS success, `package-lock.json` 무변경.
+- [ ] 사용자가 고친 화면을 브라우저에서 직접 보고 승인했다.
+
+## 체크포인트
+
+- 다음: 새 세션이 "착수 절차" 1번부터 시작한다.

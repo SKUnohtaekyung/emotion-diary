@@ -6,6 +6,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["scripts/preview.mjs", "4173"],
       "port": 4173
+    },
+    {
+      "name": "web-prototype",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/web-preview.mjs", "4174"],
+      "port": 4174
     }
   ]
 }

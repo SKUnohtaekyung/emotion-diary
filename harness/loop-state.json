@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-INFRA-01",
-  "phase": "dev-infrastructure-maintenance",
+  "task_id": "TASK-WEB-UI-01",
+  "phase": "browser-first-ui-prototype",
   "iteration": 1,
-  "status": "done",
-  "current_hypothesis": "The development apparatus (CI, harness state files, machine contracts, task docs) drifted because verify.mjs checked existence and syntax but not agreement with reality. Restoring CI on both OSes and adding deterministic drift checks (scripts/check-harness.mjs) makes the same drift visible the next time it happens.",
+  "status": "in_progress",
+  "current_hypothesis": "A dependency-free static prototype (plain HTML/CSS/ES modules under web/) that reads design/tokens.json, data/taxonomy/v2.json and design/characters at runtime lets the user review the direct-writing flow and character placement in a browser without pulling the Phase 1 framework decision forward and without creating a second copy of any value.",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "59caa78",
+  "last_verified_commit": "9131f53",
   "completed_nodes": ["bootstrap-audit", "taxonomy-v1", "taxonomy-v2-research"],
   "next_node": "hosting-identity-spike",
   "blockers": [
@@ -15,5 +15,5 @@
     "model-access-spike gate (B-06 partial): job expiry/failed handling, independent verifier double call, crisis-signal cases, subscription retention settings (RK-016)",
     "app-scaffold stays blocked until hosting-identity-spike and data-store-spike are done; TASK-MOBILE (single Worker + Static Assets proposal) is on hold until Phase 1 starts"
   ],
-  "last_checkpoint": "2026-09-20 TASK-INFRA-01: CI green for the first time on ubuntu and windows (PR #28, first at 7149b84, latest verified b54a0a2) after preserving references/source bytes via .gitattributes and adding npm ci. check-harness.mjs reproduced 11 FAIL + 2 WARN on the stale state, then harness files were synced. Schemas moved to 9 categories, canon docs aligned, CURRENT_TASK split into tasks/archive (byte-verified). PR #28 merged to main as 59caa78 (merge commit, five batch commits kept) and main CI succeeded on both OSes; issue #27 closed on user instruction. TASK-INFRA-01 is done — when the next task starts, move its section to tasks/archive and change task_id here (check-harness fails otherwise). User decided not to republish the design-preview artifact; the local preview is canonical. No pending user decisions. History of the 2026-09-02 spikes that used to live in this field is in git (harness/loop-state.json before this commit), docs/STATUS.md section 3 and harness/runtime-profile.json."
+  "last_checkpoint": "2026-09-20 TASK-WEB-UI-01 started on branch web-ui/prototype after the user approved the plan. User decisions: step-by-step flow first with a long-form view of the same content, representative characters appear in a row under the constellation map (map dots stay as specified in DESIGN_SYSTEM 6.2), no real-device check this time (recorded as unverified). T0 done: the finished TASK-INFRA-01 section moved byte-for-byte to tasks/archive/TASK-INFRA-01.md (sha256 prefix ea1586bf865b, re-inserting it reproduces 9131f53's CURRENT_TASK.md). The prototype is outside the work-graph nodes; next_node and blockers are unchanged from the previous task. Task list and observable done-criteria are in tasks/CURRENT_TASK.md."
 }
