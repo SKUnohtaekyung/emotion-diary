@@ -1,0 +1,150 @@
+/* 감정일기 화면 시안 — 바탕 규칙. 색·글자·간격 값은 여기에 적지 않는다: js/tokens.js가 design/tokens.json을 읽어 CSS 변수로 올린다(D-047).
+   무드 v4(D-061): 흰 바탕, 그림자·굵은 윤곽·친구를 담는 박스 없음, 눌리는 것은 ink 알약 하나, 나머지는 글자와 옅은 회색 면. light 전용(D-034). */
+
+/* 글꼴(D-057): 가변 범위(45~920) 하나. swap이라 파일이 늦어도 글이 먼저 보인다. */
+@font-face{font-family:"Pretendard Variable";src:url("/design/fonts/PretendardVariable.woff2") format("woff2-variations");font-weight:45 920;font-style:normal;font-display:swap}
+
+*{box-sizing:border-box}
+html{color-scheme:light;-webkit-text-size-adjust:100%}
+html:not(.ready) body{visibility:hidden}
+body{margin:0;background:var(--surface);color:var(--text);font-family:var(--font);font-size:var(--fs-body);line-height:var(--lh-body);word-break:keep-all;overflow-wrap:anywhere;-webkit-font-smoothing:antialiased}
+h1{font-size:var(--fs-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.03em;margin:0 0 var(--sp-3);text-wrap:balance}
+h1:focus{outline:none}
+/* hero(44/52·800)는 큰 제목 한 줄에만 쓴다. 360px에서 44px 한글은 한 줄에 약 7자라 clamp()로 줄어들고 글자 확대(rem)에서는 최솟값에서 멈춘다. */
+.hero{font-size:clamp(1.75rem,10.4vw,var(--fs-hero));line-height:calc(var(--lh-hero-ratio) * .94);font-weight:var(--fw-hero);letter-spacing:-.03em;margin:0 0 var(--sp-3)}
+h2{font-size:var(--fs-title);line-height:var(--lh-title);font-weight:var(--fw-title);margin:var(--sp-10) 0 var(--sp-3)}
+h3{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:var(--fw-heading);margin:var(--sp-5) 0 var(--sp-1)}
+p{margin:0 0 var(--sp-2)}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;touch-action:manipulation}
+:focus-visible{outline:var(--emphasis) solid var(--focus);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.skip{position:absolute;left:var(--sp-2);top:-100px;background:var(--text);color:var(--bg);padding:var(--sp-3) var(--sp-4);border-radius:var(--radius);z-index:100}
+.skip:focus{top:var(--sp-2)}
+.caption{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--text-subtle,var(--subtle))}
+.note{font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
+.lede{font-size:var(--fs-body);color:var(--muted)}
+.center{text-align:center}
+[hidden]{display:none !important}
+
+/* 감정 테마 면(D-053·D-059): 그 계열 300이 화면 전체를 물들인다. 300 위에는 흰 글자를 쓰지 않는다(9계열 모두 대비 미달). 흐린 글자 색은 이 면에서 본문 색으로 올린다. */
+[data-theme-cat]{--muted:var(--text);--subtle:var(--text);--focus:var(--service-ink)}
+.screen[data-theme-cat],.step-footer[data-theme-cat]{background:var(--tint)}
+
+/* 틀 */
+.app{max-width:var(--content-max);min-height:100dvh;margin:0 auto;background:var(--bg);display:flex;flex-direction:column;border-inline:var(--hairline) solid var(--border)}
+.proto-banner{margin:0;padding:var(--sp-2) var(--sp-4);background:var(--text);color:var(--bg);font-size:var(--fs-caption);line-height:var(--lh-caption);text-align:center;position:sticky;top:0;z-index:var(--z-nav)}
+.proto-banner b{display:inline-block;border:var(--hairline) solid var(--bg);border-radius:var(--radius-chip);padding:0 var(--sp-2);margin-right:var(--sp-2)}
+main{flex:1;display:flex;flex-direction:column;min-width:0}
+main:focus{outline:none}
+.screen{flex:1;padding:var(--sp-5) var(--sp-5) var(--sp-8);min-width:0}
+.stack{display:flex;flex-direction:column;gap:var(--sp-2);margin-top:var(--sp-4)}
+.proto-tag{display:inline-block;font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:var(--fw-body-strong);color:var(--text);background:var(--surface-soft);border-radius:var(--radius-chip);padding:0 var(--sp-2);vertical-align:middle}
+.proto-note{font-size:var(--fs-label);color:var(--muted);background:var(--surface-soft);border-radius:var(--radius-card);padding:var(--sp-2) var(--sp-4)}
+
+/* 하단 탐색(§6.11, D-049): ink 알약 안에서 민트 방울 하나가 현재 칸으로 옮겨 간다. 오늘 화면(어두운 숲)에는 탐색이 없다(D-076). */
+.bottom-nav{position:sticky;bottom:0;z-index:var(--z-nav);min-height:var(--nav-h);padding:var(--sp-2) var(--sp-3) calc(var(--sp-2) + env(safe-area-inset-bottom));background:var(--bg)}
+.bottom-nav-rail{position:relative;display:grid;grid-template-columns:repeat(4,1fr);min-height:56px;border-radius:var(--radius-chip);background:var(--service-ink)}
+.bottom-nav-indicator{position:absolute;z-index:0;top:2px;left:var(--nav-position);width:52px;height:52px;border-radius:var(--radius-blob);background:var(--service-mint);pointer-events:none;transform:translateX(-50%);transition:left var(--dur-slow) var(--spring)}
+.bottom-nav-rail.is-moving .bottom-nav-indicator{animation:nav-indicator-settle var(--dur-slow) var(--spring)}
+.bottom-nav a{position:relative;z-index:1;display:grid;place-items:center;min-width:var(--touch);min-height:56px;color:var(--bg);text-decoration:none;touch-action:manipulation;transition:color var(--dur-fast) var(--ease)}
+.bottom-nav a:hover:not([aria-current]){color:var(--service-mint)}
+.bottom-nav a:focus-visible{outline:var(--emphasis) solid var(--service-mint);outline-offset:-4px}
+.bottom-nav svg{width:25px;height:25px;fill:none;stroke:none}
+.bottom-nav .ic-line,.bottom-nav .ic-stroke,.bottom-nav .ic-cut,.bottom-nav .ic-bars{stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.bottom-nav .ic-mark{display:none}
+.bottom-nav .ic-fill{display:none;fill:currentColor}
+.bottom-nav a[aria-current]{color:var(--service-ink)}
+.bottom-nav a[aria-current] .ic-fill{display:inline}
+.bottom-nav a[aria-current] .ic-line{display:none}
+/* 활성 아이콘은 ink 면이라 안쪽 선이 면에 묻힌다 — 달력은 머리띠 선과 날짜 칸을 mint로 파서(집의 문처럼) 실루엣 덩어리가 아니라 달력으로 읽히게 한다(D-080, QA #31). 설정 원판은 살과 떨어지게 r 4.4→3.8 */
+.bottom-nav a[aria-current] .ic-cut{stroke:var(--service-mint)}
+.bottom-nav a[aria-current] .ic-mark{display:inline;fill:var(--service-mint)}
+/* 탭을 옮길 때 새 아이콘이 먼저 ink가 되면 방울이 도착하기 전까지 ink 레일 위에서 사라진다 — 방울이 거의 도착한 뒤(이동 시간의 55%)에 ink로 바꾼다 */
+.bottom-nav-rail.is-moving a[aria-current]{transition-delay:calc(var(--dur-slow) * .55)}
+.bottom-nav a[aria-current] .ic-bars{stroke-width:3.4}
+@keyframes nav-indicator-settle{0%{transform:translateX(-50%) scale(.8,.88) rotate(-5deg)}58%{transform:translateX(-50%) scale(1.08,.94) rotate(2deg)}100%{transform:translateX(-50%) scale(1) rotate(0)}}
+.nav-label{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+/* 오늘 화면(어두운 숲)에는 하단 탐색이 없다(D-076 — D-062 ④의 유리 탐색과 D-075를 대체). 그림 화면은 작성 흐름·편지처럼 탐색 없는 전체 화면이고,
+   달력·통계·설정으로 가는 입구는 날짜 줄의 '지난 기록'(scene.css)이다. 밝은 화면의 네 탭은 그대로라 거기서 '오늘'을 누르면 숲으로 들어가며 탭 바가 사라진다. */
+body[data-scene="forest"] .bottom-nav{display:none}
+
+/* 버튼(§6.1): 눌리는 것은 ink 알약 하나(주), 보조는 옅은 회색 면, 나머지는 글자. 굵은 윤곽 없음. 하단의 큰 조작(big)은 56px다. */
+.btn{min-height:48px;padding:0 var(--sp-6);border-radius:var(--radius-chip);font-size:var(--fs-body);font-weight:var(--fw-body-strong);border:0;display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);background:transparent;color:var(--text)}
+.btn.big{min-height:56px;font-size:var(--fs-heading);line-height:var(--lh-heading)}
+.btn.primary{background:var(--service-ink);color:var(--bg)}
+.btn.secondary{background:var(--surface-soft);color:var(--service-ink)}
+.btn.danger{background:var(--danger);color:var(--bg)}
+.btn.text{background:transparent;color:var(--service-ink)}
+.btn:active{transform:scale(.98)}
+.btn[aria-disabled="true"]{opacity:.45;cursor:default}
+.btn[aria-disabled="true"]:active{transform:none}
+.link{background:none;border:0;padding:0 var(--sp-2);min-height:var(--touch);min-width:var(--touch);font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--text);text-decoration:underline;text-underline-offset:3px}
+.segmented{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:var(--sp-1);gap:var(--sp-1);border-radius:var(--radius-chip);background:var(--surface-soft)}
+.segmented button{min-height:44px;padding:0 var(--sp-4);border:0;border-radius:var(--radius-chip);background:transparent;font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted)}
+.segmented button[aria-pressed="true"]{background:var(--service-ink);color:var(--bg);font-weight:var(--fw-body-strong)}
+.segmented button:focus-visible{outline-offset:-4px}
+
+/* 입력(§6.5): 옅은 회색 면에 테두리 없음. 이유·사건은 줄 노트 위에 쓴다. */
+.field{padding:0;border:0;min-width:0}
+.field-label{display:block;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);padding:0}
+input[type="date"],.slot-input{display:block;width:100%;border:0;font-size:var(--fs-body);line-height:var(--lh-body)}
+input::placeholder,textarea::placeholder{color:var(--subtle)}
+.ruled{display:block;padding:0;border:0;border-radius:0;font-size:var(--fs-heading);line-height:2rem;resize:none;overflow:hidden}
+.field-error{font-size:var(--fs-label);color:var(--danger);margin:var(--sp-1) 0 0}
+.field-error::before{content:"! ";font-weight:var(--fw-title)}
+[data-theme-cat] .field-error{color:var(--text);font-weight:var(--fw-body-strong)} /* danger 원색은 감정 300 위 2.2~4.2:1이라 중립 글자로 두고 "!" 표지·굵기로 오류임을 알린다(D-053) */
+.guide{font-size:var(--fs-heading);line-height:var(--lh-heading);margin:0 0 var(--sp-6)}
+
+/* 친구 그림(D-051): 정적 PNG. 상자·타일·흰 테두리 없이 그대로 선다(D-061). 호흡은 2~3% 안쪽이다. */
+.friend-spot{position:relative;display:block;flex:none;line-height:0}
+.friend-img{position:relative;display:block;max-width:100%;height:auto;object-fit:contain}
+.breathe{transform-origin:50% 100%;animation:breathe 5.2s ease-in-out infinite;animation-delay:calc(var(--i,0) * -1.3s)}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.025,1.03)}}
+.cat-mark{display:flex;align-items:center;gap:var(--sp-3)}
+.cat-mark-name{display:flex;flex-direction:column;align-items:flex-start;min-width:0}
+.cat-mark-name strong{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:var(--fw-heading)}
+.cat-mark-name span{font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
+
+/* 아래 시트: 흰 시트가 어두운 면 위로 올라온다. */
+.sheet-dim{position:fixed;inset:0;z-index:var(--z-sheet,30);background:color-mix(in srgb,var(--service-ink) 50%,transparent);display:flex;align-items:flex-end;justify-content:center;animation:fade-in var(--dur-base) var(--ease)}
+.sheet{width:100%;max-width:var(--content-max);max-height:88dvh;overflow:auto;background:var(--bg);border-radius:var(--radius-sheet) var(--radius-sheet) 0 0;padding:var(--sp-3) var(--sp-5) calc(var(--sp-6) + env(safe-area-inset-bottom));animation:sheet-up var(--dur-slow) var(--ease)}
+.sheet-grab{display:block;width:40px;height:5px;margin:0 auto var(--sp-4);border-radius:3px;background:var(--border-strong)}
+.sheet h2{margin:0 0 var(--sp-2);font-size:var(--fs-title)}
+.sheet .btns{display:flex;flex-direction:column;gap:var(--sp-1);margin-top:var(--sp-5)}
+@keyframes fade-in{from{opacity:0}to{opacity:1}}
+@keyframes sheet-up{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+.menu-row{display:flex;align-items:center;gap:var(--sp-3);width:100%;min-height:60px;padding:0;border:0;background:none;text-align:left;font-size:var(--fs-heading);font-weight:var(--fw-heading)}
+.menu-row small{display:block;font-size:var(--fs-label);font-weight:var(--fw-body);color:var(--muted)}
+.menu-row.danger{color:var(--danger)}
+.menu-row.danger small{color:var(--danger)}
+.banner{display:flex;gap:var(--sp-3);align-items:flex-start;padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-card);background:var(--service-light);color:var(--service-ink);font-size:var(--fs-label);font-weight:var(--fw-body-strong)}
+.banner small{display:block;margin-top:2px;font-weight:var(--fw-body);color:var(--service-ink)}
+.banner.soft{background:var(--surface-soft)}
+
+@media (prefers-reduced-motion:reduce){
+  *{scroll-behavior:auto !important}
+  .bottom-nav-indicator,.bottom-nav a{transition:none}
+  .bottom-nav-rail.is-moving .bottom-nav-indicator{animation:none}
+  .breathe{animation:none}
+  .btn:active{transform:none}
+  .sheet-dim,.sheet{animation:none}
+}
+
+/* 불러오기 상태(D-083, dom.js renderStatus): 뼈대는 옅은 막대 셋이 숨 쉬듯 깜빡이고, 오류·연결 끊김은 두 줄 글과 '다시 시도'. 어두운 숲 위에서는 .dark */
+.status-block{display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);padding:var(--sp-6) var(--sp-4);text-align:center;color:var(--text)}
+.status-title{margin:0;font-size:var(--fs-heading);font-weight:var(--fw-body-strong)}
+.status-detail{margin:0;font-size:var(--fs-label);color:var(--muted)}
+.status-retry{margin-top:var(--sp-2);min-height:var(--touch)}
+.status-block.is-loading{align-items:stretch;width:100%}
+.status-block.is-loading i{display:block;height:14px;border-radius:7px;background:var(--surface-soft);animation:skel 1.6s ease-in-out infinite}
+.status-block.is-loading i:nth-of-type(2){width:72%}
+.status-block.is-loading i:nth-of-type(3){width:48%}
+.status-block.dark{color:var(--bg)}
+.status-block.dark .status-detail{color:color-mix(in srgb,var(--bg) 78%,transparent)}
+.status-block.dark.is-loading i{background:color-mix(in srgb,var(--bg) 14%,transparent)}
+@media (prefers-reduced-motion:reduce){.status-block.is-loading i{animation:none}}
+/* 토스트(dom.js toast): 위쪽 가운데, 앱 폭 안, ink 알약에 흰 글자. 4초 뒤 사라진다. 움직임 줄이기에서는 나타나는 연출 없음 */
+.toast{position:fixed;left:50%;top:calc(var(--sp-4) + env(safe-area-inset-top));z-index:250;transform:translateX(-50%);max-width:min(440px,calc(100vw - 2 * var(--sp-4)));padding:var(--sp-2) var(--sp-4);border-radius:var(--radius-chip);background:var(--service-ink);color:var(--bg);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-align:center;animation:toast-in var(--dur-base) var(--ease) both}
+@keyframes toast-in{0%{opacity:0;translate:0 -8px}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}

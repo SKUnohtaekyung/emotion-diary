@@ -13,8 +13,9 @@
 
 | 파일 | 상태 | 남은 일이 간 곳 |
 | --- | --- | --- |
+| [TASK-WEB-UI-01.md](TASK-WEB-UI-01.md) 브라우저 우선 UI 프로토타입 | 구현·PC 검수 완료(2026-09-20), PR #30 CI 두 OS success이나 2026-09-21 기준 병합 전 | 사용자 확인(T7)과 미검증 5항목 → `CURRENT_TASK`의 TASK-WEB-UI-02 "사용자 QA 점검표". 2026-09-21 TASK-WEB-UI-02 착수 때 옮김(원문 10,608B, SHA-256 앞 12자리 `75976470981a`, 직전 커밋 `55f3f91`, 상대 링크 1개의 경로 깊이만 고침) |
 | [TASK-INFRA-01.md](TASK-INFRA-01.md) 개발 인프라 정비 | done(2026-09-20), PR #28·#29 병합 | 개발 장치 쪽 후속 → `docs/STATUS.md` §4. 2026-09-20 TASK-WEB-UI-01 착수 때 옮김(원문 SHA-256 앞 12자리 `ea1586bf865b`, 직전 커밋 `9131f53`) |
-| [TASK-ISSUE-26.md](TASK-ISSUE-26.md) 캐릭터 9종 포즈·애니메이션 | complete(2026-09-19), 이슈 #26 closed | 실기기·OS reduced-motion·회색조 판독 → `CURRENT_TASK`의 TASK-WEB-UI-01 |
+| [TASK-ISSUE-26.md](TASK-ISSUE-26.md) 캐릭터 9종 포즈·애니메이션 | complete(2026-09-19), 이슈 #26 closed | 실기기·OS reduced-motion·회색조 판독 → TASK-WEB-UI-01([archive](TASK-WEB-UI-01.md))을 거쳐 `CURRENT_TASK`의 TASK-WEB-UI-02 "사용자 QA 점검표" |
 | [TASK-ISSUE-27.md](TASK-ISSUE-27.md) 소유 파일 밖 쓰기 감지 | done(2026-09-06), 이슈 #27 closed(2026-09-20) | 알려진 한계 → AGENTS §2.2, 재검토 조건 → D-042 |
 | [TASK-CBM.md](TASK-CBM.md) Codebase Memory 통합 | partial(2026-09-02) | 운영 규칙 → AGENT_WORKFLOW §9, 추적 → TRACEABILITY AG-CBM-001 |
 | [TASK-DESIGN.md](TASK-DESIGN.md) 디자인 시스템 검수와 확정 | done(결정 2026-09-04, 실행 1~3 완료 2026-09-19) | 실기기 확인, 위기 안내 연락처 값 검수 → `docs/STATUS.md` §4 |

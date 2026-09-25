@@ -1,0 +1,147 @@
+/* 이대로 남길까요(편지) 화면과 기록 상세(읽기)의 이야기 배경. 작업자 letter 소유.
+   이야기(2026-09-24 배경 재개편 — 사용자 직접 요청, '길의 끝' 방향을 대체): 마음의 숲 속 빈터, 나에게 쓴 편지를 열기 직전. 둥근 나무 실루엣이 겹겹이 둘러싼 가운데
+   빈터에 봉투가 놓이고, 부드러운 빛이 그리로 시선을 모은다. 저자극 — 튀는 도형(해·해 고리·나비) 없이 민트/그린 한 계열, 낮은 대비, 둥근 윤곽만 쓴다.
+   나무·하늘→민트 배경·비네트는 main 배경 하나(CSS 그러데이션 여러 장)로 화면 전체 폭·높이를 이음매 없이 채운다 — SVG를 프레임 폭과 화면 폭으로 나눠 겹쳤던 전 방식은
+   이음매·옆 흰 띠가 생겼다(메인 지적). 봉투 자리를 따라가야 하는 것(빈터 바닥·조약돌·빛 알갱이)만 프레임 안에 따로 그린다. 연필·나비·해·길은 없다(완료 기준).
+   글자·위 바·아래 버튼 줄·페이저는 다른 밝은 화면과 같은 스타일이다(ink 글자, ink 알약). 색은 전부 CSS 변수다(리터럴 없음). 그림자·상자·날카로운 모서리 없음. */
+
+/* ── 장면의 상자와 색 ── main이 상자다(나무·빛이 화면 전체 폭·높이로 뻗고 main이 잘라 준다). 초점 링은 ink: 파랑(--focus)은 옅은 민트 면 위에서도 ink가 더 또렷하다.
+   민트 톤 셋은 land 언덕 색에서 뽑았다(옅음→하늘 쪽, 짙음→가까운 나무) — 다른 화면의 언덕과 같은 뿌리색이라 이야기가 이어진다. */
+main:has(.screen.review),main:has(.screen.record){
+  position:relative;isolation:isolate;overflow:clip;
+  --focus:var(--service-ink);
+  --fc-pale:color-mix(in srgb,var(--land-hill-far) 44%,var(--bg));
+  --fc-mid:color-mix(in srgb,var(--land-hill-mid) 58%,var(--bg));
+  --fc-deep:color-mix(in srgb,var(--land-hill-near) 70%,var(--bg));
+  /* 나무는 옅은(먼)→짙은(가까운) 세 겹, 가운데를 비워 둘러싼 빈터를 만든다. 비네트(가장자리)·따뜻한 빛(봉투 자리)은 대비를 낮게 둔다(저자극).
+     처음 값(32/46/58%)은 실측 캡처에서 나무가 거의 안 보이는 밋밋한 그러데이션으로만 읽혔다(둘러싼 나무가 안 보임) — notes.css의 옅은 산 haze(42%)에 맞춰 10~12pt 올려 둥근 실루엣이 보이게 했다. */
+  background:
+    radial-gradient(ellipse 42% 30% at 50% 46%,color-mix(in srgb,var(--bg) 90%,var(--service-mint)) 0%,color-mix(in srgb,var(--bg) 55%,var(--service-mint) 8%) 48%,transparent 78%),
+    radial-gradient(ellipse 135% 115% at 50% 48%,transparent 52%,color-mix(in srgb,var(--land-hill-mid) 20%,transparent) 100%),
+    radial-gradient(circle 150px at -4% 66%,var(--fc-deep) 0%,transparent 62%),
+    radial-gradient(circle 158px at 104% 64%,var(--fc-deep) 0%,transparent 62%),
+    radial-gradient(circle 108px at 3% 40%,var(--fc-mid) 0%,transparent 64%),
+    radial-gradient(circle 100px at 98% 38%,var(--fc-mid) 0%,transparent 64%),
+    radial-gradient(circle 78px at 20% 16%,var(--fc-pale) 0%,transparent 66%),
+    radial-gradient(circle 82px at 80% 15%,var(--fc-pale) 0%,transparent 66%),
+    linear-gradient(to bottom,var(--bg) 0%,var(--fc-pale) 26%,var(--fc-mid) 62%,var(--fc-deep) 100%);
+}
+.screen.record{display:flex;flex-direction:column;padding-bottom:6px}
+
+/* ── 편지는 화면 한가운데(가로·세로) ── 위 글(제목·안내)과 아래 버튼 줄 사이의 남는 자리 한가운데에 편지 틀이 놓인다. 틀 크기는 카드 크기를 따라간다(D-079).
+   카드 높이 --card-h: 375×812에서 448px(≥440 요구, DESIGN_RATIONALE 참고), 화면이 낮아지면 100dvh를 따라 줄고, 376px(기존 크기) 밑으로는 내려가지 않는다 — 기록 상세(버튼 줄 없음)는 360×640까지 이 최솟값으로 스크롤 0을 지킨다(실측, 아래 표).
+     360×640 기록 상세 예산 = 화면 높이 − 204(위 글·여백 고정분) = 436px, 틀 필요치 = 376(카드) + 54(간격+페이저 줄) = 430px → 여유 6px, 스크롤 없음.
+     검토 화면(버튼 줄 있음)은 예산이 95px 더 적어(− 299) 360×640에서 카드가 376이어도 약 89px이 버튼 줄과 겹친다(RK-030, 알약 36px 최소 높이 때문에 카드를 더 줄이면 세부 감정 4개짜리 카드가 못 들어간다 — 실기기 검수 항목으로 남긴다). 375×812·360×740 검토 화면은 여유 있게 들어간다.
+   틀의 가운데 = 닫힌 봉투의 가운데 = 열린 카드 묶음(카드 + 페이저 줄)의 가운데라서 열려도 자리가 튀지 않는다. 위아래 최소 간격은 검토 화면에서 안내 글 아래 12px과 버튼 줄 위 패딩 12px, 기록 상세에서 위아래 6px이다. */
+.letter-stage{position:static;left:auto;width:auto;height:auto;margin:auto 0}
+.lt-frame{--lt-h:74px;--card-w:328px;--card-h:clamp(376px, calc(100dvh - 360px), 448px);--frame-h:calc(var(--card-h) + 54px);position:relative;width:360px;height:var(--frame-h);left:50%;margin:0 0 0 -180px}
+/* 달력 인라인(A2, tabs.js): 책상 장면·봉투가 없어 틀이 카드+페이저 줄만큼만 필요하고, 화면 패딩 안(칸 폭)에 그대로 들어가야 해서 360px 고정폭 트릭을 쓰지 않는다.
+   카드 높이는 기록 상세·검토와 같은 최솟값 376px로 고정한다 — 그 밑으로는 .t1 안 이름·알약·크기 자리 공식(write.css)이 겹치기 시작해 새로 유도해야 한다(RK-030과 같은 이유). 375×812는 달력 쪽 다른 줄 간격을 줄여 맞춘다. */
+/* --card-w:100%는 .card{flex:0 0 var(--card-w)}의 기준 상자(.pager의 내용 상자, 이미 자기 padding 16px×2를 뺀 값)에서 퍼센트를 잰다 — 여기서 다시 32px를 빼면(예전 값) 기준을 이중으로 빼 버려 카드가 좁아지고 옆 카드가 40px 가까이 넘겨봤다(2026-09-24 실측 캡처에서 발견). 100%만 쓰면 기존 328px 카드·30px 여백과 같은 비율로 8px만 살짝 보인다. */
+.lt-frame-inline{position:relative;left:auto;width:100%;margin:0;--card-w:100%;--card-h:376px}
+.screen.review .letter-sub,.screen.record .letter-sub{line-height:var(--lh-label);min-height:calc(var(--lh-label) * 2)}
+.screen.review .letter-sub{margin-bottom:var(--sp-3)}
+.screen.record .letter-sub{margin-bottom:6px}
+/* 봉투 묶음을 틀 가운데로: 봉투는 늘 틀 높이의 절반에 자기 높이(206)의 절반만큼 걸쳐 선다(카드가 커져도 봉투는 그대로 가운데). 조약돌은 봉투 입구(봉투 위에서 92px)에서, 캡션은 봉투 아래(봉투 아래에서 20px). 열림 연출은 봉투가 내려앉아 바닥이 카드 클립 바닥(카드 높이)과 맞는다 — 내려앉는 거리 D-079 계산은 아래 rise·envmove 참고. */
+.lt-frame .envback,.lt-frame .envfront,.lt-frame .flapwrap{top:calc(var(--frame-h) / 2 - 103px)}
+.lt-frame .envcap{top:calc(var(--frame-h) / 2 + 123px)}
+@media (max-height:660px){.lt-frame .envcap{top:calc(var(--frame-h) / 2 + 111px)}} /* 낮은 화면: 버튼 줄 위에 캡션이 남게 봉투에 조금 더 붙인다(기존 –12px 튜닝 유지) */
+/* 봉투가 내려앉는 거리(카드 묶음의 클립 바닥 = 카드 높이)에서 봉투 자기 높이(206)를 뺀 값 = card-h/2 − 130(공식 유도: envelope-top이 frame-h/2−103이므로 봉투 바닥은 frame-h/2+103 = card-h/2+27+103, 클립 바닥(card-h)과의 차 = card-h/2−130). 원래 값(카드 376) 그대로면 58px로 기존과 동일하다. */
+.lt-frame{--env-settle:calc(var(--card-h) / 2 - 130px);--env-final:calc(var(--env-settle) + 190px)}
+@keyframes envmove{0%{transform:translateY(0);opacity:1;animation-timing-function:ease-out}22%{transform:translateY(var(--env-settle));opacity:1}77.5%{transform:translateY(var(--env-settle));opacity:1;animation-timing-function:cubic-bezier(.5,0,.8,.4)}100%{transform:translateY(var(--env-final));opacity:0}}
+/* 봉투는 책상 위에서 뒤·앞·뚜껑이 함께 숨 쉰다(write.css는 앞면만 움직였다) */
+.closed .envback,.closed .flapwrap{animation:bobenv 3s ease-in-out infinite}
+/* 창으로 든 낮 빛이 봉투 왼쪽 위를 비춘다(하얀 면 하나, 그림자 아님). 봉투 앞면과 뚜껑 바깥면이 같은 결로 밝다. */
+.lt-frame .envfront::after{content:"";position:absolute;inset:0;border-radius:0 0 16px 16px;pointer-events:none;background:linear-gradient(118deg,color-mix(in srgb,var(--bg) 46%,transparent) 0,color-mix(in srgb,var(--bg) 14%,transparent) 32%,transparent 58%)}
+.lt-frame .f-out{background:linear-gradient(118deg,color-mix(in srgb,var(--bg) 42%,transparent) 0,transparent 55%),var(--envelope-flap)}
+
+.lt-scene{position:absolute;inset:0;z-index:-1;pointer-events:none}
+/* 빈터 바닥: 봉투가 놓인 자리 아래로 옅은 풀밭 타원. main 배경의 짙은 민트와 같은 색 계열이라 바닥이 붕 떠 보이지 않는다. */
+.lt-floor{position:absolute;left:50%;top:calc(var(--frame-h) / 2 + 40px);width:300px;height:160px;margin-left:-150px;border-radius:50%;
+  background:radial-gradient(ellipse closest-side,color-mix(in srgb,var(--land-hill-near) 26%,var(--bg)) 0%,transparent 80%)}
+
+/* ── 낮 빛: 봉투 뒤에서 번지는 따뜻한 흰빛(시선을 가운데로 모은다, main 배경의 중앙 빛과 같은 자리). 열리면 조금 밝아지고 카드가 그 빛 속으로 올라온다. ── */
+.lt-glow{position:absolute;left:-60px;top:-140px;width:320px;height:320px;opacity:.7;transition:opacity 900ms var(--ease),transform 1400ms var(--ease)}
+.lt-glow>i{position:absolute;inset:0;border-radius:50%;animation:lt-breathe 7s ease-in-out infinite;
+  background:radial-gradient(circle closest-side,color-mix(in srgb,var(--service-light) 58%,transparent) 0,color-mix(in srgb,var(--service-light) 20%,transparent) 46%,transparent 100%)}
+.opening .lt-glow,.opened .lt-glow{opacity:1;transform:scale(1.12)}
+@keyframes lt-breathe{0%,100%{opacity:.9}50%{opacity:1}}
+/* 뚜껑이 열리는 순간 봉투 입구에서 빛이 한 번 퍼진다(0.3초 뒤 시작, 1.5초) */
+.lt-burst{position:absolute;left:-20px;top:-10px;width:400px;height:300px;opacity:0;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--bg) 62%,transparent) 0,color-mix(in srgb,var(--service-light) 40%,transparent) 46%,transparent 100%)}
+.opening .lt-burst{animation:lt-burst 1500ms ease-out 300ms both}
+@keyframes lt-burst{0%{opacity:0;transform:scale(.55)}30%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
+/* 카드가 올라온 뒤에는 카드 둘레에 밝은 빛이 머문다(카드는 그 빛 속에 떠 있다) */
+.lt-halo{position:absolute;left:-30px;top:-40px;width:420px;height:470px;opacity:0;transition:opacity 1200ms var(--ease) 900ms;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--bg) 46%,transparent) 0,color-mix(in srgb,var(--service-light) 22%,transparent) 62%,transparent 100%)}
+.opening .lt-halo,.opened .lt-halo{opacity:1}
+
+/* 나비·연필은 없앴다(시선을 뺏는다, 저자극 — 메인·사용자 지적. 연필은 2026-09-25 최신 완료 기준 "길·해·나비·연필 없음"에서 다시 확인해 지웠다). */
+
+/* ── 빛 알갱이: 아주 천천히(9~12초) 대각선 14px 안쪽 범위에서 떠다니고, 5초 안팎으로 은은히 밝아진다 ── */
+.lt-mote{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);border-radius:50%;opacity:.85;
+  background:radial-gradient(circle closest-side,var(--bg) 0,var(--bg) 24%,color-mix(in srgb,var(--bg) 44%,transparent) 48%,transparent 100%);
+  animation:lt-drift var(--t) ease-in-out var(--d) infinite,lt-blink calc(var(--t) * .5) ease-in-out var(--d) infinite}
+@keyframes lt-drift{0%,100%{transform:translate(0,0)}34%{transform:translate(var(--ax),var(--ay))}68%{transform:translate(var(--bx),var(--by))}}
+@keyframes lt-blink{0%,100%{opacity:.4}50%{opacity:1}}
+
+/* ── 그날 고른 조약돌: "봉투를 눌러 열어요" 캡션 아래 땅 띠에서 가운데 기준 좌우 대칭인 얕은 호를 그린다(메인 재검수 2026-09-25). dx·dy는 letter.js(arcSlot)가 봉투 바닥(frame-h/2+103) 기준으로 준다 — dy가 늘 양수·캡션 아래 여백 ≥12px이라 어떤 카드 높이에서도 봉투·캡션 밖(겹침 0). ──
+   글로시 젤리처럼 보이지 않게 이 화면에서만 톤을 낮추고(채도·밝기·대비), 돌 결(노이즈, 조약돌 모양으로만 마스킹)과 접지 그림자(PNG의 빈 아래 여백을 뺀 실제 밑변 기준)를 얹는다 — 원본 PNG·다른 화면의 조약돌은 그대로다. */
+.lt-rp-wrap{position:absolute;left:calc(50% + var(--dx));top:calc(var(--frame-h) / 2 + 103px + var(--dy));transform:translate(-50%,-50%);z-index:1}
+.lt-rp{display:block;position:relative;transform:rotate(var(--r));filter:saturate(.6) brightness(.95) contrast(.92)} /* 한 단계 더 낮춘 채도(무광 돌, 메인 재검수 2026-09-25) — 계열마다 색상(hue)이 달라 채도를 줄여도 9색은 구별된다 */
+/* 그림자는 조약돌 PNG 원본의 실제(투명 아님) 그림 밑변에 맞춘다: 원본 캔버스 안 그림은 아래로 12~15%가 빈 여백이라(실측, design/pebbles/ui/*-320.png getbbox) top:75%(그림 밑변 ≈86%)를 그림자 세로 중심으로 잡는다 — 이전의 고정 bottom:-5px는 이 여백을 안 빼서 돌이 10px쯤 떠 보였다(메인 확대 캡처 지적). */
+.lt-rp-shadow{position:absolute;left:50%;top:75%;width:78%;height:22%;margin-left:-39%;border-radius:50%;background:color-mix(in srgb,var(--land-hill-near) 40%,transparent);filter:blur(1.5px)}
+.lt-rp-grain{position:absolute;inset:0;opacity:.3;mix-blend-mode:overlay;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size:140% 140%;mask-image:var(--peb-src);-webkit-mask-image:var(--peb-src);mask-size:100% 100%;-webkit-mask-size:100% 100%;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat}
+
+/* ── 위 바·아래 버튼 줄·페이저는 밝은 화면 스타일 그대로다. 아래만 장면에 맞춘다 ── */
+.screen.review .write-top{background:var(--bg)} /* 위 바는 붙어 다닌다: 화면이 낮아 스크롤될 때 글이 바 밑으로 지나가며 겹치지 않도록 흰색으로 채운다 */
+main:has(.screen.review) .step-footer{background:var(--bg)} /* 버튼 줄은 불투명이다: 화면이 낮거나 수정 중 배너로 글이 길어 카드가 줄 밑으로 지나가도 버튼 글자가 카드 위에 뜨지 않는다 */
+.letter-stage .letter-nav .dd i{background:color-mix(in srgb,var(--service-ink) 50%,transparent)} /* 안 켜진 점: 흰 바탕 위에서 3:1 이상 */
+.letter-stage .letter-nav{visibility:hidden} /* 닫힌 동안 안 보이는 화살표가 초점을 받지 않게 */
+.opened .letter-nav{visibility:visible}
+.letter-stage .letter-nav .dd i.on{background:var(--service-ink)}
+.letter-stage .edit-tag::after{content:"";position:absolute;inset:-6px -5px} /* 눈에 보이는 크기는 그대로, 누르는 영역만 44px 이상으로 */
+
+/* ── 카드 안의 글: 짧으면 스크롤이 없고, 넘칠 때만 가는 막대 하나(4px, 트랙 없음)가 생긴다. 긴 글이 서로 겹치거나 카드 밖으로 나가지 않는다. ── */
+.letter-stage .lt-scroll{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+.letter-stage .lt-scroll:focus-visible{outline:var(--emphasis) solid var(--focus);outline-offset:-4px}
+.letter-stage .lt-scroll::-webkit-scrollbar{width:4px}
+.letter-stage .lt-scroll::-webkit-scrollbar-track{background:transparent}
+.letter-stage .lt-scroll::-webkit-scrollbar-thumb{border-radius:4px;background:color-mix(in srgb,var(--service-ink) 28%,transparent)}
+.letter-stage .lt-scroll:hover::-webkit-scrollbar-thumb,.letter-stage .lt-scroll.lt-scrolling::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--service-ink) 46%,transparent)}
+@supports not selector(::-webkit-scrollbar){ /* 표준 속성은 웹킷 막대가 없는 브라우저(Firefox)에서만: Chrome 121+는 표준 속성이 있으면 웹킷 막대를 무시해 4px이 안 된다 */
+  .letter-stage .lt-scroll{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--service-ink) 28%,transparent) transparent}
+  .letter-stage .lt-scroll:hover,.letter-stage .lt-scroll.lt-scrolling{scrollbar-color:color-mix(in srgb,var(--service-ink) 46%,transparent) transparent}
+}
+/* 감정 카드: 세부 감정 칸(알약은 36/32px 두 단만 쓰고 절대 더 줄지 않는다, D-079 — write.css의 .chips/.chips.many)과 크기 줄(숫자 글자 상자가 카드 밖으로 2px 삐져 스크롤이 항상 생기던 것을 막는다).
+   overflow:hidden은 반올림 오차 대비 안전판이지 실제로 넘칠 일은 없다(168px = 1~4개 한 열의 최대 높이(36px*4 + 8px*3), 5~8개 두 열은 146px로 더 낮다). */
+.letter-stage .t1 .chips{max-height:168px;overflow:hidden}
+.letter-stage .t1 .size{height:62px;overflow:hidden}
+/* 이야기 카드: 줄 노트가 글과 함께 스크롤된다(줄은 스크롤 영역이 그린다). 첫 글 칸은 세 줄 높이를 지켜 짧은 글에서도 원래 모양 그대로다. */
+.letter-stage .t2{background:var(--paper)}
+.letter-stage .lt-paper{position:absolute;left:0;right:0;top:46px;bottom:0;padding:6px 22px 22px;border-radius:0 0 28px 28px;
+  background:repeating-linear-gradient(to bottom,transparent 0 29px,var(--paper-rule) 29px 30px) 0 6px repeat-y;background-attachment:local}
+.letter-stage .lt-paper .lt-line{position:relative;min-height:30px}
+.letter-stage .lt-paper .k,.letter-stage .lt-paper .v{position:static;margin:0}
+.letter-stage .lt-paper .v.ev{min-height:90px}
+.letter-stage .lt-paper .edit-tag{right:-8px}
+/* 칭찬·감사 카드: 인용문은 위에서 118px, 서명은 맨 아래(짧을 때). 길면 함께 스크롤되고 서명은 글 끝에 온다. */
+.letter-stage .t3{overflow:hidden}
+.letter-stage .lt-body{position:absolute;left:0;right:0;top:56px;bottom:0;padding:0 24px 22px;display:flex;flex-direction:column;border-radius:0 0 28px 28px}
+.letter-stage .lt-body .q{position:static;margin:62px 0 0}
+.letter-stage .lt-body .qs{position:static;margin:36px 0 0}
+.letter-stage .lt-sign{margin-top:auto;padding-top:20px;display:flex;align-items:flex-end;justify-content:space-between}
+.letter-stage .lt-sign .sig{position:static;margin:0 0 4px}
+.letter-stage .lt-sign .seal2{position:static;flex:none}
+
+@media (prefers-reduced-motion:reduce){
+  .lt-mote,.lt-glow>i,.closed .envback,.closed .flapwrap{animation:none !important}
+  .lt-glow,.lt-halo,.letter-stage .letter-nav{transition:none}
+}
+
+/* 강제 색상(고대비) 모드: 장식 장면은 빼고 시스템 색으로 글자·부품만 보인다 */
+@media (forced-colors:active){
+  .lt-scene{display:none}
+}

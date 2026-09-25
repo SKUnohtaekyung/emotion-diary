@@ -1,0 +1,86 @@
+/* 이유 화면(D-069): 손으로 쓰는 종이 노트 한 장과, 아래 초록 언덕에 나란히 선 "이번에 고른" 친구들. 작업자 reason 소유.
+   장면은 문서 흐름 안에 있다 — position:fixed로 화면을 덮지 않으므로 모바일 키보드가 올라와도 textarea를 가리지 않는다(아래 버튼 줄 뒤의 가까운 언덕 rs-base만 sticky).
+   색은 전부 변수다(종이·언덕·ink). write.css·base.css의 규칙은 여기서 더 구체적인 선택자로 덮는다(덮은 규칙은 다른 단계가 계속 쓰므로 원본은 그대로 둔다). */
+main:has(.rs-scene){--rs-foot-h:calc(84px + env(safe-area-inset-bottom))} /* 아래 버튼 줄(.step-footer)의 높이 */
+html:has(.rs-scene){scroll-padding-top:calc(var(--banner-h,2rem) + 3.5rem);scroll-padding-bottom:calc(128px + env(safe-area-inset-bottom))}
+.screen.write:has(.rs-scene){padding-bottom:0}
+.screen.write:has(.rs-scene) .write-top{background:var(--bg)} /* 화면이 길어 스크롤될 때 글이 뒤로 가기·단계 표시 밑으로 비쳐 보이지 않게 */
+.rs-scene{position:relative;flex:1;display:flex;flex-direction:column;min-width:0}
+
+/* ── 종이 노트 ─ 페이지 전체가 줄 종이다. 라벨·글·오류 문구가 모두 같은 2rem 줄 위에 앉는다. 기울기 −0.6°, 그림자 없음.
+      남는 세로 공간은 노트와 언덕이 나눠 갖는다 — 글 쓰는 칸(textarea)이 늘어나며 줄이 이어진다(글이 길어지면 write.js의 자동 높이가 더 키운다). ── */
+.rs-note{--rs-tilt:-.6deg;position:relative;flex:1 1 auto;display:flex;flex-direction:column;margin:var(--sp-3) 0 var(--sp-4);padding:0 var(--sp-4) var(--sp-2);border-radius:var(--radius-card);
+  background:var(--paper) linear-gradient(to bottom,transparent calc(2rem - 1px),var(--paper-rule) calc(2rem - 1px)) 0 0/100% 2rem repeat-y;
+  transform:rotate(var(--rs-tilt));transform-origin:50% 0;animation:rs-note-in 560ms var(--ease) backwards}
+.rs-note::before{content:"";position:absolute;right:-.5rem;top:-.45rem;width:3.25rem;height:1.05rem;pointer-events:none;background:color-mix(in srgb,var(--service-mint) 72%,transparent);transform:rotate(24deg);
+  clip-path:polygon(0 0,100% 0,97% 12.5%,100% 25%,97% 37.5%,100% 50%,97% 62.5%,100% 75%,97% 87.5%,100% 100%,0 100%,3% 87.5%,0 75%,3% 62.5%,0 50%,3% 37.5%,0 25%,3% 12.5%)}
+.rs-note .field{flex:1 1 auto;display:flex;flex-direction:column;margin:0}
+.rs-note .field-label{margin:0;font-size:var(--fs-label);line-height:2rem;font-weight:var(--fw-body-strong);color:var(--paper-ink)}
+.rs-note .ruled{flex:1 0 auto;width:calc(100% + var(--sp-4) * 2);min-height:0;margin:0 calc(var(--sp-4) * -1);padding:0 var(--sp-4);background:none;color:var(--text);scroll-margin-bottom:calc(128px + env(safe-area-inset-bottom))} /* 종이 좌우 여백까지 눌러도 글쓰기가 시작된다 */
+.rs-note .ruled::placeholder{color:var(--muted)}
+.rs-note .field-error{margin:0;font-size:var(--fs-label);line-height:2rem}
+@supports selector(:has(*)){
+  .rs-note:has(.ruled:focus-visible){outline:var(--emphasis) solid var(--focus);outline-offset:4px}
+  .rs-note .ruled:focus-visible{outline:none}
+}
+
+/* ── 언덕과 친구들 ─ 마음 고르기의 초록 언덕과 같은 세 겹(land 토큰). 친구는 모두 같은 크기이고 발끝이 같은 땅 선에 선다.
+      몸통(먼·중간 언덕, 이야기 줄, 친구들)은 버튼 줄 위에 앉고, 남는 높이는 먼 언덕의 옅은 초록으로 채워진다.
+      맨 앞의 가까운 언덕(rs-base)은 버튼 줄 자리(맨 아래)에 따로 있고 sticky다 — 화면이 길어 버튼 줄이 글 위에 떠 있는 동안에도 그 뒤에 초록으로 따라오다가,
+      끝까지 내리면 몸통의 언덕과 하나로 이어진다(흰 띠로 받치지 않는다). ── */
+.rs-land{--rs-crest:1rem;--rs-size:var(--rs-nominal);--rs-pad:calc(var(--rs-foot-h) + 28px);
+  --rs-ground:calc(var(--rs-pad) + var(--rs-h) + 40px); /* 친구 무리 전체 높이(--rs-h, js가 인원별로 준다) + 여유 — 자유 배치라 "첫 줄" 개념이 없다(D-078 방식) */
+  position:relative;z-index:0;flex:1 0 auto;display:flex;flex-direction:column;justify-content:flex-end;margin:0 calc(var(--sp-5) * -1);padding:2.75rem var(--sp-3) var(--rs-pad);overflow:hidden}
+.rs-land.empty{min-height:calc(var(--rs-foot-h) + 8rem)}
+.rs-hill{position:absolute;pointer-events:none}
+.rs-hill.h1{left:-25%;right:-45%;top:var(--rs-crest);bottom:0;border-radius:50% 50% 0 0/3.5rem 3.5rem 0 0;background:var(--land-hill-far)}
+.rs-hill.h2{left:-55%;right:-15%;bottom:0;height:calc(var(--rs-ground) + var(--rs-size) * .4);border-radius:50% 50% 0 0/3rem 3rem 0 0;background:var(--land-hill-mid)}
+.rs-tree{position:absolute;left:var(--x);top:calc(var(--rs-crest) + var(--dy) - var(--r) * 2.5px);width:calc(var(--r) * 2px);height:calc(var(--r) * 2.8px);margin-left:calc(var(--r) * -1px);pointer-events:none;transform-origin:50% 100%;animation:rs-sway 7s ease-in-out calc(var(--i) * -2.3s) infinite}
+.rs-tree::before{content:"";position:absolute;left:50%;bottom:0;width:3px;height:calc(var(--r) * 1.2px);margin-left:-1.5px;border-radius:2px;background:color-mix(in srgb,var(--land-hill-near) 68%,var(--service-ink))}
+.rs-tree::after{content:"";position:absolute;left:0;top:0;width:100%;aspect-ratio:1;border-radius:50%;background:var(--land-hill-near)}
+.rs-base{position:sticky;bottom:0;z-index:2;flex:none;display:block;height:calc(var(--rs-foot-h) + 20px);margin:calc((var(--rs-foot-h) + 20px) * -1) calc(var(--sp-5) * -1) 0;overflow:hidden;pointer-events:none}
+.rs-base i{position:absolute;left:-20%;right:-50%;top:0;bottom:0;border-radius:50% 50% 0 0/2rem 2rem 0 0;background:var(--land-hill-near)}
+.rs-story{position:relative;z-index:1;flex:none;margin:0 0 var(--sp-4);text-align:center;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-label);color:var(--service-ink);animation:rs-fade 600ms var(--ease) 320ms backwards}
+/* 자유 배치(D-078 방식, 2회차): js가 인원별 손자리표(REASON_LAYOUTS)로 --rs-h(무리 전체 높이)와 각 친구의 left%·top px·기울기를 준다.
+   .rs-friends는 그 높이만큼의 자리(칸)이고, 각 친구(.rs-fr)는 그 안에서 절대 배치 + 가운데 정렬(translateX(-50%))된다 — 라벨 폭이 그림보다
+   넓어도 자기 칸 가운데에 맞춰 선다. 문서 흐름은 유지한다(.rs-friends 자체는 보통 흐름의 블록이고, 화면 키보드가 떠도 밀려날 뿐 깨지지 않는다). */
+.rs-friends{position:relative;z-index:1;flex:none;width:100%;height:var(--rs-h);margin:0;padding:0;list-style:none}
+.rs-fr{position:absolute;left:0;top:0;display:flex;flex-direction:column;align-items:center;transform:translateX(-50%);animation:rs-walk 620ms var(--ease) calc(360ms + var(--i) * 120ms) backwards}
+/* 발끝 정렬: 그림 상자를 (foot − 가장 작은 foot .035)만큼 내려 모든 발끝이 같은 선에 서게 하고, 이름은 그 발끝 바로 아래에 붙인다(js/components/reason.js의 FOOT 표).
+   기울기(--tilt, B1과 같은 방식)는 그림에만 준다 — rs-breathe가 transform(scale)을 쓰므로 개별 속성 rotate로 줘 서로 안 덮어쓴다. 라벨(.rs-nm)은 수평 그대로다. */
+.rs-pic{display:block;width:var(--rs-size);height:var(--rs-size);margin:calc((var(--foot) - .035) * var(--rs-size)) 0 calc(var(--foot) * var(--rs-size) * -1);transform-origin:50% calc(100% * (1 - var(--foot)));rotate:var(--tilt, 0deg);animation:rs-breathe 5.2s ease-in-out calc(var(--i) * -1.3s) infinite}
+.rs-pic .friend-img{width:100%;height:100%;max-width:none}
+.rs-nm{display:flex;flex-direction:column;align-items:center;margin-top:var(--sp-2);font-size:var(--fs-label);line-height:1.25rem;font-weight:var(--fw-body-strong);color:var(--service-ink);white-space:nowrap}
+.rs-nm b{font-weight:800}
+.rs-cat{display:block;font-size:var(--fs-caption);line-height:1rem;font-weight:600}
+
+/* 아래 버튼 줄은 가까운 언덕(rs-base) 위에 얹힌다(배경 투명). 초록 위 초점 링은 ink 3px. */
+main:has(.rs-scene) .step-footer{margin-top:calc(var(--rs-foot-h) * -1);background:transparent}
+main:has(.rs-scene) .step-footer :focus-visible{outline:3px solid var(--service-ink);outline-offset:3px}
+
+@keyframes rs-note-in{from{opacity:0;transform:perspective(720px) translateY(12px) rotateX(-8deg) rotate(calc(var(--rs-tilt) - .8deg))}to{opacity:1;transform:perspective(720px) translateY(0) rotateX(0) rotate(var(--rs-tilt))}}
+@keyframes rs-walk{0%{opacity:0;translate:24px 0}45%{opacity:1;translate:11px -3px}100%{opacity:1;translate:0 0}}
+@keyframes rs-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+@keyframes rs-sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+@keyframes rs-fade{from{opacity:0}to{opacity:1}}
+/* 화면이 낮으면(≤760px) 세로 여백만 줄인다 — 친구 크기는 어떤 높이에서도 그대로다(2회차 규칙). */
+@media (max-height:760px){
+  .screen.write:has(.rs-scene) h1{margin:var(--sp-1) 0}
+  .rs-note{margin:var(--sp-1) 0 var(--sp-3)}
+  .rs-land{--rs-crest:.625rem;padding-top:1.25rem}
+  .rs-story{margin-bottom:var(--sp-2)}
+}
+/* 노트는 어떤 화면에서도 줄지 않는다(3회차 규칙) — 이 화면의 주된 일은 글을 쓰는 것이고 친구는 장식이라, 장식을 위해 입력 칸을 줄이지 않는다.
+   친구가 한 화면에 다 안 들어가면 페이지가 세로로 늘어나 스크롤된다 — 장식(친구) 크기도 줄이지 않는다(D-061 ④ 최소값 96/72/58). 두 요구를 함께
+   지키는 방법은 스크롤뿐이다: .rs-land의 padding-bottom(--rs-pad = 버튼 줄 높이 + 안전영역 + 28px 여유)이 장면 끝에 버튼 줄만큼의 흰 여백을
+   남겨, 끝까지 내리면 모든 친구·라벨이 버튼 줄 위로 올라온다(처음 화면에서 버튼 줄 뒤로 일부 가려 있는 것은 스크롤 가능한 콘텐츠의 정상 상태다). */
+@media (prefers-reduced-motion:reduce){.rs-note,.rs-fr,.rs-pic,.rs-story,.rs-tree{animation:none}}
+
+/* ── 큰 글자 격자(D-083 ③, RK-027): 이유 화면. reason.js가 .rs-friends에 fl-grid를 붙인다(루트 글자 20px+ 또는 실측 겹침). 3열, 기울기 0,
+   라벨(.rs-nm)은 자유 배치에서도 이미 수평이라 그대로다. 칸 높이는 라벨 줄바꿈에 맞춰 늘어나고(보통 문서 흐름), 모자라면 페이지가 세로로
+   스크롤된다(3회차와 같은 원리 — .rs-land의 padding-bottom이 버튼 줄 자리를 남긴다). 언덕·나무 장식은 격자 폭에 안 맞아 접고 민 초록색만 남긴다. ── */
+.rs-land:has(.fl-grid){overflow:visible;background:var(--land-hill-mid)}
+.rs-land:has(.fl-grid) .rs-hill,.rs-land:has(.fl-grid) .rs-tree{display:none}
+.rs-friends.fl-grid{height:auto;display:grid;grid-template-columns:repeat(3, 1fr);column-gap:var(--sp-2);row-gap:var(--sp-5);justify-items:center}
+.rs-friends.fl-grid .rs-fr{position:static;left:auto;top:auto;transform:none;animation:none}
+.rs-friends.fl-grid .rs-pic{rotate:0deg;margin:0;animation:none}

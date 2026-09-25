@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light">
+<title>브랜드 무드 탐색 — 감정일기</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&family=Gowun+Batang:wght@400;700&family=Nanum+Pen+Script&display=swap" rel="stylesheet">
+<style>
+/* 브랜드 무드 탐색 페이지(2026-09-21, TASK-WEB-UI-02). 결정이 아니라 비교용 시안이다.
+   감정 9색은 tokens.json에서 실행 중에 읽고, 서비스 색 후보는 이 페이지 안에서만 정의한다. 캐릭터는 design/characters의 기존 그림이다.
+   손글씨 글꼴은 제목·이름표 같은 장식 문구에만 쓴다. 꼭 읽혀야 하는 안내·질문·내비게이션은 기본 글꼴이다. */
+:root{--desk:#F4F0E8;--ink:#2E2A26;--muted:#6B645A;--line:#DDD5C6}
+*{box-sizing:border-box}
+body{margin:0;background:var(--desk);color:var(--ink);font-family:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Malgun Gothic","Segoe UI",sans-serif;font-size:15px;line-height:1.55;word-break:keep-all}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 72px}
+h1{font-size:24px;line-height:1.25;margin:0 0 6px}
+h2{font-size:19px;line-height:1.3;margin:0}
+h3{font-size:14px;margin:0 0 4px}
+p{margin:0 0 8px}
+.lead{color:var(--muted);max-width:760px}
+.rules{margin:14px 0 26px;padding:14px 16px;border:1px solid var(--line);border-radius:12px;background:#fff;max-width:760px}
+.rules ol{margin:6px 0 0;padding-left:20px}.rules li{margin:3px 0}
+.boards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:36px 24px;align-items:start}
+.board{min-width:0}
+.board-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 10px;margin:0 auto 8px;max-width:360px}
+.board-head .no{font-size:12px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--ink);border-radius:999px;padding:2px 9px}
+.board-head .dial{font-size:12px;color:var(--muted)}
+.tagline{max-width:360px;margin:0 auto 12px;color:#4d463d}
+.notes{max-width:360px;margin:14px auto 0;font-size:13.5px}
+.notes dl{margin:0}.notes dt{font-weight:700;margin-top:8px}.notes dd{margin:1px 0 0;color:#4d463d}
+.sw{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}
+.sw span{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:#4d463d;border:1px solid var(--line);border-radius:999px;padding:2px 9px 2px 3px;background:#fff}
+.sw i{width:18px;height:18px;border-radius:50%;border:1px solid rgba(0,0,0,.12)}
+.emo{display:flex;gap:4px;margin:8px 0 0}.emo i{flex:1;height:10px;border-radius:3px}
+.de{font-size:12px;color:var(--muted);margin-top:4px}
+.de b{color:#4d463d}
+.sec{margin-top:40px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(240px,100%),1fr));gap:12px;margin-top:10px}
+.card{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px}
+.card .ph{width:64px;height:64px;border-radius:50%;border:2px dashed #b9ad97;display:grid;place-items:center;font-size:32px;margin-bottom:8px;background:#faf7f0}
+.ask li{margin:5px 0}
+
+/* ===== 공통 화면 틀(오늘) ===== */
+.mock{position:relative;width:100%;max-width:360px;margin:0 auto;border-radius:22px;overflow:hidden;border:1px solid rgba(59,43,32,.14);box-shadow:0 10px 28px rgba(59,43,32,.12);isolation:isolate}
+.m-in{padding:20px 16px 10px}
+.m-head{margin-bottom:10px}
+.m-date{font-size:12px;color:var(--muted);letter-spacing:.02em}
+.m-title{margin:2px 0 0;font-size:26px;line-height:1.15;color:var(--ink)}
+.m-scene{position:relative}
+.m-lede{margin:10px 0 2px;font-size:16px;line-height:1.5;color:var(--ink)}
+.m-sub{margin:0 0 12px;font-size:12.5px;color:var(--muted)}
+.m-cta{display:grid;gap:8px}
+.m-cta p{margin:0;text-align:center;font-size:12px;color:var(--muted)}
+.b{min-height:48px;border-radius:8px;border:1px solid transparent;font:inherit;font-size:16px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+.b.off{opacity:.6}
+.mod{margin-top:16px}
+.mod h3{font-size:13px;margin-bottom:8px}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.days b{font-weight:500;font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.d{width:34px;height:34px;margin:0 auto;border-radius:50%;display:grid;place-items:center}
+.d svg{width:16px;height:16px;fill:currentColor}
+.legend{display:flex;flex-wrap:wrap;gap:4px 10px;margin-top:8px;font-size:11px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend .d{width:16px;height:16px;margin:0}.legend .d svg{width:9px;height:9px}
+.ask-q{font-size:15px;line-height:1.5;margin:0 0 6px}
+.ask-go{font-size:13px;font-weight:700;color:var(--brand);text-decoration:underline;text-underline-offset:3px}
+.past{display:flex;gap:10px;align-items:center}
+.past img{width:44px;height:44px;flex:none}
+.past small{display:block;font-size:11px;color:var(--muted)}
+.m-nav{display:grid;grid-template-columns:repeat(4,1fr);margin-top:16px;border-top:1px solid var(--line)}
+.m-nav div{height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:11px;color:var(--muted)}
+.m-nav div.on{color:var(--ink);font-weight:700}
+.m-nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.m-nav .on svg{fill:currentColor}
+.stk,.pl img{display:block}
+
+/* ===== 안 1 도감 ===== */
+.t1 .mock{--paper:#FBF8F1;--ink:#2E2A26;--brand:#3B2B20;--accent:#7A4E2D;--tint:#EFE6D6;--line:#DDD3C0;--muted:#6E6558;background:var(--paper)}
+.t1 .m-title,.t1 h2,.t1 .mod h3{font-family:"Gowun Batang","Noto Serif KR",Batang,serif}
+.t1 .m-title{font-size:27px;font-weight:700;letter-spacing:.01em}
+.t1 .m-head{border-bottom:1px solid var(--ink);padding-bottom:10px}
+.t1 .plates{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px}
+.t1 .pl{border:1px solid var(--line);border-radius:4px;padding:6px 4px 5px;text-align:center;background:#fff}
+.t1 .pl img{width:62px;height:62px;margin:0 auto}
+.t1 .pl small{display:block;font-size:10px;letter-spacing:.08em;color:var(--muted)}
+.t1 .pl span{font-family:"Gowun Batang",serif;font-size:13px;font-weight:700}
+.t1 .b.pri{background:var(--brand);color:#FBF8F1;border-radius:4px}
+.t1 .b.off{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:4px}
+.t1 .mod{border-top:1px solid var(--line);padding-top:12px}
+.t1 .mod h3{font-size:14px}
+.t1 .d.done{background:var(--brand);color:#FBF8F1}
+.t1 .d.draft{background:var(--tint);border:1.5px dashed var(--accent);color:var(--accent)}
+.t1 .d.none{border:1.5px dotted #B9AE9A}
+.t1 .d.today{outline:2px solid var(--ink);outline-offset:2px}
+.t1 .d.future{opacity:.35;border:1.5px dotted #B9AE9A}
+.t1 .m-nav{background:#fff}
+
+/* ===== 안 2 탐험 노트 ===== */
+.t2 .mock{--paper:#FBF6EA;--ink:#3B2B20;--brand:#7A4E2D;--tint:#E3CFAE;--line:#E3D5BA;--muted:#75644F;background-color:var(--paper);background-image:radial-gradient(circle,rgba(122,78,45,.24) 1px,transparent 1.4px);background-size:18px 18px}
+.t2 .m-in{position:relative;padding-left:24px}
+.t2 .m-in::before{content:"";position:absolute;left:10px;top:0;bottom:0;border-left:2px dashed rgba(122,78,45,.28)}
+.t2 .m-title{font-family:Gaegu,"Nanum Pen Script","Malgun Gothic",cursive;font-size:40px;font-weight:700;line-height:1;letter-spacing:-.04em}
+.t2 .m-title::after{content:"";display:block;width:132px;height:9px;margin-top:2px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='132' height='9' viewBox='0 0 132 9'><path d='M2 6 C 22 1 44 9 68 4 S 112 2 130 6' fill='none' stroke='%237A4E2D' stroke-width='2.6' stroke-linecap='round'/></svg>") no-repeat}
+.t2 .m-date{font-family:Gaegu,"Nanum Pen Script",cursive;font-size:16px;font-weight:700;color:var(--brand);letter-spacing:0}
+.t2 .m-scene{height:288px;margin:8px -8px 0 -8px}
+.t2 .route{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.t2 .stk{position:absolute;height:auto;aspect-ratio:1;filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff) drop-shadow(0 3px 3px rgba(59,43,32,.28))}
+.t2 .me{position:absolute;aspect-ratio:1;border:2px dashed var(--brand);border-radius:50%;display:grid;place-items:center;text-align:center;font-family:Gaegu,cursive;font-size:15px;font-weight:700;line-height:1.05;color:var(--brand);background:rgba(251,246,234,.85);transform:rotate(-4deg)}
+.t2 .m-lede{font-family:Gaegu,"Nanum Pen Script",cursive;font-size:22px;font-weight:700;line-height:1.25;letter-spacing:-.03em}
+.t2 .m-cta{gap:12px}
+.t2 .b{font-family:Gaegu,cursive;font-size:22px;font-weight:700;letter-spacing:-.02em}
+.t2 .b.pri{position:relative;background:var(--brand);color:#FBF6EA;border-radius:10px 13px 11px 12px/12px 10px 13px 11px;box-shadow:0 3px 0 #3B2B20}
+.t2 .b.pri::before{content:"";position:absolute;left:14px;top:-9px;width:54px;height:17px;background:rgba(227,207,174,.92);transform:rotate(-5deg);clip-path:polygon(0 0,4% 22%,0 44%,4% 66%,0 88%,3% 100%,100% 100%,96% 80%,100% 58%,96% 36%,100% 14%,97% 0)}
+.t2 .b.off{background:transparent;border:2px dashed #B9A78A;color:var(--muted);border-radius:12px 10px 13px 11px/10px 13px 11px 12px;box-shadow:none}
+.t2 .mod h3{font-family:Gaegu,cursive;font-size:20px;font-weight:700;color:var(--brand);margin-bottom:6px;letter-spacing:-.03em}
+.t2 .ask-q{letter-spacing:-.02em}
+.t2 .d.done{background:var(--brand);color:#FBF6EA}
+.t2 .d.draft{background:var(--tint);border:1.5px dashed var(--brand);color:var(--brand)}
+.t2 .d.none{border:1.5px dotted #B9A78A;background:rgba(255,255,255,.5)}
+.t2 .d.today{outline:2px solid var(--ink);outline-offset:2px}
+.t2 .d.future{opacity:.35;border:1.5px dotted #B9A78A}
+.t2 .note{position:relative;background:#F1E4C8;border-radius:3px 3px 12px 3px;padding:14px 14px 12px;transform:rotate(-1.2deg);box-shadow:2px 3px 0 rgba(122,78,45,.18)}
+.t2 .note::before{content:"";position:absolute;left:50%;top:-9px;width:58px;height:17px;margin-left:-29px;background:rgba(199,169,125,.78);transform:rotate(3deg);clip-path:polygon(0 0,4% 22%,0 44%,4% 66%,0 88%,3% 100%,100% 100%,96% 80%,100% 58%,96% 36%,100% 14%,97% 0)}
+.t2 .note h3{margin-top:2px}
+.t2 .ask-q{font-family:Gaegu,"Nanum Pen Script",cursive;font-size:19px;font-weight:700;line-height:1.3}
+.t2 .past{background:#fff;border:1px solid var(--line);border-radius:6px;padding:10px;transform:rotate(.8deg);box-shadow:2px 3px 0 rgba(122,78,45,.12)}
+.t2 .m-nav{background:rgba(251,246,234,.92)}
+
+/* ===== 안 3 숲 빈터 ===== */
+.t3 .mock{--paper:#F7F1E3;--ink:#33281F;--brand:#7A4E2D;--tint:#E7D6B4;--line:#E2D6BC;--muted:#75644F;background:var(--paper)}
+.t3 .hero{position:relative;height:322px;background:#F3EAD3;isolation:isolate}
+.t3 .hero svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.t3 .hero .stk{position:absolute;height:auto;aspect-ratio:1;filter:drop-shadow(0 4px 2px rgba(51,40,31,.18))}
+.t3 .hero .front{position:absolute;left:0;right:0;bottom:0;height:48px;pointer-events:none;z-index:4}
+.t3 .hero-text{position:absolute;left:16px;top:16px;right:16px;z-index:5}
+.t3 .m-title{font-family:"Gowun Batang","Noto Serif KR",serif;font-size:26px;font-weight:700}
+.t3 .m-date{color:#6F5E48}
+.t3 .m-in{padding-top:0;position:relative;z-index:6}
+.t3 .sign{position:relative;margin:-14px 2px 0;padding:16px 14px 14px;border-radius:14px;background-color:#B69064;box-shadow:0 4px 0 #8A6A45;background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px)}
+.t3 .sign::before,.t3 .sign::after{content:"";position:absolute;top:-8px;width:12px;height:16px;border-radius:3px;background:#8A6A45}
+.t3 .sign::before{left:28px}.t3 .sign::after{right:28px}
+.t3 .m-lede{color:#33281F;font-family:"Gowun Batang",serif;font-size:16px;font-weight:700;margin:0 0 4px}
+.t3 .m-sub{color:#4a3a2a}
+.t3 .b.pri{background:#33281F;color:#F7F1E3;border-radius:10px}
+.t3 .b.off{background:rgba(255,255,255,.3);border:1.5px dashed rgba(51,40,31,.55);color:#33281F;border-radius:10px;opacity:.85}
+.t3 .m-cta p{color:#33281F}
+.t3 .mod h3{font-family:"Gowun Batang",serif;font-size:14px}
+.t3 .panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+.t3 .d.done{background:var(--brand);color:#F7F1E3}
+.t3 .d.draft{background:var(--tint);border:1.5px dashed var(--brand);color:var(--brand)}
+.t3 .d.none{border:1.5px dotted #B7A98D}
+.t3 .d.today{outline:2px solid var(--ink);outline-offset:2px}
+.t3 .d.future{opacity:.35;border:1.5px dotted #B7A98D}
+.t3 .m-nav{background:#fff;position:relative;z-index:6}
+
+/* ===== 안 4 밤의 숲, 작은 빛 — 사용자가 정해 준 뜻: 짙은 청록=안정·깊이·절제·사색, 반딧불이 빛, 자유=열린 여백 ===== */
+.t4 .mock{--paper:#FAF7F0;--ink:#092326;--deep:#092326;--light:#FFF3D6;--line:#DCE3E1;--muted:#4A6360;background:var(--paper);color:var(--ink)}
+.t4 .m-title,.t4 .mod h3,.t4 .m-lede{font-family:"Gowun Batang","Noto Serif KR",serif}
+.t4 .hero{position:relative;height:318px;background:var(--deep);isolation:isolate;overflow:hidden;box-shadow:0 1px 0 var(--paper)}
+.t4 .hero svg.bg{position:absolute;inset:0;width:100%;height:100%}
+.t4 .hero-text{position:absolute;left:16px;top:16px;right:16px;z-index:5}
+.t4 .hero-text .m-date{color:rgba(255,243,214,.72)}
+.t4 .hero-text .m-title{color:var(--light);font-size:26px;font-weight:700}
+.t4 .hero-text .tag{margin-top:4px;font-size:12.5px;color:rgba(255,243,214,.8)}
+.t4 .fly{position:absolute;border-radius:50%;background:#FFF6DE;z-index:4;box-shadow:0 0 10px 3px rgba(255,243,214,.55),0 0 24px 9px rgba(255,243,214,.16);animation:glow 3.4s ease-in-out 3 both}
+@keyframes glow{0%,100%{opacity:.5;transform:scale(.8)}50%{opacity:1;transform:scale(1.12)}}
+@media (prefers-reduced-motion:reduce){.t4 .fly{animation:none;opacity:.9}}
+.t4 .hero .stk{position:absolute;height:auto;aspect-ratio:1;filter:drop-shadow(0 0 1.5px rgba(255,243,214,.95)) drop-shadow(0 0 7px rgba(255,243,214,.32)) drop-shadow(0 3px 4px rgba(0,0,0,.45))}
+.t4 .m-in{padding-top:16px}
+.t4 .m-lede{font-weight:700;font-size:17px}
+.t4 .b.pri{background:var(--deep);color:var(--light);border-radius:8px}
+.t4 .b.off{background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px}
+.t4 .mod h3{font-size:14px}
+.t4 .glow{display:block;width:8px;height:8px;border-radius:50%;background:#FFF6DE;box-shadow:0 0 8px 2px rgba(255,243,214,.8)}
+.t4 .legend .glow{width:5px;height:5px;box-shadow:0 0 5px 1px rgba(255,243,214,.8)}
+.t4 .d.done{background:var(--deep)}
+.t4 .d.draft{background:#E6EAE9;border:1.5px dashed #345C59;color:#345C59}
+.t4 .d.none{border:1.5px dotted #A5B4B1}
+.t4 .d.today{outline:2px solid var(--deep);outline-offset:2px}
+.t4 .d.future{opacity:.35;border:1.5px dotted #A5B4B1}
+.t4 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px}
+.t4 .lamp{flex:none;width:40px;height:40px;border-radius:50%;background:var(--deep);display:grid;place-items:center}
+.t4 .lamp .glow{width:10px;height:10px;box-shadow:0 0 10px 3px rgba(255,243,214,.85)}
+.t4 .m-nav{background:#fff}
+
+/* ===== 안 5 시냇가의 조약돌 — 밤의 숲에서 빛을 밝혀 조약돌(=세부 감정 하나, 저장 단위)을 줍는다. 안 4의 색·빛을 그대로 쓴다(article에 t4 t5가 함께 붙는다) ===== */
+.t5 .hero{height:330px}
+.t5 .halo{position:absolute;left:36%;top:214px;width:210px;height:130px;background:radial-gradient(closest-side,rgba(255,243,214,.30),rgba(255,243,214,.10) 55%,rgba(255,243,214,0));z-index:3;pointer-events:none}
+.t5 .fly.me{box-shadow:0 0 14px 5px rgba(255,243,214,.7),0 0 34px 14px rgba(255,243,214,.22)}
+.t5 .hero .stk{filter:drop-shadow(0 0 1.5px rgba(255,243,214,.9)) drop-shadow(0 0 5px rgba(255,243,214,.28)) drop-shadow(0 2px 3px rgba(0,0,0,.45))}
+.t5 .d{border-radius:58% 42% 55% 45%/52% 48% 52% 48%}
+.t5 .days>div:nth-child(2n) .d{transform:translateY(3px) rotate(5deg)}
+.t5 .days>div:nth-child(3n) .d{transform:translateY(-2px) rotate(-6deg)}
+.t5 .lamp{border-radius:58% 42% 55% 45%/52% 48% 52% 48%;width:44px;height:36px}
+.frag{max-width:360px;margin:14px auto 0;border:1px solid #DCE3E1;border-radius:14px;background:#FAF7F0;overflow:hidden}
+.frag-cap{font-size:12px;color:#4A6360;padding:8px 12px;border-bottom:1px solid #DCE3E1;background:#fff}
+.frag-in{padding:12px;color:#092326}
+.frag .sbar{height:44px;border:1px solid #C9D3D1;border-radius:999px;background:#fff;color:#6F8481;font-size:14px;display:flex;align-items:center;padding:0 16px}
+.frag .trayx{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.frag .pillx{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 10px;border:1px solid;border-radius:999px;font-size:13.5px;font-weight:500}
+.frag .pillx b{font-weight:400;opacity:.65;margin-left:2px}
+.frag .rowx{display:flex;align-items:center;justify-content:space-between;min-height:48px;padding:6px 14px;margin-bottom:8px;border:1px solid transparent;border-radius:12px;background:#fff;font-size:16px}
+.frag .rowx .empty{width:22px;height:16px;border:1.5px dashed #A5B4B1;border-radius:58% 42% 55% 45%/52% 48% 52% 48%}
+.jump{margin:0 0 14px;font-size:13px}
+.jump a{color:#2E2A26;margin-right:12px;text-underline-offset:3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>브랜드 무드 탐색 <small style="font-weight:400;color:#6B645A;font-size:14px">— 초안, 결정 아님</small></h1>
+  <p class="lead"><b>안 1~3</b>은 처음 말씀하신 씨앗을 하나의 축으로 놓은 것입니다: <b>"숲속을 탐험하는 나"라는 세계관을 화면에 얼마나 깔 것인가.</b> <b>안 4</b>는 그다음에 정해 주신 색·빛의 뜻(반딧불이의 밝은 빛, 짙은 청록, 자유)을 이야기로 묶어 그린 것입니다. <b>안 5</b>는 그 위에 "숲 속에서 빛을 밝혀 조약돌을 줍는" 은유를 얹어 본 것입니다. 모두 같은 오늘 화면에 같은 새 요소를 넣었고, 서비스 색은 감정 9색을 피해 골랐습니다. 캐릭터는 기존 9종 그림 그대로입니다.</p>
+  <p class="jump" id="jump"></p>
+  <div class="rules">
+    <b>네 안이 공유하는 전제 — 어느 안을 고르든 지키는 것</b>
+    <ol>
+      <li>감정은 색을 갖고, 서비스는 감정 색 밖(흙·종이·깊은 청록·크림빛)에서 색을 고른다. 감정 9색은 그대로 둔다.</li>
+      <li>세계관은 <b>입구·출구(오늘·완료·빈 상태)에서 진하게</b>, 쓰는 순간(작성 화면)에서는 조용하게 한다. 마음을 적는 자리는 산만하면 안 된다.</li>
+      <li>날씨·시드는 나무·어두운 밤처럼 <b>좋고 나쁨을 암시하는 숲의 은유는 쓰지 않는다</b>(감정을 판정하지 않는 원칙).</li>
+      <li>상태(완료·임시저장·없음)는 색이 아니라 <b>진하기 3단계 + 모양</b>으로 구분해 회색조·색각 차이에서도 읽힌다.</li>
+    </ol>
+    <div class="emo" id="emoStrip" aria-hidden="true"></div>
+    <div class="de">위 줄은 감정 9색(tokens.json에서 실행 중에 읽음). 서비스의 <b>진한 색</b>은 이 강조색들과 색차(ΔE) 7 이상이라는 프로젝트 기준을 적용했습니다.</div>
+    <div class="de" id="softNote"></div>
+  </div>
+
+  <div class="boards" id="boards"></div>
+
+  <section class="sec">
+    <h2>"감정 그 자체"를 나타내는 주인공 — 후보 세 갈래</h2>
+    <p class="lead">아홉 친구는 각각 한 감정을 맡고 있으니, 주인공은 <b>친구들을 만나러 다니는 "나"</b>에 가깝습니다. 그림은 아직 없어서 아래는 자리표시(이모지)이며, 실제 그림은 기존 크레용 스타일(D-045)로 새로 그려야 합니다.</p>
+    <div class="cards">
+      <div class="card"><div class="ph">🎒</div><h3>A. 탐험가 "나" (사람)</h3><p>배낭과 노트를 멘 작은 사람. 사용자 자신이 그대로 들어가 "숲속을 탐험하는 나"에 가장 직접적입니다. 얼굴·성별·나이를 정해 버리면 자기 이야기로 느끼기 어려워질 수 있어 얼굴은 단순하게 하거나 뒷모습으로 둡니다.</p></div>
+      <div class="card"><div class="ph">🐿️</div><h3>B. 다람쥐 안내자 (동물)</h3><p>도토리를 모으듯 하루를 모아 두는 숲의 안내자. 기존 9종(양·거북이·기니피그·고양이·쥐·개·까마귀·토끼·침팬지)과 겹치지 않는 열 번째 동물이고, 서비스 색(도토리 갈색)과 자연스럽게 이어집니다.</p></div>
+      <div class="card"><div class="ph">🌰</div><h3>C. 마음 도토리 (사물)</h3><p>작은 씨앗이라 소중히 적어 둔다는 뜻. 얼굴만 있는 단순한 캐릭터라 스티커·아이콘·앱 아이콘으로 쓰기 좋고 그림 작업도 가장 작습니다. 다만 "친구"라기보다 "표식"에 가깝습니다.</p></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <h2>정해 주셔야 다음으로 넘어갈 수 있는 것</h2>
+    <ol class="ask">
+      <li><b>세계관의 세기</b> — 세 안 중 어디에 가장 가까운가요? 둘을 섞어도 됩니다(제 제안은 채팅에 있습니다).</li>
+      <li><b>주인공</b> — 사람 / 동물 / 도토리 중 어느 쪽인가요? 새 그림은 Codex 이미지 생성으로 만들어야 하므로 그쪽 작업이 가능한지도 알려 주세요.</li>
+      <li><b>글꼴</b> — 손글씨 느낌의 글꼴을 제목·이름표 같은 장식 문구에만 쓰는 것을 허용할까요? 지금 규칙(D-034)은 웹폰트를 싣지 않는 것입니다.</li>
+      <li><b>규칙 완화</b> — "그림자·장식 텍스처 없음"(DESIGN_SYSTEM §11)을 <b>입구·출구 화면 한정으로</b> 완화해도 될까요?</li>
+    </ol>
+  </section>
+</div>
+
+<script type="module">
+/* ── 색차(CIEDE2000): scripts/check-contrast.mjs와 같은 계산 ── */
+function lab(hex){const[r,g,b]=hex.replace("#","").match(/.{2}/g).map(h=>parseInt(h,16)/255).map(c=>c<=0.03928?c/12.92:((c+0.055)/1.055)**2.4);const X=(0.4124*r+0.3576*g+0.1805*b)/0.95047,Y=0.2126*r+0.7152*g+0.0722*b,Z=(0.0193*r+0.1192*g+0.9505*b)/1.08883;const f=v=>v>0.008856?Math.cbrt(v):7.787*v+16/116;return[116*f(Y)-16,500*(f(X)-f(Y)),200*(f(Y)-f(Z))]}
+function dE(a,b){const[L1,a1,b1]=lab(a),[L2,a2,b2]=lab(b);const Cb=(Math.hypot(a1,b1)+Math.hypot(a2,b2))/2;const G=0.5*(1-Math.sqrt(Cb**7/(Cb**7+25**7)));const A1=(1+G)*a1,A2=(1+G)*a2;const C1=Math.hypot(A1,b1),C2=Math.hypot(A2,b2);const hue=(y,x)=>(y===0&&x===0?0:((Math.atan2(y,x)*180)/Math.PI+360)%360);const h1=hue(b1,A1),h2=hue(b2,A2);const dL=L2-L1,dC=C2-C1;let dh=0;if(C1*C2!==0){dh=h2-h1;if(dh>180)dh-=360;else if(dh<-180)dh+=360}const dH=2*Math.sqrt(C1*C2)*Math.sin((dh*Math.PI)/360);const Lb=(L1+L2)/2,Cp=(C1+C2)/2;let hb;if(C1*C2===0)hb=h1+h2;else{hb=(h1+h2)/2;if(Math.abs(h1-h2)>180)hb+=h1+h2<360?180:-180}const T=1-0.17*Math.cos(((hb-30)*Math.PI)/180)+0.24*Math.cos((2*hb*Math.PI)/180)+0.32*Math.cos(((3*hb+6)*Math.PI)/180)-0.2*Math.cos(((4*hb-63)*Math.PI)/180);const Sl=1+(0.015*(Lb-50)**2)/Math.sqrt(20+(Lb-50)**2),Sc=1+0.045*Cp,Sh=1+0.015*Cp*T;const Rt=-2*Math.sqrt(Cp**7/(Cp**7+25**7))*Math.sin((60*Math.exp(-(((hb-275)/25)**2))*Math.PI)/180);return Math.sqrt((dL/Sl)**2+(dC/Sc)**2+(dH/Sh)**2+Rt*(dC/Sc)*(dH/Sh))}
+
+const tokens = await (await fetch("/tokens.json")).json();
+const usage = tokens.color["emotion-usage"], fams = Object.entries(tokens.color.emotion);
+const accent = (k, f) => f[usage["accent-override"]?.[k]?.light ?? usage["category-accent"].light];
+document.getElementById("emoStrip").append(...fams.map(([k, f]) => Object.assign(document.createElement("i"), { style: `background:${accent(k, f)}`, title: f.label })));
+/* 진한 색은 감정 강조색과, 연한 면은 감정 50·100(부드러운 배경·chip 채움)과 비교한다 — 역할이 같은 자리끼리 재야 뜻이 있다 */
+function nearest(hex) {
+  const L = lab(hex)[0], light = L > 78;
+  // 밝기별로 같은 자리의 감정 색과 비교한다: 연한 면(50·100) / 중간(300·500·700) / 아주 짙은 색(700·900 — 글자·잉크 자리)
+  const steps = light ? ["50", "100"] : L < 32 ? ["700", "900"] : ["300", "500", "700"];
+  let best = null;
+  for (const [k, f] of fams) for (const s of steps) { const d = dE(hex, f[s]); if (!best || d < best.d) best = { d, name: f.label, role: s, light }; }
+  return best;
+}
+const surfaceRef = nearest("#FAFAF8");
+document.getElementById("softNote").innerHTML = `연한 종이색은 감정 50·100 색과 색차가 작을 수밖에 없습니다(지금 쓰는 연한 회색 면 #FAFAF8도 ${surfaceRef.name} ${surfaceRef.role}와 ΔE ${surfaceRef.d.toFixed(1)}). 그래서 <b>감정을 고른 표시는 면 색이 아니라 테두리(300)와 체크로 하고 면 색만으로 구별하지 않는다</b>는 지금 규칙(DESIGN_SYSTEM §6.3)을 그대로 지킵니다.`;
+
+/* ── 캐릭터·문구 ── */
+/* 화면에 90px 이하로 그리므로 120px 원본이면 충분하다. 1024px 원본 9장을 서른 번 넘게 그리면 페이지가 무거워진다 */
+const P = "/characters/ui-poses/", pose = (k) => `${P}${k}--expressive-static-120.png`;
+const FR = { enjoyment: ["즐거움", "양"], wish: ["희망", "거북이"], sadness: ["슬픔", "기니피그"], anger: ["분노", "고양이"], joy: ["기쁨", "쥐"], love: ["사랑", "개"], hate: ["미움", "까마귀"], fear: ["공포", "토끼"], disgust: ["혐오", "침팬지"] };
+const KEYS = Object.keys(FR);
+const ICON = {
+  home: '<svg viewBox="0 0 24 24"><path d="M12 4 4 10.4V20h4.5v-6h7v6H20v-9.6z"/></svg>',
+  cal: '<svg viewBox="0 0 24 24"><rect x="3.5" y="5.5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3.5v4M16 3.5v4"/></svg>',
+  bars: '<svg viewBox="0 0 24 24"><path d="M5 19V11M12 19V5M19 19v-5"/></svg>',
+  sun: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3.5v2.6M12 17.9v2.6M20.5 12h-2.6M6.1 12H3.5M18 6l-1.8 1.8M7.8 16.2 6 18M18 18l-1.8-1.8M7.8 7.8 6 6"/></svg>'
+};
+const CHECK = '<svg viewBox="0 0 24 24"><path d="M9.6 17.2 4.8 12.4l1.7-1.7 3.1 3.1 7.9-7.9 1.7 1.7z"/></svg>';
+const PAW = '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="16.2" rx="5.2" ry="4"/><circle cx="5.6" cy="11" r="2.1"/><circle cx="9.8" cy="6.6" r="2.1"/><circle cx="14.2" cy="6.6" r="2.1"/><circle cx="18.4" cy="11" r="2.1"/></svg>';
+const PENCIL = '<svg viewBox="0 0 24 24"><path d="M4 20l1-4.6L15.9 4.5a1.6 1.6 0 0 1 2.3 0l1.3 1.3a1.6 1.6 0 0 1 0 2.3L8.6 19z"/></svg>';
+const WEEK = [["월", "done"], ["화", "done"], ["수", "draft"], ["목", "none"], ["금", "done"], ["토", "today"], ["일", "future"]];
+const night = (t) => t === "t4" || t === "t5";
+const mark = (theme, s) => s === "done" ? (theme === "t1" ? CHECK : night(theme) ? '<i class="glow"></i>' : PAW) : s === "draft" ? PENCIL : "";
+
+const week = (theme) => `<section class="mod"><h3>${theme === "t1" ? "이번 주 기록" : theme === "t4" ? "이번 주" : theme === "t5" ? "이번 주 길" : "이번 주 발자국"}</h3>
+  <div class="days">${WEEK.map(([d, s]) => `<div><b>${d}</b><div class="d ${s}">${mark(theme, s)}</div></div>`).join("")}</div>
+  <div class="legend"><span><i class="d done">${mark(theme, "done")}</i>완료</span><span><i class="d draft">${PENCIL}</i>임시저장</span><span><i class="d none"></i>기록 없음</span><span><i class="d today"></i>오늘</span></div>
+  <p class="de" style="margin-top:6px">빈 날은 그냥 빈 날이에요. 이어 가지 못해도 괜찮아요.</p></section>`;
+const ask = (theme) => `<section class="mod ${theme === "t2" ? "note" : theme === "t3" || night(theme) ? "panel" : ""}"><h3>오늘의 한 줄 질문</h3>
+  <p class="ask-q">오늘 가장 오래 마음에 남은 순간은 언제였나요?</p><a class="ask-go">이 질문으로 시작</a></section>`;
+const past = (theme) => night(theme)
+  ? `<section class="mod"><h3>${theme === "t5" ? "다시 만난 조약돌" : "다시 만난 작은 빛"}</h3><div class="past panel"><span class="lamp"><i class="glow"></i></span><div><small>9월 14일 · 감사</small>“들어 준 사람이 있었다”</div></div></section>`
+  : `<section class="mod"><h3>${theme === "t1" ? "지난 기록" : "일주일 전 오늘"}</h3><div class="past ${theme === "t3" ? "panel" : ""}"><img src="${pose("sadness")}" alt=""><div><small>9월 14일 · 슬픔</small>“발표가 끝나고 나니 허전했다”</div></div></section>`;
+const nav = `<nav class="m-nav">${[["오늘", "home", 1], ["달력", "cal"], ["통계", "bars"], ["설정", "sun"]].map(([n, i, on]) => `<div class="${on ? "on" : ""}">${ICON[i]}${n}</div>`).join("")}</nav>`;
+const cta = `<div class="m-cta"><div class="b pri">직접 작성</div><div class="b off">AI와 대화하며 작성</div><p>현재 제공되지 않음 — 지금은 직접 작성만 할 수 있어요</p></div>`;
+const lede = (t) => `<p class="m-lede">${t}</p><p class="m-sub">감정을 진단하지 않아요. 내가 고른 말로 하루를 적어 두는 곳이에요.</p>`;
+
+/* ── 세 안. 스티커 위치·크기는 장면 너비에 대한 %라서 화면 폭이 달라도 잘리지 않는다 ── */
+const stk = (k, left, top, size, rot, z = 1) => `<img class="stk" src="${pose(k)}" alt="" style="left:${left}%;top:${top}px;width:${size}%;transform:rotate(${rot}deg);z-index:${z}">`;
+/* ── 조약돌·밤 숲 공용 도구: 조약돌은 살짝 찌그러진 둥근 도형이라 새 그림 없이 코드로 만든다 ── */
+const rand = (s) => { const v = Math.sin(s * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+const blob = (rx, ry, seed = 1) => {
+  const n = 8, pts = [];
+  for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI * 2, j = 0.9 + rand(seed + i) * 0.2; pts.push([Math.cos(a) * rx * j, Math.sin(a) * ry * j]); }
+  const f = (v) => v.toFixed(1);
+  let d = `M${f(pts[0][0])} ${f(pts[0][1])}`;
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+    d += `C${f(p1[0] + (p2[0] - p0[0]) / 6)} ${f(p1[1] + (p2[1] - p0[1]) / 6)} ${f(p2[0] - (p3[0] - p1[0]) / 6)} ${f(p2[1] - (p3[1] - p1[1]) / 6)} ${f(p2[0])} ${f(p2[1])}`;
+  }
+  return d + "Z";
+};
+let stoneId = 0;
+/* 조약돌 하나: lit(0~1)이 클수록 가까운 빛을 받아 윗면이 밝고 반짝임이 맺힌다. band는 감정 색을 가는 줄무늬로 박은 돌 */
+const stone = (x, y, rx, ry, rot, fill, lit = 0, band = null, op = 1) => {
+  const id = `st${stoneId++}`, d = blob(rx, ry, stoneId + 2);
+  const hi = `<ellipse cx="${-rx * 0.28}" cy="${-ry * 0.34}" rx="${rx * 0.42}" ry="${ry * 0.26}" fill="#FFF3D6" opacity="${(0.1 + lit * 0.5).toFixed(2)}" transform="rotate(-12)"/>`;
+  const glint = lit > 0.5 ? `<circle cx="${-rx * 0.3}" cy="${-ry * 0.42}" r="${Math.max(1.4, rx * 0.07).toFixed(1)}" fill="#FFF8E6"/>` : "";
+  const stripe = band ? `<clipPath id="${id}"><path d="${d}"/></clipPath><g clip-path="url(#${id})"><path d="M${-rx * 1.1} ${ry * 0.15} Q0 ${-ry * 0.35} ${rx * 1.1} ${ry * 0.05}" fill="none" stroke="${band}" stroke-width="${Math.max(2.4, ry * 0.32).toFixed(1)}" stroke-linecap="round"/></g>` : "";
+  return `<g opacity="${op}" transform="translate(${x} ${y}) rotate(${rot})"><path d="${d}" fill="${fill}"/>${stripe}${hi}${glint}<path d="${d}" fill="none" stroke="#04161A" stroke-opacity=".45" stroke-width="1"/></g>`;
+};
+const pebbleIcon = (color, w = 16, h = 12) => `<svg width="${w}" height="${h}" viewBox="-9 -7 18 14" aria-hidden="true"><path d="${blob(8, 5.6, 5)}" fill="${color}"/><ellipse cx="-2.6" cy="-2.2" rx="2.6" ry="1.5" fill="#fff" opacity=".55" transform="rotate(-12)"/></svg>`;
+const acc = (key) => accent(key, tokens.color.emotion[key]);
+const pine = (x, b, w, h) => { const tri = (top, bot, half) => `M${x} ${top}L${x + half} ${bot}L${x - half} ${bot}Z`; return tri(b - h, b - h * 0.55, w * 0.28) + tri(b - h * 0.78, b - h * 0.28, w * 0.4) + tri(b - h * 0.5, b, w * 0.5) + `M${x - w * 0.05} ${b}h${w * 0.1}v${h * 0.06}h${-w * 0.1}Z`; };
+const pines = (list, fill) => `<path fill="${fill}" d="${list.map(([x, b, w, h]) => pine(x, b, w, h)).join("")}"/>`;
+const fly = (l, t, s, delay = 0) => `<i class="fly" style="left:${l}%;top:${t}px;width:${s}px;height:${s}px;animation-delay:${delay}s"></i>`;
+
+const themes = {
+  t1: {
+    no: "안 1", name: "도감", dial: "세계관 ●○○ · 차분·정돈", tag: "숲에서 만난 마음을 차분히 모으는 감정 도감",
+    scene: () => `<div class="plates">${KEYS.map((k, i) => `<div class="pl"><img src="${pose(k)}" alt=""><small>No.${String(i + 1).padStart(2, "0")}</small><span>${FR[k][0]}</span></div>`).join("")}</div>`,
+    lede: "오늘은 어떤 마음을 만났나요?",
+    colors: [["종이", "#FBF8F1"], ["호두 잉크", "#3B2B20"], ["도토리", "#7A4E2D"], ["탄 틴트", "#EFE6D6"]],
+    notes: [["화면이 바뀌는 곳", "배경이 흰색 → 따뜻한 종이색, 얇은 선, 번호와 이름표. 그림·장식은 캐릭터뿐."], ["좋은 점", "지금 디자인 규칙(평면·얇은 선)과 거의 안 부딪히고, 새로 그릴 것이 없고, 오래 써도 질리지 않습니다."], ["아쉬운 점", "말씀하신 <b>자유분방함과 \"나의 노트\" 느낌은 가장 약합니다</b>. 대조를 위한 안입니다."]]
+  },
+  t2: {
+    no: "안 2", name: "탐험 노트", dial: "세계관 ●●○ · 자유분방·손맛", tag: "숲을 걷는 나의 탐험 일지 — 종이 위에 친구들을 붙이고 길을 그린다",
+    scene: () => `<div class="m-scene"><svg class="route" viewBox="0 0 340 288" preserveAspectRatio="none" aria-hidden="true"><path d="M52 52 C 86 22 130 22 176 46 S 262 34 288 58 S 306 112 288 144 S 212 172 178 156 S 84 136 54 152 S 24 204 58 234 S 116 222 152 232 S 200 246 214 238 S 258 214 280 226" fill="none" stroke="#7A4E2D" stroke-opacity=".55" stroke-width="2.4" stroke-linecap="round" stroke-dasharray="1 8"/></svg>
+      ${stk("enjoyment", 2.4, 12, 24.5, -6)}${stk("wish", 37.5, 0, 25.7, 5, 2)}${stk("sadness", 70, 14, 24, -4)}
+      ${stk("anger", 1, 108, 25, -3)}<div class="me" style="left:38%;top:114px;width:25%">주인공<br>“나”<br>자리</div>${stk("joy", 70, 106, 24, 7, 2)}
+      ${stk("love", 4.5, 198, 22.5, 5)}${stk("hate", 29, 192, 24, -6, 2)}${stk("fear", 54, 208, 21.5, 4)}${stk("disgust", 74, 194, 21.5, -6, 2)}</div>`,
+    lede: "오늘은 어떤 친구가 찾아왔나요?",
+    colors: [["종이", "#FBF6EA"], ["크래프트", "#E6D8C0"], ["도토리", "#7A4E2D"], ["탄 틴트", "#E3CFAE"]],
+    notes: [["화면이 바뀌는 곳", "점 격자 종이, 손글씨 제목, 친구들은 스티커, 점선 길, 종이 태그 버튼, 스티커 메모(오늘의 질문)."], ["좋은 점", "<b>\"나의 노트\"·자유분방·자연 분위기에 가장 가깝고</b> 기존 9종 그림만으로 시작할 수 있습니다."], ["조심할 점", "장식이 늘어 <b>작성 화면은 안 1처럼 조용하게</b> 둬야 하고, DESIGN_SYSTEM §11(그림자·장식 텍스처 없음) 완화 결정이 필요합니다."]]
+  },
+  t3: {
+    no: "안 3", name: "숲 빈터", dial: "세계관 ●●● · 포근·몰입", tag: "숲속 빈터에 친구들이 모여 있는 오늘 — 풍경이 있는 입구",
+    scene: () => `<div class="hero"><svg class="bg" viewBox="0 0 360 334" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <rect width="360" height="334" fill="#F3EAD3"/>
+        <polygon points="250,0 300,0 205,334 135,334" fill="#fff" opacity=".22"/><polygon points="312,0 342,0 274,334 238,334" fill="#fff" opacity=".16"/>
+        <path d="M0 182 Q70 138 140 174 T290 156 T360 176 V334 H0Z" fill="#E8DDC3"/>
+        <g fill="#D9C9A6"><circle cx="44" cy="134" r="34"/><rect x="40" y="152" width="8" height="40"/><circle cx="320" cy="122" r="40"/><rect x="316" y="144" width="9" height="52"/><circle cx="196" cy="150" r="26"/><rect x="193" y="164" width="6" height="30"/></g>
+        <path d="M0 220 Q90 184 190 214 T360 202 V334 H0Z" fill="#D9C7A0"/>
+        <g fill="#C9B389"><circle cx="118" cy="176" r="30"/><rect x="114" y="194" width="8" height="42"/><circle cx="258" cy="182" r="34"/><rect x="254" y="202" width="9" height="46"/></g>
+        <path d="M0 264 Q100 238 200 258 T360 252 V334 H0Z" fill="#C4AE84"/>
+      </svg>
+      ${stk("enjoyment", 5, 108, 17.5, -3)}${stk("hate", 41, 100, 17, 3)}${stk("disgust", 76, 106, 17.5, -4)}
+      ${stk("anger", 0.5, 156, 21.5, 4, 2)}${stk("joy", 32, 162, 20.5, -5, 2)}${stk("love", 62, 156, 21.5, 3, 2)}
+      ${stk("wish", 9, 214, 25, -3, 3)}${stk("fear", 40, 224, 23, 4, 3)}${stk("sadness", 67, 212, 25, -4, 3)}
+      <svg class="front" viewBox="0 0 360 48" preserveAspectRatio="none" aria-hidden="true"><g stroke="#A08A5F" stroke-width="2.4" stroke-linecap="round" fill="none"><path d="M18 48c2-14 2-22 8-30M26 48c1-10 6-16 12-22M304 48c0-12 4-20 10-26M314 48c1-9 7-15 14-19M126 48c1-8 3-12 8-16"/></g></svg>
+      <div class="hero-text"><div class="m-date">2026년 9월 21일 (월)</div><div class="m-title">감정일기</div></div></div>`,
+    hero: true,
+    lede: "오늘은 어떤 친구가 찾아왔나요?",
+    colors: [["빈터 종이", "#F7F1E3"], ["팻말 나무", "#B69064"], ["도토리", "#7A4E2D"], ["숲 흙", "#C4AE84"]],
+    notes: [["화면이 바뀌는 곳", "오늘·완료·빈 상태 위쪽에 풍경, 버튼은 나무 팻말 위에 \"깔림\", 친구들은 앞·뒤 깊이로 흩어짐."], ["좋은 점", "<b>\"숲속을 탐험하는\" 컨셉이 가장 직접적</b>이고 브랜드 기억점이 강합니다."], ["조심할 점", "풍경 그림을 새로 만들어야 하고(작업 큼), 초록 배경은 즐거움 색과 겹쳐 읽힐 수 있어 <b>채도를 낮춘 흙빛</b>으로만 그렸습니다. 작은 화면에서 자리를 많이 씁니다."]]
+  },
+  t4: {
+    no: "안 4", name: "밤의 숲, 작은 빛", dial: "세계관 ●●○ · 절제·사색·작은 빛", tag: "\"오늘의 나를 비추는 작은 빛\" — 깊고 조용한 숲에서 이름을 붙이면 마음이 보인다(사용자가 정해 준 색·빛의 뜻에 기반)",
+    night: true,
+    scene: () => {
+      /* 소나무 실루엣(세 겹 삼각형)을 코드로 만든다. 색은 모두 깊은 청록의 명도 단계다 */
+      const pine = (x, b, w, h) => { const tri = (top, bot, half) => `M${x} ${top}L${x + half} ${bot}L${x - half} ${bot}Z`; return tri(b - h, b - h * 0.55, w * 0.28) + tri(b - h * 0.78, b - h * 0.28, w * 0.4) + tri(b - h * 0.5, b, w * 0.5) + `M${x - w * 0.05} ${b}h${w * 0.1}v${h * 0.06}h${-w * 0.1}Z`; };
+      const pines = (list, fill) => `<path fill="${fill}" d="${list.map(([x, b, w, h]) => pine(x, b, w, h)).join("")}"/>`;
+      const fly = (l, t, s, delay = 0) => `<i class="fly" style="left:${l}%;top:${t}px;width:${s}px;height:${s}px;animation-delay:${delay}s"></i>`;
+      /* 아홉 친구: 같은 크기, taxonomy 순서 그대로 고정 배열(D-041). 느슨함은 위치와 기울기로만 낸다 */
+      const A = [4, 22, 40, 58, 76], B = [13, 31, 49, 67], rA = [-3, 2, -2, 3, -2], rB = [2, -3, 3, -2];
+      const friends = KEYS.slice(0, 5).map((k, i) => stk(k, A[i], 194, 16.5, rA[i], 2)).join("") + KEYS.slice(5).map((k, i) => stk(k, B[i], 244, 16.5, rB[i], 3)).join("");
+      return `<div class="hero"><svg class="bg" viewBox="0 0 360 318" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <rect width="360" height="318" fill="#092326"/>
+        ${pines([[26, 236, 46, 104], [78, 232, 52, 124], [132, 236, 46, 100], [206, 232, 50, 116], [262, 236, 52, 138], [316, 232, 48, 118]], "#0F3033")}
+        ${pines([[6, 246, 58, 130], [56, 250, 54, 112], [112, 250, 56, 122], [240, 250, 60, 128], [298, 250, 56, 138], [350, 248, 58, 122]], "#0C2A2D")}
+        <ellipse cx="180" cy="268" rx="180" ry="54" fill="#FFF3D6" opacity=".07"/>
+        <path d="M0 226 Q90 210 180 222 T360 214 V318 H0Z" fill="#0B2A2D"/>
+        ${pines([[-4, 318, 96, 232], [352, 318, 100, 246]], "#061B1E")}
+        <path d="M0 306 Q70 294 150 303 T300 299 T360 302 V318 H0Z" fill="#FAF7F0"/>
+      </svg>${friends}
+      ${fly(12, 104, 6)}${fly(27, 140, 8, .6)}${fly(50, 116, 9, .3)}${fly(57, 158, 6, 1)}${fly(72, 100, 12, .9)}${fly(88, 168, 7, .2)}${fly(20, 178, 5, 1.3)}${fly(82, 46, 5, .5)}
+      <div class="hero-text"><div class="m-date">2026년 9월 21일 (월)</div><div class="m-title">감정일기</div><div class="tag">오늘의 나를 비추는 작은 빛</div></div></div>`;
+    },
+    lede: "오늘은 어떤 친구가 찾아왔나요?",
+    colors: [["깊은 청록", "#092326"], ["크림빛", "#FFF3D6"], ["종이", "#FAF7F0"], ["안개(자유의 여백)", "#E9EFEE"]],
+    notes: [["화면이 바뀌는 곳", "글자·버튼·완료 표시가 깊은 청록으로 바뀌고, 오늘·완료 위쪽에만 밤의 숲 한 장면이 들어갑니다. 반딧불이의 빛은 색이 없는 크림빛이고 작게 드물게 켜집니다(이 페이지의 반짝임도 세 번만 켜졌다 잦아듭니다). 쓰는 화면은 종이+청록 잉크로 조용하게 둡니다."], ["좋은 점", "정해 주신 뜻(안정·깊이·절제·사색)이 그대로 읽히고, <b>\"어둠=나쁨\"이 아니라 \"어둠=깊이\"</b>라 감정을 판정하지 않는 원칙과 맞습니다. 빛은 어둠 위에서만 빛으로 읽히므로 반딧불이의 뜻이 살고, 서비스 색이 둘(청록·크림)뿐이라 절제되며 감정 9색이 가장 돋보입니다."], ["조심할 점", "큰 어두운 면은 PRD §6.3(흰색/중립 배경 기본)·D-034(밝은 모드 전용)와 부딪혀 <b>\"입구 한 장면\"으로 한정</b>하는 결정이 필요합니다. 짙은 청록은 공포 계열(짙은 청록 900)과 색이 이웃이라(ΔE 10~14) 공포 화면에서 정체성에 주의해야 합니다. 밤 배경 그림을 새로 그려야 합니다. 여섯째 자리가 정해지지 않은 <b>#09232?</b>는 #092326으로 그렸습니다(16가지 모두 흰 글자 대비 16:1 이상)."]]
+  },
+  t5: {
+    no: "안 5", name: "시냇가의 조약돌", dial: "세계관 ●●○ · 절제·사색·줍는 손", extend: "t4",
+    tag: "빛을 밝혀 조약돌을 줍듯, 오늘의 마음을 하나씩 줍는다 — 조약돌 하나 = 세부 감정 하나(저장 단위). <b>실제 시안에서 눌러 보기: <a href=\"http://localhost:4174/?theme=pebble\" target=\"_blank\" rel=\"noopener\">localhost:4174/?theme=pebble</a></b>",
+    night: true,
+    scene: () => {
+      const S = [ // [x, y, rx, ry, 기울기, 색, 빛(0~1), 감정 줄무늬, 투명도]
+        [40, 300, 24, 13, -8, "#1F4B4E", .15], [96, 314, 18, 10, 6, "#27595B", .25], [150, 296, 14, 8, -14, "#1E4E51", .55],
+        [206, 306, 26, 14, 4, "#2E6567", .85, acc("sadness")], [262, 296, 17, 10, -6, "#27595B", .7, acc("anger")], [318, 308, 22, 12, 10, "#1E4A4D", .15],
+        [238, 322, 12, 7, 0, "#2F6466", .6], [122, 324, 10, 6, 12, "#1B4447", 0], [304, 284, 11, 7, -4, "#27595B", .3, acc("fear")], [16, 322, 15, 8, -6, "#173E41", 0],
+        [70, 274, 8, 5, 8, "#1F4B4E", .1], [128, 278, 6, 4, -10, "#173E41", 0], [178, 272, 9, 5, 4, "#27595B", .5], [282, 276, 7, 4, 6, "#1E4A4D", .2], [336, 280, 8, 5, -8, "#234F52", .1],
+        [36, 238, 7, 4, 0, "#123F42", 0, null, .7], [206, 242, 9, 5, 6, "#144245", 0, null, .7], [268, 234, 6, 4, -6, "#123F42", 0, null, .7]
+      ];
+      /* 아홉 친구는 먼 둑에 같은 크기로, taxonomy 순서 그대로 왼쪽에서 오른쪽으로 서 있다. 한 줄로 세우지 않고 셋씩 세 무리로 느슨하게 모여 있다 */
+      const FL = [2.5, 13, 23.5, 37.5, 48, 58.5, 71.5, 81.5, 88], FT = [152, 140, 154, 144, 156, 142, 150, 139, 155], FR = [-3, 2, -2, 3, -3, 2, -2, 3, -2];
+      const friends = KEYS.map((k, i) => stk(k, FL[i], FT[i], 11.5, FR[i], i % 2 ? 2 : 3)).join("");
+      return `<div class="hero"><svg class="bg" viewBox="0 0 360 330" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <rect width="360" height="330" fill="#092326"/>
+        ${pines([[24, 200, 46, 100], [76, 196, 52, 118], [132, 200, 46, 92], [204, 196, 50, 108], [262, 200, 52, 126], [318, 196, 48, 110]], "#0F3033")}
+        ${pines([[6, 208, 58, 116], [58, 210, 54, 100], [112, 210, 56, 108], [240, 210, 60, 114], [298, 210, 56, 122], [350, 208, 58, 108]], "#0C2A2D")}
+        <path d="M0 196 Q90 186 180 194 T360 190 V216 H0Z" fill="#0B2A2D"/>
+        <path d="M0 208 Q100 198 200 206 T360 202 V262 Q260 270 170 260 T0 266Z" fill="#0F383B"/>
+        <g fill="none" stroke="#FFF3D6" stroke-opacity=".15" stroke-width="1.6" stroke-linecap="round"><path d="M30 224q14-4 28 0M96 240q16-4 32 0M170 222q12-3 24 0M228 246q18-4 36 0M300 228q12-3 24 0M60 252q12-3 24 0"/></g>
+        <g stroke="#FFF3D6" stroke-linecap="round" stroke-dasharray="1 5" stroke-width="2" opacity=".28"><path d="M158 218v30M252 212v28"/></g>
+        <path d="M0 262 Q90 250 190 262 T360 256 V330 H0Z" fill="#0A2427"/>
+        ${S.map((s) => stone(...s)).join("")}
+        ${pines([[-4, 330, 96, 232], [352, 330, 100, 246]], "#061B1E")}
+      </svg><div class="halo"></div>${friends}
+      ${fly(12, 96, 6)}${fly(30, 116, 8, .5)}${fly(78, 100, 9, .8)}${fly(93, 132, 6, .2)}${fly(84, 60, 5, 1)}${fly(44, 204, 8, .4)}${fly(70, 198, 7, .9)}
+      <i class="fly me" style="left:56%;top:262px;width:14px;height:14px;animation-delay:.3s"></i>
+      <div class="hero-text"><div class="m-date">2026년 9월 21일 (월)</div><div class="m-title">감정일기</div><div class="tag">빛을 밝혀, 오늘의 마음을 하나씩 줍는 곳</div></div></div>`;
+    },
+    lede: "오늘은 어떤 친구가 다녀갔나요?",
+    colors: [["깊은 청록", "#092326"], ["크림빛", "#FFF3D6"], ["종이", "#FAF7F0"], ["조약돌 청회색", "#27595B"]],
+    after: () => {
+      const chip = ([k, w]) => { const f = tokens.color.emotion[k]; return `<span class="pillx" style="background:${f["100"]};border-color:${f["300"]};color:${f["900"]}">${pebbleIcon(acc(k))}${w}<b>×</b></span>`; };
+      const row = (k, w, on) => { const f = tokens.color.emotion[k]; return `<div class="rowx" style="${on ? `background:${f["50"]};border-color:${f["300"]}` : ""}"><span>${w}</span>${on ? pebbleIcon(acc(k), 24, 18) : '<i class="empty"></i>'}</div>`; };
+      return `<div class="frag"><div class="frag-cap">쓰는 화면은 이렇게 조용하게 — 세부 감정 고르기(3/7): 조약돌은 체크 표시와 알약의 점 자리에만 작게 들어갑니다</div><div class="frag-in"><div class="sbar">감정 검색 — 허전, ㅎㅈ</div><div class="trayx">${[["sadness", "가슴아픈"], ["anger", "가혹한"], ["fear", "공포에질린"]].map(chip).join("")}</div>${row("sadness", "가슴아픈", true)}${row("sadness", "걱정되는", false)}${row("sadness", "고단한", false)}</div></div>`;
+    },
+    notes: [["화면이 바뀌는 곳", "오늘·완료 위쪽이 밤의 숲 시냇가가 됩니다. 반딧불 하나가 \"내 빛\"으로 가까운 조약돌을 비추고, 빛을 받은 돌이 반짝입니다. 세부 감정 하나가 조약돌 하나(PRD §6.2의 저장 단위)이고, 선택 트레이가 \"주머니\"가 되며, 달력은 하루에 하나씩 놓이는 조약돌 길이 됩니다. 돌에 박힌 가는 줄무늬만 감정 색(슬픔·분노·공포)이고 나머지는 청회색입니다."], ["좋은 점", "빛을 켜고 줍는 쪽이 <b>사용자 자신</b>이라 안내자에게 주체성을 넘기지 않고, 얼굴 없는 중립 사물이라 판정·페르소나·AI 얼굴 문제가 없으며, <b>새 캐릭터 그림이 필요 없습니다</b>(조약돌은 코드로 그린 도형). \"감정 그 자체\"를 나타내는 것이 마스코트가 아니라 조약돌 하나가 됩니다."], ["조심할 점", "<b>개수·가득 참·희귀한 돌·돌탑 높이</b> 같은 수집 장치와, 돌을 던지거나(물수제비) 짊어지는(\"돌덩이\") 연출은 쓰지 않습니다. 무거운 마음도 담도록 돌의 크기 범위를 넓게 두고, 화면 규칙(밤 장면은 입구 한 장면)은 안 4와 같은 승인이 필요합니다. 청회색 돌은 공포 계열과 색이 이웃이라 감정 줄무늬가 있는 돌과 없는 돌을 구분해서 써야 합니다."]]
+  }
+};
+
+const root = document.getElementById("boards");
+for (const [id, t] of Object.entries(themes)) {
+  const head = t.hero || t.night ? "" : `<header class="m-head"><div class="m-date">2026년 9월 21일 (월)</div><h3 class="m-title" style="margin:2px 0 0">감정일기</h3></header>`;
+  const body = t.night
+    ? `${t.scene()}<div class="m-in">${lede(t.lede)}${cta}${week(id)}${ask(id)}${past(id)}</div>`
+    : t.hero
+    ? `${t.scene()}<div class="m-in"><div class="sign"><p class="m-lede">${t.lede}</p><p class="m-sub">감정을 진단하지 않아요. 내가 고른 말로 하루를 적어 두는 곳이에요.</p>${cta}</div>${week(id)}${ask(id)}${past(id)}</div>`
+    : `<div class="m-in">${head}${t.scene()}${lede(t.lede)}${cta}${week(id)}${ask(id)}${past(id)}</div>`;
+  const sw = t.colors.map(([n, hex]) => `<span><i style="background:${hex}"></i>${n} ${hex}</span>`).join("");
+  const de = t.colors.map(([n, hex]) => { const nn = nearest(hex); return `${n} → ${nn.name} ${nn.role} ΔE ${nn.d.toFixed(1)}${nn.light && nn.d < 7 ? " (가까움)" : ""}`; }).join(" · ");
+  root.insertAdjacentHTML("beforeend", `<article class="board ${id}${t.extend ? " " + t.extend : ""}" id="b-${id}">
+    <div class="board-head"><span class="no">${t.no}</span><h2>${t.name}</h2><span class="dial">${t.dial}</span></div>
+    <p class="tagline">${t.tag}</p>
+    <div class="mock">${body}${nav}</div>${t.after ? t.after() : ""}
+    <div class="notes"><div class="sw">${sw}</div><div class="de"><b>가장 가까운 감정 색과의 거리</b>(밝기가 같은 자리끼리 비교 — 아주 짙은 색은 700·900, 중간은 300~700, 연한 색은 50·100): ${de}</div>
+      <dl>${t.notes.map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join("")}</dl></div></article>`);
+}
+document.getElementById("jump").innerHTML = Object.entries(themes).map(([id, t]) => `<a href="#b-${id}">${t.no} ${t.name}</a>`).join("");
+</script>
+</body>
+</html>

@@ -19,6 +19,47 @@ function contrast(a, b) {
 const checks = [];
 const n = tokens.color.neutral;
 const s = tokens.color.semantic;
+const service = tokens.color.service;
+if (service) {
+  checks.push({ name: "service navigation: white icon on ink", fg: n.bg.light, bg: service.ink.light, min: 3 });
+  checks.push({ name: "service navigation: ink icon on mint selection", fg: service.ink.light, bg: service.mint.light, min: 3 });
+  checks.push({ name: "service button: white label on ink (text, D-054)", fg: n.bg.light, bg: service.ink.light, min: 4.5 });
+  checks.push({ name: "service light on ink stage (D-055)", fg: service.light.light, bg: service.ink.light, min: 7 });
+}
+// 오늘 화면의 어두운 숲(D-062): 큰 질문·안내 글자(흰색)와 날짜 줄(날짜·'지난 기록' 입구)이 숲 위에서 읽혀야 한다. 하단 탐색은 없다(D-076 — 예전의 유리 탐색 아이콘 검사는 뺐다).
+const forest = tokens.color.forest;
+const mixHex = (a, b, t) => "#" + [1, 3, 5].map((i) => Math.round(parseInt(a.slice(i, i + 2), 16) * (1 - t) + parseInt(b.slice(i, i + 2), 16) * t).toString(16).padStart(2, "0")).join("").toUpperCase();
+if (forest) {
+  checks.push({ name: "forest hero: white on sky (text, D-062)", fg: n.bg.light, bg: forest.sky.light, min: 7 });
+  checks.push({ name: "forest caption: white on path-near (text, D-062)", fg: n.bg.light, bg: forest["path-near"].light, min: 4.5 });
+  // 날짜와 '지난 기록 ›'은 흰색 78%(scene.css의 color-mix)이고 하늘 가운데 색 위에 앉는다(D-076). 본문 글자라 4.5:1.
+  checks.push({ name: "forest date row: white 78% date and '지난 기록' link on sky (text, D-076)", fg: mixHex(forest.sky.light, n.bg.light, 0.78), bg: forest.sky.light, min: 4.5 });
+}
+// 편지(D-063): 종이·봉투·칭찬 카드 위 글자. 봉투의 '나에게'는 ink를 78%로 얹은 색이다.
+const paper = tokens.color.paper;
+if (paper && service) {
+  checks.push({ name: "letter paper: text on paper (D-063)", fg: n.text.light, bg: paper.paper.light, min: 4.5 });
+  checks.push({ name: "letter paper: paper-ink label on paper (D-063)", fg: paper["paper-ink"].light, bg: paper.paper.light, min: 4.5 });
+  checks.push({ name: "letter praise: text on service light (D-063)", fg: n.text.light, bg: service.light.light, min: 4.5 });
+  checks.push({ name: "letter praise: paper-ink label on service light (D-063)", fg: paper["paper-ink"].light, bg: service.light.light, min: 4.5 });
+  checks.push({ name: "reason note: text-muted placeholder on paper (D-069)", fg: n["text-muted"].light, bg: paper.paper.light, min: 4.5 });
+  checks.push({ name: "reason note: danger error on paper (D-069)", fg: s.danger.light, bg: paper.paper.light, min: 4.5 });
+  checks.push({ name: "letter envelope: ink 78% label on envelope-body (D-063)", fg: mixHex(paper["envelope-body"].light, service.ink.light, 0.78), bg: paper["envelope-body"].light, min: 4.5 });
+}
+// 완료·온보딩의 색 언덕(D-061): 언덕 위에는 ink 글자(아래 버튼 줄의 '달력 보기')만 올린다. 흰 글자는 올리지 않는다.
+const land = tokens.color.land;
+if (land && service) {
+  for (const hill of ["hill-far", "hill-mid", "hill-near"]) checks.push({ name: `land: ink text on ${hill} (D-061)`, fg: service.ink.light, bg: land[hill].light, min: 4.5 });
+  // 마음 고르기(D-066): 초록 하늘 위 본문 글자와 오류 문구. danger 원색은 4.38:1이라 ink를 25% 섞은 색을 쓴다(write.css `.screen.pick .field-error`).
+  checks.push({ name: "land meadow: text on sky hill-far (D-066)", fg: n.text.light, bg: land["hill-far"].light, min: 4.5 });
+  checks.push({ name: "land meadow error: danger+ink 25% on sky hill-far (D-066)", fg: mixHex(s.danger.light, service.ink.light, 0.25), bg: land["hill-far"].light, min: 4.5 });
+  checks.push({ name: "land meadow: ink text on middle hill mix (D-066)", fg: service.ink.light, bg: mixHex(land["hill-mid"].light, land["hill-near"].light, 0.55), min: 4.5 });
+  // 편지 책상(D-069): 옅은 민트 면 — 뒤쪽은 hill-far 88%+흰색 12%, 앞쪽(페이저·버튼 줄)은 흰색 80%+hill-far 20%(letter-scene.css의 --lt-desk-mid·--lt-desk-front). 캡션(ink)과 안 켜진 페이저 점(ink 50%)이 읽혀야 한다.
+  const deskMid = mixHex(land["hill-far"].light, n.bg.light, 0.12), deskFront = mixHex(n.bg.light, land["hill-far"].light, 0.2);
+  checks.push({ name: "letter desk: ink caption on desk (D-069)", fg: service.ink.light, bg: deskMid, min: 4.5 });
+  checks.push({ name: "letter desk: idle pager dot (ink 50%) on desk (non-text, D-069)", fg: mixHex(deskMid, service.ink.light, 0.5), bg: deskMid, min: 3 });
+  checks.push({ name: "letter desk: idle pager dot (ink 50%) on desk front (non-text, D-069)", fg: mixHex(deskFront, service.ink.light, 0.5), bg: deskFront, min: 3 });
+}
 for (const mode of ["light", "dark"]) {
   checks.push({ name: `${mode} text on bg`, fg: n.text[mode], bg: n.bg[mode], min: 4.5 });
   checks.push({ name: `${mode} text on surface`, fg: n.text[mode], bg: n.surface[mode], min: 4.5 });
@@ -34,6 +75,18 @@ for (const mode of ["light", "dark"]) {
     checks.push({ name: `${mode} chip ${key}: text on fill`, fg: text, bg: fill, min: 4.5 });
     checks.push({ name: `${mode} chip ${key}: border/accent on bg (non-text)`, fg: accent, bg: n.bg[mode], min: 3 });
     checks.push({ name: `${mode} text on soft ${key} 50/900`, fg: n.text[mode], bg: mode === "light" ? fam["50"] : fam["900"], min: 4.5 });
+    if (mode === "light") {
+      // 감정 테마 면(D-053): 계열 300 위에 중립 글자와 ink 채움 버튼이 읽혀야 한다. 흰 글자는 9계열 모두 미달이라 쓰지 않는다.
+      checks.push({ name: `light text on theme field ${key} 300`, fg: n.text[mode], bg: fam["300"], min: 4.5 });
+      // 세부 감정 화면(D-071): 배경은 100 60% + 50 40%, pill은 300 45% + 흰색. 그 위 글자.
+      const tintBg = mixHex(fam["100"], fam["50"], 0.4), pillBg = mixHex(fam["300"], n.bg.light, 0.55);
+      checks.push({ name: `light ink text on detail tint ${key} (D-071)`, fg: service ? service.ink.light : n.text[mode], bg: tintBg, min: 4.5 });
+      checks.push({ name: `light ink text on detail pill ${key} (D-071)`, fg: service ? service.ink.light : n.text[mode], bg: pillBg, min: 4.5 });
+      if (service) {
+        checks.push({ name: `light ink text on theme field ${key} 300`, fg: service.ink.light, bg: fam["300"], min: 4.5 });
+        checks.push({ name: `light ink button edge on theme field ${key} 300 (non-text)`, fg: service.ink.light, bg: fam["300"], min: 3 });
+      }
+    }
   }
 }
 
@@ -93,6 +146,25 @@ for (const [slotName, role, mode] of slots) {
       });
     }
   }
+}
+
+// 서비스 색은 어떤 감정 색 단계와도 구별돼야 한다(D-054). 감정 색과 같아 보이면 "서비스가 감정을 말한다"로 읽힌다.
+// mint는 밝은 단계(100·300·500)와, ink는 어두운 단계(700·900)와 견준다 — 실제로 나란히 놓이는 단계들이다.
+if (service) {
+  for (const [name, color, stepNames] of [["mint", service.mint.light, ["100", "300", "500"]], ["ink", service.ink.light, ["700", "900"]]]) {
+    for (const [, fam] of families) {
+      for (const stepName of stepNames) {
+        checks.push({ name: `service ${name} vs ${fam.label} ${stepName} 색차`, deltaE: deltaE2000(color, fam[stepName]), min: MIN_DELTA_E });
+      }
+    }
+  }
+}
+
+// 밤하늘(D-077·D-084 한 색): 하늘이 감정 색으로 읽히지 않아야 한다 — 짙은 남색은 미움(짙은 남색·보라)과 가깝다. 하늘은 어두운 단계(700·900)와 견준다.
+// 하늘이 숲에 묻혀 초록으로 보이던 문제(하늘-나무 ΔE 1~3)를 되풀이하지 않도록 하늘 가운데와 먼 나무의 색차도 10 이상을 요구한다.
+if (forest) {
+  for (const [, fam] of Object.entries(tokens.color.emotion)) for (const stepName of ["700", "900"]) checks.push({ name: `forest sky vs ${fam.label} ${stepName} 색차 (D-077·D-084)`, deltaE: deltaE2000(forest.sky.light, fam[stepName]), min: MIN_DELTA_E });
+  checks.push({ name: "forest sky vs tree-far 색차 — 하늘과 숲 층 구분 (D-077)", deltaE: deltaE2000(forest.sky.light, forest["tree-far"].light), min: 10 });
 }
 
 let failed = 0;

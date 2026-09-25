@@ -1,6 +1,10 @@
 // 화면 시안(web/) 미리보기용 최소 정적 서버(의존성 없음). 사용: node scripts/web-preview.mjs [port]
-// web/을 "/"로 제공하고, 시안이 값을 베껴 적지 않도록 정본 세 곳을 읽기 전용 경로로 함께 제공한다(D-047):
-//   /design/tokens.json, /data/taxonomy/v2.json, 캐릭터 가운데 시안이 쓰는 것(prompts.json, <key>.png, motion/, ui-poses/)
+// web/을 "/"로 제공하고, 시안이 값을 베껴 적지 않도록 정본을 읽기 전용 경로로 함께 제공한다(D-047):
+//   /design/tokens.json, /data/taxonomy/v2.json,
+//   /design/fonts/*.woff2 (Pretendard 가변 폰트, D-057),
+//   /design/pebbles/ui/*.png (조약돌 화면용 파생본, D-050),
+//   /design/characters/flat-friends/ui/*.png (평면 친구 화면용 파생본, D-051)
+// 디렉터리 경로는 확장자까지 허용 목록으로 좁힌다 — 폰트 폴더의 README·라이선스, 원본 PNG, 크레용 동물 자산(D-051로 시안이 더는 쓰지 않는다)은 내주지 않는다.
 // 그 밖의 저장소 파일은 제공하지 않는다. GET/HEAD만 받는다 — 시안은 아무것도 저장·전송하지 않는다.
 import http from "node:http";
 import fs from "node:fs";
@@ -9,33 +13,29 @@ import { fileURLToPath } from "node:url";
 
 const repo = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const port = Number(process.argv[2] ?? process.env.PORT ?? 4174);
-const types = { ".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".webp": "image/webp" };
+const types = { ".html": "text/html; charset=utf-8", ".json": "application/json; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".woff2": "font/woff2" };
 
-// [URL 접두, 실제 위치, 디렉터리 여부]. 위에서부터 먼저 맞는 것을 쓴다.
+// [URL 접두, 실제 위치, 디렉터리 여부, 디렉터리일 때 허용하는 확장자]. 위에서부터 먼저 맞는 것을 쓴다.
 const mounts = [
   ["/design/tokens.json", path.join(repo, "design", "tokens.json"), false],
   ["/data/taxonomy/v2.json", path.join(repo, "data", "taxonomy", "v2.json"), false],
-  ["/design/characters/prompts.json", path.join(repo, "design", "characters", "prompts.json"), false],
-  ["/design/characters/motion/", path.join(repo, "design", "characters", "motion"), true],
-  ["/design/characters/ui-poses/", path.join(repo, "design", "characters", "ui-poses"), true],
+  ["/design/fonts/", path.join(repo, "design", "fonts"), true, [".woff2"]],
+  ["/design/pebbles/ui/", path.join(repo, "design", "pebbles", "ui"), true, [".png"]],
+  ["/design/characters/flat-friends/ui/", path.join(repo, "design", "characters", "flat-friends", "ui"), true, [".png"]],
   ["/", path.join(repo, "web"), true]
 ];
 
-// 대표 PNG는 design/characters/ 바로 아래의 <key>.png뿐이다. pilot/·src/·qa.html 같은 작업 파일은 내주지 않는다.
-const REPRESENTATIVE = new RegExp("^/design/characters/([a-z]+)[.]png$");
-
 export function resolveRequest(urlPath) {
-  const representative = urlPath.match(REPRESENTATIVE);
-  if (representative) return path.join(repo, "design", "characters", `${representative[1]}.png`);
   if (urlPath.startsWith("/design/") || urlPath.startsWith("/data/")) {
     if (!mounts.some(([prefix, , isDir]) => prefix !== "/" && (isDir ? urlPath.startsWith(prefix) : urlPath === prefix))) return null;
   }
-  for (const [prefix, target, isDir] of mounts) {
+  for (const [prefix, target, isDir, exts] of mounts) {
     if (!isDir) { if (urlPath === prefix) return target; continue; }
     if (!urlPath.startsWith(prefix)) continue;
     const rel = urlPath.slice(prefix.length) || "index.html";
     const file = path.resolve(target, rel);
     if (file !== target && !file.startsWith(target + path.sep)) return null;
+    if (exts && !exts.includes(path.extname(file).toLowerCase())) return null;
     return file;
   }
   return null;

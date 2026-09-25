@@ -1,0 +1,163 @@
+/* 오늘 있었던 일·칭찬·감사 화면의 장면(D-069). 작업자 notes 소유. 색은 전부 CSS 변수(tokens.json)다 — 필요한 중간색은 color-mix()로 만든다.
+   이유 화면(reason.css)과 같은 가족이다: 흰 바탕 위의 종이, 민트 테이프, 아래 초록 언덕, 그림자 없음, 아래 버튼 줄이 투명해 언덕이 그 뒤까지 이어진다.
+   화면마다 다른 이야기를 한다 — 종이 모양·기울기·풍경 요소·언덕 배치가 모두 다르다:
+     오늘 있었던 일  줄 종이 노트(+.5°)와 날짜 탭 · 이른 아침(해·흰 길·시작하는 돌)
+     칭찬           세 장의 쪽지(−1.5° +1° −.5°) · 해가 높이 뜬 낮의 언덕과 이번에 고른 조약돌
+     감사           끈에 꿴 세 장의 종이 카드(±.6°) · 노을 띠와 언덕, 작은 등불
+   장면은 문서 흐름 안에 있다(position:fixed로 화면을 덮지 않는다). 아래 버튼 줄 뒤의 가까운 언덕(.nt-base)만 sticky다.
+   write.css·base.css의 규칙은 여기서 더 구체적인 선택자로 덮는다(덮은 규칙은 다른 단계가 계속 쓰므로 원본은 그대로 둔다). */
+
+/* ── 공통 뼈대 ── */
+main:has(.nt-scene){--nt-foot-h:calc(84px + env(safe-area-inset-bottom));--nt-crest0:calc(var(--nt-foot-h) + 20px)} /* foot-h: 아래 버튼 줄(.step-footer)의 높이, crest0: 그 위로 가까운 언덕의 마루가 솟은 높이 */
+html:has(.nt-scene){scroll-padding-top:calc(var(--banner-h,2rem) + 3.5rem);scroll-padding-bottom:calc(128px + env(safe-area-inset-bottom))}
+.screen.write:has(.nt-scene){padding-bottom:0}
+.screen.write:has(.nt-scene) .write-top{background:var(--bg)} /* 화면이 길어 스크롤될 때 글이 뒤로 가기·단계 표시 밑으로 비쳐 보이지 않게 */
+.screen.write:has(.nt-scene) .paper-guide{margin:0 0 var(--sp-4)}
+.nt-scene{position:relative;flex:1;display:flex;flex-direction:column;min-width:0}
+/* write.css의 일반 진입 연출(stepin)은 이 장면들이 각자의 진입 연출을 가지므로 끈다(제목·안내 줄의 stepin은 그대로 쓴다). */
+.screen.write .nt-scene :is(.field,.slots-field,.slot-input){animation:none}
+
+/* ── 민트 테이프 ─ 이유 화면과 같은 가장자리 모양. 크기·기울기·자리만 다르다. ── */
+.nt-slip::before,.nt-tab::before,.nt-tags::after,.nt-sheet>.nt-paper:first-child::before{content:"";position:absolute;pointer-events:none;background:color-mix(in srgb,var(--service-mint) 72%,transparent);
+  clip-path:polygon(0 0,100% 0,97% 12.5%,100% 25%,97% 37.5%,100% 50%,97% 62.5%,100% 75%,97% 87.5%,100% 100%,0 100%,3% 87.5%,0 75%,3% 62.5%,0 50%,3% 37.5%,0 25%,3% 12.5%)}
+
+/* ── 땅과 하늘 ─ 초록 언덕(land 토큰). 하늘 쪽 장식(해·안개)은 위에서, 땅 쪽 장식(언덕·길·돌·조약돌·등불)은 가까운 언덕의 마루에서 잰다.
+      그래서 화면이 높아져 남는 자리는 하늘이 되고 땅은 늘 발 아래 그대로다. 몸통(.nt-land)은 버튼 줄 위까지, 가까운 언덕(.nt-base)은 버튼 줄 자리에 따로 있고 sticky다. ── */
+.nt-land{position:relative;z-index:0;flex:1 0 auto;min-height:calc(var(--nt-crest0) + var(--nt-sky));margin:0 calc(var(--sp-5) * -1);overflow:hidden}
+.nt-hill{position:absolute;left:var(--l);right:var(--r);bottom:0;border-radius:50% 50% 0 0/var(--ry) var(--ry) 0 0;pointer-events:none}
+.nt-hill.far{height:calc(var(--nt-crest0) + var(--nt-far-h));background:var(--land-hill-far)}
+.nt-hill.mid{height:calc(var(--nt-crest0) + var(--nt-mid-h));background:var(--land-hill-mid)}
+.nt-tree{position:absolute;left:var(--x);bottom:calc(var(--nt-crest0) + var(--nt-tree-h) - var(--dy) - var(--r) * .3px);width:calc(var(--r) * 2px);height:calc(var(--r) * 2.8px);margin-left:calc(var(--r) * -1px);pointer-events:none}
+.nt-tree::before{content:"";position:absolute;left:50%;bottom:0;width:3px;height:calc(var(--r) * 1.2px);margin-left:-1.5px;border-radius:2px;background:color-mix(in srgb,var(--land-hill-near) 68%,var(--service-ink))}
+.nt-tree::after{content:"";position:absolute;left:0;top:0;width:100%;aspect-ratio:1;border-radius:50%;background:var(--land-hill-near)}
+.nt-base{position:sticky;bottom:0;z-index:2;flex:none;display:block;height:var(--nt-crest0);margin:calc(var(--nt-crest0) * -1) calc(var(--sp-5) * -1) 0;overflow:hidden;pointer-events:none}
+.nt-base i{position:absolute;left:var(--l);right:var(--r);top:0;bottom:0;border-radius:50% 50% 0 0/var(--ry) var(--ry) 0 0;background:var(--land-hill-near)}
+/* 해: 둥근 해와 옅은 고리 둘. 해 자체는 움직이지 않고 아주 천천히 2~3%만 커졌다 줄어든다(scale). 언덕 뒤에 놓여 마루가 해의 아래쪽을 가릴 수 있다. */
+.nt-sun{position:absolute;left:var(--sx);width:var(--s);height:var(--s);margin-left:calc(var(--s) * -.5);border-radius:50%;background:var(--land-sun);pointer-events:none;animation:nt-pulse 9s ease-in-out 1.8s infinite}
+.nt-sun::before,.nt-sun::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.nt-sun::before{inset:calc(var(--s) * -.3);border:2.5px solid var(--land-sun-ring)}
+.nt-sun::after{inset:calc(var(--s) * -.62);border:2px solid var(--land-sun-ring)}
+
+/* 아래 버튼 줄은 가까운 언덕(.nt-base) 위에 얹힌다(배경 투명). 초록 위 초점 링은 ink 3px. */
+main:has(.nt-scene) .step-footer{margin-top:calc(var(--nt-foot-h) * -1);background:transparent}
+main:has(.nt-scene) .step-footer :focus-visible{outline:3px solid var(--service-ink);outline-offset:3px}
+
+/* ═══ 오늘 있었던 일 ─ 길의 시작·아침 ═══
+   줄 종이 노트가 +.5°로 기운다(이유는 −.6°). 날짜 칸을 받으면 노트 위에 붙은 종이 탭이다(작성 흐름은 D-082로 날짜 칸이 없어 종이만 선다). 아래는 옅은 초록 하늘, 막 뜨는 해, 먼 언덕, 흰 길, 길의 들머리에 놓인 시작하는 돌. */
+.nt-event .nt-land{--nt-sky:8rem;--nt-far-h:5.6rem;--nt-mid-h:2.9rem;--nt-tree-h:var(--nt-far-h)}
+.nt-sheet{--nt-tilt:.5deg;position:relative;flex:3 1 auto;display:flex;flex-direction:column;margin:var(--sp-5) 0 var(--sp-4);transform:rotate(var(--nt-tilt));transform-origin:50% 0;animation:nt-sheet-in 560ms var(--ease) backwards}
+.nt-tab{position:relative;align-self:flex-start;width:min(100%,18.5rem);margin-left:0;padding:0 var(--sp-4) var(--sp-2);border-radius:var(--radius-card) var(--radius-card) 0 0;background:color-mix(in srgb,var(--service-light) 60%,var(--paper-rule));animation:nt-tab-in 420ms var(--ease) 240ms backwards}
+.nt-tab::before{left:-.7rem;top:-.35rem;width:2.5rem;height:.95rem;transform:rotate(-32deg)}
+.nt-tab .field{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:var(--sp-1);margin:0}
+.nt-tab .field-label{margin:0;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);color:var(--paper-ink)}
+.nt-tab input[type="date"]{min-width:0;min-height:var(--touch);padding:0 var(--sp-2);border-radius:var(--radius);background:none;color:var(--text);font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:700}
+.nt-tab input[type="date"]:focus-visible{outline-offset:-2px}
+.nt-tab input[type="date"]::-webkit-calendar-picker-indicator{margin:0 calc(var(--sp-1) * -1) 0 0;padding:var(--sp-3);opacity:.72;cursor:pointer} /* 달력 아이콘의 누르는 자리를 40px 안팎으로 키운다 */
+.nt-tab .field .caption{grid-column:1/-1;margin:-2px 0 0;color:var(--paper-ink)}
+.nt-tab .field-error{grid-column:1/-1;margin:0 0 var(--sp-1)}
+.nt-paper{position:relative;flex:1 1 auto;display:flex;flex-direction:column;padding:0 var(--sp-4) var(--sp-2);border-radius:0 var(--radius-card) var(--radius-card) var(--radius-card);
+  background:var(--paper) linear-gradient(to bottom,transparent calc(2rem - 1px),var(--paper-rule) calc(2rem - 1px)) 0 0/100% 2rem repeat-y}
+/* 날짜 탭이 없으면(D-082 — 새 기록은 그날만 써서 작성 흐름에 날짜 칸이 없다) 종이가 맨 위다: 네 모서리를 모두 둥글게 하고 탭의 민트 테이프를 종이 모서리가 받는다. */
+.nt-sheet>.nt-paper:first-child{border-top-left-radius:var(--radius-card)}
+.nt-sheet>.nt-paper:first-child::before{left:-.7rem;top:-.35rem;width:2.5rem;height:.95rem;transform:rotate(-32deg)}
+.nt-paper .field{flex:1 1 auto;display:flex;flex-direction:column;margin:0}
+.nt-paper .field-label{margin:0;font-size:var(--fs-label);line-height:2rem;font-weight:var(--fw-body-strong);color:var(--paper-ink)}
+.nt-paper .ruled{flex:1 0 auto;width:calc(100% + var(--sp-4) * 2);min-height:0;margin:0 calc(var(--sp-4) * -1);padding:0 var(--sp-4);background:none;color:var(--text);scroll-margin-bottom:calc(128px + env(safe-area-inset-bottom))} /* 종이 좌우 여백까지 눌러도 글쓰기가 시작된다 */
+.nt-paper .ruled::placeholder{color:var(--muted)}
+.nt-paper .field-error{margin:0;font-size:var(--fs-label);line-height:2rem}
+@supports selector(:has(*)){
+  .nt-paper:has(.ruled:focus-visible){outline:var(--emphasis) solid var(--focus);outline-offset:4px}
+  .nt-paper .ruled:focus-visible{outline:none}
+}
+/* 하늘은 옅은 초록 언덕 모양의 안개다. 해는 먼 언덕 마루에 반쯤 걸려 있다(막 뜨는 중). */
+.nt-haze{position:absolute;left:-30%;right:-30%;top:0;bottom:0;border-radius:50% 50% 0 0/3rem 3rem 0 0;background:color-mix(in srgb,var(--land-hill-far) 42%,var(--bg));pointer-events:none}
+.nt-sun.dawn{--s:2.6rem;--sx:74%;bottom:calc(var(--nt-crest0) + var(--nt-far-h));margin-bottom:calc(var(--s) * -.5);animation:nt-rise 1600ms var(--ease) 300ms backwards,nt-pulse 9s ease-in-out 1.9s infinite}
+.nt-road{position:absolute;left:0;bottom:calc(var(--nt-foot-h) + 12px);width:100%;height:calc(var(--nt-far-h) + 8px);pointer-events:none}
+.nt-road path{fill:var(--bg)}
+.nt-stone{position:absolute;left:var(--rx);bottom:calc(var(--nt-crest0) + 3px);width:3.75rem;margin-left:-1.875rem;pointer-events:none;animation:nt-drop 620ms var(--ease) 700ms backwards}
+.nt-stone .stone-img{position:static;display:block;width:100%;height:auto}
+.nt-story{position:absolute;left:calc(var(--rx) + 2.75rem);bottom:calc(var(--nt-crest0) + .8rem);max-width:calc(100% - var(--rx) - 3.75rem);margin:0;text-wrap:balance;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);color:var(--service-ink);animation:nt-fade 600ms var(--ease) 900ms backwards}
+
+/* ═══ 칭찬 ─ 빛 아래 쪽지 ═══
+   크림빛 종이에 민트 테이프로 붙인 쪽지 셋. 기울기와 자리가 제각각이다(−1.5° +1° −.5°, 좌우로 엇갈림). 아래 오른쪽 모서리가 접혀 있다. 입력은 그대로 <input>이고 쪽지가 그 바탕이다.
+   아래는 해가 높이 뜬 밝은 언덕이고 이번에 고른 계열의 조약돌이 언덕 위에 조용히 놓인다(모두 같은 크기, 장식). */
+.nt-praise .nt-land{--nt-sky:12rem;--nt-far-h:6.4rem;--nt-mid-h:3.6rem;--nt-tree-h:var(--nt-far-h)}
+.nt-desk{flex:none;margin:var(--sp-2) 0 var(--sp-5)}
+.nt-desk .slots-field{margin:0}
+.nt-desk .slots-field .field-label{margin:0;color:var(--text)}
+.nt-desk .slots-field .caption{margin:var(--sp-1) 0;color:var(--muted)}
+.nt-slips{display:flex;flex-direction:column;gap:var(--sp-4);padding-top:var(--sp-4)}
+.nt-slip{--nt-tilt:-1.5deg;position:relative;width:calc(100% - 1.5rem);border-radius:var(--radius-card) var(--radius-card) 0 var(--radius-card);background:linear-gradient(315deg,transparent .7rem,var(--service-light) .7rem);transform:rotate(var(--nt-tilt));animation:nt-stick 540ms var(--ease) calc(120ms + var(--i) * 150ms) backwards}
+.nt-slip:nth-child(2){--nt-tilt:1deg;margin-left:auto}
+.nt-slip:nth-child(3){--nt-tilt:-.5deg}
+.nt-slip::before{left:50%;top:-.5rem;width:2.75rem;height:.95rem;margin-left:-1.375rem;transform:rotate(-4deg);animation:nt-fade 320ms var(--ease) calc(420ms + var(--i) * 150ms) backwards}
+.nt-slip:nth-child(2)::before{transform:rotate(3deg)}
+.nt-slip:nth-child(3)::before{transform:rotate(-2deg)}
+.nt-slip::after{content:"";position:absolute;right:0;bottom:0;width:1rem;height:1rem;background:color-mix(in srgb,var(--service-light) 62%,var(--paper-rule));clip-path:polygon(0 0,100% 0,0 100%);pointer-events:none}
+.nt-slip .slot-input{display:block;margin:0;min-height:3.25rem;padding:var(--sp-3) var(--sp-4);border-radius:inherit;background:none;color:var(--text);scroll-margin-bottom:calc(128px + env(safe-area-inset-bottom))}
+.nt-slip .slot-input::placeholder{color:var(--muted)}
+.nt-sun.noon{--s:3.5rem;--sx:22%;top:4.4rem;margin-top:calc(var(--s) * -.5);animation:nt-fade 900ms var(--ease) 300ms backwards,nt-pulse 9s ease-in-out 1.8s infinite}
+.nt-pebbles{position:absolute;left:0;right:0;bottom:calc(var(--nt-crest0) + .75rem);display:flex;justify-content:center;align-items:flex-end;gap:var(--sp-2);padding:0 var(--sp-3);pointer-events:none}
+.nt-peb{flex:none;display:block;width:var(--nt-peb);height:var(--nt-peb);margin-bottom:calc(var(--nt-peb) * -.12);rotate:var(--rot);animation:nt-settle 700ms var(--ease) calc(560ms + var(--i) * 90ms) backwards}
+.nt-peb:nth-child(3n+2){translate:0 -6px}
+.nt-peb:nth-child(3n){translate:0 3px}
+.nt-peb img{display:block;width:100%;height:100%;max-width:none}
+
+/* ═══ 감사 ─ 저녁 무렵 등불 아래 카드 ═══
+   끈에 꿴 종이 카드 셋. 쪽지보다 가로로 넓고 거의 곧게 놓이며(±.6°), 카드마다 줄 하나와 끈 구멍이 있다. 끈은 맨 위 민트 테이프에서 내려와 카드마다 구멍으로 들어간다.
+   아래는 저녁 무렵의 언덕(밝은 톤 그대로)과 아주 옅은 노을 띠, 그리고 작은 등불 하나 — 등불 빛이 아주 천천히 숨쉰다. 조약돌은 놓지 않는다(칭찬 화면의 것과 겹치지 않게). */
+.nt-thanks .nt-land{--nt-sky:11rem;--nt-mid-h:4.6rem;--nt-tree-h:var(--nt-mid-h)}
+.nt-tags{--nt-thread:color-mix(in srgb,var(--paper-ink) 55%,transparent);position:relative;display:flex;flex-direction:column;gap:var(--sp-3);padding-top:1.75rem}
+.nt-tags::after{left:.4rem;top:.1rem;width:2.5rem;height:.9rem;transform:rotate(-8deg)}
+.nt-tag{--nt-tilt:-.6deg;position:relative;border-radius:var(--radius-card);transform:rotate(var(--nt-tilt));animation:nt-hang 620ms var(--ease) calc(120ms + var(--i) * 160ms) backwards;
+  background:var(--paper) linear-gradient(to bottom,transparent calc(100% - .875rem),var(--paper-rule) calc(100% - .875rem),var(--paper-rule) calc(100% - .875rem + 1px),transparent calc(100% - .875rem + 1px))}
+.nt-tag:nth-child(2){--nt-tilt:.5deg}
+.nt-tag:nth-child(3){--nt-tilt:-.4deg}
+.nt-tag::before{content:"";position:absolute;left:1.5rem;top:50%;width:1rem;height:1rem;margin:-.5rem 0 0 -.5rem;border:3px solid var(--paper-rule);border-radius:50%;background:var(--bg);pointer-events:none}
+.nt-tag::after{content:"";position:absolute;left:1.5rem;top:calc(var(--sp-3) * -1);width:2px;height:calc(var(--sp-3) + 50%);margin-left:-1px;background:var(--nt-thread);pointer-events:none}
+.nt-tag:first-child::after{top:-1.4rem;height:calc(1.4rem + 50%)}
+.nt-tag .slot-input{display:block;margin:0;min-height:3.25rem;padding:var(--sp-3) var(--sp-4) var(--sp-3) 3rem;border-radius:var(--radius-card);background:none;color:var(--text);scroll-margin-bottom:calc(128px + env(safe-area-inset-bottom))}
+.nt-tag .slot-input::placeholder{color:var(--muted)}
+/* 노을 띠: 아주 옅은 크림빛 두 겹이 언덕 위 하늘에 깔린다(밝은 바탕 유지). */
+.nt-dusk{position:absolute;left:-40%;right:-40%;bottom:0;border-radius:50% 50% 0 0/4.5rem 4.5rem 0 0;pointer-events:none}
+.nt-dusk.d1{top:.75rem;background:color-mix(in srgb,var(--service-light) 34%,var(--bg))}
+.nt-dusk.d2{height:calc(var(--nt-crest0) + var(--nt-mid-h) + 3.5rem);background:color-mix(in srgb,var(--service-light) 72%,var(--bg))}
+/* 등불: 언덕 마루에 세운 기둥 끝의 작은 등. 빛은 둥근 면 둘(옅은 크림빛)이고 아주 천천히 커졌다 줄어든다. */
+.nt-lantern{position:absolute;left:var(--x);bottom:calc(var(--nt-crest0) + var(--nt-mid-h) - var(--dy) - .3rem);width:0;height:4rem;pointer-events:none}
+.nt-lpole{position:absolute;left:-1.5px;bottom:0;width:3px;height:3.6rem;border-radius:2px;background:color-mix(in srgb,var(--land-hill-near) 45%,var(--service-ink))}
+.nt-lamp{position:absolute;left:-.75rem;top:0;width:1.5rem;height:1.9rem;border-radius:.5rem;background:color-mix(in srgb,var(--service-light) 45%,var(--envelope-flap))}
+.nt-lamp::before,.nt-lamp::after{content:"";position:absolute;left:-.15rem;right:-.15rem;height:.35rem;border-radius:.2rem;background:color-mix(in srgb,var(--land-hill-near) 45%,var(--service-ink))}
+.nt-lamp::before{top:-.2rem}
+.nt-lamp::after{bottom:-.2rem}
+.nt-lglow{position:absolute;left:0;top:.95rem;border-radius:50%;transform-origin:50% 50%;animation:nt-breathe 7s ease-in-out infinite}
+.nt-lglow.g1{width:4.5rem;height:4.5rem;margin:-2.25rem 0 0 -2.25rem;background:color-mix(in srgb,var(--service-light) 58%,transparent)}
+.nt-lglow.g2{width:7rem;height:7rem;margin:-3.5rem 0 0 -3.5rem;background:color-mix(in srgb,var(--service-light) 30%,transparent);animation-delay:-1.6s}
+
+/* 초점이 들어온 쪽지·카드는 곧게 펴진다 — 글의 내용이 아니라 손끝(초점)에만 반응하고, 나가면 다시 기운다. */
+.nt-slip,.nt-tag{transition:transform var(--dur-slow) var(--ease)}
+.nt-slip:focus-within,.nt-tag:focus-within{transform:rotate(0deg)}
+
+/* ── 움직임: 진입 1회와 아주 느린 반복 하나(오늘 있었던 일 = 해, 칭찬 = 해, 감사 = 등불 빛). 반복은 3% 안쪽(등불 빛은 불투명도가 함께 숨쉰다). ── */
+@keyframes nt-sheet-in{from{opacity:0;transform:translateY(12px) rotate(calc(var(--nt-tilt) + .8deg))}to{opacity:1;transform:translateY(0) rotate(var(--nt-tilt))}}
+@keyframes nt-tab-in{from{opacity:0;translate:0 8px}to{opacity:1;translate:0 0}}
+@keyframes nt-rise{from{opacity:0;translate:0 1.75rem}to{opacity:1;translate:0 0}}
+@keyframes nt-pulse{0%,100%{scale:1}50%{scale:1.03}}
+@keyframes nt-drop{from{opacity:0;translate:0 -.75rem}to{opacity:1;translate:0 0}}
+@keyframes nt-fade{from{opacity:0}to{opacity:1}}
+@keyframes nt-stick{0%{opacity:0;translate:0 -18px;scale:1.06}60%{opacity:1;translate:0 2px;scale:1}100%{opacity:1;translate:0 0;scale:1}}
+@keyframes nt-settle{from{opacity:0;translate:0 -10px}}
+@keyframes nt-hang{0%{opacity:0;translate:0 -16px;rotate:-1.6deg}100%{opacity:1;translate:0 0;rotate:0deg}}
+@keyframes nt-breathe{0%,100%{scale:1;opacity:1}50%{scale:1.03;opacity:.8}}
+
+/* 화면이 낮으면(≤780px) 세로 여백을 줄인다(이 경계 바로 위에서 한 화면에 들어오도록 780으로 잡았다). */
+@media (max-height:780px){
+  .screen.write:has(.nt-scene) h1{margin:var(--sp-1) 0}
+  .screen.write:has(.nt-scene) .paper-guide{margin-bottom:var(--sp-2)}
+  .nt-sheet{margin:var(--sp-4) 0 var(--sp-3)}
+  .nt-desk{margin-bottom:var(--sp-2)}
+  .nt-slips{gap:var(--sp-3);padding-top:var(--sp-3)}
+}
+@media (prefers-reduced-motion:reduce){
+  .nt-sheet,.nt-tab,.nt-sun,.nt-sun.dawn,.nt-sun.noon,.nt-stone,.nt-story,.nt-slip,.nt-slip::before,.nt-peb,.nt-tag,.nt-lglow{animation:none}
+  .nt-slip,.nt-tag{transition:none}
+}

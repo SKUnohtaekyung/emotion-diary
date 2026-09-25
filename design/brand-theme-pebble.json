@@ -1,0 +1,40 @@
+{
+  "name": "pebble",
+  "status": "superseded(2026-09-21) — 이 값을 읽던 ?theme=pebble 예시는 폐기했다. 크림빛 #FFF3D6은 tokens.json의 service.light(D-054·D-055)로 옮겼고, 밤 장면·종이색·청록 잉크 값은 흰 바탕 결정(D-050)으로 쓰지 않는다. 기록용으로만 보존한다",
+  "note": "감정 9색은 tokens.json 그대로다. 여기에는 감정 색이 아닌 서비스 색(중립·빛·밤 장면)만 둔다. 중립색 대비(계산 2026-09-21): text/bg 15.3:1, text-muted 6.6~7.6:1, text-subtle 4.7~5.4:1 — 글자 조합은 모두 4.5 이상이다. 깊은 청록 #092326은 여섯째 자리가 정해지지 않은 #09232?의 가운데 값이다.",
+  "neutral": {
+    "bg": "#FAF7F0",
+    "surface": "#F3F0E8",
+    "surface-raised": "#FFFFFF",
+    "border": "#E1E5E1",
+    "border-strong": "#B9C5C2",
+    "text": "#092326",
+    "text-muted": "#3F5957",
+    "text-subtle": "#586F6C"
+  },
+  "light": "#FFF3D6",
+  "scene": {
+    "night": "#092326",
+    "pine-far": "#0F3033",
+    "pine-mid": "#0C2A2D",
+    "pine-front": "#061B1E",
+    "bank-far": "#0B2A2D",
+    "water": "#0F383B",
+    "bank-near": "#0A2427",
+    "glint": "#FFF8E6",
+    "edge": "#04161A",
+    "stones": [
+      "#1F4B4E",
+      "#27595B",
+      "#1E4E51",
+      "#2E6567",
+      "#173E41",
+      "#2F6466",
+      "#1B4447",
+      "#1E4A4D",
+      "#234F52",
+      "#123F42",
+      "#144245"
+    ]
+  }
+}

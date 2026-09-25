@@ -1,0 +1,87 @@
+/* 화면 사이 연출(D-084, 사용자 요청 "한 편의 영화처럼"): 이미 있는 세 연출(오늘 돌의 흰빛, 봉투 열림, 완료 화면 친구 입장)과 같은 결 —
+   저자극·차분, 느리고 부드럽게, 한 번에 한 가지 움직임만. 움직임 줄이기에서는 모두 끄거나 150ms 이하로 줄인다(맨 아래 공통 규칙).
+   write.js·state.js·main.js(라우터)가 여기 클래스·CSS 변수를 붙였다 뗀다. letter.js·tabs.js 등 다른 소유 파일은 고치지 않고 이 파일에서만 덮어쓴다. */
+
+/* ── 1) 작성 단계 사이(과제1, write.js goStep) ─────────────────────────────────────────
+   main.js가 #/write?step= 사이 이동일 때만 document.startViewTransition으로 감싼다. 배경 장면(언덕·틀)은 그대로 두고
+   제목(h1)과 장면(각 단계 body의 마지막 요소)만 앞/뒤 방향으로 살짝(16px) 밀리며 옅게 바뀐다. write.js가 goStep에서
+   documentElement의 data-film-dir(fwd|back)을 미리 정해 둔다. */
+.screen.write h1 { view-transition-name: film-title; }
+.screen.write > :last-child { view-transition-name: film-scene; }
+
+::view-transition-group(film-title), ::view-transition-group(film-scene) { animation-duration: 300ms; animation-timing-function: var(--ease); }
+::view-transition-old(film-title), ::view-transition-old(film-scene) { animation: film-step-out 280ms var(--ease) both; }
+::view-transition-new(film-title), ::view-transition-new(film-scene) { animation: film-step-in 300ms var(--ease) both; }
+:root[data-film-dir="back"]::view-transition-old(film-title), :root[data-film-dir="back"]::view-transition-old(film-scene) { animation-name: film-step-out-back; }
+:root[data-film-dir="back"]::view-transition-new(film-title), :root[data-film-dir="back"]::view-transition-new(film-scene) { animation-name: film-step-in-back; }
+@keyframes film-step-out { to { opacity: 0; transform: translateX(-16px); } }
+@keyframes film-step-in { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
+@keyframes film-step-out-back { to { opacity: 0; transform: translateX(16px); } }
+@keyframes film-step-in-back { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+
+/* View Transitions 미지원 대체(main.js가 최초 1회 html에 film-vt를 달아 둔다 — 있으면 위 방식을 쓰므로 아래는 켜지 않는다). */
+@media (prefers-reduced-motion: no-preference) {
+  html:not(.film-vt) .screen.write h1, html:not(.film-vt) .screen.write > :last-child { animation: film-step-in 300ms var(--ease) both; }
+  html:not(.film-vt)[data-film-dir="back"] .screen.write h1, html:not(.film-vt)[data-film-dir="back"] .screen.write > :last-child { animation-name: film-step-in-back; }
+}
+
+/* ── 2) '남기기' 뒤 봉인(과제2, write.js complete()) ─────────────────────────────────────
+   카드 묶음이 작아지며 내려가고(450ms) → 뚜껑이 닫히고 → 인장이 눌리고 → 봉투가 흰빛 속으로 옅어지고 → 완료 화면이 그 빛에서 떠오른다.
+   봉투가 열려 있지 않았으면 카드 단계를 건너뛴다(write.js가 클래스를 안 붙인다). */
+.film-cards-in { transition: transform 380ms var(--ease), opacity 380ms var(--ease); transform: scale(.12) translateY(130px); opacity: 0; }
+/* write.css는 .opened .envback·.envfront·.flapwrap을 display:none으로 감춘다(열고 나면 다시 안 보이게) — 봉인 연출은 그걸 되돌려야 뚜껑·인장이 보인다.
+   .flap의 회전 애니메이션도 .opening이 빠지면 사라져 있어(기본값은 닫힌 0deg) 다시 보일 때 열린 180deg로 잡아 둔 뒤 닫는 애니메이션을 건다. */
+.letter-stage.film-sealing .envback, .letter-stage.film-sealing .envfront, .letter-stage.film-sealing .flapwrap { display: block; }
+.letter-stage.film-sealing .flap { transform: perspective(900px) rotateX(180deg); }
+.film-flap-close { animation: film-flap-close 250ms var(--ease) both; }
+@keyframes film-flap-close { from { transform: perspective(900px) rotateX(180deg); } to { transform: perspective(900px) rotateX(0deg); } }
+.film-seal-press { animation: film-seal-press 280ms var(--ease) both; }
+@keyframes film-seal-press { 0% { transform: scale(1); } 55% { transform: scale(.9); } 100% { transform: scale(1); } }
+.film-envelope-out { transition: transform 330ms var(--ease), opacity 330ms var(--ease); transform: translateY(-20px); opacity: 0; }
+.film-whiteout { position: fixed; inset: 0; z-index: 300; background: var(--bg); opacity: 0; pointer-events: none; transition: opacity 380ms var(--ease); }
+.film-whiteout.film-show { opacity: 1; }
+.film-whiteout.film-hide { opacity: 0; }
+/* 완료 화면이 흰빛에서 떠오른다: renderDone이 매번 붙이는 진입 애니메이션(D-061 기존 '친구 입장'과 같은 결 — 화면 자체는 살짝 위로, 옅게). */
+@media (prefers-reduced-motion: no-preference) {
+  .screen.done { animation: film-rise-in 420ms var(--ease) both; }
+}
+@keyframes film-rise-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+/* ── 3) 완료 → 달력 보기(과제3, 재작업 2회차로 구조를 바꿨다) ──────────────────────────────
+   전에는 body.film-just-saved로 오늘 칸(.cal [aria-current="date"])의 ::after에 조약돌을 얹었는데, 그 ::after는
+   tabs.css가 이미 완료·임시저장 상태의 안쪽 채움에 쓰고 있어(.day.today.completed::after 등, D-080) 같은 가짜
+   요소를 두고 다퉜다 — 내 규칙이 명시성으로 이겨 자리·크기·배경을 가로채면서, 조약돌이 떠 있는 동안 '완료' 채움이
+   통째로 사라져 보이는 결함이 났다(칸 자체의 클래스·색은 실제로는 한 번도 안 바뀌었다 — computed style로도 확인했다).
+   그래서 조약돌은 tabs.js 요소의 pseudo를 아예 쓰지 않고 write.js가 만든 진짜 엘리먼트(.wf-film-badge, body에 붙인
+   position:fixed)로 그린다 — 오늘 칸의 실제 화면 좌표(getBoundingClientRect)를 재서 자리만 빌릴 뿐, 칸 자체의
+   background·border·opacity는 전혀 건드리지 않는다. 은은한 빛은 칸에 box-shadow만 준다(배경을 바꾸지 않으니 완료·
+   임시저장 표시를 가리지 않는다). wf-film-badge-enter(내려앉는 애니메이션)는 700ms 뒤 뗀다(both 유지값이 뒤에 오는
+   opacity 전환을 막지 않도록 — 재작업 1회차에서 검증된 방식). wf-film-badge-out은 1200ms에 더해 300ms에 걸쳐
+   흐려지게 한 뒤에야 write.js가 배지를 없앤다. */
+.wf-film-badge {
+  position: fixed; width: 21px; height: 21px; z-index: 300; pointer-events: none;
+  transform: translate(-50%, -50%);
+  background-size: contain; background-repeat: no-repeat;
+  filter: drop-shadow(0 2px 1.5px rgba(9, 35, 40, .28));
+  opacity: 1; transition: opacity 300ms var(--ease);
+}
+.wf-film-badge.wf-film-badge-out { opacity: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .wf-film-badge.wf-film-badge-enter { animation: film-pebble-drop 700ms var(--ease) both; }
+  .wf-film-glow { animation: film-cell-glow 700ms var(--ease) both; }
+}
+@keyframes film-pebble-drop { 0% { transform: translate(-50%, -50%) translateY(-16px); opacity: 0; } 55% { opacity: 1; } 100% { transform: translate(-50%, -50%) translateY(0); opacity: 1; } }
+@keyframes film-cell-glow { 0%, 100% { box-shadow: none; } 42% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--service-mint) 55%, transparent); } }
+
+/* ── 움직임 줄이기: 모두 끄거나 150ms 이하 즉시 전환(공통 원칙) ── */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(film-title), ::view-transition-group(film-scene),
+  ::view-transition-old(film-title), ::view-transition-old(film-scene),
+  ::view-transition-new(film-title), ::view-transition-new(film-scene) { animation: none !important; }
+  .film-cards-in, .film-envelope-out { transition-duration: 120ms !important; }
+  .film-flap-close, .film-seal-press { animation-duration: 1ms !important; }
+  .film-whiteout { transition-duration: 120ms !important; }
+  .screen.done { animation: none !important; }
+  .wf-film-glow { animation: none !important; }
+  .wf-film-badge { animation: none !important; transition-duration: 120ms !important; }
+}

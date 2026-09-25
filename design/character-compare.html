@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>캐릭터 벡터 — 임시</title>
+<style>
+/* 임시 화면(D-048 잠정 채택). 사용자가 준 예시 시트의 아홉 캐릭터를 그대로 따라 벡터(SVG)로 다시 그린 것을 보여 준다.
+   그림 파일은 design/temp-flat/(vec-*.svg, vec-sheet.svg, ref-*.png = 같은 좌표로 자른 시트 원본). 확정되면 정리한다. web/은 바꾸지 않았다. */
+:root{--ink:#092326;--muted:#3F5957;--subtle:#586F6C;--line:#E1E5E1;--line-strong:#B9C5C2;--k:.8;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);font:400 16px/1.5 var(--sans)}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 20px 72px}
+.tag{display:inline-block;margin:0 0 8px;padding:3px 11px;border:1.5px solid var(--ink);border-radius:999px;font:700 12.5px/1.4 var(--sans)}
+h1{margin:0 0 4px;font:800 28px/1.2 var(--sans);letter-spacing:-.02em}
+.lede{max-width:70ch;margin:0 0 16px;color:var(--muted);font-size:15px}
+.controls{display:flex;flex-wrap:wrap;gap:12px 28px;margin:0 0 6px}
+.ctl{display:flex;flex-direction:column;gap:5px}
+.ctl b{font:700 12.5px/1.3 var(--sans);color:var(--muted)}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden;background:#fff}
+.seg button{min-height:44px;padding:0 16px;border:0;background:#fff;color:var(--ink);font:600 14px/1 var(--sans);cursor:pointer}
+.seg button+button{border-left:1.5px solid var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.seg button:focus-visible{outline:3px solid var(--ink);outline-offset:-4px}
+.hint{margin:6px 0 0;color:var(--subtle);font-size:13.5px;min-height:20px}
+
+/* 아홉: 시트와 같은 3×3, 같은 축척(시트의 상대 크기 그대로) */
+.grid{list-style:none;margin:14px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px 0}
+.cell{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;min-height:calc(372px * var(--k) * .95 + 44px);padding-bottom:6px}
+.art{position:relative;display:flex;align-items:flex-end;justify-content:center;width:calc(372px * var(--k));height:calc(340px * var(--k));isolation:isolate}
+.art svg{position:relative;z-index:1;display:block;width:calc(var(--w) * var(--k) * 1px);height:auto;flex:none}
+.art img{display:none;position:absolute;z-index:0;left:50%;bottom:0;width:calc(var(--w) * var(--k) * 1px);height:auto;transform:translateX(-50%)}
+.name{margin-top:10px;font:700 17px/1.2 var(--sans)}
+.grid[data-mode="orig"] .art svg{display:none}
+.grid[data-mode="orig"] .art img{display:block}
+.grid[data-mode="diff"] .art img{display:block}
+.grid[data-mode="diff"] .art svg{mix-blend-mode:difference}
+[data-ink="teal"] .ink{fill:#092326}
+
+.sizes{margin:40px 0 0;padding-top:20px;border-top:1.5px solid var(--line-strong)}
+.sizes h2,.files h2{margin:0 0 8px;font:800 18px/1.3 var(--sans)}
+.sizes p{margin:0 0 10px;color:var(--muted);font-size:14px}
+.strip{display:flex;flex-wrap:wrap;align-items:flex-end;gap:10px 14px;margin:0 0 14px}
+.strip svg{display:block;width:auto;flex:none}
+.files{margin:30px 0 0;padding-top:20px;border-top:1.5px solid var(--line-strong);max-width:78ch}
+.files ul{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:6px 8px}
+.files a{display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1.5px solid var(--line-strong);border-radius:999px;color:var(--ink);font:600 13.5px/1 var(--sans);text-decoration:none}
+.files a:hover{border-color:var(--ink)}
+.files a:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+.files p{margin:10px 0 0;color:var(--muted);font-size:14px}
+@media (max-width:640px){.wrap{padding:16px 12px 56px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="tag">임시 · 실제 시안(web/)은 바꾸지 않았습니다</p>
+  <h1>캐릭터 벡터</h1>
+  <p class="lede">예시 시트의 아홉 캐릭터를 <b>그대로 따라</b> 벡터(SVG)로 다시 그렸습니다. 모양·색·자세는 시트와 같고, 눈은 시트에서 잰 크기의 타원으로 깔끔하게 그렸습니다.</p>
+  <div class="controls" role="group" aria-label="보기 조정">
+    <div class="ctl"><b>보기</b><div class="seg" data-ctl="mode" role="group" aria-label="보기 방식"><button type="button" data-v="vector" aria-pressed="true">벡터</button><button type="button" data-v="orig" aria-pressed="false">시트 원본</button><button type="button" data-v="diff" aria-pressed="false">차이</button></div></div>
+    <div class="ctl"><b>눈·신발 색</b><div class="seg" data-ctl="ink" role="group" aria-label="눈과 신발 색"><button type="button" data-v="black" aria-pressed="true">시트 그대로(검정)</button><button type="button" data-v="teal" aria-pressed="false">짙은 청록</button></div></div>
+  </div>
+  <p class="hint" id="hint" aria-live="polite"></p>
+
+  <ul class="grid" id="grid" data-mode="vector" aria-label="벡터로 다시 그린 캐릭터 아홉"></ul>
+
+  <section class="sizes" aria-labelledby="h-sizes">
+    <h2 id="h-sizes">작은 크기</h2>
+    <p>벡터라 어느 크기에서도 선명합니다. 높이 96 · 64 · 44 · 32px입니다.</p>
+    <div id="strips"></div>
+  </section>
+
+  <section class="files" aria-labelledby="h-files">
+    <h2 id="h-files">파일</h2>
+    <ul id="filelist"></ul>
+    <p>층마다 <code>class</code>가 붙어 있습니다(<code>c1…</code>은 색 면, <code>ink</code>는 눈·신발). 색은 <code>fill</code> 값을 바꾸면 됩니다. 감정 글자와 그림자는 그림에 넣지 않았습니다.</p>
+  </section>
+</div>
+
+<script type="module">
+const CODES = ["enjoyment", "wish", "sadness", "anger", "joy", "love", "hate", "fear", "disgust"];
+const W = { enjoyment: 369, wish: 290, sadness: 275, anger: 340, joy: 339, love: 221, hate: 206, fear: 215, disgust: 296 }; // SVG 가로(px) — 시트의 상대 크기를 그대로 두는 배율에 쓴다
+const tokens = await (await fetch("tokens.json")).json();
+const label = (c) => tokens.color.emotion[c].label;
+const svgText = {};
+await Promise.all(CODES.map(async (c) => { svgText[c] = await (await fetch(`temp-flat/vec-${c}.svg`)).text(); }));
+
+const grid = document.getElementById("grid");
+grid.innerHTML = CODES.map((c) => `<li class="cell"><div class="art" style="--w:${W[c]}">${svgText[c]}<img src="temp-flat/ref-${c}.png" alt="" draggable="false"></div><span class="name">${label(c)}</span></li>`).join("");
+grid.querySelectorAll(".art svg").forEach((s) => s.setAttribute("aria-hidden", "true"));
+
+// 창 폭에 맞춰 같은 배율로 줄이고 늘린다
+const fit = () => { const k = Math.min(1, (grid.clientWidth / 3) * 0.9 / 372); document.documentElement.style.setProperty("--k", k.toFixed(3)); };
+new ResizeObserver(fit).observe(grid); fit();
+
+// 작은 크기 줄
+const strips = document.getElementById("strips");
+strips.innerHTML = [96, 64, 44, 32].map((h) => `<div class="strip" aria-hidden="true">${CODES.map((c) => svgText[c].replace("<svg ", `<svg style="height:${h}px" `)).join("")}</div>`).join("");
+
+// 파일 목록
+document.getElementById("filelist").innerHTML = [...CODES.map((c) => `<li><a href="temp-flat/vec-${c}.svg" download>vec-${c}.svg</a></li>`), `<li><a href="temp-flat/vec-sheet.svg" download>vec-sheet.svg (아홉 한 장)</a></li>`].join("");
+
+const hints = {
+  vector: "다시 그린 벡터입니다.",
+  orig: "사용자가 준 시트에서 오린 원본입니다(그림자는 지웠습니다).",
+  diff: "원본 위에 벡터를 겹쳐 차이만 보입니다. 검정 = 같음, 색이 남은 곳 = 다름(대부분 가장자리 1픽셀 안팎).",
+};
+const hint = document.getElementById("hint"); hint.textContent = hints.vector;
+document.querySelectorAll(".seg").forEach((seg) => seg.addEventListener("click", (ev) => {
+  const b = ev.target.closest("button"); if (!b) return;
+  seg.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  if (seg.dataset.ctl === "mode") { grid.dataset.mode = b.dataset.v; hint.textContent = hints[b.dataset.v]; }
+  if (seg.dataset.ctl === "ink") document.body.dataset.ink = b.dataset.v;
+}));
+</script>
+</body>
+</html>

@@ -115,7 +115,9 @@ MVP는 Cloudflare Workers 하나가 모든 API를 처리하고, 서버 접근 �
 | `GET /api/ai-jobs/next`, `POST /api/ai-jobs/:id/result` | PC worker 전용 lease/결과 반환 | worker secret, lease 만료, 결과 schema 재검증 |
 | `POST /api/analyses` | snapshot 분석 job 등록 | version, rate/cost limit |
 | `GET /api/export` | versioned JSON export | owner + no-cache |
-| `GET/PUT /api/settings/reminder` | 알림 설정 | timezone validation |
+| `GET/PUT /api/settings/reminder` | 알림·하루 기준 시각 등 owner 설정(D-081) | timezone validation, `day_start_hour` 0~6 범위 검사 |
+
+`PUT /api/diaries/:date`는 이미 존재하는 diary(과거 `entry_date`의 draft 포함)라면 언제든 upsert를 허용하지만, **새로 행을 만드는 요청은 `:date`가 서버가 owner의 timezone과 `day_start_hour`(DATA_MODEL §2·§3.4)로 계산한 오늘과 같을 때만 허용**하고 다르면 404/422로 거부한다(D-082). `POST /api/diaries/:date/complete`는 `entry_date`가 과거여도 그 diary가 draft 상태이고 완료조건을 만족하면 허용한다 — 완료 시점이 `entry_date`보다 나중이어도 막지 않는다.
 
 모든 변경 API는 인증, CSRF 방어, schema validation, request size limit, rate limit, audit event를 검토한다. CSRF 방어는 다음으로 확정한다(D-025).
 
@@ -149,7 +151,9 @@ MVP는 Cloudflare Workers 하나가 모든 API를 처리하고, 서버 접근 �
 
 | 실패 | 동작 |
 | --- | --- |
-| draft 저장 네트워크 실패 | 로컬에 암호화되지 않은 장기 원문을 남기지 않는 범위에서 재시도 표시; 같은 idempotency key 사용 |
+| draft 저장 네트워크 실패 | 그 브라우저 탭이 열려 있는 동안만 `sessionStorage`에 임시 보관(장기 원문 저장 아님, DATA_MODEL §6)하며 재시도 표시; 같은 idempotency key 사용; 탭을 닫거나 저장에 성공하면 즉시 지움(D-082 ④) |
+| 주요 화면 조회 실패(오늘·달력·통계·기록 상세) | 불러오지 못함 상태와 다시 시도를 표시; 오늘 화면은 오늘 기록 상태를 확인하지 못하면 새 기록 시작을 막는다(D-083) |
+| 없는·미래 `entry_date` 조회 | 해당 날짜에 기록이 없음을 표시하고 새 draft를 만들지 않는다(D-083) |
 | revision 충돌 | 서버/로컬 차이를 보여 주고 자동 덮어쓰기 금지 |
 | AI timeout/rate limit | 일기는 유지하고 직접 작성으로 전환; 최대 2회 bounded retry |
 | 검색 근거 부족/충돌 | 분석 보류와 일반 성찰 질문만 표시 |

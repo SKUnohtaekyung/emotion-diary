@@ -1,0 +1,80 @@
+/* 크기(intensity) 화면의 이야기 있는 슬라이더 — 길 위의 친구(D-069). 작업자 size 소유.
+   계열마다 작은 풍경 하나: 낮은 언덕 띠 · 굽이진 회색 길(오늘 숲의 길과 같은 회색을 흰 바탕에 맞게 옅게) · 길을 걷는 그 계열의 친구.
+   길에서 강조색으로 칠해진 길이가 크기다(색 단계로 강도를 말하지 않는다). 친구의 크기는 값과 무관하게 같고 위치만 바뀐다.
+   진짜 컨트롤은 무대를 덮은 투명 native range이고, 키보드 초점은 친구 둘레의 3px ink 링이 알린다. 색은 전부 CSS 변수다. */
+
+.int-list{gap:var(--sp-6)}
+.int-panel.sz-block{--sz-road:color-mix(in srgb,var(--forest-path-near) 40%,var(--bg));gap:0;animation:sz-in var(--dur-slow) var(--ease) both;animation-delay:calc(var(--i,0) * 70ms)}
+@keyframes sz-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* 머리줄: 친구 이름·"~의 크기" / 스테퍼와 큰 숫자 */
+.sz-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);min-height:var(--touch)}
+.sz-who{display:flex;flex-direction:column;min-width:0}
+.sz-who strong{font-size:var(--fs-heading);line-height:var(--lh-body);font-weight:var(--fw-title)}
+.sz-who span{font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
+.sz-ctrl{flex:none;gap:var(--sp-1)}
+.sz-num{display:inline-flex;align-items:baseline;justify-content:center;gap:var(--sp-1);min-width:4.75rem;font-variant-numeric:tabular-nums}
+.sz-num b{font-size:2.25rem;line-height:1;font-weight:800;letter-spacing:-.03em}
+.sz-num small{font-size:var(--fs-label);line-height:1;font-weight:var(--fw-label);color:var(--muted)}
+.sz-num.unset b{font-weight:300;color:var(--subtle)}
+.int-panel .step[aria-disabled="true"]{opacity:.35;cursor:default}
+.int-panel .step:not([aria-disabled="true"]):active{transform:scale(.94)}
+
+/* 무대 */
+.sz-scene{position:relative;height:var(--sz-h);--sz-t:0ms;--sz-e:var(--ease);-webkit-user-select:none;user-select:none}
+.sz-scene[data-motion="spring"]{--sz-t:var(--dur-slow);--sz-e:var(--spring)}
+.sz-scene[data-motion="glide"]{--sz-e:cubic-bezier(.4,0,.2,1)} /* 큰 걸음: 길이(--sz-t)는 JS가 걸음 수에 맞춰 정하고 넘치지 않는다 */
+.sz-scene[data-motion="drag"]{--sz-t:var(--dur-fast);--sz-e:var(--ease)}
+/* 풍경 그림. 양 끝은 흐려져 길이 계속 이어지는 것처럼 보이고(끝·문·깃발이 없다) 언덕 띠가 상자로 보이지 않는다. */
+.sz-art{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;
+  -webkit-mask-image:linear-gradient(90deg,transparent 0,var(--service-ink) 9%,var(--service-ink) 91%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0,var(--service-ink) 9%,var(--service-ink) 91%,transparent 100%)}
+.sz-far,.sz-near{transition:transform var(--sz-t) var(--ease)}
+.sz-hill{fill:var(--land-hill-far)}
+.sz-hill.a{opacity:.85}
+.sz-hill.b{opacity:.7}
+.sz-pines{fill:var(--land-hill-mid);opacity:.8}
+.sz-road,.sz-fill{fill:none;stroke-width:var(--sz-road-w);stroke-linecap:round;stroke-linejoin:round}
+.sz-road{stroke:var(--sz-road)}
+.sz-fill{stroke:var(--c);stroke-dasharray:100 300;stroke-dashoffset:100;transition:stroke-dashoffset var(--sz-t) var(--sz-e),opacity var(--sz-t) linear}
+.sz-scene.unset .sz-fill{opacity:0}
+.sz-dot{fill:color-mix(in srgb,var(--forest-path-near) 52%,var(--bg))}
+.sz-dot.on{fill:var(--bg)}
+
+/* 진짜 컨트롤: 투명한 native range가 길과 친구가 있는 무대 위쪽을 덮는다(키보드·스크린리더의 대상이라 pointer-events는 받지 않는다).
+   누르기·끌기는 그 위의 sz-hit 층이 받는다 — 좌우는 JS가 값 1·10의 반 칸 바깥까지로 정하고, 세로 스크롤은 브라우저에 맡긴다(pan-y). */
+.sz-range{position:absolute;left:0;top:0;width:100%;height:var(--sz-hit);margin:0;padding:0;background:transparent;opacity:0;pointer-events:none;-webkit-appearance:none;appearance:none}
+.sz-range:focus-visible{outline:none}
+.sz-hit{position:absolute;top:0;height:var(--sz-hit);cursor:pointer;touch-action:pan-y;-webkit-tap-highlight-color:transparent}
+
+/* 손잡이: 길을 따라 걷는다(offset-path). 발이 길 한가운데에 닿도록 --sz-foot만큼 내려 앉힌다. */
+.sz-walker{position:absolute;left:0;top:0;width:var(--sz-size);height:var(--sz-size);offset-rotate:0deg;offset-anchor:50% 100%;pointer-events:none;transition:offset-distance var(--sz-t) var(--sz-e),transform var(--sz-t) var(--sz-e)}
+.sz-hop{position:relative;top:var(--sz-foot,0);display:block;width:100%;height:100%}
+.sz-body{display:block;width:100%;height:100%;transform-origin:50% 100%;transition:transform var(--sz-t) var(--sz-e)}
+.sz-body .friend-img,.sz-body .pebble-img{display:block;width:100%;height:100%;max-width:none}
+.sz-scene[data-kind="main"] .sz-body{animation:sz-breathe 5.2s ease-in-out infinite;animation-delay:calc(var(--i,0) * -1.3s)}
+.sz-scene[data-kind="mini"] .sz-body{transform-origin:50% 60%}
+@keyframes sz-breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.015,1.02)}}
+.sz-ring{position:absolute;inset:-5px;border:3px solid var(--service-ink);border-radius:50%;opacity:0;pointer-events:none}
+.sz-range:focus-visible ~ .sz-walker .sz-ring{opacity:1}
+.sz-scene[data-pointer] .sz-range:focus-visible ~ .sz-walker .sz-ring{opacity:0} /* 마우스·터치로 누른 뒤에는 링이 없고, 키를 누르면 나타난다 */
+
+/* 앵커 문구: 길 아래(흐름 안이라 글자를 키우면 아래 요소를 밀어낸다) */
+.int-panel .anchor-line{margin:2px 0 0}
+.int-panel .field-error{margin:var(--sp-1) 0 0}
+.int-panel .int-more{margin-top:0}
+
+/* 세부 감정: 같은 구조의 작은 길 */
+.int-details{display:flex;flex-direction:column;margin-top:var(--sp-1)}
+.int-details .mini{padding:var(--sp-2) 0}
+.int-details .mini:first-child{padding-top:0}
+.sz-mini .sl-name{font-size:var(--fs-body);font-weight:var(--fw-body-strong)}
+.sz-mini>.link{margin-left:calc(var(--sp-2) * -1)}
+.sz-mini .sz-num{min-width:3.5rem}
+.sz-mini .sz-num b{font-size:var(--fs-title);line-height:var(--lh-title);font-weight:var(--fw-title)}
+
+@media (prefers-reduced-motion:reduce){
+  .int-panel.sz-block{animation:none}
+  .sz-scene[data-kind="main"] .sz-body{animation:none}
+  .sz-walker,.sz-fill,.sz-far,.sz-near,.sz-body{transition:none !important}
+  .int-panel .step:not([aria-disabled="true"]):active{transform:none}
+}

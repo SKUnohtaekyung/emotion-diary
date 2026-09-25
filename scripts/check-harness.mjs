@@ -134,7 +134,9 @@ const NEUTRAL_VARIABLES = { bg: "bg", surface: "surface", raised: "surface-raise
 // 자동 로드로 바꾸기 전까지는 두 곳의 값이 같은지를 여기서 대조한다.
 export function checkStyleGuideTokens(html, tokens) {
   const failures = [];
-  const blocks = [...html.matchAll(/:root[^{]*\{([^}]*)\}/g)].map((match) => Object.fromEntries([...match[1].matchAll(/--([a-z0-9-]+):\s*(#[0-9A-Fa-f]{3,8})/g)].map((pair) => [pair[1], pair[2].toUpperCase()])));
+  // CSS 주석 속 ":root" 글자를 블록으로 읽지 않도록 주석을 먼저 걷어 낸다(2026-09-22 style-guide 주석 때문에 dark 검사가 거짓으로 실패했다).
+  const withoutComments = html.replace(/\/\*[\s\S]*?\*\//g, "");
+  const blocks = [...withoutComments.matchAll(/:root[^{]*\{([^}]*)\}/g)].map((match) => Object.fromEntries([...match[1].matchAll(/--([a-z0-9-]+):\s*(#[0-9A-Fa-f]{3,8})/g)].map((pair) => [pair[1], pair[2].toUpperCase()])));
   if (!blocks.length) return ["style-guide.html에서 :root 블록을 찾지 못했다"];
   const compare = (variables, name, expected, where) => {
     if (expected == null) return;

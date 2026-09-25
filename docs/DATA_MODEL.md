@@ -12,6 +12,7 @@
 - `owner_key`는 서버 인증 컨텍스트에서 생성하며 요청 body/query의 값을 받지 않는다.
 - 시각은 DB에 UTC ISO-8601로 저장한다. 일기 귀속 날짜는 별도 `entry_date`(YYYY-MM-DD)와 당시 IANA `timezone`으로 저장한다.
 - 클라이언트가 보낸 `timezone`은 서버의 IANA 목록으로 검증하고, `entry_date`는 그 timezone의 서버 현재 날짜와 대조해 미래 날짜를 거부한다. 클라이언트 timezone은 사용자 편의 값이지 권한·완료 판정의 근거가 아니다(결함 I-15).
+- `entry_date`는 단순 캘린더 날짜가 아니라 owner의 `day_start_hour`(§3.4, 정수 0~6, 기본 4시)를 반영해 계산한다 — 그 timezone의 현재 시각이 `day_start_hour` 이전이면 전날을, 이후면 당일을 `entry_date`로 쓴다. 새 draft 생성, streak, 알림, 대시보드 기간 집계, 서버의 미래 날짜 검사가 모두 이 계산을 공유한다. `day_start_hour`를 바꿔도 이미 저장된 행의 `entry_date`는 소급 재계산하지 않는다(D-081).
 - 사용자 텍스트는 UTF-8, 서버에서 길이 제한과 제어문자 검사를 적용하고 출력 시 context-aware escaping한다.
 - 행 변경에는 `revision`과 `updated_at`을 사용해 오래된 클라이언트의 무조건 덮어쓰기를 막는다.
 - 분석·대시보드는 `status = completed`인 기록만 사용한다.
@@ -39,10 +40,11 @@
 DB 불변조건:
 
 - `UNIQUE(owner_key, entry_date)` — draft와 completed를 합쳐 하루 한 기록.
+- 새 행(첫 draft 생성)은 `entry_date`가 그 요청 시점에 서버가 계산한 오늘(위 §2의 `day_start_hour` 규칙)과 같을 때만 만들 수 있다 — 과거 `entry_date`로 새 행을 만드는 경로는 없다(D-082, D-002의 소급 작성 허용을 대체). 이미 존재하는 draft는 `entry_date`가 지난 뒤에도 기한 없이 이어 써서 completed로 전환할 수 있다.
 - `status`는 `CHECK (status IN ('draft','completed'))`, completed 행은 `CHECK (status <> 'completed' OR (first_completed_at IS NOT NULL AND completed_at IS NOT NULL AND first_completed_local_date IS NOT NULL))`.
 - 완료 전환은 저장소의 interactive transaction에 의존하지 않는다(D-024). D1(D-032)은 interactive transaction이 없고 `batch()` 원자 실행과 trigger를 제공하므로, 검사 조건은 statement 안에 두고 다중 statement는 batch로 묶는다. 서버는 사건·이유 nonblank, `diary_emotions` 1행 이상, 모든 `intensity` 1~10을 **하나의 조건부 UPDATE**로 검사한다. 예: `UPDATE diary_entries SET status='completed', revision=revision+1, ... WHERE id=? AND owner_key=? AND revision=? AND status='draft' AND trim(event_text)<>'' AND trim(reason_text)<>'' AND EXISTS (SELECT 1 FROM diary_emotions WHERE diary_id=diary_entries.id)`. 영향 행이 0이면 완료를 실패(409 revision 충돌 또는 422 완료조건 미충족)로 돌려주고 어떤 상태도 바꾸지 않는다. 검사와 갱신을 분리한 read-then-write는 TOCTOU 창이 있으므로 금지한다.
 - completed 이후에는 마지막 감정 행 삭제나 사건·이유 blank 갱신을 trigger(`BEFORE DELETE ON diary_emotions` / `BEFORE UPDATE ON diary_entries`에서 `RAISE(ABORT)`) 또는 같은 조건을 포함한 조건부 statement로 차단한다. trigger 지원 여부는 B-04에서 확인하고, 미지원이면 조건부 statement만으로 같은 불변조건을 보장해야 한다.
-- 과거 `entry_date`라도 `first_completed_local_date`는 실제 작성 완료일이므로 과거 streak를 복구하지 않는다.
+- `entry_date`가 과거인 채로 나중에 completed로 전환된 행(그날 시작해 나중에 완료한 draft, D-082 ②)도 `first_completed_local_date`는 실제 작성 완료일이므로 과거 streak를 복구하지 않는다.
 
 ### 3.2 `diary_emotions`
 
@@ -72,9 +74,10 @@ DB 불변조건:
 
 ### 3.4 `reminder_settings`
 
-- `owner_key`가 PK인 owner당 1행: `enabled`, `local_time`, `timezone`, `channel`, `permission_state`, `updated_at`. 갱신은 upsert(`INSERT ... ON CONFLICT(owner_key) DO UPDATE`)로 재시도에 안전해야 한다.
+- `owner_key`가 PK인 owner당 1행: `enabled`, `local_time`, `timezone`, `channel`, `permission_state`, `day_start_hour`, `updated_at`. 갱신은 upsert(`INSERT ... ON CONFLICT(owner_key) DO UPDATE`)로 재시도에 안전해야 한다.
+- `day_start_hour`는 정수 0~6, 기본 4다. 이름은 reminder 전용처럼 보이지만 실제로는 owner의 하루 경계를 정하는 공용 설정이며, `entry_date` 계산(§2)·streak·대시보드 기간에도 같은 값을 쓴다. 값은 내보내기(§8)에 포함한다.
 - MVP `channel`은 `in_app`; 플랫폼 검증 후에만 `web_push`를 허용한다.
-- 당일 diary가 completed이면 reminder를 표시하지 않는다.
+- 인앱 reminder 문구는 `enabled`가 true이고 현재 시각이 `local_time`을 지났으며, 오늘 `entry_date`에 completed diary도 진행 중인 draft(과거에 시작해 아직 끝나지 않은 것 포함)도 없을 때만 표시 대상이다. 진행 중인 draft가 있으면 reminder 대신 이어서 쓰기 표시를 UI가 보여준다(D-077, D-081).
 
 ### 3.5 `analysis_runs`
 
@@ -222,16 +225,19 @@ completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편
 - 턴 계약(결함 I-11): 클라이언트가 전송하는 이전 assistant 턴은 신뢰하지 않는다. 서버는 응답마다 `(draft_id, revision, turn_index, assistant_message)`에 대한 HMAC `turn_token`을 발급하고, 다음 요청에 포함된 이전 턴은 token이 일치할 때만 문맥으로 사용한다. 불일치·누락 턴은 폐기하고 현재 사용자 발화와 구조화 draft만으로 응답한다. 문맥 턴 수와 총 길이에 상한을 둔다.
 - 새로고침 뒤에는 구조화 draft는 복구되지만 AI 대화 문장 전체는 복구되지 않을 수 있음을 UX에서 알린다.
 - 브라우저 local storage에 일기 원문을 장기 저장하지 않는다. 오프라인 기능은 별도 암호화·위협 모델 없이는 제공하지 않는다.
+- 예외: 서버 저장이 실패하거나 연결이 끊기면 클라이언트는 **그 브라우저 탭이 열려 있는 동안만** 구조화 draft를 `sessionStorage`에 임시 보관해 재시도·새로고침 복구에 쓴다. 탭을 닫거나 서버 저장에 성공하면 즉시 지운다. 이 보관은 tab 수명으로 한정되므로 위 장기 저장 금지와 충돌하지 않는다(D-082 ④).
 
 ## 7. 대시보드 계산 계약
 
 - 기간은 사용자의 현재 timezone 기준 `entry_date`로 선택한다.
 - 감정 빈도: 완료 diary의 `diary_emotions` 행 수.
-- 카테고리 비중: 선택된 세부 감정 수를 category별 집계. diary 수와 혼동하지 않고 UI에 분모를 표시한다.
-- 평균 강도: 해당 emotion/category 선택 행의 산술평균. 표본 수 `n`을 함께 제공한다.
-- 7일 추세: 날짜별 선택 감정 강도 집계; 기록 없는 날은 0이 아니라 missing.
+- 크기(강도) 추세와 평균은 **계열마다 따로** 계산한다. 서로 다른 계열을 섞은 단일 평균·단일 추세는 두지 않는다(D-086) — 이전에 있던 "카테고리 비중"(선택된 세부 감정 수의 category별 집계, 막대 표시)은 D-064가 그 화면에서 막대 자체를 빼며 폐지됐고, 아래 "친구와의 친밀도"가 그 자리의 계열 단위 지표를 대신한다.
+- 계열별 날 단위 평균: 그 계열을 고른 날마다 그날 선택된 그 계열 `diary_emotions` 행들의 `intensity` 산술평균을 하루 값으로 삼는다. 기간 평균은 그 하루 값들을 다시 평균해 낸다(세부 감정을 많이 고른 날이 더 무겁게 반영되지 않는다). 표본 수 `n`은 그 계열을 고른 날 수이며 `n`<3이면 평균을 반환하지 않는다. 최솟값·최댓값(범위)을 함께 제공한다.
+- 계열별 추세(7/30일): 위 하루 값을 날짜순으로 이어 계열마다 한 줄(small multiples)로 낸다. 기록 없는 날은 0이 아니라 missing이라 선이 끊긴다.
+- 기간 비교: 바로 앞 같은 길이의 기간과 비교할 때는 두 기간 모두 `n`≥3이고, 평균 차이가 1.0 이상이면서 Welch t-test 95% 신뢰수준을 만족할 때만 `높음`/`낮음`을 반환하고, 그렇지 않으면 `비슷함`을 반환한다. 계산 결과는 방향·수치·판정 문자열까지이며 색·강조 같은 표현은 UX_SPEC 몫이다(D-086).
 - 작성 streak: `first_completed_local_date`의 연속 날짜. backdated `entry_date`는 과거 streak를 채우지 않는다.
 - 현재 streak는 오늘 또는 어제까지 이어진 연속 `first_completed_local_date`로 정의하고 timezone 변경 경계를 테스트한다.
+- 친구와의 친밀도(D-064): 기간 안의 **완료 diary가 있는 날** 중 그 계열(친구)의 세부 감정이 하나라도 선택된 날의 **비율**이다. 분모는 그 기간에 완료 diary가 있는 서로 다른 `entry_date` 수(하루 한 기록이라 diary 수와 같다), 분자는 그중 해당 category의 `diary_emotions` 행이 있는 날 수다. 함께한 날 수를 함께 제공하고, 분모가 5일 미만이면 친구별 값을 계산해 내보내지 않고 "기록이 더 필요함"만 돌려준다(UX_SPEC §9). 이 값은 단계·점수가 아니라 비율이며 순위 문장·레벨을 만들지 않는다.
 
 계산 함수는 모델이 아니라 순수 코드/SQL로 만들고 같은 snapshot에서 재현 가능해야 한다.
 
@@ -248,7 +254,7 @@ completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편
 ### 내보내기
 
 - MVP는 UTF-8 `application/json` 한 파일이다.
-- 최상위에 `schemaVersion`, `exportedAt`, `timezone`, `diaries`, `analyses`(선택)를 둔다. 이 문서의 표와 SQL 계약은 저장 컬럼 이름(snake_case)으로 적고, 내보내기 파일과 API의 JSON 키는 [../schemas/export.schema.json](../schemas/export.schema.json)·[../schemas/diary-entry.schema.json](../schemas/diary-entry.schema.json)의 camelCase를 따른다. 같은 필드의 두 표기는 기계적으로 대응한다(`entry_date` ↔ `entryDate`).
+- 최상위에 `schemaVersion`, `exportedAt`, `timezone`, `dayStartHour`(§3.4의 `day_start_hour`, 0~6 — D-081 ②), `diaries`, `analyses`(선택)를 둔다. 이 문서의 표와 SQL 계약은 저장 컬럼 이름(snake_case)으로 적고, 내보내기 파일과 API의 JSON 키는 [../schemas/export.schema.json](../schemas/export.schema.json)·[../schemas/diary-entry.schema.json](../schemas/diary-entry.schema.json)의 camelCase를 따른다. 같은 필드의 두 표기는 기계적으로 대응한다(`entry_date` ↔ `entryDate`).
 - 비밀값, 내부 owner key, raw model prompt, verifier 내부 판정 전문은 제외한다.
 - JSON Schema로 자동 검증하고 재수입 가능 여부는 별도 범위다. CSV는 향후 기능이다.
 

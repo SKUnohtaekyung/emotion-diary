@@ -1,13 +1,13 @@
 # 진행 상황과 다음 할 일
 
-최종 갱신: 2026-09-20. 세부 증거는 [../tasks/CURRENT_TASK.md](../tasks/CURRENT_TASK.md)와 [../tasks/archive/](../tasks/archive/README.md), 결정 근거는 [DECISIONS.md](DECISIONS.md)에 있다. 이 문서는 한눈에 보는 요약이다. 이 날짜가 HEAD 커밋일보다 14일 넘게 앞서면 `verify`가 경고한다.
+최종 갱신: 2026-09-24. 세부 증거는 [../tasks/CURRENT_TASK.md](../tasks/CURRENT_TASK.md)와 [../tasks/archive/](../tasks/archive/README.md), 결정 근거는 [DECISIONS.md](DECISIONS.md)에 있다. 이 문서는 한눈에 보는 요약이다. 이 날짜가 HEAD 커밋일보다 14일 넘게 앞서면 `verify`가 경고한다.
 
 ## 1. 지금 어디에 있나
 
 | 단계 | 상태 | 요약 |
 | --- | --- | --- |
 | Phase 0 — 부트스트랩 | 마무리 중 | 정본 문서, Git baseline, 계획 교정(D-017~D-027), 배포·AI 경로 확정(D-029~D-032), 기술 스파이크 실행(판정은 partial), taxonomy v1·v2, 디자인 시스템, 캐릭터 9종, 개발 인프라 정비까지 끝났다. 남은 것은 스파이크 잔여 판정(§3)이다 |
-| 브라우저 우선 UI 프로토타입 | 구현·PC 검수 완료, 사용자 확인 대기 | `TASK-WEB-UI-01` — `web/`의 정적 시안(D-047). 하단 탐색 4칸과 직접 작성 흐름(단계형 + 긴 한 장)을 브라우저에서 눌러 볼 수 있다. 저장·인증·AI는 없다. 실기기 검수는 하지 않았다 |
+| 브라우저 우선 UI 프로토타입 | 구현·PC 검수 완료(PR #30 병합 전). **2026-09-24~25 QA 피드백(D-076~D-089) 반영·검수 완료, 마감 검토 1회 결과 반영 중(커밋 전)** | `TASK-WEB-UI-01`(archive)의 정적 시안(D-047, `web/`). 사용자 QA(`TASK-WEB-UI-02`, 브랜치 `web-ui/qa`)가 서비스 스토리·디자인 시스템 전면 개정(D-050~D-072, 문서·토큰·전시장 완료)에 이어, 2026-09-24 QA 피드백 13건 — 오늘 화면 하단 탐색 제거(D-076)·오늘 밤하늘과 세 겹 숲(D-077·D-084)·완료 자유 배치(D-078)·편지 카드·이유 자유 배치(D-079)·달력 한 주 접기(D-080)·설정과 하루 기준 시각(D-081)·그날만 작성(D-082)·주요 화면 예외 상태(D-083)·통계 친밀도와 계열별 추세(D-064·D-086)·편지 배경(D-085) — 을 반영하는 중이다. 세부 진행 상태는 `tasks/CURRENT_TASK.md`(QA #31~#47 표, 2026-09-24 체크포인트)를 따른다. 저장·인증·AI는 없다. 실기기 검수는 하지 않았다 |
 | Phase 1 — 기반·데이터 무결성 | 대기 | 앱 뼈대(Workers API, D1 migration, 테스트). `work-graph`의 `app-scaffold`는 `hosting-identity-spike`·`data-store-spike`가 `done`이 돼야 열린다. 착수 전에 TASK-MOBILE의 단일 Worker 제안을 결정으로 받을지 먼저 정한다 |
 | Phase 2 — 직접 작성 MVP | 대기 | 선행 조건이던 taxonomy는 끝났다(v1 2026-09-04, v2 9계열 194개 2026-09-05, 둘 다 `review_status: reviewed`) |
 | Phase 4 — 대시보드·알림 | 대기 | — |
@@ -16,13 +16,13 @@
 
 ## 2. 확정된 것
 
-- **제품**: 원형 일기 6영역(날짜·사건·감정+강도·이유·칭찬 3·감사 3), 9개 상위 감정과 세부 감정 194개(taxonomy v2, D-038), 원자료 전사본 v1의 보존, 복수 감정과 각 1~10 강도, 하루 1개·소급 작성·streak, 결정론적 대시보드, 비진단 원칙.
+- **제품**: 원형 일기 6영역(날짜·사건·감정+강도·이유·칭찬 3·감사 3), 9개 상위 감정과 세부 감정 194개(taxonomy v2, D-038), 원자료 전사본 v1의 보존, 복수 감정과 각 1~10 강도, 하루 1개·그날만 작성(D-082가 소급 작성 허용을 대체)·streak, 결정론적 대시보드(친구와의 친밀도·계열별 평균, D-064·D-086), 비진단 원칙.
 - **배포(D-032)**: 직접 작성한 백엔드를 무료 클라우드에 올린다 — Cloudflare Pages(정적 UI) + Workers(API, 유일한 진입점) + D1(SQLite 호환). 로그인은 서버 접근 토큰 cookie와 D1 전역 잠금. 단일 origin Worker로의 교정은 미결 제안이다(`tasks/TASK-MOBILE.md`, 보류).
 - **AI 경로(D-029, D-031)**: 유료 API 없이 PC의 worker가 백엔드 작업 큐를 가져가 Claude Code 헤드리스(`claude -p`)로 처리한다. 작성 보조는 Sonnet 5, 검증·분석은 Opus 5. PC가 꺼져 있으면 AI만 비활성이고 기록·대시보드는 동작한다.
 - **순서(D-018)**: 직접 작성+대시보드의 제한 MVP를 먼저 배포하고 AI 대화·RAG는 그 뒤.
 - **안전(D-020)**: 위기 감지는 AI 관여 경로에서만, 직접 작성 원문은 자동 스캔하지 않으며 한계를 고지. 위기 리소스는 한국 기준.
-- **디자인 시스템(D-033 accepted, 세부 D-034~D-037·D-041)**: 9계열 색 토큰, 접근성 대비와 계열 색차 자동 검사(216건), 감정 입력은 감정 별자리 지도(카테고리, 다중 선택) + 소프트 리스트(세부 감정, 카테고리별 묶음) + 슬라이더(강도)이고 chip은 표시 전용이다. 별자리 지도와 큰 글자 3열 폴백은 `design/style-guide.html`에 동작하는 형태로 구현돼 있다(2026-09-17). 정본 `docs/DESIGN_SYSTEM.md`, 값 `design/tokens.json`.
-- **캐릭터(D-044~D-046)**: 서로 다른 동물 9종(양·거북이·기니피그·고양이·쥐·개·까마귀·토끼·침팬지), 크레용 외곽선·납작한 색면 스타일, 대표 PNG·포즈·idle/acknowledge lossless animated WebP·UI 정적 포즈가 `design/characters/`에 있고 `check-characters`가 quick에서 규격을 검사한다(이슈 #26 closed, 2026-09-19).
+- **디자인 시스템(D-033 기반, 2026-09-21 개정 D-050~D-059)**: 감정 9계열 색 토큰, 서비스 색 ink·mint·크림빛(D-054), 감정 테마(계열 300 면, D-053), 흰 바탕 + 숲색 무대의 오늘 화면(D-056), 조약돌(D-050)과 알아차림의 빛(D-055), 큰 제목 hero + Pretendard 웹폰트(D-057), 작성 흐름 = 계열 지도 → 계열별 세부 감정 화면(pill 구름) → 대표 강도(+선택형 세부 강도)(D-059). 정본 `docs/DESIGN_SYSTEM.md`, 스토리 `docs/BRAND_STORY.md`, 선택의 근거 `docs/DESIGN_RATIONALE.md`, 값 `design/tokens.json`, 검사 `scripts/check-contrast.mjs`(292건), 전시장 `design/style-guide.html`.
+- **캐릭터(친구, D-051)**: 눈 두 점·입 없는 평면 친구 9종(누리·바라·설이·타온·나래·품이·아린·숨이·가름), 정적 PNG(`design/characters/flat-friends/`). 크레용 동물 세트(D-044~D-046)는 비교 이력으로 보존하며 `check-characters`가 계속 검사한다. 설이(슬픔)·숨이(공포)의 색 근접은 알려진 한계.
 - **개발 장치(2026-09-20)**: GitHub Actions가 Ubuntu·Windows에서 `npm ci` → quick → full을 돌린다. harness 상태 파일·schema·style-guide의 어긋남은 `check-harness`가 quick에서 잡는다([../harness/README.md](../harness/README.md)).
 
 ## 3. 스파이크로 확인된 것 (2026-09-02)
@@ -44,7 +44,7 @@
 
 ## 4. 다음 할 일 (우선순위 순)
 
-1. **TASK-WEB-UI-02 사용자 QA와 디자인 수정**(planned, 새 세션에서 착수) — 사용자가 시안을 직접 눌러 보며 고칠 곳을 말하고, 확정된 모양을 디자인 시스템에 되돌려 적는다. 착수 절차·점검표·"어디를 고치면 무엇이 바뀌나" 표는 `tasks/CURRENT_TASK.md`의 해당 절. 아래 남은 검수도 이 작업에서 한다. **TASK-WEB-UI-01 화면 시안의 남은 검수** — 시안은 `web/`에 있다(D-047). 이슈 #26에서 넘어온 검수 가운데 Chromium에서 할 수 있는 것(360px·1280px 가로 넘침 0, 44px 측정, 200% 글자에서 3열 격자, 회색조 캡처, 움직이는 WebP→정적 PNG 대체 구조)은 끝났다. **남은 것**: iPhone Safari·Android Chrome 실기기, 실제 OS reduced-motion 설정, 회색조·label 없음 상태의 사람 눈 판독, 초성 레일 버튼(360px에서 32×24.6px — WCAG 2.5.8의 24px는 넘지만 이 제품의 44px 기준에는 못 미친다)의 처리 방향.
+1. **TASK-WEB-UI-02 브랜드·디자인 개편과 시안 재구성**(in_progress, 2026-09-21) — 결정 D-050~D-059는 끝났다(문서·토큰·전시장). `web/` 시안을 새 언어(흰 바탕 + 숲색 무대 + 감정 테마 300 + 조약돌·빛 + 친구)로 재구성하고 메인이 헤드리스 Chromium으로 캡처·측정한다. 증거와 남은 것은 `tasks/CURRENT_TASK.md`. 사용자 눈 검수 대상: 300 면의 인상, 친구가 면에 묻히는지, 돌 더미 애니메이션, 작성 단계 수(계열 셋이면 10단계). **남은 검수(TASK-WEB-UI-01 유래)**: iPhone Safari·Android Chrome 실기기, 실제 OS reduced-motion 설정, 회색조·label 없음 상태의 사람 눈 판독. **추후 계획**: 오늘의 한 줄 질문 목록 작성, 앱 이름·로고(D-058).
 2. **디자인 시스템 잔여 실행 항목** — 실기기에서 chip 대비·40px 아이콘 판독성·44px 터치·별자리 다중 선택 조작감 확인, 위기 안내 **연락처 값** 검수(문구 톤은 D-036으로 확정).
 3. **스파이크 잔여 판정(Phase 1의 선행)** — B-02/B-03/B-08: iPhone Safari 본체·홈 화면·Android Chrome, bundle/log secret scan, Cloudflare Access 적용 가능성, 무료 한도 수치. B-05: 백업 절차와 삭제 지연 고지 문구. B-06(병렬 가능): job 만료·`failed` 전환, verifier 독립 2회 호출, 위기 케이스, 구독 경로의 보존 설정.
 4. **TASK-MOBILE 제안의 결정**(보류 중, Phase 1 착수 직전) — 단일 origin Worker + Static Assets로 D-032를 교정할지.

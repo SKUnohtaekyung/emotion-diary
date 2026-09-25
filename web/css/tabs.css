@@ -1,0 +1,103 @@
+/* 달력·기록 상세·통계·설정·안내 화면. 흰 바탕, 박스 없이 글자와 옅은 회색 면. */
+
+/* 날짜 모양(§6.7): 서비스 색과 조약돌 모양으로만 구분한다 — 완료=ink 채움, 임시저장=옅은 돌 윤곽 점선+연필, 기록 없음=빈 자리, 오늘=mint 칸+ink 2px 테두리, 미래=비활성. */
+.screen.calendar .cal-year{margin:0}
+.cal-title{font-size:3.5rem;line-height:3.6rem;margin:0}
+.cal-month{margin:var(--sp-1) 0 var(--sp-3);font-size:var(--fs-heading);color:var(--muted)}
+.screen.calendar .proto-note{margin-bottom:var(--sp-4)}
+.cal-head,.cal{display:grid;grid-template-columns:repeat(7,1fr);column-gap:0;row-gap:var(--sp-1)}
+.cal-head span{text-align:center;font-size:var(--fs-caption);color:var(--subtle);padding-bottom:var(--sp-1)}
+.day{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;width:100%;min-width:0;min-height:var(--touch);padding:0;border:0;background:transparent;color:var(--text);font-size:var(--fs-label);line-height:1;font-variant-numeric:tabular-nums}
+.day>*{position:relative;z-index:1}
+.day::before{content:"";position:absolute;inset:2px;z-index:0;border-radius:var(--radius-blob);border:var(--hairline) solid var(--border);pointer-events:none}
+.day.completed{color:var(--bg);font-weight:var(--fw-body-strong)}
+.day.completed::before{background:var(--service-ink);border-color:var(--service-ink)}
+.day.draft::before{border:var(--emphasis) dashed color-mix(in srgb,var(--service-ink) 50%,transparent)}
+.day .pencil{width:11px;height:11px;fill:none;stroke:var(--service-ink);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.day.today::before{background:var(--service-mint);border:var(--emphasis) solid var(--service-ink)}
+.day.today.completed::after,.day.today.draft::after{content:"";position:absolute;inset:9px 10px;z-index:0;border-radius:var(--radius-blob)}
+.day.today.completed::after{background:var(--service-ink)}
+.day.today.draft::after{border:var(--emphasis) dashed color-mix(in srgb,var(--service-ink) 55%,transparent)}
+.day.future{opacity:.4;cursor:default}
+.day.future::before{border-color:transparent}
+.day.blank::before{display:none}
+.day:focus-visible{outline-offset:-2px}
+/* 접힌 한 주(A2)에서 고른 날: 상태 색과는 별개로 테두리 하나를 더 둘러 "지금 이 날이 열려 있다"를 알린다. 초점 링과 자리가 겹치지 않게 오프셋을 다르게 둔다. */
+.day[aria-pressed="true"]::before{outline:var(--emphasis) solid var(--service-ink);outline-offset:3px}
+.cal .day:nth-child(3n)::before{transform:scaleX(-1)}
+.cal .day:nth-child(4n+2)::before{transform:scaleY(-1)}
+.legend{list-style:none;margin:var(--sp-5) 0;padding:0;display:flex;flex-wrap:wrap;gap:var(--sp-4);font-size:var(--fs-caption);color:var(--muted)}
+.legend li{display:flex;align-items:center;gap:var(--sp-1)}
+.day.mini{display:inline-flex;width:24px;min-height:24px;height:24px}
+.day.mini::before{inset:1px}
+.day.mini .pencil{width:9px;height:9px}
+
+/* 시트 안 요약 */
+.chipline{display:flex;gap:var(--sp-2);align-items:center;margin:0 0 var(--sp-3)}
+.chip{display:inline-flex;align-items:center;min-height:28px;padding:0 var(--sp-3);border-radius:var(--radius-chip);background:var(--surface-soft);font-size:var(--fs-caption);font-weight:var(--fw-body-strong)}
+.sum-row{display:flex;align-items:center;gap:var(--sp-3)}
+.sum-row .note{margin:0}
+.friend-row{display:inline-flex;align-items:flex-end;gap:var(--sp-1)}
+.friend-row .friend-img{width:auto;height:54px}
+.missing-list{margin:var(--sp-2) 0 var(--sp-3);padding-left:var(--sp-5);font-weight:var(--fw-body-strong)}
+
+/* 기록 상세(편지 읽기)·안내 화면의 위쪽 줄 */
+.info-top{display:flex;align-items:center;justify-content:space-between;margin:calc(var(--sp-2) * -1) calc(var(--sp-3) * -1) var(--sp-2) calc(var(--sp-2) * -1)}
+.info-top .back{display:grid;place-items:center;width:var(--touch);height:var(--touch);border:0;background:none;color:var(--service-ink)}
+.info-top .back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.info-top .dots3{fill:currentColor;stroke:none}
+.screen.record h1{font-size:2.125rem;line-height:2.625rem;margin-top:0}
+
+/* 통계: 규칙은 css/stats.css(sx- 접두어, D-086)로 옮겼다. 여기에는 기간 전환 여백만 남긴다. */
+.stats-screen .segmented{margin-top:var(--sp-3)}
+
+/* 설정 */
+.panel{margin-top:var(--sp-8);padding-top:var(--sp-6);border-top:var(--hairline) solid var(--border)}
+.panel h2{margin-top:0}
+.panel .stack{margin-top:var(--sp-2)}
+.help-link{display:block;padding-left:0;margin-top:var(--sp-1)}
+.danger-zone{margin-top:var(--sp-10);padding:var(--sp-5);border:var(--hairline) solid var(--danger);border-radius:var(--radius-card)}
+.setting-row{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);min-height:var(--touch)}
+.switch{width:64px;height:var(--touch);padding:0;border:0;background:none;display:flex;align-items:center}
+/* 꺼짐(aria-checked=false, 이 시안의 실제 상태)은 연한 회색 바탕에 흰 손잡이가 왼쪽이다 — 이전에는 바탕이 늘 ink라 꺼진 상태도 켜진 것처럼 보였다(A4 재작업 3). */
+.switch i{display:block;width:64px;height:36px;border-radius:var(--radius-chip);background:var(--border);position:relative}
+.switch i::after{content:"";position:absolute;left:4px;top:4px;width:28px;height:28px;border-radius:50%;background:var(--bg);border:var(--hairline) solid var(--muted)}
+.switch[aria-checked="true"] i{background:var(--service-ink)}
+.switch[aria-checked="true"] i::after{left:auto;right:4px;background:var(--service-mint);border-color:transparent}
+.placeholder-box{border-radius:var(--radius-card);padding:var(--sp-3) var(--sp-4);color:var(--muted);font-size:var(--fs-label);background:var(--surface-soft)}
+.proto-tag{margin-left:var(--sp-1)}
+
+/* 설정 목록 줄(A4, D-081 ①): '이름 · 값 ›' 한 줄. 줄마다 위쪽 실선으로 나뉘고(박스 없이) 44px 이상을 확보한다.
+   큰 글자에서 이름·값이 겹치지 않도록 줄바꿈을 허용하고(flex-wrap), 값은 오른쪽에 붙인다(margin-left:auto). */
+.set-list{margin-top:var(--sp-2)}
+.set-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:var(--sp-1) var(--sp-3);width:100%;min-height:var(--touch);padding:var(--sp-3) 0;border:0;border-top:var(--hairline) solid var(--border);background:none;color:var(--text);font-size:var(--fs-body);line-height:var(--lh-body);text-align:left}
+.set-list .set-row:first-child{border-top:0}
+.set-row-name{font-weight:var(--fw-body-strong)}
+.set-row-value{display:inline-flex;align-items:center;gap:2px;margin-left:auto;color:var(--muted);font-weight:var(--fw-label)}
+.set-chev{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.set-note{margin-top:var(--sp-2)}
+/* 위기 연락처 정적 칸(검수 전) — 번호를 적지 않는다. 안내 칸이라 오류·위험처럼 읽히지 않게 중립 테두리를 쓴다(빨강은 영구 삭제에만, A4 재작업 5). */
+.set-crisis{margin-top:var(--sp-3);padding:var(--sp-4);border:var(--hairline) solid var(--border);border-radius:var(--radius-card)}
+.set-crisis h3{margin:0 0 var(--sp-1);font-size:var(--fs-label);color:var(--service-ink)}
+.set-crisis .note{margin:0}
+
+/* 온보딩(D-061): 흰 하늘 아래 색 언덕 위에 아홉 친구와 조약돌 몇 개. 두 번째 쪽은 글이다. */
+.screen.welcome{position:relative;padding:var(--sp-6) 0 0;display:flex;flex-direction:column;overflow:hidden}
+.welcome-head{padding:0 var(--sp-5)}
+/* 장면 상자는 남은 자리 안에 통째로 들어온다(높이가 모자라면 상자가 줄고, 언덕이 옆으로 뻗어 폭을 채운다) — 해나 윗줄 친구가 잘리지 않는다. */
+.welcome-land,.done-land{position:relative;flex:1;min-height:0;margin-top:var(--sp-2);overflow:hidden}
+.welcome-foot{padding:var(--sp-4) var(--sp-5) calc(var(--sp-5) + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:var(--sp-2);background:transparent}
+.welcome-land+.welcome-foot{position:absolute;left:0;right:0;bottom:0;z-index:2}
+.screen.welcome.page2,.screen.help{padding:var(--sp-2) var(--sp-5) 0}
+.screen.help h1,.screen.welcome.page2 h1{font-size:2rem;line-height:2.5rem;margin-top:var(--sp-3)}
+.points{list-style:none;margin:var(--sp-6) 0 var(--sp-8);padding:0;display:flex;flex-direction:column;gap:var(--sp-6)}
+.points li{display:flex;gap:var(--sp-3);align-items:flex-start}
+.points .icb{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
+.points .ico{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.points b{display:block;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800}
+.points p{margin:2px 0 0;color:var(--muted);font-size:var(--fs-label);line-height:var(--lh-label)}
+.help-box{margin:var(--sp-6) 0 var(--sp-4);padding:var(--sp-5);border:var(--emphasis) solid var(--danger);border-radius:var(--radius-card)}
+.help-box h2{margin:0 0 var(--sp-2);font-size:var(--fs-heading)}
+.screen.help .welcome-foot{padding-inline:0;margin-top:auto}
+.screen.page2 .welcome-foot{padding-inline:0;margin-top:auto}
+.screen.done .done-head .caption{margin-top:var(--sp-1)}

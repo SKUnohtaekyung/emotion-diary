@@ -1,0 +1,90 @@
+/* ── 완료·온보딩 언덕(.land) 기본 규칙 — 2026-09-25 scene.css·tabs.css에서 이 파일로 모았다(규칙 값은 그대로). ── */
+@keyframes lfin{0%{opacity:0;transform:translateY(16px) scale(.96)}100%{opacity:1;transform:none}}
+@keyframes lfbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6%)}}
+@keyframes sunpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+.land-fit{position:absolute;inset:0;container-type:size;display:flex;align-items:flex-end;justify-content:center}
+.land-fit .land{position:relative;flex:none;width:min(100cqw,calc(100cqh * 360 / 590))}
+.land{position:relative;width:100%;aspect-ratio:360/590}
+.land-svg{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.land .hill-far{fill:var(--land-hill-far)}
+.land .hill-mid{fill:var(--land-hill-mid)}
+.land .hill-near{fill:var(--land-hill-near)}
+.land .road{fill:var(--bg)}
+.land .sun{fill:var(--land-sun)}
+.land .ring{position:static;opacity:1;animation:none}
+.land .sun-ring{fill:none;stroke:var(--land-sun-ring);stroke-width:2.5}
+.land-friend,.land-pebble{position:absolute;display:block;height:auto}
+.land-friend{bottom:var(--bt);transform-origin:50% 100%;animation:lfin .6s var(--ease) both,lfbob 5.4s ease-in-out .6s infinite;animation-delay:calc(var(--i,0) * 110ms),calc(600ms + var(--i,0) * -520ms)}
+.land .sun-ring{transform-box:fill-box;transform-origin:center;animation:sunpulse 7s ease-in-out infinite}
+.land .sun-ring:nth-of-type(2){animation-delay:-3.5s}
+.land-pebble{transform:rotate(var(--r,0deg))}
+@media (prefers-reduced-motion:reduce){.land-friend,.land .sun-ring{animation:none !important}}
+
+/* 자유 배치(D-078·D-079·D-083): 완료 화면 언덕·이유 화면 친구·마음 고르기의 큰 글자 격자 전환. 언덕 기본 규칙은 이 파일 머리로 옮겼고(2026-09-25), write.css의 마음 고르기 규칙은 여기서 덮어쓴다(통합은 문서 동기화 때). */
+
+/* 완료 화면 친구 기울기(D-078): land.js가 --tilt(deg)를 준다. 위 기본 규칙의 .land-friend는 lfin(입장)·lfbob(숨쉬기)에서 transform을 쓰므로
+   여기서는 transform이 아니라 개별 속성 rotate로 기울인다 — translate/scale(애니메이션)과 rotate(정적)가 합성돼 서로 안 덮어쓴다.
+   기준점은 scene.css가 이미 발(50% 100%)로 잡아 둬 발을 축으로만 돈다. */
+.land-friend{rotate:var(--tilt, 0deg)}
+
+/* 입장 버그 고침(D-078): 위 기본 규칙의 lfbob(숨쉬기) 지연이 `600ms + i*-520ms`라 i>=1에서 0 또는 음수가 돼 lfbob이 즉시(혹은 이미 진행된 채) 시작한다.
+   lfin·lfbob이 같은 transform을 쓰는데(애니메이션 합성은 뒤에 적힌 게 이긴다) lfbob이 먼저/즉시 시작하면 lfin의 오는 동작(옮겨오며 커짐)을 가려 첫 친구만
+   올라오는 것처럼 보였다. 각 친구의 숨쉬기는 자기 입장이 끝나는 시점(i*110ms + 600ms)에 시작하도록 다시 준다 — 모두 차례로 들어오고, 그 뒤 각자 숨쉰다. */
+.land-friend{animation-delay:calc(var(--i, 0) * 110ms), calc(var(--i, 0) * 110ms + 600ms)}
+
+/* ── 큰 글자 격자(D-083 ③, RK-027): 완료 화면. land.js가 fl-grid를 붙인다(루트 글자 20px+ 또는 실측 겹침). 3열, 기울기 0, 조약돌은 같은
+   land-cell 안에서 친구 바로 아래(발치)에 그대로 붙는다. 칸 높이는 라벨 줄바꿈에 맞춰 늘어나고(보통 문서 흐름), 모자라면 화면이 세로로
+   스크롤된다 — 버튼 줄(.done-bar)은 화면 그대로 두고(다른 작업자 소유) 이 카드가 늘어난 만큼 페이지가 길어지게만 한다.
+   재작업 1회차(main 독립 캡처 3건 지적) 수정:
+   1) 친구·조약돌 너비가 30px 안팎으로 줄어 있었다 — land.js가 img에 인라인 style.width(%)를 직접 주는데(자유 배치용) 인라인 스타일은
+      보통 클래스 규칙보다 우선해 격자에서도 그 %가 좁은 칸 기준으로 다시 계산돼 작아졌다. width에 !important를 줘 덮어쓴다.
+   2) 1행 1열이 비고 그림이 2열부터 시작했다 — .land-art(언덕 svg를 담는 div)가 fl-grid에서도 여전히 grid item으로 남아 첫 칸을
+      먼저 차지했다(land-svg만 display:none 했을 뿐 그 부모 .land-art는 그대로였다). .land-art를 절대 배치로 격자 흐름 밖에 뺀다.
+   3) 화면 아래 절반이 흰 빈 면이었다 — 위 수정과 함께 해온다: 언덕을 아예 숨기지 않고 격자 뒤 배경(클릭 불가)으로 남겨 완료 장면
+      분위기를 유지한다(해만 숨긴다).
+   재작업 2회차(main 독립 캡처 strip2.png 지적) 수정:
+   4) 1·3명에서 언덕 배경이 격자 내용 높이만큼만 깔리고 그 아래가 흰 면으로 잘렸다 — .land-art는 .land 기준 inset:0인데 .land 자신의
+      높이가 격자 칸 내용만큼만(짧으면 짧게) 잡혀 있었다. 처음엔 .land-fit을 position:static;height:100%로 바꿔 고치려 했으나 실측해
+      보니 height:100%가 0으로 풀렸다(.done-land가 flex:1로만 높이를 받아 퍼센트 기준으로 확정된 높이로 안 잡혔다). 대신 .land-fit은
+      tabs.css 기본값(position:absolute;inset:0 — 자유 모드와 같다)을 그대로 두고 display만 block으로 바꾼다 — inset:0 절대 배치는
+      퍼센트 문제 없이 항상 확정된 높이를 가지므로 .land의 min-height:100%가 그 위에서 안정적으로 풀린다. 9명처럼 칸 내용이 더 길면
+      .land가 land-fit 박스보다 더 자라고(overflow:visible이라 안 잘림) .done-land·.screen.done의 overflow 해제로 페이지가 그만큼 스크롤된다.
+   5) 1명은 왼쪽 위 홀로, 3명은 한 줄에 몰려 있었다 — land.js가 준 data-n으로 1~3명일 때만 3열 대신 가운데 한 줄로 모은다(3행 grid,
+      가운데 행에 auto-flow:column으로 옆으로 늘어놓고 justify-content:center). 이름표가 없어 칸 폭에 묶일 이유가 없으므로 친구 크기는
+      화면 폭의 55%까지 허용한다. 세로는 40:60 fr 행 비율로 장면 영역 안 가운데보다 살짝 위(약 40% 지점)에 둔다. ── */
+.land-cell{display:contents} /* 자유 배치에서는 안 보이는 상자 — 자식은 곧바로 .land 기준으로 절대 배치된다(지금과 같다) */
+.done-land:has(.land.fl-grid),.screen.done:has(.land.fl-grid){overflow:visible}
+.land-fit:has(.land.fl-grid){display:block} /* position:absolute;inset:0은 tabs.css 기본값 그대로 둔다(자유 모드와 같음, 확정 높이) */
+.land.fl-grid{position:relative;width:100%;min-height:100%;aspect-ratio:auto;display:grid;grid-template-columns:repeat(3, 1fr);column-gap:var(--sp-2);row-gap:var(--sp-6);padding:var(--sp-5) var(--sp-3) calc(84px + var(--sp-5) + env(safe-area-inset-bottom))}
+.land.fl-grid .land-art{position:absolute;inset:0;z-index:0;pointer-events:none} /* 절대 배치라 grid item에서 빠진다 — 1행 1열을 더 안 삼킨다 */
+.land.fl-grid .land-svg{display:block;width:100%;height:100%}
+.land.fl-grid .land-svg .sun-g{display:none} /* 해만 숨긴다 — 언덕은 격자 뒤 배경으로 남긴다 */
+.land.fl-grid .land-cell{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:var(--sp-2)}
+/* 너비: 4~9명 88px, 1~3명은 자유 배치 크기(--fw-px) 그대로 두되 3열 칸보다 넓으면 칸 폭까지만(마음 고르기 격자와 같은 원칙 — max-width로 캡).
+   1~3명은 아래에서 55vw로 다시 캡해 칸 폭 제한을 없앤다. */
+.land.fl-grid .land-friend{position:static;left:auto;bottom:auto;width:var(--fw-px) !important;max-width:100%;height:auto;rotate:0deg;animation:none}
+.land.fl-grid .land-pebble{position:static;left:auto;top:auto;width:32px !important;height:auto;transform:none} /* 격자에서는 인원과 무관하게 발치에 약 32px 고정 */
+
+/* 1~3명: 3열 대신 가운데 한 줄. 가운데 행(2행)에 auto-flow:column으로 칸을 옆으로 늘어놓고 justify-content로 그 줄 전체를 가운데 모은다.
+   위:아래 행 비율 40:60 = 그 줄이 장면 세로 자리에서 대략 40% 지점에 오게(요청한 "가운데보다 살짝 위"). */
+.land.fl-grid[data-n="1"],.land.fl-grid[data-n="2"],.land.fl-grid[data-n="3"]{
+  grid-template-columns:none;grid-template-rows:40fr auto 60fr;grid-auto-flow:column;grid-auto-columns:max-content;justify-content:center;column-gap:var(--sp-5)
+}
+.land.fl-grid[data-n="1"] .land-cell,.land.fl-grid[data-n="2"] .land-cell,.land.fl-grid[data-n="3"] .land-cell{grid-row:2}
+/* 55vw 문구 그대로는 1명에만 안전하다 — 2·3명은 한 줄에 나란히 두므로 항목 수만큼 나눠 쓰지 않으면(예: 3명×55vw) 가로로 넘친다(실측에서 확인,
+   왼쪽 끝은 안전-정렬로 붙고 오른쪽이 화면 밖으로 잘렸다). .land-cell은 grid-auto-columns:max-content라 그 폭에 대한 %는 순환 참조가 돼(자기
+   내용이 자기 칸 크기를 정하는데 그 칸 기준 %를 다시 쓰면 풀리지 않는다) vw로 인원별 상한을 직접 나눠 준다(패딩·간격 여유 포함, 실측 통과). */
+.land.fl-grid[data-n="1"] .land-friend{max-width:55vw}
+.land.fl-grid[data-n="2"] .land-friend{max-width:40vw}
+.land.fl-grid[data-n="3"] .land-friend{max-width:27vw}
+
+/* ── 큰 글자 격자: 마음 고르기(D-083 ③). write.css의 .meadow·.ff(자유 배치, D-066)를 여기서 덮어쓴다 — 원본은 그대로 둔다(통합은 문서 동기화 때).
+   meadow.js가 폭에 따라 --fl-cols(2 또는 3)를 준다. 친구 크기(.ff-pic 19.5cqw, write.css 그대로)는 줄이지 않는다 — container-type만 유지한다. ── */
+.pick-scene.fl-grid{overflow:visible;min-height:0}
+.pick-scene.fl-grid .meadow-fit{position:static;display:block;inset:auto}
+.pick-scene.fl-grid .meadow{position:relative;width:100%;aspect-ratio:auto;display:grid;grid-template-columns:repeat(var(--fl-cols, 3), 1fr);column-gap:var(--sp-2);row-gap:var(--sp-6);padding:var(--sp-5) var(--sp-3) calc(84px + var(--sp-5) + env(safe-area-inset-bottom))}
+.pick-scene.fl-grid .meadow-art-wrap{display:none}
+.pick-scene.fl-grid .ff{position:static;left:auto;top:auto;width:auto;transform:none}
+.pick-scene.fl-grid .ff-pic{transform:none}
+.pick-scene.fl-grid .ff-pic .friend-img{animation:none}
+

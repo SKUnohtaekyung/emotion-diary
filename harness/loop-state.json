@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-WEB-UI-01",
-  "phase": "browser-first-ui-prototype",
+  "task_id": "TASK-WEB-UI-02",
+  "phase": "user-qa-and-design-fixes",
   "iteration": 1,
   "status": "in_progress",
-  "current_hypothesis": "A dependency-free static prototype (plain HTML/CSS/ES modules under web/) that reads design/tokens.json, data/taxonomy/v2.json and design/characters at runtime lets the user review the direct-writing flow and character placement in a browser without pulling the Phase 1 framework decision forward and without creating a second copy of any value.",
+  "current_hypothesis": "The user, who judges by eye, can review the static screen prototype (web/) in the browser and report design problems in design language; each report is confirmed as 'which screen, what, how', fixed with the smallest change (values in design/tokens.json, shapes in web/css/app.css), shown as a before/after capture, and the settled shape is written back into DESIGN_SYSTEM.md and style-guide.html in the same change so the design system stays the single source.",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "9131f53",
+  "last_verified_commit": "55f3f91",
   "completed_nodes": ["bootstrap-audit", "taxonomy-v1", "taxonomy-v2-research"],
   "next_node": "hosting-identity-spike",
   "blockers": [
@@ -15,5 +15,5 @@
     "model-access-spike gate (B-06 partial): job expiry/failed handling, independent verifier double call, crisis-signal cases, subscription retention settings (RK-016)",
     "app-scaffold stays blocked until hosting-identity-spike and data-store-spike are done; TASK-MOBILE (single Worker + Static Assets proposal) is on hold until Phase 1 starts"
   ],
-  "last_checkpoint": "2026-09-20 TASK-WEB-UI-01 started on branch web-ui/prototype after the user approved the plan. User decisions: step-by-step flow first with a long-form view of the same content, representative characters appear in a row under the constellation map (map dots stay as specified in DESIGN_SYSTEM 6.2), no real-device check this time (recorded as unverified). T0 done: the finished TASK-INFRA-01 section moved byte-for-byte to tasks/archive/TASK-INFRA-01.md (sha256 prefix ea1586bf865b, re-inserting it reproduces 9131f53's CURRENT_TASK.md). The prototype is outside the work-graph nodes; next_node and blockers are unchanged from the previous task. Task list and observable done-criteria are in tasks/CURRENT_TASK.md."
+  "last_checkpoint": "2026-09-21 TASK-WEB-UI-02 started on branch web-ui/qa. PR #30 (TASK-WEB-UI-01) was still open (CI green on both OS, mergeable), so with the user's decision the branch was cut from the end of web-ui/prototype (55f3f91) without merging; merging happens only when the user does it or says so. The finished TASK-WEB-UI-01 section moved to tasks/archive/TASK-WEB-UI-01.md (original 10,608 bytes, sha256 prefix 75976470981a; only one relative link target depth was adjusted). QA mode chosen by the user: the user first walks through the prototype alone and then reports everything at once; meanwhile the prototype is left unchanged. First user report (same day): one defect fixed at once (neighbour-cell fragments removed from the wish/sadness UI pose PNGs, verified, check-characters PASS); everything else depends on a brand direction, and the user asked to settle brand mood and concept before further QA. design/brand-concepts.html holds three directions (field guide / explorer notebook / forest clearing) and mascot options; waiting for the user's choice before writing a decision row (next number D-050; D-048 = provisional character adoption, D-049 = bottom navigation) or touching web/. The prototype is outside the work-graph nodes; next_node and blockers are unchanged. Acceptance conditions and the QA log are in tasks/CURRENT_TASK.md."
 }

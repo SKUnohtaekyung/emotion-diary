@@ -1,0 +1,88 @@
+/* 통계 화면(크기 추세·친구 걸음·불러오기 상태, D-086). 통계 규칙의 정본은 이 파일이다 — 옛 tabs.css·tabs-mood.css의 .stats/.trk/.trend 규칙은 2026-09-25에 지웠고,
+   tabs.css에는 기간 전환(.segmented) 여백 한 줄만 남았다. stats.js가 그리는 마크업은 전부 sx- 접두어다. */
+
+.stats-screen .segmented{margin-top:var(--sp-3)}
+.sx-body{margin-top:var(--sp-2)}
+.sx-sec{margin-top:var(--sp-8)}
+
+/* 요약 칸 둘 — '평균 크기' 칸은 없앴다: 서로 다른 감정의 크기를 한데 섞은 평균은 어느 마음의 크기도 아니다(SERVICE_WHY §12, DESIGN_SYSTEM §6.10). */
+.sx-summary{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin:var(--sp-6) 0}
+.sx-tile-v{font-size:2.5rem;line-height:2.9rem;font-weight:800;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.sx-tile-k{font-size:var(--fs-label);color:var(--muted);font-weight:var(--fw-label)}
+.sx-tile-note{margin-top:2px;font-size:var(--fs-caption);color:var(--subtle)}
+
+.sx-eyebrow{margin:0 0 var(--sp-1);font-size:var(--fs-label);color:var(--muted);font-weight:var(--fw-body-strong)}
+.sx-headline{font-size:1.5rem;line-height:2rem;font-weight:800;letter-spacing:-.025em;margin:0 0 var(--sp-1)}
+
+/* ── 친구와의 친밀도(D-064): 친구가 길을 걸어 '나'에게 얼마나 가까이 왔는지. 진입 때 한 번만 걷는다(.sx-animate-in이 있을 때만 — 7/30 전환에서는 이 클래스를 붙이지 않는다). ── */
+.sx-tracks{list-style:none;margin:var(--sp-4) 0 0;padding:0}
+.sx-trk{display:flex;align-items:flex-end;min-height:5.6rem;padding-bottom:0}
+.sx-trk-who{display:flex;flex-direction:column;justify-content:center;width:5.5rem;flex:none}
+.sx-trk-who strong{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800}
+.sx-trk-who span{font-size:var(--fs-caption);color:var(--muted);font-weight:600}
+.sx-trk-line{position:relative;flex:1;display:flex;align-items:flex-end;height:5.4rem;min-width:0}
+.sx-road{position:relative;flex:1;align-self:stretch;min-width:0}
+.sx-base,.sx-fill{position:absolute;left:0;bottom:22px;height:6px;border-radius:3px}
+.sx-base{right:0;background:var(--border)}
+.sx-fill{width:calc(20% + var(--p) * .6%);background:var(--c)}
+.sx-pos{position:absolute;bottom:24px;left:calc(20% + var(--p) * .6%);transform:translateX(-50%);line-height:0}
+.sx-pos .friend-img{width:auto;height:3.8rem}
+.sx-me{position:relative;z-index:1;flex:none;display:flex;align-items:flex-end;justify-content:center;width:38px;margin-left:-6px;padding-bottom:6px}
+.sx-me .stone-img{position:static;display:block;width:34px;height:auto}
+
+/* 걸음·채움 1200ms(전 400ms), 줄 간격 120ms(전 50ms), 걷는 동안 통통 4번. 0%에서 폭·왼쪽 위치를 0/6%로 못박아(backwards) 자기 차례 전에
+   채움 조각이 먼저 보이던 문제를 없앴다 — 전에는 0%만 정의해 100%가 암시적으로 이어져 delay 동안 6% 폭이 계속 보였다. */
+@keyframes sx-grow{0%{width:0}100%{width:calc(20% + var(--p) * .6%)}}
+@keyframes sx-walk{0%{left:6%;opacity:0}8%{opacity:1}100%{left:calc(20% + var(--p) * .6%)}}
+@keyframes sx-step{0%,100%{transform:translateY(0)}12.5%,37.5%,62.5%,87.5%{transform:translateY(-4px)}25%,50%,75%{transform:translateY(0)}}
+.sx-tracks.sx-animate-in .sx-trk{--go:calc(120ms + var(--sx-i,0) * 120ms)}
+.sx-tracks.sx-animate-in .sx-fill{animation:sx-grow 1200ms var(--ease) var(--go) backwards}
+.sx-tracks.sx-animate-in .sx-pos{animation:sx-walk 1200ms var(--ease) var(--go) backwards}
+.sx-tracks.sx-animate-in .sx-pos .friend-img{animation:sx-step 1200ms ease-in-out var(--go) backwards}
+
+.sx-away{margin-top:var(--sp-6)}
+.sx-away h3{margin:0 0 var(--sp-2);font-size:var(--fs-label);color:var(--muted)}
+.sx-away-row{display:flex;gap:var(--sp-6);flex-wrap:wrap}
+.sx-away-row>div{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:var(--fs-caption);color:var(--muted)}
+.sx-away-row .friend-img{width:auto;height:46px}
+.sx-away-row b{font-size:var(--fs-label);color:var(--text)}
+
+.sx-empty{padding:var(--sp-6) 0;text-align:center}
+.sx-empty-friend{display:flex;justify-content:center;margin-bottom:var(--sp-3)}
+
+/* ── 크기 추세: 계열마다 따로 작은 차트(small multiples) 한 벌. 서로 다른 계열의 크기는 어디서도 합쳐 평균 내지 않는다. ── */
+.sx-axis{display:flex;justify-content:space-between;margin-top:var(--sp-4);padding:0 2px;font-size:var(--fs-caption);color:var(--subtle);font-variant-numeric:tabular-nums}
+.sx-rows{list-style:none;margin:var(--sp-2) 0 0;padding:0}
+.sx-row{padding:var(--sp-4) 0;border-top:var(--hairline) solid var(--border)}
+.sx-row:first-child{border-top:0}
+.sx-row-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.sx-row-who{display:flex;align-items:center;gap:var(--sp-2);min-width:0;font-size:var(--fs-label);font-weight:var(--fw-body-strong)}
+.sx-row-who .friend-img{width:auto;height:40px;flex:none}
+.sx-row-stat{font-size:var(--fs-caption);color:var(--muted);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.sx-chart{margin-top:var(--sp-2)}
+.sx-chart-svg{display:block;width:100%;height:44px}
+.sx-grid{stroke:var(--border);stroke-width:1}
+.sx-mean-line{stroke:var(--service-ink);stroke-opacity:.32;stroke-width:1.4;stroke-dasharray:3 3}
+.sx-line{fill:none;stroke:color-mix(in srgb,var(--dot) 55%,transparent);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+.sx-dot{fill:var(--dot)}
+.sx-row-foot{margin:var(--sp-1) 0 0;font-size:var(--fs-caption);color:var(--muted)}
+
+.sx-details{margin-top:var(--sp-5)}
+/* summary에 display:flex를 주면 크롬 기본 삼각형 마커(list-item 렌더링)가 사라진다 — 지우는 대신 우리 아이콘 언어에 맞는 셰브론을 직접 그린다(border 두 변을 45도로 접는 방식, 그림자 없음). */
+.sx-details summary{list-style:none;min-height:44px;display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--service-ink);cursor:pointer}
+.sx-details summary::-webkit-details-marker{display:none}
+.sx-details summary::before{content:"";flex:none;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform var(--dur-fast) var(--ease)}
+.sx-details[open] summary::before{transform:rotate(45deg)}
+.sx-guide{margin:var(--sp-2) 0 0;padding-left:var(--sp-5);color:var(--muted);font-size:var(--fs-label);line-height:var(--lh-label)}
+.sx-guide li{margin-bottom:var(--sp-2)}
+.sx-guide li:last-child{margin-bottom:0}
+
+/* 자주 머문 말: 막대가 아니라 낱말 pill — 감정 색으로 순위를 매기는 인상을 피한다(DESIGN_SYSTEM §6.9). */
+.sx-pillrow{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-3)}
+.sx-pill{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:38px;padding:0 var(--sp-3);border-radius:var(--radius-chip);background:var(--surface-soft);font-weight:var(--fw-body-strong)}
+.sx-pill em{font-style:normal;font-size:var(--fs-caption);color:var(--muted)}
+
+@media (prefers-reduced-motion:reduce){
+  .sx-details summary::before{transition:none}
+  .sx-fill,.sx-pos,.sx-pos .friend-img{animation:none !important}
+}

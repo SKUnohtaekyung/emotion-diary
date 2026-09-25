@@ -10,6 +10,20 @@
 // 전체에서 "- 소유 파일: ..." 선언 줄의 backtick 경로/글롭을 모아 허용 목록으로 삼고,
 // Write/Edit 대상이 그 목록 밖이면 permissionDecision: "ask"를 돌려준다.
 //
+// 확인창을 띄우지 않는 경우(D-060, docs/PROCESS_LOG.md §5):
+// - 권한 모드가 auto다(입력의 permission_mode). 사용자가 자동 진행을 택한 세션에서 이 훅이
+//   ask를 돌려주면 auto 모드도 그 확인창을 막지 못해 작업마다 창이 떴다. 모드를 알 수 없으면
+//   (필드 없음) 안전 쪽인 확인을 유지한다.
+// - 대상이 Claude Code 자신의 작업 폴더다 — 세션 scratchpad(입력의 scratchpad_dir)와 자동 메모리
+//   폴더(transcript_path가 놓인 projects/<프로젝트> 폴더 아래 memory). 저장소 파일이 아니라
+//   소유 파일 규칙의 대상이 아니다. 실측(2026-09-21): 이 훅이 낸 확인 78건 가운데 77건이 이 두
+//   폴더 쓰기였고(나머지 1건은 그 밖의 프로젝트 밖 경로) 프로젝트 안 파일은 0건이었다. 이 제외는
+//   모드와 상관없이 적용한다.
+// - 소유 파일 선언의 backtick 토큰 하나가 정규식으로 바뀌지 않아도(예: URL 조각) 훅이 죽지 않는다 —
+//   그 토큰만 건너뛴다. 죽은 훅은 "hook error" 알림만 남기고 조용히 통과돼 검사 전체가 꺼진다.
+//   auto 모드에서는 이 검사가 꺼지므로 소유 파일 밖 쓰기의 사후 점검(이슈 #27의 "세션 경계
+//   스냅샷")은 별도 작업으로 남는다.
+//
 // 알려진 한계(모두 과다 허용 쪽 — false negative 여지. §2.2, docs/PROCESS_LOG.md 참고):
 // - 완료·보류 상태를 가리지 않고 파일 전체의 모든 "소유 파일" 선언을 하나로 합친다.
 //   지금 진행 중이 아닌 과거 작업이 선언한 파일도 계속 허용된다. 작업 단위로 좁히지 않는다.
@@ -60,14 +74,69 @@ function globToRegExp(pattern) {
   const escaped = normalized
     .split("*")
     .map((piece) => piece.replace(/[.+^${}()|[\]\\]/g, "\\$&"))
-    .join("[^/]*");
+    .join("[^/]*")
+    // `?`는 글롭이 아니라 글자 그대로다. 선언 줄 설명문의 backtick 조각(예: `?theme=pebble`)이
+    // 패턴으로 들어와 "Nothing to repeat" 오류로 훅이 죽은 일이 있다(2026-09-19~21, 29회).
+    .replaceAll("?", "[?]");
   return new RegExp(isDirPrefix ? `^${escaped}` : `^${escaped}$`);
 }
 
 export function isOwned(relativePath, ownedPaths) {
   const normalized = relativePath.replace(/\\/g, "/");
   if (normalized.startsWith("..")) return false; // 프로젝트 root 밖
-  return ownedPaths.some((pattern) => globToRegExp(pattern).test(normalized));
+  return ownedPaths.some((pattern) => {
+    try {
+      return globToRegExp(pattern).test(normalized);
+    } catch {
+      return false; // 정규식으로 바뀌지 않는 토큰은 허용 목록에서 뺀다 — 훅이 죽어 검사 전체가 꺼지는 것보다 낫다.
+    }
+  });
+}
+
+// Windows는 같은 폴더가 NOHTAE~1 같은 짧은 이름과 긴 이름으로 섞여 나오고, 새로 만들 파일은 아직
+// 없어 realpath가 실패한다 — 실제로 있는 가장 가까운 상위 폴더까지만 풀고 나머지 이름을 붙여
+// 비교할 수 있는 경로를 만든다.
+function canonicalPath(target) {
+  const rest = [];
+  let current = path.resolve(target);
+  for (;;) {
+    try {
+      return path.join(fs.realpathSync.native(current), ...rest.reverse());
+    } catch {
+      const parent = path.dirname(current);
+      if (parent === current) return path.resolve(target);
+      rest.push(path.basename(current));
+      current = parent;
+    }
+  }
+}
+
+function isInside(child, parent) {
+  const relative = path.relative(parent, child);
+  if (relative === "" || path.isAbsolute(relative)) return false;
+  return relative !== ".." && !relative.startsWith(`..${path.sep}`);
+}
+
+// Claude Code 자신의 작업 폴더인가 — 세션 scratchpad와 자동 메모리 폴더. 메모리 폴더는 transcript_path에서
+// 찾는다: 기록 파일이 projects/<프로젝트>/ 바로 아래에 있든(주 에이전트) 그 밑 더 깊은 폴더에 있든
+// (하위 에이전트) 위로 올라가며 "projects" 바로 밑 폴더를 찾아 그 아래 memory를 쓴다.
+function isHarnessWorkDir(filePath, input) {
+  const dirs = [];
+  if (typeof input?.scratchpad_dir === "string" && input.scratchpad_dir) dirs.push(input.scratchpad_dir);
+  if (typeof input?.transcript_path === "string" && input.transcript_path) {
+    let dir = path.dirname(input.transcript_path);
+    while (path.basename(path.dirname(dir)) !== "projects") {
+      const parent = path.dirname(dir);
+      if (parent === dir) {
+        dir = "";
+        break;
+      }
+      dir = parent;
+    }
+    if (dir) dirs.push(path.join(dir, "memory"));
+  }
+  const target = canonicalPath(filePath);
+  return dirs.some((dir) => isInside(target, canonicalPath(dir)));
 }
 
 async function main() {
@@ -75,17 +144,24 @@ async function main() {
   stdin.setEncoding("utf8");
   for await (const chunk of stdin) raw += chunk;
 
-  let toolName = "";
-  let filePath = "";
+  let input;
   try {
-    const input = JSON.parse(raw);
-    toolName = input?.tool_name ?? "";
-    filePath = input?.tool_input?.file_path ?? "";
+    input = JSON.parse(raw);
   } catch {
     return;
   }
+  const toolName = input?.tool_name ?? "";
+  const filePath = input?.tool_input?.file_path ?? "";
 
-  if (!["Write", "Edit"].includes(toolName) || !filePath) return;
+  if (!["Write", "Edit"].includes(toolName) || typeof filePath !== "string" || !filePath) return;
+
+  // 머리말의 "확인창을 띄우지 않는 경우" — 아무것도 출력하지 않고 통과시킨다.
+  if (input?.permission_mode === "auto") return;
+  try {
+    if (isHarnessWorkDir(filePath, input)) return;
+  } catch {
+    // 작업 폴더 판정이 실패하면 제외하지 않고 아래 소유 파일 확인으로 넘어간다(안전 쪽).
+  }
 
   let currentTaskContent;
   try {

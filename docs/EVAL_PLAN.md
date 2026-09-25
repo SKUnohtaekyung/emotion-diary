@@ -56,24 +56,31 @@
 | F-04 | 선택 필드 | 칭찬/감사 3칸이 보이고 비워도 완료 가능 | 중대 |
 | F-05 | 복수 감정 | 복수 category/emotion과 서로 다른 강도의 CRUD가 보존 | 중대 |
 | F-06 | 하루 하나 | 동시 요청/여러 탭에서도 `(owner,date)` unique, 기존 record 열기 | 차단 |
-| F-07 | 소급·미래 날짜 | 과거 허용/미래 거부, entry date 집계, 과거 streak 미복구 | 중대 |
+| F-07 | 그날만 새로 쓰기·지난 draft 완료(D-082, D-002의 소급 작성 허용을 대체) | 과거 `entry_date`로 새 draft 생성 거부(404/422), 미래 거부, 오늘 `entry_date`로는 생성 허용, 이미 있는 draft는 entry_date가 지나도 기한 없이 완료 허용, entry date 집계, 과거 streak 미복구 | 중대 |
 | F-08 | autosave | 이탈/새로고침 후 structured draft 복구, 실패 표시, 입력 손실 없음 | 중대 |
 | F-09 | revision conflict | stale revision이 최신 내용을 조용히 덮어쓰지 않음 | 차단 |
 | F-10 | 멱등성 | 완료/delete/분석 요청 재전송이 중복 데이터·비용을 만들지 않음 | 중대 |
 | F-11 | 수정과 stale | completed 수정 후 input hash가 달라지고 기존 분석 stale | 중대 |
-| F-12 | dashboard | 완료 기록만으로 기간·빈도·비중·평균+n·streak 재현 | 중대 |
-| F-13 | reminder | 시간/ON/OFF/timezone, 오늘 완료 후 중단, 인앱 fallback | 중대 |
+| F-12 | dashboard | 완료 기록만으로 기간·빈도·친구와의 친밀도(D-064)·계열별 날 단위 평균+n+범위·기간 비교(D-086)·streak 재현 | 중대 |
+| F-13 | reminder | 시간/ON/OFF/timezone, 오늘 완료 후 중단, 진행 중인 임시저장이 있으면 알림 대신 이어 쓰기 표시(D-081 ③), 오늘 화면 한 줄로 통합된 인앱 fallback(D-077) | 중대 |
 | F-14 | hard delete | 확인·owner 검사·transaction cascade, 통계/분석에서 제거 | 차단 |
 | F-15 | JSON export | owner data만, UTF-8/schema version, secret/internal key 제외, schema valid | 차단 |
 | F-16 | transcript 최소화 | AI 전체 대화는 영구 저장되지 않고 structured draft만 복구 | 차단 |
+| F-17 | 하루 기준 시각 경계(D-081) | `day_start_hour` 직전/직후(예: 03:59와 04:00)에 `entry_date`가 정확히 갈리고, `day_start_hour`를 바꿔도 이미 저장된 행의 `entry_date`는 그대로 | 중대 |
+| F-18 | 작성 흐름 이동(D-082 ⑤) | 흐름 이탈(완료·닫기·임시저장 삭제) 후 기기/브라우저 뒤로 가기가 이미 끝난 작성 단계나 전체 검토(편지)로 돌아가지 않음 | 중간 |
+| F-19 | 세션 임시 보관(D-082 ④) | 저장 실패 시 `sessionStorage` 임시 보관, 탭을 닫으면 삭제, 서버 저장 성공 시에도 삭제, 새로고침 시에는 복구 | 중대 |
+| F-20 | 계열별 통계 비교(D-086) | `n`<3이면 평균·비교 미표시, 두 기간 모두 `n`≥3이고 Welch t 95%·차이≥1.0일 때만 '높음/낮음', 그렇지 않으면 '비슷함' | 중대 |
+| F-21 | 주요 화면 예외 상태(D-083) | 오늘·달력·통계·기록 상세의 불러오기/오류/연결 끊김 표시, 오늘 기록 확인 실패 시 새 기록 시작 차단, 없는/미래 날짜 안내 | 중대 |
 
 필수 경계 fixture:
 
 - 자정 직전/직후, DST가 있는 timezone, timezone 변경, 윤년
+- 하루 기준 시각(`day_start_hour`) 직전/직후 경계, 기준 시각 변경 전후 기존 `entry_date` 불변(D-081)
 - 동시에 같은 날짜 생성, 같은 idempotency key/다른 body, 늦은 autosave
 - blank/whitespace, 최대 길이, emoji/한글, 제어문자, XSS payload
 - 1과 10, 범위 밖/소수 intensity, 중복 emotion code, taxonomy version 변경
 - network drop, DB transaction 중단, API 4xx/5xx/timeout, double tap
+- 저장 실패 중 탭 닫기·새로고침에서 세션 임시 보관(sessionStorage)의 생존/삭제(D-082 ④)
 - 빈 기간, 기록 없는 날(missing≠0), 삭제/수정 전후 dashboard snapshot
 
 ## 6. 사용자 원자료·시각·모바일·접근성

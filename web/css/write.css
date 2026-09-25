@@ -1,0 +1,247 @@
+/* 작성 흐름(D-061): 풀스크린 단계형. 위에 뒤로 가기와 몇 번째 단계인지, 아래에 이전·다음. 하단 탐색은 없다. 색 면은 세부 감정에서만 화면 전체로 온다. */
+body[data-fullscreen] .bottom-nav{display:none}
+.screen.write{display:flex;flex-direction:column;padding:0 var(--sp-5) var(--sp-6)}
+.write-top{position:sticky;top:var(--banner-h,2rem);z-index:var(--z-sticky);display:flex;align-items:center;justify-content:space-between;min-height:var(--touch);margin:0 calc(var(--sp-5) * -1);padding:var(--sp-2) var(--sp-3) 0 var(--sp-2);background:var(--bg)}
+.screen[data-theme-cat] .write-top{background:var(--tint)}
+.write-top .back{display:grid;place-items:center;width:var(--touch);height:var(--touch);border:0;background:none;color:var(--service-ink)}
+.write-top .back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.step-count{font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--muted);font-variant-numeric:tabular-nums}
+.progress{height:3px;margin:0 0 var(--sp-3);border-radius:var(--radius-chip);background:var(--border);overflow:hidden}
+.progress i{display:block;height:100%;background:var(--service-ink)}
+.editing-banner{margin:var(--sp-2) 0 var(--sp-3)}
+.step-footer{position:sticky;bottom:0;z-index:var(--z-sticky);display:grid;grid-template-columns:minmax(96px,auto) 1fr;gap:var(--sp-2);align-items:center;padding:var(--sp-3) var(--sp-5) calc(var(--sp-4) + env(safe-area-inset-bottom));background:var(--bg)}
+.step-footer .btn.text{padding:0 var(--sp-3)}
+.write h1{font-size:2.125rem;line-height:2.625rem;margin:var(--sp-3) 0 var(--sp-2)}
+.write .lede{margin-bottom:var(--sp-4)}
+.paper-guide{font-size:var(--fs-heading);line-height:var(--lh-heading);color:var(--muted);margin:0 0 var(--sp-6)}
+
+/* 마음 고르기: 친구 아홉을 박스 없이(D-061). 세 줄 세 칸, 모두 같은 크기이고 위아래로 살짝 어긋난다. */
+.write .hero{font-size:clamp(1.5rem,8.4vw,1.9rem);line-height:1.25;margin:var(--sp-1) 0 var(--sp-1)}
+.friend-grid{display:grid;grid-template-columns:repeat(3,1fr);row-gap:0;margin:var(--sp-2) calc(var(--sp-2) * -1) 0}
+.fr{display:flex;flex-direction:column;align-items:center;min-height:8.1rem;margin-top:var(--jit,0);padding:0;border:0;background:none;color:var(--text)}
+.fr-pic{position:relative;display:flex;align-items:flex-end;justify-content:center;width:100%;height:4.6rem;transform:rotate(var(--tilt,0deg))}
+.fr-pic .friend-img{width:auto;max-width:5.8rem;max-height:4.5rem;transition:transform var(--dur-base) var(--ease)}
+.fr[aria-pressed="true"] .fr-pic .friend-img{transform:scale(1.06)}
+.fr-nm{margin-top:var(--sp-2);padding:0 var(--sp-3);border-radius:var(--radius-chip);font-size:var(--fs-label);font-weight:800;line-height:1.4rem}
+.fr[aria-pressed="true"] .fr-nm{background:var(--service-ink);color:var(--bg)}
+.fr small{margin-top:2px;font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted);font-weight:600}
+.fr-ck{position:absolute;right:.5rem;top:-.1rem;display:none;place-items:center;width:1.4rem;height:1.4rem;border-radius:50%;background:var(--service-ink);color:var(--bg);font-style:normal;font-size:.75rem;font-weight:900}
+.fr[aria-pressed="true"] .fr-ck{display:grid}
+.fr:focus-visible{outline-offset:-2px;border-radius:var(--radius-card)}
+
+/* 마음 고르기 — 초록 언덕 위의 친구들(D-066 시안). 배경은 land 초록 한 계열(하늘=먼 언덕색), 해·구름·조약돌 없음.
+   친구는 모두 같은 크기의 자리를 쓰고 위치·기울기만 제멋대로다. 장면 상자는 남은 자리 안에 들어오고 언덕이 옆으로 뻗어 폭을 채운다. */
+.screen.pick,.step-footer.pick{--muted:var(--text);--subtle:var(--text);--focus:var(--service-ink)}
+.screen.pick{position:relative;padding-bottom:0;background:var(--land-hill-far)}
+.screen.pick .write-top{background:var(--land-hill-far)}
+.screen.pick .field-error{color:color-mix(in srgb,var(--danger) 75%,var(--service-ink))} /* danger 원색은 초록 하늘 위 4.38:1이라 ink를 25% 섞어 6.2:1로 올린다 */
+.screen.pick .progress{background:color-mix(in srgb,var(--service-ink) 14%,transparent)}
+.screen.pick .btn.primary[aria-disabled="true"]{opacity:1;background:color-mix(in srgb,var(--service-ink) 34%,var(--land-hill-mid))}
+.screen.pick .step-footer{position:sticky;bottom:0;z-index:2;margin:calc(84px * -1 - env(safe-area-inset-bottom)) calc(var(--sp-5) * -1) 0;background:transparent}
+.pick-scene{position:relative;flex:1;min-height:31rem;margin:0 calc(var(--sp-5) * -1);overflow:hidden}
+.meadow-fit{position:absolute;inset:0;container-type:size;display:flex;align-items:flex-end;justify-content:center}
+.meadow{position:relative;flex:none;width:min(100cqw,calc(100cqh * 360 / 590));aspect-ratio:360/590;container-type:inline-size}
+.meadow-art{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.meadow-art .fh1{fill:var(--land-hill-mid)}
+.meadow-art .fh2{fill:color-mix(in srgb,var(--land-hill-mid) 45%,var(--land-hill-near))}
+.meadow-art .fh3{fill:var(--land-hill-near)}
+.meadow-art .froad{fill:color-mix(in srgb,var(--bg) 62%,var(--land-hill-far))}
+.meadow-art .ft-c{fill:color-mix(in srgb,var(--land-hill-near) 82%,var(--service-ink))}
+.meadow-art .ft-t{fill:color-mix(in srgb,var(--land-hill-near) 55%,var(--service-ink))}
+.ff{position:absolute;left:var(--x);top:var(--y);width:21.7%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;padding:0;border:0;background:none;color:var(--text);cursor:pointer;-webkit-tap-highlight-color:transparent}
+.ff-pic{position:relative;display:flex;align-items:flex-end;justify-content:center;width:100%;height:19.5cqw;transform:rotate(var(--tilt,0deg));transition:transform var(--dur-base) var(--ease)}
+.ff-pic .friend-img{display:block;width:auto;height:auto;max-width:100%;max-height:100%;animation:ffbob 5.2s ease-in-out infinite;animation-delay:calc(var(--i) * -.83s)}
+.ff[aria-pressed="true"] .ff-pic{transform:rotate(var(--tilt,0deg)) scale(1.08)}
+.ff-pic.hop{animation:ffhop 420ms var(--ease)}
+.ff-nm{margin-top:.15rem;padding:0 max(.5rem,2.4cqw);border-radius:var(--radius-chip);font-size:max(.8125rem,3.9cqw);font-weight:800;line-height:1.4}
+.ff[aria-pressed="true"] .ff-nm{background:var(--service-ink);color:var(--bg)}
+.ff small{margin-top:1px;font-size:max(.75rem,3.2cqw);line-height:1.2;font-weight:700}
+.ff-ck{position:absolute;right:2%;top:-4%;display:none;place-items:center;width:max(1.25rem,5.6cqw);height:max(1.25rem,5.6cqw);border-radius:50%;background:var(--service-ink);color:var(--bg);font-style:normal;font-size:max(.7rem,3cqw);font-weight:900;transform:rotate(calc(var(--tilt,0deg) * -1))}
+.ff[aria-pressed="true"] .ff-ck{display:grid}
+.ff:focus-visible{outline:3px solid var(--service-ink);outline-offset:2px;border-radius:14px}
+@keyframes ffbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2.2%)}}
+@keyframes ffhop{0%{transform:rotate(var(--tilt,0deg)) scale(1)}38%{transform:translateY(-9%) rotate(var(--tilt,0deg)) scale(1.12)}72%{transform:translateY(1.5%) rotate(var(--tilt,0deg)) scale(1.04)}100%{transform:rotate(var(--tilt,0deg)) scale(1.08)}}
+@media (max-height:700px){.screen.pick .hero{font-size:1.5rem}.screen.pick .lede{margin-bottom:var(--sp-2)}}
+@media (prefers-reduced-motion:reduce){.ff-pic .friend-img{animation:none}.ff-pic.hop{animation:none}.ff-pic{transition:none}}
+
+/* 세부 감정: 화면 전체가 그 계열 300. 위쪽 친구와 조약돌 더미는 sticky이고 스크롤하면 컴팩트가 된다. 친구는 상자 없이 그대로 선다. */
+.detail-screen{padding-top:0}
+.detail-stage{--compact:.52;position:sticky;top:calc(var(--banner-h,2rem) + var(--touch));z-index:6;height:216px;margin:0 calc(var(--sp-5) * -1) var(--sp-2);pointer-events:none}
+.detail-stage::before{content:"";position:absolute;inset:0 0 auto;height:100%;background:var(--tint);transition:height var(--dur-slow) var(--ease)}
+.detail-stage.compact::before{height:calc(216px * var(--compact) + var(--sp-1))}
+.stage-art{position:absolute;left:50%;top:0;width:200px;height:216px;margin-left:-100px;transform-origin:50% 0;transition:transform var(--dur-slow) var(--ease)}
+.detail-stage.compact .stage-art{transform:scale(var(--compact))}
+.stage-art .friend-spot{position:absolute;left:0;bottom:0;width:200px;height:200px}
+.stage-art .friend-img{width:100%;height:100%}
+html:has(.detail-stage){scroll-padding-top:calc(var(--banner-h,2rem) + 170px);scroll-padding-bottom:96px}
+.pile{position:absolute;left:0;right:0;bottom:0;height:70px;z-index:2;pointer-events:none}
+.pile-stone{position:absolute;width:40px;height:40px;left:calc(50% + var(--px) * 1px - 20px);bottom:calc(var(--py) * 1px + 2px)}
+.fly-stone{position:fixed;left:0;top:0;z-index:200;width:40px;height:40px;pointer-events:none;will-change:transform,opacity}
+.detail-label{margin:var(--sp-3) 0 var(--sp-1);font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong)}
+.cloud{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin:var(--sp-4) 0 var(--sp-3)}
+.choice{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:var(--touch);padding:0 var(--sp-4) 0 var(--sp-2);border:0;border-radius:var(--radius-chip);background:var(--tint-pill,color-mix(in srgb,var(--bg) 74%,transparent));color:var(--service-ink);font-size:var(--fs-body);line-height:var(--lh-body);font-weight:var(--fw-label)}
+.detail-screen .choice{box-shadow:inset 0 0 0 var(--hairline) color-mix(in srgb,var(--service-ink) 18%,transparent)} /* 연한 배경 위에서 pill의 모양이 보이게 안쪽 윤곽선(그림자가 아니라 선) */
+.choice .ck{display:grid;place-items:center;flex:none;width:24px;height:24px;border-radius:50%;background:color-mix(in srgb,var(--service-ink) 12%,transparent);font-size:14px;line-height:1;color:transparent}
+.choice[aria-pressed="true"]{background:var(--service-ink);color:var(--bg)}
+.choice[aria-pressed="true"] .ck{background:var(--service-mint);color:var(--service-ink)}
+.detail-skip{display:block;margin:0 0 var(--sp-1);padding-left:0}
+.step-footer[data-theme-cat]{border-top-color:transparent}
+
+/* 크기(강도): 계열마다 친구 한 줄과 조작 줄. 화면은 흰 종이이고 색은 채움에만 쓴다. */
+.int-list{display:flex;flex-direction:column;gap:var(--sp-8)}
+.int-panel{display:flex;flex-direction:column;gap:var(--sp-3)}
+.int-head{display:flex;align-items:center;gap:var(--sp-3)}
+.int-head .friend-img{max-height:4.4rem;width:auto}
+.int-who{display:flex;flex-direction:column}
+.int-who strong{font-size:var(--fs-title);line-height:var(--lh-title);font-weight:var(--fw-title)}
+.int-who span{font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
+.sl-card{display:flex;flex-direction:column;gap:var(--sp-1)}
+.sl-top{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-2);margin-bottom:var(--sp-1)}
+.sl-name{font-size:var(--fs-body);font-weight:var(--fw-body-strong)}
+.sl-val{min-width:2ch;font-size:2.25rem;line-height:1;font-weight:800;font-variant-numeric:tabular-nums;text-align:right;letter-spacing:-.03em}
+.sl-row{display:flex;align-items:center;gap:var(--sp-2)}
+.step{width:var(--touch);height:var(--touch);flex:none;border:0;background:var(--surface-soft);color:var(--service-ink);border-radius:50%;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}
+.step:disabled{opacity:.35;cursor:default}
+.sl{position:relative;flex:1;height:var(--touch);min-width:0}
+.sl-track{position:absolute;left:0;right:0;top:50%;height:12px;margin-top:-6px;border-radius:var(--radius-chip);background:var(--border);overflow:hidden}
+.sl-fill{position:absolute;inset:0 auto 0 0;border-radius:var(--radius-chip);background:var(--c);width:0}
+.sl-dots{position:absolute;left:15px;right:15px;top:50%;margin-top:-2px;height:4px;display:grid;grid-template-columns:repeat(10,1fr);pointer-events:none}
+.sl-dots i{width:4px;height:4px;border-radius:50%;background:var(--subtle);justify-self:center;opacity:.6}
+.sl-dots i.on{opacity:0}
+.sl input{position:absolute;inset:0;width:100%;height:100%;opacity:0;margin:0;cursor:pointer}
+.sl-thumb{position:absolute;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--service-ink);pointer-events:none}
+.sl.unset .sl-thumb{display:none}
+.sl input:focus-visible~.sl-thumb{outline:var(--emphasis) solid var(--focus);outline-offset:3px}
+.sl.unset input:focus-visible{opacity:1;accent-color:var(--c)}
+.sl.anim .sl-fill,.sl.anim .sl-thumb{transition:width var(--dur-slow) var(--spring),left var(--dur-slow) var(--spring)}
+.anchor-line{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted);margin:var(--sp-2) 0 0}
+.int-more{align-self:flex-start;display:inline-flex;align-items:center;gap:var(--sp-2);padding:0 var(--sp-3) 0 0}
+.int-more::after{content:"";width:8px;height:8px;border-right:var(--emphasis) solid currentColor;border-bottom:var(--emphasis) solid currentColor;transform:translateY(-2px) rotate(45deg);transition:transform var(--dur-base) var(--ease)}
+.int-more[aria-expanded="true"]::after{transform:translateY(2px) rotate(-135deg)}
+.int-details .mini{padding:var(--sp-3) 0}
+.int-details .mini:first-child{padding-top:0}
+.mini .sl-val{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:var(--fw-title)}
+.own-tag{display:inline-block;padding:0 var(--sp-2);border-radius:var(--radius-chip);background:var(--surface-soft);font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:var(--fw-label);color:var(--service-ink)}
+
+/* 검토 = 편지(D-063) ─ 360px 기준 고정 틀. 카드는 328×(376~448, letter-scene.css --card-h)이고 옆으로 넘긴다(D-079, 2026-09-24). */
+.screen.review{padding-bottom:0}
+.screen.review{overflow-x:clip}
+.envback,.envfront,.flapwrap{position:absolute;left:28px;width:304px}
+.envback{height:206px;z-index:2}
+.envfront{height:206px;z-index:5;padding:0;border:0;background:none;cursor:pointer}
+.env-svg{display:block;width:100%;height:100%}
+.e-back{fill:var(--envelope-back)}.e-body{fill:var(--envelope-body)}.e-fold{fill:var(--envelope-fold)}.e-fold-light{fill:var(--envelope-fold-light)}
+.e-to{font-size:20px;font-weight:800;fill:color-mix(in srgb,var(--service-ink) 78%,transparent);font-family:inherit}
+.flapwrap{height:122px;z-index:6;pointer-events:none}
+.flap{position:absolute;inset:0;transform-origin:50% 0;transform-style:preserve-3d}
+.f-out,.f-in{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.f-out{clip-path:polygon(0 0,100% 0,50% 100%)}
+.f-in{background:var(--envelope-flap-inner);clip-path:polygon(0 100%,100% 100%,50% 0);transform:rotateX(180deg)}
+.sealw{position:absolute;left:50%;top:100%;width:36px;height:36px;margin:-19px 0 0 -18px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.seal{position:absolute;inset:0;border-radius:50%;background:var(--service-mint)}
+.seal::before{content:"";position:absolute;left:7px;top:6px;width:12px;height:7px;border-radius:50%;background:color-mix(in srgb,var(--bg) 70%,transparent);transform:rotate(-24deg)}
+.seal::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--service-mint);opacity:0;animation:sealp 2.2s ease-out infinite}
+.envcap{position:absolute;left:0;right:0;margin:0;text-align:center;font-size:var(--fs-body);font-weight:var(--fw-body-strong);color:var(--service-ink);transition:opacity .3s}
+.opening .envcap,.opened .envcap{opacity:0}
+/* 카드 좌우로 다음/이전 카드가 살짝 보이는 자리(pager의 30px 여백)는 그 틈으로 뒤 장면(언덕)과 이웃 카드의 다른 색이 부딪혀 딱딱해 보였다(2026-09-23 사용자 지적, "뒷배경 살짝 어색하다").
+   지금 카드는 그대로 두고 그 24px 안쪽만 가장자리에서 옅어지게 해 부딪힘을 부드럽게 한다 — 카드 자체는 30px 더 안쪽이라 마스크에 걸리지 않는다. */
+.pagerclip{position:absolute;left:0;top:0;width:100%;height:var(--card-h);overflow:hidden;z-index:3;pointer-events:none;
+  mask-image:linear-gradient(to right,transparent,var(--service-ink) 24px,var(--service-ink) calc(100% - 24px),transparent);
+  -webkit-mask-image:linear-gradient(to right,transparent,var(--service-ink) 24px,var(--service-ink) calc(100% - 24px),transparent)}
+.opened .pagerclip{height:calc(var(--card-h) + 64px)}
+/* 카드 폭 328px, 틀 360px → 양옆 16px. 간격 8px이라 다음/이전 카드가 8px씩 살짝 보인다(기존 30px/12px 간격의 비율을 카드가 커진 만큼 줄였다 — letter.js STEP()의 +8도 이 간격과 맞춘다). */
+.pager{position:absolute;left:0;top:0;width:100%;height:var(--card-h);display:flex;gap:8px;padding:0 16px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 16px;scrollbar-width:none;pointer-events:auto;visibility:hidden}
+.pager::-webkit-scrollbar{display:none}
+.opened .pager,.opening .pager{visibility:visible}
+.pager:focus-visible{outline-offset:-4px;border-radius:28px}
+.card{flex:0 0 var(--card-w);height:var(--card-h);border-radius:28px;position:relative;scroll-snap-align:start;color:var(--service-ink);overflow:hidden;overflow-y:auto}
+.card.t2{overflow:visible}
+.edit-tag{position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:5px;min-height:34px;padding:0 12px 0 10px;border-radius:9px;background:var(--bg);border:var(--hairline) solid color-mix(in srgb,var(--service-ink) 16%,transparent);font-size:.8125rem;font-weight:800;color:var(--service-ink);transform:rotate(-3deg);z-index:2}
+.edit-tag .ico{fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.tape{position:absolute;display:block;width:26px;height:11px;left:-9px;top:-7px;background:color-mix(in srgb,var(--service-mint) 85%,transparent);transform:rotate(-32deg);clip-path:polygon(0 12%,10% 0,20% 14%,30% 0,100% 0,100% 100%,30% 100%,20% 86%,10% 100%,0 88%)}
+.tape.big{width:78px;height:24px;left:108px;top:-12px;transform:rotate(-3deg)}
+.t1{background:var(--tint)}
+.t1 .lab{position:absolute;left:22px;top:24px;margin:0;font-size:.8125rem;font-weight:800;opacity:.78}
+/* 이름을 48px로 올리고 줄 높이를 살짝 좁혀(4rem→3.625rem) 숫자 쪽에 내줄 자리를 만들었다(A5, 2026-09-24 — 아래 숫자 간격 참고). */
+.t1 .ename{position:absolute;left:22px;top:48px;margin:0;font-size:3.5rem;line-height:3.625rem;font-weight:800;letter-spacing:-.035em}
+.t1 .pebble-img{position:absolute;right:8px;top:100px;width:170px;height:auto}
+/* 알약이 5개 이상이면(.chips.many와 같은 카드) 조약돌을 작게 오른쪽 위로 옮겨 두 열 알약과 겹치지 않게 한다(D-079 ④). 형제 상태는 :has()로 본다(letter-scene.css의 main:has(...)와 같은 방식).
+   80px(예전 96px)로 한 번 더 줄인 것은 아래 알약 칸(top 공식)이 숫자 간격을 넓히며 함께 위로 올라와 여유가 줄었기 때문이다(A5). */
+.t1:has(.chips.many) .pebble-img{width:80px;top:52px;right:14px}
+/* 세부 감정 알약(D-079, 2026-09-24 사용자 확정 — 이전 D-074 '개수가 늘면 다 같이 줄어든다'를 대체): 1~4개는 36px/15px 한 열, 5~8개는 32px/14px 두 열(열마다 최대 4개, letter.js의 renderChips가 나눈다). 두 값 모두 고정이고 더 줄지 않는다.
+   top은 카드 바닥에서 거꾸로 잰다(아래 rule·size와 합쳐 늘 같은 간격) — 168px(1~4개 한 열의 최대: 36*4+8*3)과 146px(5~8개 두 열: 32*4+6*3)이 letter-scene.css의 max-height와 맞다.
+   알약↔구분선 간격을 6→8px로(A5, 메인 지적 "최소 간격 8px"), 그만큼 숫자 아래 간격을 20px로 넓힌 값이 아래로 이어져 전부 위로 올라왔다(376px 카드에서 이름 아래↔알약 위 8.5px — 여전히 ≥8px). */
+.t1 .chips{position:absolute;left:22px;top:calc(var(--card-h) - 261.5px);display:flex;gap:16px;--chip-h:36px;--chip-fs:.9375rem;--chip-pad:15px}
+.t1 .chips.many{top:calc(var(--card-h) - 239.5px);--chip-h:32px;--chip-fs:.875rem;--chip-pad:13px}
+.t1 .chip-col{display:flex;flex-direction:column;gap:8px}
+.t1 .chips.many .chip-col{gap:6px}
+.t1 .chips span{display:flex;align-items:center;flex:none;height:var(--chip-h);line-height:1;padding:0 var(--chip-pad);border-radius:calc(var(--chip-h) / 2);background:color-mix(in srgb,var(--bg) 72%,transparent);font-size:var(--chip-fs);font-weight:700}
+.t1 .rule{position:absolute;left:22px;right:22px;top:calc(var(--card-h) - 85.5px);height:1.5px;background:color-mix(in srgb,var(--service-ink) 16%,transparent)}
+/* 숫자(크기) 칸: 글자 아래↔카드 아래를 20px로 늘렸다(예전 2px, 메인 지적) — 숫자를 46→40px로 줄이고 칸 자체를 위로 올려 만든 자리다. */
+.t1 .size{position:absolute;left:22px;right:22px;top:calc(var(--card-h) - 74px)}
+.t1 .size small{position:absolute;left:0;top:-3px;font-size:.8125rem;font-weight:800;opacity:.78}
+.t1 .size .val{position:absolute;left:0;top:14px;display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+.t1 .size b{font-size:2.5rem;line-height:1;font-weight:800;letter-spacing:-.04em}
+.t1 .size em{font-style:normal;font-size:1rem;font-weight:700;opacity:.7}
+.d10{position:absolute;right:0;top:30px;display:flex;gap:4px}
+.d10 i{width:10px;height:10px;border-radius:50%;background:color-mix(in srgb,var(--bg) 55%,transparent)}
+.d10 i.f{background:var(--service-ink)}
+/* 이어지는 카드(9개 이상, D-079 ③): 첫 카드와 같은 크기·같은 계열 300 면이다(DESIGN_SYSTEM "카드의 크기는 모두 같다"). 크기(강도)는 계열의 값이라 첫 카드에만 두고 여기는 라벨(예: "슬픔 · 이어서 2/3")·작은 이름·남은 알약·고치기 태그만 있다.
+   이름·알약 칸을 한 덩어리(.t1-more-body)로 묶어 남은 자리 세로 가운데에 둔다 — 카드 높이가 화면마다 달라도(--card-h) 항상 가운데고, 이름과 알약이 따로 떠 보이지 않는다. */
+.t1-more-body{position:absolute;left:22px;right:22px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px}
+.t1-more .ename2{position:static;margin:0;font-size:1.75rem;line-height:2.25rem;font-weight:800;letter-spacing:-.02em}
+.t1-more .chips{position:static}
+.t2 .lab2{position:absolute;left:22px;top:22px;margin:0;font-size:.78rem;font-weight:700;color:var(--paper-ink)}
+.t2 .k,.t2 .v{margin:0}
+.t2 .k{font-size:.8125rem;font-weight:800;line-height:30px;color:var(--paper-ink)}
+.t2 .v{font-size:1.125rem;line-height:30px;font-weight:600;color:var(--text)}
+.t3{background:var(--service-light)}
+.t3 .lab3{position:absolute;left:22px;top:24px;margin:0;font-size:.8125rem;font-weight:800;color:var(--paper-ink)}
+.t3 .q{font-size:1.6875rem;line-height:2.4rem;font-weight:750;letter-spacing:-.025em}
+.t3 .q::before{content:"“";display:block;height:40px;font-size:4rem;line-height:44px;font-weight:800;color:color-mix(in srgb,var(--service-ink) 14%,transparent)}
+.t3 .qs{padding:0;list-style:none;font-size:1.25rem;line-height:1.8rem;font-weight:700}
+.t3 .qs li{padding:var(--sp-3) 0 var(--sp-3) var(--sp-5);position:relative}
+.t3 .qs li::before{content:"";position:absolute;left:0;top:1.2rem;width:9px;height:9px;border-radius:50%;background:var(--service-mint)}
+.t3 .sig{font-size:.84rem;font-weight:700;color:var(--paper-ink)}
+.seal2{width:30px;height:30px;border-radius:50%;background:var(--service-mint)}
+.letter-nav{position:absolute;left:0;right:0;top:calc(var(--card-h) + 18px);height:36px;display:flex;align-items:center;justify-content:center;gap:12px;z-index:6;opacity:0;pointer-events:none;transition:opacity .4s}
+.opened .letter-nav{opacity:1;pointer-events:auto}
+.letter-nav .dd{display:flex;gap:8px;align-items:center}
+.letter-nav .dd i{width:7px;height:7px;border-radius:4px;display:block;transition:width .25s,background .25s}
+.letter-nav .dd i.on{width:20px;background:var(--service-ink)}
+.letter-nav .ar{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
+.letter-nav .ar[disabled]{opacity:.35;cursor:default}
+.letter-nav .ico{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.letter-sub{font-size:var(--fs-label);color:var(--muted)}
+
+/* 열림 연출: 0~0.7초 뚜껑, 0.5~2초 조약돌, 1~1.85초 카드, 1.8~2.3초 봉투가 내려간다. */
+.opening .flap{animation:flapopen 700ms cubic-bezier(.4,0,.2,1) both}
+.opening .flapwrap{animation:envmove 2320ms linear both,flapz 1ms linear 350ms both}
+/* envfront(z-index 5)가 카드(z-index 3)보다 늘 앞이라 카드가 봉투 앞을 지나 올라오는 동안(1~1.85초) 봉투 앞면이 카드 위에 겹쳐 보였다(카드가 커져 겹치는 폭도 커지면서 눈에 띔, 375×812 실측에서 발견) — 뚜껑(flapwrap)과 같은 350ms에 같이 뒤로 보낸다. */
+.opening .envback,.opening .envfront{animation:envmove 2320ms linear both,flapz 1ms linear 350ms both;pointer-events:none}
+.opening .pager{opacity:0;animation:rise 850ms cubic-bezier(.2,.85,.25,1) 1000ms forwards}
+.opening .pager .card:not(:first-child){visibility:hidden}
+.opened .envback,.opened .envfront,.opened .flapwrap{display:none}
+.closed .envfront{animation:bobenv 3s ease-in-out infinite}
+.opening .seal::after,.opened .seal::after{animation:none;opacity:0}
+@keyframes flapopen{from{transform:perspective(900px) rotateX(0)}to{transform:perspective(900px) rotateX(180deg)}}
+@keyframes flapz{from{z-index:6}to{z-index:1}}
+/* 카드는 늘 150px만 남기고 클립 아래에 숨어 있다가 올라온다(카드 높이가 달라도 처음 드러나는 양은 같다) — 기존 카드(376px)로 계산하면 226px로, 원래 튜닝한 230px과 거의 같다. */
+@keyframes rise{0%{transform:translateY(calc(var(--card-h) - 150px));opacity:1}100%{transform:none;opacity:1}}
+@keyframes bobenv{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes sealp{0%{transform:scale(.8);opacity:.75}100%{transform:scale(1.7);opacity:0}}
+
+@media (prefers-reduced-motion:reduce){
+  .star-core{transition:none}
+  .sl.anim .sl-fill,.sl.anim .sl-thumb{transition:none}
+  .int-more::after,.fr-pic .friend-img{transition:none}
+  .detail-stage::before,.stage-art{transition:none}
+  .closed .envfront,.seal::after{animation:none !important}
+  .opening .flap,.opening .envback,.opening .envfront,.opening .flapwrap,.opening .pager{animation:none !important}
+}
+
+/* 덜 정적으로(D-069): 글쓰기 단계(날짜·사건, 칭찬, 감사)가 열릴 때 제목·안내·입력이 차례로 올라온다(한 번). 움직임 줄이기에서는 없다. */
+.step-date :is(h1,.paper-guide),.step-praise :is(h1,.paper-guide),.step-thanks :is(h1,.paper-guide){animation:stepin .5s var(--ease) both}
+.step-date .paper-guide,.step-praise .paper-guide,.step-thanks .paper-guide{animation-delay:.06s}
+@keyframes stepin{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.step-date :is(h1,.paper-guide),.step-praise :is(h1,.paper-guide),.step-thanks :is(h1,.paper-guide){animation:none}}

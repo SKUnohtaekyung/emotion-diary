@@ -11,6 +11,11 @@ export async function applyTokens() {
   // MVP는 light 전용이다(tokens.mode, D-034).
   for (const [key, value] of Object.entries(tokens.color.neutral)) set(NEUTRAL_NAMES[key] ?? key, value.light);
   for (const [key, value] of Object.entries(tokens.color.semantic)) set(key, value.light);
+  for (const [key, value] of Object.entries(tokens.color.service ?? {})) set(`service-${key}`, value.light); // --service-ink|mint|light (D-054)
+
+  for (const [key, value] of Object.entries(tokens.color.forest ?? {})) if (value?.light) set(`forest-${key}`, value.light); // 오늘 화면의 어두운 숲(D-062)
+  for (const [key, value] of Object.entries(tokens.color.land ?? {})) if (value?.light) set(`land-${key}`, value.light); // 완료·온보딩의 색 언덕(D-061)
+  for (const [key, value] of Object.entries(tokens.color.paper ?? {})) if (value?.light) set(key.startsWith("paper") ? key : key, value.light); // 편지 종이·봉투(D-063): --paper, --paper-rule, --paper-ink, --envelope-*
 
   const usage = tokens.color["emotion-usage"];
   for (const [key, steps] of Object.entries(tokens.color.emotion)) {
@@ -27,13 +32,20 @@ export async function applyTokens() {
     // 글자 크기는 rem으로 올린다. 사용자가 브라우저·기기의 기본 글자 크기를 키우면 시안의 글자도 같이 커져야 한다(DESIGN_SYSTEM §9 확대).
     set(`fs-${name}`, `${scale.size / 16}rem`); set(`lh-${name}`, `${scale.line / 16}rem`); set(`fw-${name}`, scale.weight);
   }
+  // hero는 clamp()로 화면 폭에 맞춰 줄어들므로 줄 높이를 rem 값이 아니라 글자 크기에 대한 비율로도 올린다(D-057).
+  const hero = tokens.typography.scale.hero;
+  set("lh-hero-ratio", (hero.line / hero.size).toFixed(4));
   for (const [name, value] of Object.entries(tokens.space)) set(`sp-${name}`, px(value));
   set("radius", px(tokens.radius.control)); set("radius-card", px(tokens.radius.card));
   set("radius-sheet", px(tokens.radius.sheet)); set("radius-chip", px(tokens.radius.chip));
+  set("radius-blob", tokens.radius.blob); // 유기형 면: 하단 탐색의 현재 탭, 달력 칸, 오늘 무대(D-054)
   set("touch", px(tokens.size["touch-target-min"])); set("content-max", px(tokens.size["content-max-width"]));
   set("nav-h", px(tokens.size["bottom-nav-height"]));
   set("hairline", px(tokens.border.hairline)); set("emphasis", px(tokens.border.emphasis));
   set("dur-fast", `${tokens.motion.duration.fast}ms`); set("dur-base", `${tokens.motion.duration.base}ms`); set("dur-slow", `${tokens.motion.duration.slow}ms`);
+  set("light-in", `${tokens.motion.light.in}ms`); set("light-hold", `${tokens.motion.light.hold}ms`); set("light-out", `${tokens.motion.light.out}ms`); // 알아차림의 빛(D-055)
+  const stone = tokens.motion.stone; // 가운데 돌(D-062)
+  set("stone-rock", `${stone.rock}ms`); set("stone-hop", `${stone.hop}ms`); set("stone-flood", `${stone.flood}ms`); set("stone-flood-reduced", `${stone.reducedFlood}ms`);
   set("ease", tokens.motion.easing); set("spring", tokens.motion["easing-spring"]);
   set("z-sticky", tokens.z.sticky); set("z-nav", tokens.z["bottom-nav"]);
   return tokens;
