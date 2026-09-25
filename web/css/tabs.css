@@ -22,8 +22,12 @@
 .day.future::before{border-color:transparent}
 .day.blank::before{display:none}
 .day:focus-visible{outline-offset:-2px}
-/* 접힌 한 주(A2)에서 고른 날: 상태 색과는 별개로 테두리 하나를 더 둘러 "지금 이 날이 열려 있다"를 알린다. 초점 링과 자리가 겹치지 않게 오프셋을 다르게 둔다. */
-.day[aria-pressed="true"]::before{outline:var(--emphasis) solid var(--service-ink);outline-offset:3px}
+/* 고른 날(한 달·접힌 주 모두, D-088): 상태 색과는 별개로 고리 하나를 더 둘러 "지금 이 날이 열려 있다"를 알린다.
+   고리가 칸 밖으로 나가 이웃 조약돌을 덮지 않게(전: 조약돌 inset 2px + 오프셋 3px + 두께 2px → 칸 밖 3px로 나가 이웃 조약돌을 1px 덮었다 — 2026-09-25 사용자 지적)
+   고른 조약돌을 줄여 고리까지 합친 크기가 이웃 조약돌과 비슷하게 한다. 고리는 민트 띠 + ink 선 두 겹이다(2026-09-25 사용자 선택 — ink 고리만으로는
+   ink로 채운 완료 칸 사이에서 '조금 큰 ink 조약돌'로만 읽혀 눈에 띄지 않았다. 민트는 이미 '지금 고른 것'의 색이다: 하단 탐색 현재 탭, 쪽지 테이프).
+   조약돌 inset 7px → 민트 띠 4px(흐림 없는 spread라 그림자가 아니다) → ink 2px 고리, 고리 바깥 끝이 칸 안 1px에 머물러 이웃 조약돌과 3px 떨어진다. */
+.day[aria-pressed="true"]::before{inset:7px;box-shadow:0 0 0 4px var(--service-mint);outline:var(--emphasis) solid var(--service-ink);outline-offset:4px}
 .cal .day:nth-child(3n)::before{transform:scaleX(-1)}
 .cal .day:nth-child(4n+2)::before{transform:scaleY(-1)}
 .legend{list-style:none;margin:var(--sp-5) 0;padding:0;display:flex;flex-wrap:wrap;gap:var(--sp-4);font-size:var(--fs-caption);color:var(--muted)}

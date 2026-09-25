@@ -32,8 +32,10 @@ const mixHex = (a, b, t) => "#" + [1, 3, 5].map((i) => Math.round(parseInt(a.sli
 if (forest) {
   checks.push({ name: "forest hero: white on sky (text, D-062)", fg: n.bg.light, bg: forest.sky.light, min: 7 });
   checks.push({ name: "forest caption: white on path-near (text, D-062)", fg: n.bg.light, bg: forest["path-near"].light, min: 4.5 });
-  // 날짜와 '지난 기록 ›'은 흰색 78%(scene.css의 color-mix)이고 하늘 가운데 색 위에 앉는다(D-076). 본문 글자라 4.5:1.
-  checks.push({ name: "forest date row: white 78% date and '지난 기록' link on sky (text, D-076)", fg: mixHex(forest.sky.light, n.bg.light, 0.78), bg: forest.sky.light, min: 4.5 });
+  // 날짜는 흰색 78%(scene.css의 color-mix)이고 하늘 위에 앉는다(D-076). 본문 글자라 4.5:1.
+  checks.push({ name: "forest date row: white 78% date on sky (text, D-076)", fg: mixHex(forest.sky.light, n.bg.light, 0.78), bg: forest.sky.light, min: 4.5 });
+  // '지난 기록' 입구는 하늘에 흰색 11%를 섞은 납작한 알약 위의 흰 글자·아이콘이다(D-090 ③). 호버(16%)는 대비가 더 낮아 그 값으로 잰다.
+  checks.push({ name: "forest past-records pill: white label on sky + white 16% (text, D-090)", fg: n.bg.light, bg: mixHex(forest.sky.light, n.bg.light, 0.16), min: 4.5 });
 }
 // 편지(D-063): 종이·봉투·칭찬 카드 위 글자. 봉투의 '나에게'는 ink를 78%로 얹은 색이다.
 const paper = tokens.color.paper;

@@ -19,7 +19,7 @@
 .tb-rise>.legend{animation-delay:420ms}
 
 /* ── 달력 ── 큰 제목은 년·월이다: 작은 '2026년 달력' 아래에 큰 '9월'이 선다(오늘 화면의 큰 질문과 같은 짜임). 양옆 ‹ ›로 달(접히면 주)을 옮긴다(A2, D-080). */
-.calendar .cal-title{display:flex;align-items:center;gap:var(--sp-2);margin:0 0 var(--sp-4);font-size:1rem;line-height:1}
+.calendar .cal-title{display:flex;align-items:center;gap:var(--sp-4);margin:0 0 var(--sp-4);font-size:1rem;line-height:1}
 .cal-title-text{display:flex;flex-direction:column;align-items:flex-start;flex:1;min-width:0}
 .tb-kicker{font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);letter-spacing:0;color:var(--muted)}
 .cal-big{display:block;font-size:clamp(3.8rem,21vw,5.25rem);font-weight:900;letter-spacing:-.055em;line-height:.92;margin:.04em 0 0 -.05em}
@@ -28,47 +28,63 @@
 .cal-arrow:disabled{opacity:.35;cursor:default}
 /* 날짜 칸은 줄 단위로 살짝 튀어 들어온다: 줄마다 50ms, 줄 안에서 12ms 간격(--tb-d는 tabs.js가 준다). 한 번뿐(펼친 달만 — 접힌 한 주는 튀어 들어오지 않는다, 매번 반복되면 산만하다). */
 .calendar .cal:not(.cal-week) .day{animation:tb-pop 340ms var(--spring) backwards;animation-delay:calc(160ms + var(--tb-d,0ms))}
+/* 처음 들어올 때만 튀어 들어온다 — 날짜 고르기·달 넘기기·펼치기/닫기로 다시 그릴 때는(tabs.js paintGrid가 붙이는 cal-settled) 칸이 가만히 있고,
+   누른 날짜 하나만 제자리에서 좌우로 살짝 까딱인다(오늘 화면 가운데 돌의 흔들림과 같은 말투, 420ms 한 번). transform은 조약돌 모양 뒤집기(::before)와
+   부딪히지 않게 개별 속성 rotate로 준다. 움직임 줄이기에서는 아래 reduce 규칙이 둘 다 끈다(2026-09-25 사용자 요청). */
+.calendar .cal-settled .cal .day{animation:none}
+@keyframes cal-wiggle{0%,100%{rotate:0deg}20%{rotate:-5deg}45%{rotate:4deg}70%{rotate:-2deg}}
+.calendar .cal-settled .cal .day.cal-wiggle{animation:cal-wiggle 420ms var(--ease)}
 
 /* ── 한 달 + 미리보기 + 그 자리 펼침(D-088, 2026-09-25 — D-080 ①의 '날짜를 누르면 바로 한 주로 접힘'을 대체) ──
    날짜를 눌러도 한 달 격자는 그대로 두고, 달 아래 남는 자리(.cal-letter-panel)에 그날의 미리보기 카드가 올라온다.
    '펼쳐 읽기'를 눌렀을 때만(.folded) 그 주 한 줄로 접히고 편지가 인라인으로 온다 — 이때 375×812에서 편지 카드(376px 고정)까지 스크롤 없이 들어가도록
    달 제목을 줄이고 안내·요일 줄·범례를 감춘다(실측: 펼친 채로는 1060px, 이 셋을 감추고 제목을 줄이면 812 안에 들어간다. D-080의 원래 실측을 그대로 물려받는다). */
 .screen.calendar.folded .proto-note,.screen.calendar.folded .cal-head,.screen.calendar.folded .legend{display:none}
-.screen.calendar.folded .cal-title{margin-bottom:var(--sp-2)}
+/* 펼친 윗줄 앞뒤 여백(D-090 ②, 재작업 3회차 — 구조는 그대로 두고 여백만 준다): 제목→주 12px, 주→윗줄 16px, 윗줄→편지 16px.
+   전에는 8·4·12px이라 줄들이 빽빽하게 쌓였다(2배 확대 실측으로 발견, D-090 근거). */
+.screen.calendar.folded .cal-title{margin-bottom:var(--sp-3)}
 .screen.calendar.folded .cal-big{font-size:2.25rem;margin-top:0}
-.screen.calendar.folded .cal-unfold{margin:var(--sp-1) 0 0}
-.screen.calendar.folded .cal-letter-panel:not(:empty){margin-top:var(--sp-3);padding-bottom:4px}
+.screen.calendar.folded .cal-unfold{margin:var(--sp-4) 0 0}
+.screen.calendar.folded .cal-letter-panel:not(:empty){margin-top:var(--sp-4);padding-bottom:4px}
 /* 날짜를 고른 채 한 달을 보는 동안(펼치지 않음)도 제목·안내를 folded와 같은 크기로 줄인다 — 달 격자·요일 줄은 그대로 두어 공간 기억을 지키고(D-088 근거),
    실측(375×812, 완료한 날 미리보기)으로 확인했다: 이 셋을 그대로 두면 카드 아래가 하단 탐색에 가려진다(메인이 지적할 지점을 A3가 먼저 찾아 고침). */
 .screen.calendar.previewing .proto-note{display:none}
 .screen.calendar.previewing .legend{display:none}
 .screen.calendar.previewing .cal-title{margin-bottom:var(--sp-2)}
 .screen.calendar.previewing .cal-big{font-size:2.25rem;margin-top:0}
-/* 펼친 상태의 윗줄(재작업 2회차, 메인 지시 — 밑줄 링크가 싸 보인다는 지적으로 아이콘 버튼으로 바꾼다): 왼쪽 44px 원형 닫기(.cal-arrow 재사용) ·
-   가운데 '9월 20일의 편지'+예시 태그 · 오른쪽 '크게 보기' 알약(.cal-arrow와 같은 --surface-soft 바탕, 높이 44·좌우 14px). 밑줄 링크는 이 줄에 없다. */
+/* 펼친 상태의 윗줄(재작업 3회차, D-090 ② — 구조는 그대로: 왼쪽 닫기 · 가운데 '9월 20일'+예시 태그 · 오른쪽 '크게 보기' 알약. 밑줄 링크는 이 줄에 없다.
+   × 원과 알약은 보이는 높이 36px로 줄이고(전 44px), 누르는 자리는 ::after로 44px을 그대로 지킨다(.cal-pv-pill과 같은 방식). */
 .cal-unfold{display:flex;align-items:center;gap:var(--sp-2);margin:var(--sp-2) 0 0}
-.cal-close-btn{border:0}
+.cal-close-btn{position:relative;width:36px;height:36px;border:0}
+.cal-close-btn::after{content:"";position:absolute;inset:-4px}
 .cal-close-btn svg{width:18px;height:18px}
 .cal-unfold-title{flex:1;min-width:0;display:flex;align-items:center;gap:var(--sp-2)}
-/* min-width:0을 이름 자신에도 줘야 말줄임이 실제로 줄어든다 — 부모에만 주면 이름이 제 너비를 다 차지해 옆 태그가 두 줄로 접혔다(2회차 실측에서 발견). */
-.cal-unfold-name{flex:1;min-width:0;margin:0;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:800;color:var(--service-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* 이름은 더 이상 flex:1로 늘어나지 않는다(D-090 ② — 늘어나면 자기 글자 폭을 넘어 옆 여백까지 차지해 '예시' 태그가 이름이 아니라 알약 쪽에 붙어 보였다,
+   2배 확대 실측으로 발견). 이제 이름+태그는 제 폭만큼만 차지해 서로 붙고, 알약까지 남는 여백은 flex:1인 title 자신이 조용히 흡수한다.
+   min-width:0은 그래도 남겨 아주 좁은 화면에서는 여전히 줄어들며 말줄임될 수 있게 한다. */
+.cal-unfold-name{flex:0 1 auto;min-width:0;margin:0;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:800;color:var(--service-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cal-unfold-tag-slot{flex:none}
-.cal-unfold-tag-slot .proto-tag{white-space:nowrap}
+/* tabs.css .proto-tag{margin-left:var(--sp-1)}(달력 밖 다른 화면을 위한 전역 규칙, 그 파일 소유가 아니라 여기서만 0으로 되돌린다)가 8px gap 위에 4px을 더 얹어
+   날짜와 태그가 12px 떨어져 보였다(2배 확대 실측) — 이 줄에서만 지운다. */
+.cal-unfold-tag-slot .proto-tag{white-space:nowrap;margin-left:0}
 .cal-biglink-slot:empty{display:none}
-.cal-big-link{display:inline-flex;align-items:center;gap:6px;flex:none;height:44px;padding:0 14px;border:0;border-radius:999px;background:var(--surface-soft);color:var(--service-ink);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-decoration:none}
+.cal-big-link{position:relative;display:inline-flex;align-items:center;gap:6px;flex:none;height:36px;padding:0 14px;border:0;border-radius:999px;background:var(--surface-soft);color:var(--service-ink);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-decoration:none}
+.cal-big-link::after{content:"";position:absolute;inset:-4px}
 .cal-big-link svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 /* 밑줄 링크는 달력 화면에서 모두 없앤다(재작업 2회차 지시) — base.css .link의 기본 밑줄을 이 화면 범위에서만 덮는다. */
 .screen.calendar .link{text-decoration:none}
 
 /* 달 아래 남는 자리가 미리보기(또는 편지)를 채운다: .screen이 이미 main 안에서 flex:1로 늘어나 있으니(base.css), tb-body와 panel도 flex 열로 이어 그 남는 높이를 panel이 받는다.
-   panel의 min-height:0은 표준적인 flex 눌림 방지 해제로, panel 자신은 내용이 없어도 눌릴 수 있게 하고 실제 바닥은 .cal-preview의 min-height(132px)가 잡는다.
-   132px보다 자리가 작은 화면(D-088 ④)은 이 flex 계산이 자연히 화면 전체(.app min-height:100dvh)를 늘려 페이지 스크롤이 생긴다 — 따로 overflow를 막지 않는다. */
+   panel의 min-height:0은 표준적인 flex 눌림 방지 해제다(panel 자신은 내용이 없어도 눌릴 수 있다) — 재작업 3회차부터 .cal-preview 자신은 min-height 없이
+   내용(줄 수)만큼만 자라므로(D-090 ①), 실제 바닥은 그 내용 높이가 잡는다(아무 날도 고르지 않았을 때만 .cal-pv-empty의 min-height:132px가 대신 잡는다, 아래).
+   완료한 날은 있었던 일(굵은 첫 줄)을 예산이 모자라도 빼지 않으므로(재작업 4회차, fitPreviewCard 정의부 설명) 아주 좁은 화면에서 종이가 탐색 아래로 길어질 수 있다
+   — 이때는 이 flex 계산이 자연히 화면 전체(.app min-height:100dvh)를 늘려 페이지 스크롤이 생긴다(D-088 ④가 허용) — 따로 overflow를 막지 않는다. */
 .screen.calendar{display:flex;flex-direction:column}
 .screen.calendar>.tb-body{display:flex;flex-direction:column;flex:1;min-height:0}
 .cal-letter-panel{display:flex;flex-direction:column;flex:1;min-height:0}
 .cal-letter-panel:not(:empty){margin-top:var(--sp-5);padding-bottom:var(--sp-4)}
-/* 넓은 화면(1280×900)에서 미리보기 아래 빈 자리를 24px 이하로: 화면 자체의 바닥 여백(--sp-8=32px)과 판의 padding-bottom(16px)을 previewing 동안만 줄인다.
-   tabs.js의 fitPreviewCard가 카드에 실측 max-height를 주므로, 그 아래 이 여백만큼만 정직하게 빈 자리로 남는다. */
+/* 넓은 화면(1280×900)에서 미리보기 아래 빈 자리를 줄인다: 화면 자체의 바닥 여백(--sp-8=32px)과 판의 padding-bottom(16px)을 previewing 동안만 줄인다.
+   .cal-preview는 내용(줄 수)만큼만 자라 남는 밑자리는 늘 정직한 흰 화면이므로(D-090 ①), 이 여백은 그 흰 화면의 크기만 살짝 다듬는다 — 카드 자체를 늘리지 않는다. */
 .screen.calendar.previewing{padding-bottom:var(--sp-2)}
 .screen.calendar.previewing .cal-letter-panel:not(:empty){padding-bottom:var(--sp-3)}
 
@@ -89,46 +105,54 @@
 .cal-pv-empty{flex:1;min-height:132px;display:flex;align-items:center;justify-content:center}
 .cal-pv-hint{margin:0;text-align:center;font-size:var(--fs-label);line-height:var(--lh-label);color:var(--subtle)}
 
-/* ── 미리보기 = 종이 한 장(재작업 2회차, 메인 지시 — '흰 박스 안에 노트'가 부자연스럽다는 지적으로 바깥 흰 카드를 없앴다) ──
-   .cal-preview 자신이 곧 notes.css .nt-paper와 같은 종이다: --paper 바탕에 위에서부터 2rem마다 --paper-rule 줄, 모서리는 --radius-card,
-   왼쪽 위에 민트 테이프(notes.css와 같은 값), 0.4deg 정적 기울기(이유·사건 화면 노트와 같은 손맛). 안의 모든 줄(날짜·조약돌+이름·있었던 일…)은
-   같은 2rem 줄에 맞춰 쌓인다 — 줄 사이에 따로 선을 긋지 않는다(줄 노트의 줄이 곧 구분선). 네 상태 모두 같은 종이다(tabs.js buildPreview). */
-/* overflow는 굳이 막지 않는다(notes.css .nt-paper와 같은 선택) — 막으면 왼쪽 위로 -.7rem/-.35rem 튀어나가는 테이프까지 잘린다.
-   대신 안의 고정 줄은 모두 flex:none으로 눌려 사라지지 않게 하고, '있었던 일' 이하만 JS(fitPreviewCard)가 실측으로 줄 수를 정해 넘치지 않게 한다. */
-.cal-preview{position:relative;flex:1 1 auto;min-height:132px;display:flex;flex-direction:column;
-  padding:0 var(--sp-4) var(--sp-2);border-radius:var(--radius-card);transform:rotate(.4deg);transform-origin:50% 0;
-  background:var(--paper) linear-gradient(to bottom,transparent calc(2rem - 1px),var(--paper-rule) calc(2rem - 1px)) 0 0/100% 2rem repeat-y}
+/* ── 미리보기 = 내용만큼의 쪽지(D-090 ①, 재작업 3회차 — '종이가 전보다 낫지만 뭔가 이상하다'는 지적을 2배 확대 실측으로 풀었다) ──
+   .cal-preview는 --paper 바탕의 종이이되, 이제 flex:none이라 자기 내용(줄 수)만큼만 자란다 — 남는 밑자리는 다른 틀 없이 흰 화면 그대로 남는다.
+   기울기는 0°(전에는 0.4deg 정적 기울기였는데, 바로 위 달 격자·아래 탐색이 수평이라 그 옆의 작은 기울기가 의도가 아니라 실수로 읽혔다).
+   줄은 종이 배경이 아니라 각 줄(.cal-pv-ln) 자신의 border-bottom으로 긋는다 — 글이 없는 줄은 애초에 DOM에 없으니 자연히 줄도 없다(빈 줄 0개).
+   네 상태 모두 같은 종이다(tabs.js buildPreview). overflow는 막지 않는다(왼쪽 위로 튀어나가는 테이프까지 잘리지 않게). */
+.cal-preview{position:relative;flex:none;display:flex;flex-direction:column;
+  padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-card);background:var(--paper)}
 /* 민트 테이프: notes.css .nt-tab::before·.nt-sheet>.nt-paper:first-child::before와 같은 clip-path·색·자리(소유 파일 안에서 같은 값으로 새로 정의). */
 .cal-preview::before{content:"";position:absolute;pointer-events:none;left:-.7rem;top:-.35rem;width:2.5rem;height:.95rem;transform:rotate(-32deg);
   background:color-mix(in srgb,var(--service-mint) 72%,transparent);
   clip-path:polygon(0 0,100% 0,97% 12.5%,100% 25%,97% 37.5%,100% 50%,97% 62.5%,100% 75%,97% 87.5%,100% 100%,0 100%,3% 87.5%,0 75%,3% 62.5%,0 50%,3% 37.5%,0 25%,3% 12.5%)}
 /* 완료한 날은 종이 전체가 큰 클릭 대상이다(Fitts, 재작업 지시) — 키보드는 .cal-pv-pill 하나만 Tab 대상이라 종이 자신은 포커스를 받지 않는다. */
 .cal-preview.cal-pv-click{cursor:pointer}
-/* tight: fitPreviewCard(tabs.js)가 남는 자리가 빠듯하다고 재면 붙인다 — 아래 여백만 줄여 낮은 화면(360×640)에서도 안 가려지게 한다. */
-.cal-preview.tight{padding-bottom:0}
-/* 고정 줄(날짜·태그·조약돌·이름·안내·버튼)은 flex:none으로 못 줄게 한다 — overflow:hidden을 준 줄이 flex-shrink 기본값 때문에
-   0으로 눌려 글자가 통째로 사라진 적이 있다(1회차 360×640 실측에서 발견). 자리가 부족하면 오직 있었던 일 이하 줄 수만 준다. */
-.cal-pv-ln{margin:0;height:2rem;line-height:2rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--fs-label);color:var(--text);flex:none}
-.cal-pv-ln.b{font-size:var(--fs-body-strong,1rem);font-weight:var(--fw-body-strong);color:var(--service-ink)} /* 있었던 일(첫 줄)만 굵게 */
-.cal-pv-ln.muted{color:var(--muted)} /* 임시저장·오늘·지난 빈 날의 안내 줄 */
-/* 1줄: 날짜(작은 muted)와 오른쪽 예시 태그. 2줄: 조약돌+이름(완료만). 둘 다 줄 노트 첫 두 줄에 그대로 얹는다. */
-.cal-pv-row1,.cal-pv-row2{display:flex;align-items:center;gap:var(--sp-2)}
+/* 줄이 있는 줄에만 선을 긋는다: 종이 좌우 padding(sp-4)만큼 음수 margin으로 넓혀 선을 종이 끝에서 끝까지 보내고, 같은 값을 padding으로 되돌려
+   글자는 종이의 원래 여백 자리 그대로 둔다. 글자는 줄 가운데가 아니라 줄 아래에 앉는다: line-height를 상자 높이(2rem)보다 작게 두고
+   align-items:flex-end로 상자 바닥(=선이 그어지는 자리)에 붙인다. 재작업 4회차(리뷰어 지적) — line-height:1.2+padding-bottom:3px 조합은
+   기준선이 선보다 6.4~7.2px 위였다(4±1 목표에 못 미침, HEAD 8~10px에서 개선폭이 1~2px뿐). 반행간이 남는 1.2 대신 line-height:1(글자 텍스트
+   span 전부)로 반행간 자체를 없애고 padding-bottom을 1px로 줄여 다시 쌓았다 — 실측(0높이 마커 span의 top을 기준선으로, §측정 방법 참고):
+   날짜 4px·이름 5px·굵은 줄 5px·본문 4px(모두 3~5 범위), 조약돌 밑면–선 2px(1~2 범위). */
+.cal-pv-ln{margin:0 calc(var(--sp-4) * -1);padding:0 var(--sp-4) 1px;height:2rem;box-sizing:border-box;display:flex;align-items:flex-end;
+  gap:var(--sp-2);border-bottom:1px solid var(--paper-rule);overflow:hidden;flex:none}
+/* 글자만 감싸는 span(.cal-pv-txt, tabs.js pvLine·row2 names)에 줄임말을 준다 — 부모(.cal-pv-ln)에 직접 주면 날짜 배지(.proto-tag)·조약돌까지
+   같은 글꼴로 눌린다. row1의 날짜(.cal-pv-date)·row2의 이름(.cal-pv-names)은 각자 아래 자기 규칙에서 크기를 잡는다(둘 다 이 파일보다 뒤에 있어야 이긴다). */
+.cal-pv-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1;font-size:var(--fs-label);color:var(--text)}
+.cal-pv-ln.b .cal-pv-txt{font-size:var(--fs-body-strong,1rem);font-weight:var(--fw-body-strong);color:var(--service-ink)} /* 있었던 일(첫 줄)만 굵게 */
+.cal-pv-ln.muted .cal-pv-txt{color:var(--muted)} /* 임시저장·오늘·지난 빈 날의 안내 줄 */
+/* 1줄: 날짜(작은 muted)와 오른쪽 예시 태그. 2줄: 조약돌+이름(완료만). 둘 다 줄 노트 첫 두 줄에 그대로 얹혀 같은 줄을 공유한다. */
 .cal-pv-row1{justify-content:space-between}
-.cal-pv-date{font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:var(--fw-label);color:var(--subtle)} /* 글 위계: 날짜(가장 작음) < 이름 < 있었던 일(가장 또렷) */
-.cal-pv-row2 .cal-pv-pebbles{display:flex;align-items:center;gap:2px}
+/* 글 위계는 크기로 남긴다(날짜 가장 작음 < 이름 < 있었던 일 가장 또렷) — 색은 --subtle 대신 --muted다: --paper(#FFF8E4) 위에서 --subtle은 4.35:1로 4.5:1에
+   못 미쳤다(HEAD부터 있던 문제, 재작업 1회차 리뷰어 지적). --muted는 6.12:1(계산: WCAG 상대 휘도 공식)이라 크기 위계를 지키면서 기준을 넘는다. */
+.cal-pv-date{font-size:var(--fs-caption);line-height:1;font-weight:var(--fw-label);color:var(--muted)}
+.cal-pv-row2 .cal-pv-pebbles{display:flex;align-items:flex-end;gap:2px}
 /* 무광 처리는 letter-scene.css .lt-rp의 필터·밑면 그림자와 같은 값이다(그대로 옮김) — 28px 줄 안에 들어가게 작게, 잔결은 생략(메인도 인정). */
 .cal-pv-pebbles .pebble-img{width:28px;height:auto;filter:saturate(.6) brightness(.95) contrast(.92) drop-shadow(0 1.5px 1px color-mix(in srgb,var(--land-hill-near) 40%,transparent))}
 .cal-pv-names{font-size:1.125rem;line-height:1;font-weight:800;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-/* 임시저장·오늘 버튼: 종이 줄 격자 바로 다음에 이어 붙인다(재작업 지시 — '줄 격자에 맞춰 놓는다'). */
-.cal-pv-actions{margin-top:var(--sp-2);flex:none}
-.cal-pv-actions .stack{margin-top:var(--sp-2)}
-/* '펼쳐 읽기' 알약(재작업 지시 B) — 종이 오른쪽 아래에 겹쳐 놓는 눈에 보이는 단서. 밑줄 없음, ink 바탕·흰 글자.
-   생김새는 40px이되 누르는 자리는 44px이어야 해서(지시대로), ::after로 상하 2px씩 보이지 않는 자리를 더한다(둘레를 늘려도 모양은 그대로). */
-.cal-pv-pill{position:absolute;right:var(--sp-3);bottom:var(--sp-3);z-index:1;display:inline-flex;align-items:center;gap:5px;
-  height:40px;padding:0 var(--sp-3);margin:2px;border:0;border-radius:999px;background:var(--service-ink);color:var(--bg);
+/* 버튼 줄(D-090 ① — 재작업 3회차: 오른쪽 아래에 종이와 겹쳐 놓던 것을 그만두고, 마지막 글 줄 다음의 흐름 안으로 옮긴다. 줄 없는 종이 여백이라 border-bottom이 없다).
+   모든 상태가 같은 부품이다: 알약 하나(완료 '펼쳐 읽기'·오늘 '오늘 화면으로')이거나, 조용한 글자 버튼+알약 둘(임시저장 '이 글 지우기'+'이어서 쓰기') — 항상 오른쪽으로 붙는다. */
+.cal-pv-btnrow{margin-top:var(--sp-3);flex:none;display:flex;align-items:center;justify-content:flex-end;gap:var(--sp-3)}
+/* '펼쳐 읽기' 등 작은 잉크 알약(D-090 ①, 모든 상태가 공유) — 밑줄 없음, ink 바탕·흰 글자.
+   생김새는 40px이되 누르는 자리는 44px이어야 해서, ::after로 상하좌우 2px씩 보이지 않는 자리를 더한다(둘레를 늘려도 모양은 그대로). */
+.cal-pv-pill{position:relative;flex:none;display:inline-flex;align-items:center;gap:5px;
+  height:40px;padding:0 var(--sp-3);border:0;border-radius:999px;background:var(--service-ink);color:var(--bg);
   font-size:15px;line-height:1;font-weight:700}
 .cal-pv-pill::after{content:"";position:absolute;inset:-2px}
 .cal-pv-pill svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+/* '이 글 지우기'(임시저장) — 조용한 글자 버튼: 배경·테두리·밑줄 없음, muted 색이라 옆 알약보다 눈에 덜 띈다. 누르는 자리는 min-height 44px로 지킨다. */
+.cal-pv-quiet{background:none;border:0;padding:0 var(--sp-2);min-height:var(--touch);display:inline-flex;align-items:center;
+  font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted)}
 
 @media (prefers-reduced-motion:reduce){
   .tb-rise>*,.calendar .cal .day{animation:none !important}

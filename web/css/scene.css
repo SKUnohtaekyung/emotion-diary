@@ -25,12 +25,17 @@
 .f-star{fill:var(--bg);animation:twinkle 4s ease-in-out infinite;animation-delay:var(--sd,0s);transform-origin:center;transform-box:fill-box}
 .today-head{position:absolute;left:0;right:0;top:0;padding:clamp(4rem,12.5dvh,7rem) var(--sp-5) 0;z-index:5;pointer-events:none}
 /* 날짜 줄: 왼쪽 날짜, 오른쪽 '지난 기록' 입구(D-076 — 오늘 화면에는 하단 탐색이 없다). 둘 다 시간에 관한 말이라 한 줄로 묶는다.
-   입구는 날짜와 같은 색·크기로 조용하게 두고 꺾쇠로 누를 수 있음을 알린다. 터치 영역 44px은 음수 여백으로 줄 높이를 늘리지 않고 확보한다. */
+   입구는 날짜와 같은 색·크기의 글자 링크였으나 유사성 때문에 날짜의 꼬리로 읽혔다(대비 11.3:1이라 흐림은 원인이 아니었다) — 달력 아이콘이 붙은
+   알약으로 바꿔 형태로 누를 수 있음을 알린다(D-090 ③). 면은 흐림·광택·테두리 없는 납작한 반투명(D-076이 기각한 입체 유리를 다시 쓰지 않는다).
+   알약의 보이는 높이(36px)는 날짜 글자보다 커서, 위아래 음수 margin(-6px)으로 줄에서 차지하는 자리를 다시 24px(글자 높이)로 줄인다 —
+   그러지 않으면 줄 자체가 36px로 늘어나 아래 큰 질문(D-067, 이번 범위 밖)까지 통째로 밀린다. 알약은 줄 위아래로 6px씩 넘쳐 보이지만
+   align-items:center가 margin box 기준으로 가운데를 맞추므로 시각 중심은 그대로 날짜와 같다. 44px 누르는 자리는 ::after로 따로 늘린다(margin의 영향을 받지 않는다). */
 .today-row{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin:0 0 var(--sp-1)}
 .today-row .today-date{margin:0}
-.today-past{pointer-events:auto;display:inline-flex;align-items:center;gap:2px;min-height:var(--touch);margin:-12px calc(var(--sp-2) * -1) -12px 0;padding:0 var(--sp-2);border-radius:var(--radius);font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:color-mix(in srgb,var(--bg) 78%,transparent);text-decoration:none;white-space:nowrap;touch-action:manipulation;transition:color var(--dur-fast) var(--ease)}
-.today-past svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
-.today-past:hover{color:var(--bg)}
+.today-past{position:relative;pointer-events:auto;display:inline-flex;align-items:center;gap:6px;height:36px;margin:-6px 0;padding:0 14px 0 11px;border-radius:var(--radius-chip);background:color-mix(in srgb,var(--bg) 11%,transparent);color:var(--bg);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-decoration:none;white-space:nowrap;touch-action:manipulation;transition:background var(--dur-fast) var(--ease)}
+.today-past::after{content:"";position:absolute;inset:-4px 0} /* 시각 높이 36px 위아래로 4px씩 늘려 누르는 자리 44px(가로는 이미 44px을 넘어 그대로 둔다). ::after는 margin이 아니라 .today-past의 패딩 박스 기준이라 위 음수 margin과 무관하게 44px을 유지한다 */
+.today-past svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.today-past:hover{background:color-mix(in srgb,var(--bg) 16%,transparent)}
 .today-past:focus-visible{outline:var(--emphasis) solid var(--service-mint);outline-offset:0}
 .today-date{margin:0 0 var(--sp-1);font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:color-mix(in srgb,var(--bg) 78%,transparent)}
 /* 큰 질문은 글자 자체가 그림이다(D-067): 작게 시작해 '마음'이 크게 서고, 끝말이 오른쪽으로 물러난다. 한 번 아래에서 차례로 올라온다. 색은 흰색 하나, 그림자·획 없음. */

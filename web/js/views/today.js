@@ -18,6 +18,14 @@ const reminderDue = () => { const t = now(); return REMINDER.on && sinceDayStart
 let parked = null;
 const chevron = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true"); const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", "M9 6l6 6-6 6"); s.append(p); return s; };
 const moon = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true"); const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", "M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"); s.append(p); return s; };
+// '지난 기록' 알약 아이콘(D-090 ③): 하단 탐색 달력 탭(index.html .bottom-nav)과 같은 모양 — 둥근 사각 + 가로 칸막이 + 고리 둘 — 을 채움·겹레이어 없이 선만으로 그린다.
+const calendarIcon = () => {
+  const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true");
+  const body = document.createElementNS("http://www.w3.org/2000/svg", "rect"); body.setAttribute("x", "3.5"); body.setAttribute("y", "5.5"); body.setAttribute("width", "17"); body.setAttribute("height", "15"); body.setAttribute("rx", "2.4");
+  const cut = document.createElementNS("http://www.w3.org/2000/svg", "path"); cut.setAttribute("d", "M3.5 10h17");
+  const rings = document.createElementNS("http://www.w3.org/2000/svg", "path"); rings.setAttribute("d", "M8 3.5v4M16 3.5v4");
+  s.append(body, cut, rings); return s;
+};
 
 export function renderToday(main, navigate, params) {
   const force = params.get("s");
@@ -87,8 +95,9 @@ export function renderToday(main, navigate, params) {
 
   // 로딩이면 글자 자리를 옅은 막대로 둔다(같은 위치·같은 줄 수). 제목(h1)은 스크린리더에게 그대로 남는다.
   // 큰 질문은 글자 크기·굵기·자리를 달리한 타이포그래픽 배치다(D-067). 읽는 글은 그대로 "오늘은 어떤 마음이 머물렀나요?"이고 조각 사이에 공백을 둬 스크린리더가 이어 읽는다.
-  // 오늘 화면에는 하단 탐색이 없다(D-076). 달력·통계·설정으로 가는 입구는 날짜 줄 오른쪽의 '지난 기록' 하나이고 달력으로 간다.
-  const past = el("a", { class: "today-past", href: "#/calendar" }, "지난 기록", chevron());
+  // 오늘 화면에는 하단 탐색이 없다(D-076). 달력·통계·설정으로 가는 입구는 날짜 줄 오른쪽의 '지난 기록' 달력 아이콘 알약 하나이고 달력으로 간다.
+  // 예전엔 날짜와 같은 색·크기의 글자 링크 + 꺾쇠라 날짜의 꼬리로 읽혔다(D-076 ①) — 알약 모양 자체가 누를 수 있다는 신호라 꺾쇠를 없앴다(D-090 ③).
+  const past = el("a", { class: "today-past", href: "#/calendar" }, calendarIcon(), "지난 기록");
   const head = el("div", { class: `today-head${force === "loading" ? " skel" : ""}` },
     el("div", { class: "today-row" }, el("p", { class: "today-date", text: formatDate(today) }), past),
     el("h1", { class: "hero", tabindex: "-1" }, el("span", { class: "ty1", text: "오늘은 어떤" }), " ", el("span", { class: "ty2" }, "마음", el("small", { text: "이" })), " ", el("span", { class: "ty3", text: "머물렀나요?" })));

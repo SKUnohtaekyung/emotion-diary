@@ -18,6 +18,10 @@ const chev = (dir) => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true"
 const expandGlyph = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M7 10l5-5 5 5" }), svgEl("path", { d: "M7 14l5 5 5-5" })); // 위아래로 벌어지는 두 꺾쇠('펼쳐 읽기' 알약)
 const closeIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M6 6l12 12M18 6 6 18" })); // × (닫기)
 const openIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M7 17 17 7M9 7h8v8" })); // ↗ 바깥으로 열기('크게 보기')
+// 재작업 4회차(D-090 ①, 리뷰어 지적 — 문 폭이 원본과 달랐다) 미리보기 버튼 줄 아이콘. 집은 index.html 하단 탐색 '오늘' 아이콘의 ic-line 경로를 그대로 쓴다
+// (거기서도 fill:none;stroke:currentColor로 그리는 닫힌 윤곽선이라 손으로 다시 그리지 않고 같은 d 값을 옮긴다).
+const homeGlyph = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M12 4 4 10.4V20h4.5v-6h7v6H20v-9.6z" })); // 집(오늘 화면으로)
+const pencilGlyph = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M4 20l4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20zM13.5 7.5l3 3" })); // 연필(components/letter.js의 pencil()과 같은 경로, 이어서 쓰기)
 const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
 const sameDay = (a, b) => startOfDay(a).getTime() === startOfDay(b).getTime();
@@ -43,32 +47,26 @@ function foldTransition(container, rebuild) {
     container.style.removeProperty("height"); container.style.removeProperty("overflow"); container.style.removeProperty("transition");
   });
 }
-// 미리보기 자리 맞추기(D-088 ①·④, 재작업 2회차 — 종이 자체가 .cal-preview라 바깥 흰 카드도 안쪽 줄 노트 상자도 없다). 하단 탐색(.bottom-nav)은
-// sticky bottom:0이고 화면의 맨 마지막 요소라, 문서가 뷰포트보다 길어져도 늘 뷰포트 아래에 붙어 있다 — 스크롤로는 그 뒤에 가려진 내용이 드러나지
-// 않는다(375×812·360×740 실측으로 확인). 그래서 flex만으로는 종이가 탐색 밑에 가려질 수 있어, 남는 실제 높이(탐색 위 끝 − 종이 위 끝)를 재서
-// 종이 자체에 max-height로 준다 — 132px 밑으로는 CSS min-height가 지킨다.
-// lines가 있으면(완료한 날) 고정 줄(row1·row2)을 뺀 남는 높이 ÷ 2rem만큼만 있었던 일 이하 후보를 글로 채우고, 나머지는 그리지 않는다 —
-// 빈 자리는 JS가 아니라 종이 배경의 빈 가로줄이 저절로 채운다. lines가 없으면(임시저장·오늘·지난 빈 날) 줄 수가 이미 고정이라 잴 것이 없다.
+// 줄 노트 한 줄(D-090 ①) — 글자를 span(.cal-pv-txt)으로 감싸 CSS의 align-items:flex-end(줄 아래 정렬)에서도 줄임말(ellipsis)이 그대로 된다.
+const pvLine = (text, cls = "") => el("p", { class: `cal-pv-ln${cls}` }, el("span", { class: "cal-pv-txt", text }));
+// 미리보기 = 내용만큼의 쪽지(D-090 ①, 재작업 4회차 — 남는 높이를 채우려고 늘어나지 않는다. .cal-preview는 이제 flex:none이라 내용이 카드 크기를 그대로 정하고,
+// 종이 아래 남는 자리는 JS가 손대지 않아도 그냥 흰 화면으로 남는다). 하단 탐색(.bottom-nav)은 sticky bottom:0이라 문서가 길어져도 늘 뷰포트 아래에 붙어 있으므로,
+// 완료한 날(lines 있음)만 남는 실제 높이(탐색 위 끝 − 종이 위 끝, 안전 여백 12px)를 재서 있었던 일 이하 후보를 몇 줄까지 더할지(n) 정한다 — 못 얹는 뒤엣것은
+// 아예 그리지 않는다(빈 줄로 채우지 않는다). 임시저장·오늘·지난 빈 날(lines 없음)은 줄 수가 이미 고정이라 잴 것이 없다.
+// 있었던 일(lines[0], 굵은 첫 줄)은 D-088 ①이 미리보기에 두기로 정한 줄이라 예산이 모자라도 뺄 수 없다 — 재작업 1회차 리뷰어 지적(360×640 회귀):
+// n을 0으로 내림하면 완료한 날인데 아무 글도 안 보이는 결과가 됐다. 그래서 n은 최소 1이고, 그 탓에 종이가 탐색 아래로 길어지면(overhead+1줄이 예산을 넘으면)
+// 그대로 둔다 — .app min-height:100dvh가 페이지를 늘리고(D-088 ④가 허용), scrollPanelIntoView(날짜를 고를 때)와 평범한 페이지 스크롤로 버튼 줄까지 닿을 수 있다.
 function fitPreviewCard(card, lines) {
-  const nav = document.querySelector(".bottom-nav");
-  if (nav && card) {
-    // 날짜·조약돌·이름 같은 고정 줄(CSS flex:none)은 줄지 않으므로, 자리가 빠듯할 때는 먼저 tight(아래 여백만 줄임, CSS)를 붙여
-    // 고정 줄의 실제 최소 높이 자체를 낮춘 뒤에 예산을 잰다 — 순서를 반대로 하면(예산부터 재고 tight를 나중에 붙이면) 한 프레임 늦게 좁아진다.
-    const raw = nav.getBoundingClientRect().top - card.getBoundingClientRect().top;
-    card.classList.toggle("tight", raw < 240);
-    const budget = raw - (card.classList.contains("tight") ? 6 : 12); // 안전 여백: 넉넉하면 12px, 빠듯하면 6px
-    card.style.maxHeight = budget > 0 ? `${budget}px` : "0px";
-  }
   if (!card || !lines) return;
+  const nav = document.querySelector(".bottom-nav");
   const rootPx = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16; // 글자 확대(rem)에도 줄 간격과 같이 커진다
-  const lh = rootPx * 2; // 2rem — 종이 배경의 줄 간격과 반드시 같은 값
+  const lh = rootPx * 2; // 2rem — 종이 줄 높이(.cal-pv-ln)와 반드시 같은 값
   card.querySelectorAll(".cal-pv-ln:not(.cal-pv-row1):not(.cal-pv-row2)").forEach((p) => p.remove()); // 다시 잴 때는 먼저 지운다(뷰포트·글꼴 변화 대응)
-  const fixed = [...card.querySelectorAll(".cal-pv-row1,.cal-pv-row2")].reduce((s, r) => s + r.getBoundingClientRect().height, 0);
-  const pill = card.querySelector(".cal-pv-pill");
-  // 알약은 종이 오른쪽 아래에 겹쳐 놓이므로(position:absolute), 마지막 줄 글이 알약과 겹치지 않도록 알약 높이만큼 아래를 비워 둔다(360×640 실측에서 겹침을 발견해 고쳤다).
-  const pillReserve = pill ? 48 : 0;
-  const n = Math.max(0, Math.min(lines.length, Math.floor((card.clientHeight - fixed - pillReserve) / lh)));
-  for (const l of lines.slice(0, n)) card.insertBefore(el("p", { class: `cal-pv-ln${l.bold ? " b" : ""}${l.muted ? " muted" : ""}`, text: l.text }), pill ?? null);
+  const overhead = card.getBoundingClientRect().height; // 아직 있었던 일 이하 줄이 없는 카드 높이(날짜·조약돌+이름·버튼 줄·종이 padding을 모두 포함)
+  const budget = nav ? nav.getBoundingClientRect().top - card.getBoundingClientRect().top - 12 : Infinity;
+  const n = Math.max(1, Math.min(lines.length, Math.floor((budget - overhead) / lh)));
+  const btnRow = card.querySelector(".cal-pv-btnrow");
+  for (const l of lines.slice(0, n)) card.insertBefore(pvLine(l.text, `${l.bold ? " b" : ""}${l.muted ? " muted" : ""}`), btnRow ?? null);
 }
 // 줄 노트에 얹을 후보 줄을 모으는 데 쓴다(letter.js의 같은 이름 도우미와 같은 규칙 — 빈 칸도 온전이라 채운 것만 줄로 얹는다, D-055).
 const nonblank = (list) => list.filter((t) => t.trim());
@@ -176,22 +174,29 @@ export function renderCalendar(main, navigate, params) {
     return el("div", { class: "cal" }, cells);
   }
   function buildWeekRow() { return el("div", { class: "cal cal-week" }, weekDatesOf(parseISO(selectedIso)).map((d) => dayCell(dayProps(d)))); }
-  function paintGrid() { gridWrap.replaceChildren(folded ? buildWeekRow() : buildMonthGrid()); } // 한 달은 날짜를 골라도 그대로다(D-088 ①) — folded일 때만 그 주로 줄어든다
+  // 한 달은 날짜를 골라도 그대로다(D-088 ①) — folded일 때만 그 주로 줄어든다.
+  // 날짜 칸이 튀어 들어오는 연출(tb-pop)은 화면에 처음 들어올 때 한 번뿐이다: 두 번째 그리기부터(날짜 고르기·달 넘기기·펼치기/닫기) cal-settled로 끈다(2026-09-25 사용자 요청 — 누를 때마다 달력이 새로 나오는 것처럼 보였다).
+  let gridPainted = false;
+  function paintGrid() {
+    gridWrap.classList.toggle("cal-settled", gridPainted); gridPainted = true;
+    gridWrap.replaceChildren(folded ? buildWeekRow() : buildMonthGrid());
+  }
   // 미리보기 종이가 하단 탐색 위 실제 남는 높이에 자리 잡도록, 그리고 있었던 일 이하가 몇 줄을 보여줄지 잰다(D-088 ①·④, fitPreviewCard 정의부 설명 참고).
   // 뷰포트가 바뀌거나 글꼴이 늦게 들어와도 다시 잰다.
   function scheduleFit(card, lines) {
     const fit = () => fitPreviewCard(card, lines);
     requestAnimationFrame(fit); document.fonts?.ready.then(fit);
     window.addEventListener("resize", fit);
-    // card 자신을 ResizeObserver로 보면 fit()이 준 max-height가 스스로를 다시 부르는 되먹임 루프가 생긴다 — 바뀌지 않는 panel(바깥 flex 배분)을 대신 본다.
+    // card 자신을 ResizeObserver로 보면 fit()이 끼워 넣는 줄이 스스로를 다시 부르는 되먹임 루프가 생긴다 — 바뀌지 않는 panel(바깥 flex 배분)을 대신 본다.
     new ResizeObserver(fit).observe(panel);
   }
-  // 미리보기 = 종이 한 장(달 아래 남는 자리, D-088 ① — 재작업 2회차: 메인 지시로 바깥 흰 카드를 없애고 .cal-preview 자신이 종이가 됐다).
-  // 모든 줄이 2rem 격자에 맞는다: 1줄 날짜+예시 태그 → (완료만) 2줄 조약돌+이름 → 있었던 일(굵게) → 이유 → 칭찬 → 감사(자리가 되는 만큼) → 남으면 빈 줄.
-  // 완료한 날은 종이 전체가 큰 클릭 대상(Fitts)이고, 눈에 보이는 단서로 오른쪽 아래에 잉크 알약(.cal-pv-pill, 유일한 Tab 대상)을 겹쳐 둔다.
+  // 미리보기 = 내용만큼의 쪽지(달 아래 남는 자리, D-090 ① — 재작업 3회차: 종이가 남는 높이를 채우려고 늘어나지 않는다. .cal-preview는 flex:none이라
+  // 아래 남는 자리는 다른 틀 없이 흰 화면 그대로다). 모든 줄이 2rem 격자에 맞는다: 1줄 날짜+예시 태그 → (완료만) 2줄 조약돌+이름 → 있었던 일(굵게) → 이유 →
+  // 칭찬 → 감사(자리가 되는 만큼, fitPreviewCard가 뒤엣것부터 뺀다) → 버튼 줄(줄 없는 종이 여백, 모든 상태가 같은 작은 잉크 알약 .cal-pv-pill을 오른쪽에 둔다).
+  // 완료한 날은 종이 전체가 큰 클릭 대상(Fitts)이고, 키보드는 알약 하나만 Tab 대상이다.
   function buildPreview(iso) {
     const dLabel = shortDay(iso), dLabelFull = shortDayWeekday(iso), date = parseISO(iso), status = statusOf(date);
-    let name = dLabel, msg, row2 = null, tag = null, pill = null, actions = null, tailLine = null, lines = null, clickable = false;
+    let name = dLabel, msg, row2 = null, tag = null, btnRow = null, tailLine = null, lines = null, clickable = false;
     if (status === "completed") {
       const rec = recordOf(iso), isReal = state.completed?.date === iso;
       const cats = rec.cats.filter((c) => rec.emotions.some((e) => e.cat === c));
@@ -199,34 +204,37 @@ export function renderCalendar(main, navigate, params) {
       // 조약돌(약 28px, 줄 안에 들어가게)과 이름을 한 줄에 나란히 — 무광 처리는 letter-scene.css .lt-rp와 같은 필터값. 감정 색으로 넓은 면을 칠하지 않는다(D-053·D-071).
       const pebbles = el("div", { class: "cal-pv-pebbles", "aria-hidden": "true" }, cats.map((c) => pebbleImg(c, { size: 28 })));
       row2 = el("div", { class: "cal-pv-ln cal-pv-row2" }, pebbles, el("span", { class: "cal-pv-names", text: names }));
-      // 3줄부터 얹는 순서: 있었던 일(굵게) → 이유 → 칭찬 → 감사. 다 못 얹으면 뒤엣것부터 빠지고, 자리가 남으면 나머지는 배경의 빈 줄이다.
+      // 3줄부터 얹는 순서: 있었던 일(굵게) → 이유 → 칭찬 → 감사. 다 못 얹으면 뒤엣것부터 빠지고, 못 얹은 줄은 그리지 않는다(빈 줄로 채우지 않는다, D-090 ①).
       lines = [{ text: rec.event, bold: true }];
       if (rec.reason) lines.push({ text: rec.reason });
       for (const t of nonblank(rec.praise)) lines.push({ text: t });
       for (const t of nonblank(rec.thanks)) lines.push({ text: t });
       tag = isReal ? null : el("span", { class: "proto-tag cal-pv-tag", text: "예시" });
       // 클릭은 종이(clickable) 전체가 맡고, 알약은 자기 클릭에서 bubbling을 막아(stopPropagation) expand()가 두 번 불리지 않게 한다(그러면 pushState도 두 번 쌓인다).
-      pill = el("button", { type: "button", class: "cal-pv-pill", onclick: (ev) => { ev.stopPropagation(); expand(); } }, expandGlyph(), "펼쳐 읽기");
+      btnRow = el("div", { class: "cal-pv-btnrow" },
+        el("button", { type: "button", class: "cal-pv-pill", onclick: (ev) => { ev.stopPropagation(); expand(); } }, expandGlyph(), "펼쳐 읽기"));
       clickable = true;
       name = `${dLabel}의 편지 미리보기`; msg = `${dLabelFull}, 완료. 미리보기를 열었어요`;
     } else if (status === "draft") {
-      tailLine = el("p", { class: "cal-pv-ln muted", text: "쓰던 글이 있어요. 이어서 쓸 수 있어요." });
-      actions = el("div", { class: "cal-pv-actions" }, el("div", { class: "stack" },
-        el("button", { type: "button", class: "btn primary", text: "이어서 쓰기", onclick: () => { if (state.draft.date !== iso) { resetDraft(); state.draft.date = iso; state.draft.event = recordOf(iso).event; } state.step = "date"; navigate("write"); } }),
-        el("button", { type: "button", class: "btn text", text: "이 글 지우기", onclick: () => confirmDiscard(iso) })));
+      tailLine = pvLine("쓰던 글이 있어요. 이어서 쓸 수 있어요.", " muted");
+      // 오른쪽 알약(연필, 이어서 쓰기) + 그 왼쪽의 조용한 글자 버튼(이 글 지우기, 밑줄·테두리 없음) — 둘 다 오른쪽으로 붙는다(D-090 ①).
+      btnRow = el("div", { class: "cal-pv-btnrow" },
+        el("button", { type: "button", class: "cal-pv-quiet", text: "이 글 지우기", onclick: () => confirmDiscard(iso) }),
+        el("button", { type: "button", class: "cal-pv-pill", onclick: () => { if (state.draft.date !== iso) { resetDraft(); state.draft.date = iso; state.draft.event = recordOf(iso).event; } state.step = "date"; navigate("write"); } }, pencilGlyph(), "이어서 쓰기"));
       msg = `${dLabel}, 임시저장. 쓰던 글 안내를 열었어요`;
     } else if (sameDay(date, today)) {
-      tailLine = el("p", { class: "cal-pv-ln muted", text: "오늘의 마음은 오늘 화면에서 남겨요." });
-      actions = el("div", { class: "cal-pv-actions" }, el("div", { class: "stack" }, el("button", { type: "button", class: "btn primary", text: "오늘 화면으로", onclick: () => navigate("today") })));
+      tailLine = pvLine("오늘의 마음은 오늘 화면에서 남겨요.", " muted");
+      btnRow = el("div", { class: "cal-pv-btnrow" },
+        el("button", { type: "button", class: "cal-pv-pill", onclick: () => navigate("today") }, homeGlyph(), "오늘 화면으로"));
       msg = `${dLabel}, 오늘`;
     } else {
-      // 쓰기 버튼 없음(D-082) — 못 썼다는 말도 쓰지 않는다(SERVICE_WHY 원칙4). 비워 둔 종이 그대로 — 첫 줄 안내 하나만 옅게 두고 나머지는 빈 줄이다(SERVICE_WHY §11, 기록하지 않은 날은 실패가 아니다).
-      tailLine = el("p", { class: "cal-pv-ln muted", text: "이 날은 남긴 기록이 없어요." });
+      // 쓰기 버튼 없음(D-082) — 못 썼다는 말도 쓰지 않는다(SERVICE_WHY 원칙4). 버튼 줄 없음, 안내 한 줄만(SERVICE_WHY §11, 기록하지 않은 날은 실패가 아니다).
+      tailLine = pvLine("이 날은 남긴 기록이 없어요.", " muted");
       msg = `${dLabel}, 기록 없음`;
     }
     const row1 = el("div", { class: "cal-pv-ln cal-pv-row1" }, el("span", { class: "cal-pv-date", text: dLabelFull }), tag);
     const card = el("div", { class: `cal-preview${clickable ? " cal-pv-click" : ""}`, onclick: clickable ? () => expand() : null },
-      row1, row2, tailLine, actions, pill);
+      row1, row2, tailLine, btnRow);
     scheduleFit(card, lines);
     return { name, msg, node: card };
   }
@@ -281,6 +289,7 @@ export function renderCalendar(main, navigate, params) {
     selectedIso = iso; folded = false;
     paintFold();
     syncURL(); paintTitle(); paintGrid(); paintPanel({ instant: true }); focusDay(iso); scrollPanelIntoView();
+    gridWrap.querySelector(`[data-iso="${iso}"]`)?.classList.add("cal-wiggle"); // 누른 날짜만 살짝 흔들린다(CSS cal-wiggle, 움직임 줄이기에서는 없음)
   }
   // 그 자리에서 펼친다(D-088 ③): pushState라 브라우저 뒤로 가기가 닫기가 된다(popstate·hashchange → main.js가 이 화면을 새로 그려 접힌 채로 돌아온다).
   // 날짜 바꾸기(주 이동)는 그 안에서 replaceState로 남는다.
