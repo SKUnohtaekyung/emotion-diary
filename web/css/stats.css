@@ -1,9 +1,10 @@
-/* 통계 화면(크기 추세·친구 걸음·불러오기 상태, D-086). 통계 규칙의 정본은 이 파일이다 — 옛 tabs.css·tabs-mood.css의 .stats/.trk/.trend 규칙은 2026-09-25에 지웠고,
-   tabs.css에는 기간 전환(.segmented) 여백 한 줄만 남았다. stats.js가 그리는 마크업은 전부 sx- 접두어다. */
+/* 통계 화면(D-064·D-070·D-086·D-091). 통계 규칙의 정본은 이 파일이다 — 옛 tabs.css·tabs-mood.css의 .stats/.trk/.trend 규칙은 2026-09-25에 지웠고,
+   stats.js가 그리는 마크업은 전부 sx-(공용)·sxd-(친구 상세 전용) 접두어다. */
 
 .stats-screen .segmented{margin-top:var(--sp-3)}
 .sx-body{margin-top:var(--sp-2)}
 .sx-sec{margin-top:var(--sp-8)}
+.sx-ai-note{margin-top:var(--sp-8)}
 
 /* 요약 칸 둘 — '평균 크기' 칸은 없앴다: 서로 다른 감정의 크기를 한데 섞은 평균은 어느 마음의 크기도 아니다(SERVICE_WHY §12, DESIGN_SYSTEM §6.10). */
 .sx-summary{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin:var(--sp-6) 0}
@@ -11,34 +12,48 @@
 .sx-tile-k{font-size:var(--fs-label);color:var(--muted);font-weight:var(--fw-label)}
 .sx-tile-note{margin-top:2px;font-size:var(--fs-caption);color:var(--subtle)}
 
+/* 섹션 머리(D-091 ① — 친밀도·자주 머문 말을 한 모양으로): 작은 muted 이름표 + 큰 문장. */
 .sx-eyebrow{margin:0 0 var(--sp-1);font-size:var(--fs-label);color:var(--muted);font-weight:var(--fw-body-strong)}
 .sx-headline{font-size:1.5rem;line-height:2rem;font-weight:800;letter-spacing:-.025em;margin:0 0 var(--sp-1)}
 
-/* ── 친구와의 친밀도(D-064): 친구가 길을 걸어 '나'에게 얼마나 가까이 왔는지. 진입 때 한 번만 걷는다(.sx-animate-in이 있을 때만 — 7/30 전환에서는 이 클래스를 붙이지 않는다). ── */
+/* ── 친구와의 친밀도(D-064): 친구가 길을 걸어 '나'에게 얼마나 가까이 왔는지. 진입 때 한 번만 걷는다(.sx-animate-in이 있을 때만 — 7/30 전환에서는 이 클래스를 붙이지 않는다).
+   D-091 ①: 색 채움 막대를 없애고 회색 길 + 친구 발밑의 계열색 작은 점으로만 위치를 보인다. 줄 전체가 <a>라 기본 링크 모양(밑줄·파란 글자)이 남지 않게 지운다. ── */
 .sx-tracks{list-style:none;margin:var(--sp-4) 0 0;padding:0}
-.sx-trk{display:flex;align-items:flex-end;min-height:5.6rem;padding-bottom:0}
-.sx-trk-who{display:flex;flex-direction:column;justify-content:center;width:5.5rem;flex:none}
+/* '보기 ›' 알약(2026-09-25 — 화살표만으로는 뜻이 안 와닿는다는 지적에 설정 §6.16의 보조 이동 알약과 같은 결로 글자를 더했다).
+   나의 돌 뒤에 오되 gap을 넉넉히 둬(.sx-end) 길·점이 이어지는 것처럼 붙어 보이지 않게 한다. */
+.sx-view-pill{display:inline-flex;align-items:center;gap:4px;height:34px;padding:0 var(--sp-3);border-radius:var(--radius-chip);background:var(--surface-soft);color:var(--service-ink);font-size:var(--fs-label);font-weight:var(--fw-body-strong);white-space:nowrap}
+.sx-view-pill .sx-chev{width:14px;height:14px;color:var(--service-ink)}
+/* 친밀도 설명 문구: 목록 바로 아래 붙어 있던 것을 16px 띄운다.
+   아래(오지 않은 친구 묶음)와의 간격은 이미 .sx-away의 margin-top(24px)과 margin 겹침으로 충분해 손대지 않는다. */
+.sx-trk-caption{margin-top:var(--sp-4)}
+.sx-trk-link{display:flex;flex-wrap:wrap;align-items:flex-end;gap:var(--sp-1) var(--sp-2);width:100%;min-height:5.6rem;padding-bottom:0;text-decoration:none;color:inherit}
+.sx-trk-who{display:flex;flex:0 1 auto;flex-direction:column;justify-content:center;min-width:4.6rem}
 .sx-trk-who strong{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800}
 .sx-trk-who span{font-size:var(--fs-caption);color:var(--muted);font-weight:600}
-.sx-trk-line{position:relative;flex:1;display:flex;align-items:flex-end;height:5.4rem;min-width:0}
+/* 큰 글자(200%)에서 who(rem 기준)가 넓어지면 이 최소폭(px 고정, 화면 폭·패딩은 글자 크기와 무관해 그대로다)을 못 지켜 줄바꿈한다 —
+   이름·날 수가 위 줄, 길은 아래 줄 전체 폭으로. 200px은 실측 문턱이다: 100%에서는 who 뒤에 236~251px가 남아 안 걸리고,
+   200%에서는 178px만 남아 걸린다 — 그 사이 값을 쓴다. */
+.sx-trk-line{position:relative;flex:1 1 200px;min-width:200px;display:flex;align-items:flex-end;height:5.4rem}
 .sx-road{position:relative;flex:1;align-self:stretch;min-width:0}
-.sx-base,.sx-fill{position:absolute;left:0;bottom:22px;height:6px;border-radius:3px}
-.sx-base{right:0;background:var(--border)}
-.sx-fill{width:calc(20% + var(--p) * .6%);background:var(--c)}
+.sx-base{position:absolute;left:0;right:0;bottom:23px;height:4px;border-radius:2px;background:color-mix(in srgb,var(--border) 75%,transparent)}
+.sx-dot-mark{position:absolute;bottom:20px;left:calc(20% + var(--p) * .6%);width:8px;height:8px;border-radius:50%;background:var(--c);transform:translateX(-50%)}
 .sx-pos{position:absolute;bottom:24px;left:calc(20% + var(--p) * .6%);transform:translateX(-50%);line-height:0}
 .sx-pos .friend-img{width:auto;height:3.8rem}
 .sx-me{position:relative;z-index:1;flex:none;display:flex;align-items:flex-end;justify-content:center;width:38px;margin-left:-6px;padding-bottom:6px}
 .sx-me .stone-img{position:static;display:block;width:34px;height:auto}
+/* 나의 돌과 › 를 한 묶음으로 둬 서로의 세로 가운데를 맞춘다.
+   sx-end 자체는 부모(sx-trk-line)의 align-items:flex-end를 그대로 물려받아 길·돌과 같은 바닥선에 선다. */
+.sx-end{display:flex;align-items:center;gap:var(--sp-4)}
+.sx-chev{flex:none;width:16px;height:16px;fill:none;stroke:var(--muted);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 
-/* 걸음·채움 1200ms(전 400ms), 줄 간격 120ms(전 50ms), 걷는 동안 통통 4번. 0%에서 폭·왼쪽 위치를 0/6%로 못박아(backwards) 자기 차례 전에
-   채움 조각이 먼저 보이던 문제를 없앴다 — 전에는 0%만 정의해 100%가 암시적으로 이어져 delay 동안 6% 폭이 계속 보였다. */
-@keyframes sx-grow{0%{width:0}100%{width:calc(20% + var(--p) * .6%)}}
+/* 걸음·발밑 점 1200ms, 줄 간격 120ms, 걷는 동안 통통 4번. 0%에서 폭·왼쪽 위치를 못박아(backwards) 자기 차례 전에 먼저 보이는 문제를 없앴다.
+   점은 친구(.sx-pos)와 같은 --go·같은 left 공식을 타 항상 발밑에서 함께 움직인다. */
 @keyframes sx-walk{0%{left:6%;opacity:0}8%{opacity:1}100%{left:calc(20% + var(--p) * .6%)}}
 @keyframes sx-step{0%,100%{transform:translateY(0)}12.5%,37.5%,62.5%,87.5%{transform:translateY(-4px)}25%,50%,75%{transform:translateY(0)}}
 .sx-tracks.sx-animate-in .sx-trk{--go:calc(120ms + var(--sx-i,0) * 120ms)}
-.sx-tracks.sx-animate-in .sx-fill{animation:sx-grow 1200ms var(--ease) var(--go) backwards}
 .sx-tracks.sx-animate-in .sx-pos{animation:sx-walk 1200ms var(--ease) var(--go) backwards}
 .sx-tracks.sx-animate-in .sx-pos .friend-img{animation:sx-step 1200ms ease-in-out var(--go) backwards}
+.sx-tracks.sx-animate-in .sx-dot-mark{animation:sx-walk 1200ms var(--ease) var(--go) backwards}
 
 .sx-away{margin-top:var(--sp-6)}
 .sx-away h3{margin:0 0 var(--sp-2);font-size:var(--fs-label);color:var(--muted)}
@@ -50,39 +65,75 @@
 .sx-empty{padding:var(--sp-6) 0;text-align:center}
 .sx-empty-friend{display:flex;justify-content:center;margin-bottom:var(--sp-3)}
 
-/* ── 크기 추세: 계열마다 따로 작은 차트(small multiples) 한 벌. 서로 다른 계열의 크기는 어디서도 합쳐 평균 내지 않는다. ── */
-.sx-axis{display:flex;justify-content:space-between;margin-top:var(--sp-4);padding:0 2px;font-size:var(--fs-caption);color:var(--subtle);font-variant-numeric:tabular-nums}
-.sx-rows{list-style:none;margin:var(--sp-2) 0 0;padding:0}
-.sx-row{padding:var(--sp-4) 0;border-top:var(--hairline) solid var(--border)}
-.sx-row:first-child{border-top:0}
-.sx-row-head{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
-.sx-row-who{display:flex;align-items:center;gap:var(--sp-2);min-width:0;font-size:var(--fs-label);font-weight:var(--fw-body-strong)}
-.sx-row-who .friend-img{width:auto;height:40px;flex:none}
-.sx-row-stat{font-size:var(--fs-caption);color:var(--muted);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
-.sx-chart{margin-top:var(--sp-2)}
-.sx-chart-svg{display:block;width:100%;height:44px}
-.sx-grid{stroke:var(--border);stroke-width:1}
-.sx-mean-line{stroke:var(--service-ink);stroke-opacity:.32;stroke-width:1.4;stroke-dasharray:3 3}
-.sx-line{fill:none;stroke:color-mix(in srgb,var(--dot) 55%,transparent);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
-.sx-dot{fill:var(--dot)}
-.sx-row-foot{margin:var(--sp-1) 0 0;font-size:var(--fs-caption);color:var(--muted)}
-
-.sx-details{margin-top:var(--sp-5)}
-/* summary에 display:flex를 주면 크롬 기본 삼각형 마커(list-item 렌더링)가 사라진다 — 지우는 대신 우리 아이콘 언어에 맞는 셰브론을 직접 그린다(border 두 변을 45도로 접는 방식, 그림자 없음). */
-.sx-details summary{list-style:none;min-height:44px;display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--service-ink);cursor:pointer}
-.sx-details summary::-webkit-details-marker{display:none}
-.sx-details summary::before{content:"";flex:none;width:7px;height:7px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);transition:transform var(--dur-fast) var(--ease)}
-.sx-details[open] summary::before{transform:rotate(45deg)}
-.sx-guide{margin:var(--sp-2) 0 0;padding-left:var(--sp-5);color:var(--muted);font-size:var(--fs-label);line-height:var(--lh-label)}
-.sx-guide li{margin-bottom:var(--sp-2)}
-.sx-guide li:last-child{margin-bottom:0}
-
 /* 자주 머문 말: 막대가 아니라 낱말 pill — 감정 색으로 순위를 매기는 인상을 피한다(DESIGN_SYSTEM §6.9). */
 .sx-pillrow{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-3)}
 .sx-pill{display:inline-flex;align-items:center;gap:var(--sp-2);min-height:38px;padding:0 var(--sp-3);border-radius:var(--radius-chip);background:var(--surface-soft);font-weight:var(--fw-body-strong)}
 .sx-pill em{font-style:normal;font-size:var(--fs-caption);color:var(--muted)}
 
+/* ══════════════════════════════ 친구 상세(#/stats/<계열>, D-091 ②) ══════════════════════════════ */
+/* 옛 sx-details/sx-guide('읽는 법' 접기)는 2026-09-25 재개편에서 크기 추세와 함께 없앴다 — 비교 한 줄(sxd-cmp-line)만 남긴다. */
+/* 원형 ‹ 뒤로는 tabs.css의 .info-top .back을 그대로 쓴다(이 파일은 고치지 않고 읽어서 재사용만 — 같은 클래스라 전역 규칙이 이미 적용된다). */
+.sxd-head{text-align:center;margin-top:var(--sp-1)}
+.sxd-sub{margin:2px 0 0;color:var(--muted);font-size:var(--fs-label)}
+.sxd-screen .segmented{margin:var(--sp-4) auto 0;max-width:15rem}
+.sxd-body{margin-top:var(--sp-2)}
+
+/* 머리 장면 — 작은 언덕 위에 선 친구(크기 화면 §6.4 '길 위의 친구'와 같은 결, 2026-09-25 재개편 → 1차 재작업).
+   언덕 둘은 land.hill-far·hill-mid, 길은 forest.path-near를 흰색에 40% 섞은 색(§6.4 원문 그대로)이다.
+   1차 재작업(메인 재측정 지적): 화면 좌우 패딩(screen의 sp-5)을 음수 margin으로 넘겨 폭 전체까지 이어지게 해 좌우가 수직으로 잘리지 않게 하고,
+   아래 끝은 mask-image로 흰 바탕에 녹아들게 해 '카드/액자'가 아니라 '흰 바탕 위에 놓인 장면'으로 읽히게 한다. 친구 뒤에는 면을 깔지 않는다(§3.3). */
+.sxd-scene{position:relative;height:200px;margin:0 calc(var(--sp-5) * -1) var(--sp-2);overflow:hidden}
+.sxd-scene-svg{position:absolute;inset:0;width:100%;height:100%;overflow:hidden;
+  mask-image:linear-gradient(to bottom,var(--service-ink) calc(100% - 30px),transparent 100%);
+  -webkit-mask-image:linear-gradient(to bottom,var(--service-ink) calc(100% - 30px),transparent 100%)} /* 마스크는 알파만 본다 — 리터럴 대신 토큰(D-047) */
+.sxd-scene-hill-far{fill:var(--land-hill-far)}
+.sxd-scene-hill-mid{fill:var(--land-hill-mid)}
+.sxd-scene-road{fill:var(--bg)} /* 흰 길(온보딩·완료 언덕과 같은 결) — 회색 길은 짧게 잘린 이 장면에서 친구 밑 산봉우리처럼 읽혔다(메인 재측정 2026-09-25) */
+/* bottom은 stats.js가 계열마다 발 보정을 더해 인라인으로 정한다(고정값을 두면 그림마다 다른 여백을 못 맞춘다). */
+.sxd-scene .friend-img{position:absolute;left:50%;transform:translateX(-50%);width:auto;height:124px}
+
+.sxd-stat-line{margin:var(--sp-3) 0 0;font-size:var(--fs-label);font-weight:var(--fw-body-strong);font-variant-numeric:tabular-nums}
+.sxd-cmp-line{margin:2px 0 0;font-size:var(--fs-caption);color:var(--muted)}
+
+/* 크기 추세 — 날마다 열 점 기둥(2026-09-25 재개편, D-050 그대로 지킨다: 조약돌 크기·색 농도로 그리지 않는다).
+   축 숫자(1·5·10)·점선 평균선·범례·읽는 법 접기·지난 기간 겹침은 없앴다 — 위 sxd-cmp-line 한 줄이 비교를 맡는다.
+   기둥마다 flex:1이라 7일은 넉넉히 퍼지고 30일은 폭 안에 저절로 들어간다(폭을 재는 JS 없이 CSS만으로). */
+.sxd-cols{display:flex;align-items:flex-end;gap:2px;margin-top:var(--sp-4);padding:0 2px}
+.sxd-col-wrap{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+/* column-reverse: DOM 첫 점(k=0, 크기 1을 뜻함)이 맨 아래에 온다 — 아래부터 채워지는 기둥. */
+.sxd-col{display:flex;flex-direction:column-reverse;align-items:center;gap:2px}
+.sxd-col i{width:8px;height:8px;border-radius:50%;background:transparent;box-shadow:inset 0 0 0 1.25px var(--border-strong)}
+.sxd-col i.f{background:var(--dot);box-shadow:none}
+/* 빈 점은 속이 빈 고리다 — 채운 점과 빈 점을 색 대비(회색 면과는 1.9~2.6:1로 3:1 미달이었다)가 아니라 모양(속 채움)으로 가른다. 채운 점은 흰 바탕 위 계열 강조색이라 3:1 이상(WCAG 1.4.11, 마감 검토 2026-09-25). */
+/* 기록 없는 날은 기둥 전체가 더 옅다(채워진 점이 없으니 값 0이 아니라 '비어 있음'으로 읽힌다). */
+.sxd-col-wrap.empty .sxd-col i{box-shadow:inset 0 0 0 1px var(--border)}
+.sxd-cols.small .sxd-col i{width:5px;height:5px;box-shadow:inset 0 0 0 1px var(--border-strong)}
+.sxd-cols.small .sxd-col i.f{box-shadow:none}
+.sxd-cols.small .sxd-col{gap:1.4px}
+.sxd-col-axis{min-height:var(--lh-caption);font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--subtle);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* '<계열>에서 고른 말' — 감정 chip(표시용, §6.3.1): fill 100/border 300/text 900, 높이 36, 좌우 12, label 14/500, 왼쪽 계열 점.
+   첫 화면의 '자주 머문 말'(중립 sx-pill)과 다른 규칙이다 — 여기는 한 계열뿐이라 그 계열 chip을 그대로 쓴다(2026-09-25 사용자 결정). */
+.sxd-chiprow{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-3)}
+.sxd-chip{display:inline-flex;align-items:center;gap:var(--sp-2);height:36px;padding:0 var(--sp-3);border-radius:var(--radius-chip);background:var(--chip-fill);border:var(--hairline) solid var(--chip-border);color:var(--chip-text);font-size:var(--fs-label);font-weight:var(--fw-label)}
+.sxd-chip-dot{width:8px;height:8px;border-radius:50%;background:var(--dot);flex:none}
+.sxd-chip-count{font-style:normal;font-size:var(--fs-caption);font-weight:var(--fw-body);margin-left:2px} /* 흐리게(opacity) 하면 12px 글자가 chip 면 위 4.5:1 아래로 내려간다 — 굵기만 낮춘다 */
+
+/* 함께한 날: 줄 앞에 그날의 조약돌(달력 칸과 같은 그림). 하이라인 구분선·›를 없애고 설정(§6.16)과 같은 눌림 면으로 누를 수 있음을 알린다. */
+.sxd-days{margin-top:var(--sp-2);display:flex;flex-direction:column}
+.sxd-day-row{position:relative;display:flex;align-items:center;gap:var(--sp-3);width:100%;min-height:var(--touch);padding:var(--sp-2) 0;text-decoration:none;color:inherit;transition:transform var(--dur-fast) var(--ease)}
+.sxd-day-row::after{content:"";position:absolute;inset:0 -10px;z-index:0;border-radius:14px;background:var(--surface-soft);opacity:0;transition:opacity var(--dur-fast) var(--ease);pointer-events:none}
+.sxd-day-row>*{position:relative;z-index:1}
+.sxd-day-row:active::after{opacity:1}
+.sxd-day-row:active{transform:scale(.985)}
+@media (hover:hover){.sxd-day-row:hover::after{opacity:.6}}
+.sxd-day-row .pebble-img{flex:none}
+/* 본문 굵기(400)로 가볍게 — 연도 없는 "9월 25일 금요일"과 함께 30일 최대 19줄이 나와도 화면이 무겁지 않게 한다. */
+.sxd-day-date{flex:1;min-width:0;font-weight:var(--fw-body)}
+.sxd-day-size{color:var(--muted);font-size:var(--fs-label);font-variant-numeric:tabular-nums;white-space:nowrap}
+
 @media (prefers-reduced-motion:reduce){
-  .sx-details summary::before{transition:none}
-  .sx-fill,.sx-pos,.sx-pos .friend-img{animation:none !important}
+  .sx-pos,.sx-pos .friend-img,.sx-dot-mark{animation:none !important}
+  .sxd-day-row{transition:none}
+  .sxd-day-row:active{transform:none}
 }

@@ -3,7 +3,8 @@
    빈터에 봉투가 놓이고, 부드러운 빛이 그리로 시선을 모은다. 저자극 — 튀는 도형(해·해 고리·나비) 없이 민트/그린 한 계열, 낮은 대비, 둥근 윤곽만 쓴다.
    나무·하늘→민트 배경·비네트는 main 배경 하나(CSS 그러데이션 여러 장)로 화면 전체 폭·높이를 이음매 없이 채운다 — SVG를 프레임 폭과 화면 폭으로 나눠 겹쳤던 전 방식은
    이음매·옆 흰 띠가 생겼다(메인 지적). 봉투 자리를 따라가야 하는 것(빈터 바닥·조약돌·빛 알갱이)만 프레임 안에 따로 그린다. 연필·나비·해·길은 없다(완료 기준).
-   글자·위 바·아래 버튼 줄·페이저는 다른 밝은 화면과 같은 스타일이다(ink 글자, ink 알약). 색은 전부 CSS 변수다(리터럴 없음). 그림자·상자·날카로운 모서리 없음. */
+   글자·위 바·아래 버튼 줄·페이저는 다른 밝은 화면과 같은 스타일이다(ink 글자, ink 알약). 색은 전부 CSS 변수다(리터럴 없음). 상자·날카로운 모서리 없음.
+   편지 카드(.card)만 옅고 넓은 그림자 한 겹을 쓴다(2026-09-25, 아래 "카드 한 장만 보인다" 절 — DESIGN_SYSTEM §2 원칙6 "그림자 없음"의 새 예외). */
 
 /* ── 장면의 상자와 색 ── main이 상자다(나무·빛이 화면 전체 폭·높이로 뻗고 main이 잘라 준다). 초점 링은 ink: 파랑(--focus)은 옅은 민트 면 위에서도 ink가 더 또렷하다.
    민트 톤 셋은 land 언덕 색에서 뽑았다(옅음→하늘 쪽, 짙음→가까운 나무) — 다른 화면의 언덕과 같은 뿌리색이라 이야기가 이어진다. */
@@ -34,11 +35,33 @@ main:has(.screen.review),main:has(.screen.record){
      검토 화면(버튼 줄 있음)은 예산이 95px 더 적어(− 299) 360×640에서 카드가 376이어도 약 89px이 버튼 줄과 겹친다(RK-030, 알약 36px 최소 높이 때문에 카드를 더 줄이면 세부 감정 4개짜리 카드가 못 들어간다 — 실기기 검수 항목으로 남긴다). 375×812·360×740 검토 화면은 여유 있게 들어간다.
    틀의 가운데 = 닫힌 봉투의 가운데 = 열린 카드 묶음(카드 + 페이저 줄)의 가운데라서 열려도 자리가 튀지 않는다. 위아래 최소 간격은 검토 화면에서 안내 글 아래 12px과 버튼 줄 위 패딩 12px, 기록 상세에서 위아래 6px이다. */
 .letter-stage{position:static;left:auto;width:auto;height:auto;margin:auto 0}
-.lt-frame{--lt-h:74px;--card-w:328px;--card-h:clamp(376px, calc(100dvh - 360px), 448px);--frame-h:calc(var(--card-h) + 54px);position:relative;width:360px;height:var(--frame-h);left:50%;margin:0 0 0 -180px}
-/* 달력 인라인(A2, tabs.js): 책상 장면·봉투가 없어 틀이 카드+페이저 줄만큼만 필요하고, 화면 패딩 안(칸 폭)에 그대로 들어가야 해서 360px 고정폭 트릭을 쓰지 않는다.
-   카드 높이는 기록 상세·검토와 같은 최솟값 376px로 고정한다 — 그 밑으로는 .t1 안 이름·알약·크기 자리 공식(write.css)이 겹치기 시작해 새로 유도해야 한다(RK-030과 같은 이유). 375×812는 달력 쪽 다른 줄 간격을 줄여 맞춘다. */
-/* --card-w:100%는 .card{flex:0 0 var(--card-w)}의 기준 상자(.pager의 내용 상자, 이미 자기 padding 16px×2를 뺀 값)에서 퍼센트를 잰다 — 여기서 다시 32px를 빼면(예전 값) 기준을 이중으로 빼 버려 카드가 좁아지고 옆 카드가 40px 가까이 넘겨봤다(2026-09-24 실측 캡처에서 발견). 100%만 쓰면 기존 328px 카드·30px 여백과 같은 비율로 8px만 살짝 보인다. */
+.lt-frame{--lt-h:74px;--card-w:328px;--card-h:clamp(376px, calc(100dvh - 360px), 448px);--frame-h:calc(var(--card-h) + 54px);--lt-shadow-y:24px;position:relative;width:360px;height:var(--frame-h);left:50%;margin:0 0 0 -180px}
+/* 달력 인라인(tabs.js): 책상 장면·봉투가 없어 틀이 카드+페이저 줄만큼만 필요하고, 화면 패딩 안(칸 폭)에 그대로 들어가야 해서 360px 고정폭 트릭을 쓰지 않는다.
+   카드 최솟값은 기록 상세·검토와 같은 376px다 — 그 밑으로는 .t1 안 이름·알약·크기 자리 공식(write.css)이 겹치기 시작해 새로 유도해야 한다(RK-030과 같은 이유).
+   --card-h는 이제(2026-09-25) 고정값이 아니라 tabs.js의 fitLetterHeight가 남는 자리에 맞춰 이 요소에 직접 setProperty한다 — 완료한 날은 미리보기 없이
+   곧장 이 카드가 열리고 하단 탐색 위까지 자리를 다 쓴다(사용자 요청 "첫 번째 화면에선 애초에 크게 볼 수 있게"). 아래 값은 JS가 붙기 전 첫 렌더용 기본값이다. */
 .lt-frame-inline{position:relative;left:auto;width:100%;margin:0;--card-w:100%;--card-h:376px}
+
+/* ── 카드 한 장만 보인다(2026-09-25 사용자 지적 — "옆에 살짝 보이는 것 없애줘. 배경에 파묻힌 느낌") ──
+   write.css의 .pager는 자기 padding(0 16px)으로 카드 자리를 안쪽에 잡는데, padding은 overflow:auto의 스크롤 자리(padding box) 안이라
+   카드(내용 상자, 100%)를 넘어 그 padding 자리로 다음 카드의 8px(gap)이 넘겨봤다 — pager 자신의 padding을 0으로 지우고, 봉투 틀(.lt-frame, 360px
+   고정)에서는 카드 자리를 left/right 16px로 직접 잡아 pager의 스크롤 자리 자체가 카드 폭과 정확히 같아지게 한다(가로 슬랙 0 — 다음 카드는 pager
+   자신의 overflow가 가린다, --card-w:328px과 정확히 같은 계산: 360 − 16 − 16 = 328). 달력 인라인(.lt-frame-inline)은 화면 padding이 이미
+   카드 자리를 주므로 pager를 폭 그대로 둔다(추가 여백 없음, --card-w:100%와 그대로 맞는다). */
+.lt-frame:not(.lt-frame-inline) .pager{left:16px;right:16px;width:auto}
+
+/* ── 종이 카드에 옅고 넓은 그림자 한 겹(2026-09-25 사용자 요청 — "배경보다 위로 올라와 보이게"). DESIGN_SYSTEM §2 원칙6 "그림자 없음"의 새 예외다
+   (문서는 메인이 고친다) — 가까운 접지 그림자(작고 조금 진함) + 넓은 확산 그림자(크고 아주 옅음) 두 겹을 한 box-shadow에 담는다. 둘 다 ink를 12% 이하로만
+   섞는다(D-047 — 리터럴 색 없이 color-mix). .pager·.pagerclip은 원래 카드 높이에 딱 맞게 잘려 있어(overflow-x:auto가 overflow-y도 auto로 만든다)
+   그림자가 보일 자리가 없었다 — 세로로만 --lt-shadow-y(24px)만큼 자리를 늘린다(카드 자신의 top:0은 그대로 두고 아래로만 늘려, 카드 위치는 안 움직인다 —
+   빛이 위에서 내려온다고 보면 그림자가 아래로 짙게 지는 쪽이 자연스럽다). 가로는 슬랙을 주지 않는다(옆 카드 안 보이기와 부딪힌다) — 그림자는
+   위아래로만 번지고 좌우 끝은 카드 경계에서 그대로 잘린다(두 겹 다 ink 12% 이하라 옅어서 잘린 자리가 도드라지지 않는다, 캡처로 확인). */
+.card{box-shadow:0 2px 4px color-mix(in srgb, var(--service-ink) 12%, transparent), 0 8px 16px color-mix(in srgb, var(--service-ink) 6%, transparent)}
+.pagerclip{height:calc(var(--card-h) + var(--lt-shadow-y))}
+/* 옆 카드 엿보기를 없앤 뒤로는 write.css의 좌우 24px 흐림 마스크가 카드 자신의 가장자리를 흐리게 해 카드가 배경에 묻혀 보였다(메인 재측정 2026-09-25) — 걷는다 */
+.pagerclip{mask-image:none;-webkit-mask-image:none}
+.opened .pagerclip{height:calc(var(--card-h) + var(--lt-shadow-y) + 64px)}
+.pager{padding:0;scroll-padding:0;height:calc(var(--card-h) + var(--lt-shadow-y))}
 .screen.review .letter-sub,.screen.record .letter-sub{line-height:var(--lh-label);min-height:calc(var(--lh-label) * 2)}
 .screen.review .letter-sub{margin-bottom:var(--sp-3)}
 .screen.record .letter-sub{margin-bottom:6px}

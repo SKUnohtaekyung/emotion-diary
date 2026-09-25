@@ -1,13 +1,13 @@
 # 진행 상황과 다음 할 일
 
-최종 갱신: 2026-09-24. 세부 증거는 [../tasks/CURRENT_TASK.md](../tasks/CURRENT_TASK.md)와 [../tasks/archive/](../tasks/archive/README.md), 결정 근거는 [DECISIONS.md](DECISIONS.md)에 있다. 이 문서는 한눈에 보는 요약이다. 이 날짜가 HEAD 커밋일보다 14일 넘게 앞서면 `verify`가 경고한다.
+최종 갱신: 2026-09-25. 세부 증거는 [../tasks/CURRENT_TASK.md](../tasks/CURRENT_TASK.md)와 [../tasks/archive/](../tasks/archive/README.md), 결정 근거는 [DECISIONS.md](DECISIONS.md)에 있다. 이 문서는 한눈에 보는 요약이다. 이 날짜가 HEAD 커밋일보다 14일 넘게 앞서면 `verify`가 경고한다.
 
 ## 1. 지금 어디에 있나
 
 | 단계 | 상태 | 요약 |
 | --- | --- | --- |
 | Phase 0 — 부트스트랩 | 마무리 중 | 정본 문서, Git baseline, 계획 교정(D-017~D-027), 배포·AI 경로 확정(D-029~D-032), 기술 스파이크 실행(판정은 partial), taxonomy v1·v2, 디자인 시스템, 캐릭터 9종, 개발 인프라 정비까지 끝났다. 남은 것은 스파이크 잔여 판정(§3)이다 |
-| 브라우저 우선 UI 프로토타입 | 구현·PC 검수 완료(PR #30 병합 전). **2026-09-24~25 QA 피드백(D-076~D-089) 반영·검수 완료, 마감 검토 1회 결과 반영 중(커밋 전)** | `TASK-WEB-UI-01`(archive)의 정적 시안(D-047, `web/`). 사용자 QA(`TASK-WEB-UI-02`, 브랜치 `web-ui/qa`)가 서비스 스토리·디자인 시스템 전면 개정(D-050~D-072, 문서·토큰·전시장 완료)에 이어, 2026-09-24 QA 피드백 13건 — 오늘 화면 하단 탐색 제거(D-076)·오늘 밤하늘과 세 겹 숲(D-077·D-084)·완료 자유 배치(D-078)·편지 카드·이유 자유 배치(D-079)·달력 한 주 접기(D-080)·설정과 하루 기준 시각(D-081)·그날만 작성(D-082)·주요 화면 예외 상태(D-083)·통계 친밀도와 계열별 추세(D-064·D-086)·편지 배경(D-085) — 을 반영하는 중이다. 세부 진행 상태는 `tasks/CURRENT_TASK.md`(QA #31~#47 표, 2026-09-24 체크포인트)를 따른다. 저장·인증·AI는 없다. 실기기 검수는 하지 않았다 |
+| 브라우저 우선 UI 프로토타입 | 구현·PC 검수 완료(PR #30 병합 전). **2026-09-24~25 QA 피드백(D-076~D-096) 반영·검수 완료** — 마감 검토(새 맥락 검토자) 세 차례 결과까지 반영, `verify full` PASS | `TASK-WEB-UI-01`(archive)의 정적 시안(D-047, `web/`). 사용자 QA(`TASK-WEB-UI-02`, 브랜치 `web-ui/qa`)가 서비스 스토리·디자인 시스템 전면 개정(D-050~D-072)에 이어 2026-09-24 피드백(D-076~D-089)을 반영했고, 2026-09-25에는 달력 미리보기 완성도(D-090)·통계 '요약+친구 상세'와 설정 '목록→하위 화면'(D-091)·온보딩 여섯 장면 이야기와 앱 시작 로딩 화면(D-092, 일시정지 포함)·온보딩 안전 안내 정리(D-093, 법적 근거 조사 반영)·위기 안내 연락처(D-094)·통계 친구 상세 재디자인(D-095)·달력의 큰 편지 카드와 종이 그림자(D-096)를 반영했다. 세부는 `tasks/CURRENT_TASK.md`(QA #50~#54 행과 2026-09-25 체크포인트·인수인계)를 따른다. 저장·인증·AI는 없다. 실기기 검수는 하지 않았다 |
 | Phase 1 — 기반·데이터 무결성 | 대기 | 앱 뼈대(Workers API, D1 migration, 테스트). `work-graph`의 `app-scaffold`는 `hosting-identity-spike`·`data-store-spike`가 `done`이 돼야 열린다. 착수 전에 TASK-MOBILE의 단일 Worker 제안을 결정으로 받을지 먼저 정한다 |
 | Phase 2 — 직접 작성 MVP | 대기 | 선행 조건이던 taxonomy는 끝났다(v1 2026-09-04, v2 9계열 194개 2026-09-05, 둘 다 `review_status: reviewed`) |
 | Phase 4 — 대시보드·알림 | 대기 | — |
@@ -45,7 +45,8 @@
 ## 4. 다음 할 일 (우선순위 순)
 
 1. **TASK-WEB-UI-02 브랜드·디자인 개편과 시안 재구성**(in_progress, 2026-09-21) — 결정 D-050~D-059는 끝났다(문서·토큰·전시장). `web/` 시안을 새 언어(흰 바탕 + 숲색 무대 + 감정 테마 300 + 조약돌·빛 + 친구)로 재구성하고 메인이 헤드리스 Chromium으로 캡처·측정한다. 증거와 남은 것은 `tasks/CURRENT_TASK.md`. 사용자 눈 검수 대상: 300 면의 인상, 친구가 면에 묻히는지, 돌 더미 애니메이션, 작성 단계 수(계열 셋이면 10단계). **남은 검수(TASK-WEB-UI-01 유래)**: iPhone Safari·Android Chrome 실기기, 실제 OS reduced-motion 설정, 회색조·label 없음 상태의 사람 눈 판독. **추후 계획**: 오늘의 한 줄 질문 목록 작성, 앱 이름·로고(D-058).
-2. **디자인 시스템 잔여 실행 항목** — 실기기에서 chip 대비·40px 아이콘 판독성·44px 터치·별자리 다중 선택 조작감 확인, 위기 안내 **연락처 값** 검수(문구 톤은 D-036으로 확정).
+2. **디자인 시스템 잔여 실행 항목** — 실기기에서 chip 대비·40px 아이콘 판독성·44px 터치·별자리 다중 선택 조작감 확인. 위기 안내 연락처는 공식 출처로 채웠고(D-094, `data/crisis-resources/kr.json`) **임상·안전 검토와 휴대전화 1388 통신사 실측이 출시 차단**으로 남았다.
+   - 출시 전 결정·구현: 건강 민감정보 **별도 동의** 흐름(D-093 — '받는다'로 정함, 문구·시점·거부 시 동작 미정), AI 작성 입구의 AI 기본법 제31조 **사전 고지 한 줄**(AI 작성이 열릴 때), 온보딩 장면 이야기의 실기기·움직임 줄이기 확인.
 3. **스파이크 잔여 판정(Phase 1의 선행)** — B-02/B-03/B-08: iPhone Safari 본체·홈 화면·Android Chrome, bundle/log secret scan, Cloudflare Access 적용 가능성, 무료 한도 수치. B-05: 백업 절차와 삭제 지연 고지 문구. B-06(병렬 가능): job 만료·`failed` 전환, verifier 독립 2회 호출, 위기 케이스, 구독 경로의 보존 설정.
 4. **TASK-MOBILE 제안의 결정**(보류 중, Phase 1 착수 직전) — 단일 origin Worker + Static Assets로 D-032를 교정할지.
 5. **Phase 1 app-scaffold → data-foundation** — Workers API, D1 migration(스파이크 스키마 기반), lint/typecheck/test/build 명령(생기면 `quality-gates`·`runtime-profile`에 같은 변경으로 채운다 — 안 채우면 quick이 실패한다), 하루 1개 unique, revision/idempotency, hard delete, versioned JSON export.

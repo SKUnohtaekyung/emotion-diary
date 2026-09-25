@@ -1,0 +1,45 @@
+{
+  "version": "2026-09-25",
+  "country": "KR",
+  "note": "위기 안내 화면(#/help)과 AI 경로 위기 전환이 함께 쓰는 한국 기준 연락처(SAFETY_POLICY §6 ③의 versioned resource, D-020·D-094). 값은 정부 부처·공공기관 공식 누리집으로만 확인했다(docs/research/legal-onboarding-crisis-2026-09.md). 임상·안전 검토는 아직이다 — 출시 전 검토와 표시 직전 재확인이 필요하다. 번호를 바꿀 때는 version·checked를 함께 고친다.",
+  "review": { "officialSources": "checked", "clinicalSafety": "pending", "carrierCall": "unverified" },
+  "checked": "2026-09-25",
+  "contacts": [
+    {
+      "id": "suicide-prevention",
+      "number": "109",
+      "name": "자살예방상담전화",
+      "help": "혼자 감당하기 어려운 마음일 때 바로 이야기할 수 있어요.",
+      "hours": "24시간",
+      "sms": null,
+      "owner": "보건복지부",
+      "sources": ["https://www.129.go.kr/109", "https://www.mohw.go.kr/board.es?mid=a10503010100&bid=0027&act=view&list_no=1479607"]
+    },
+    {
+      "id": "youth",
+      "number": "1388",
+      "name": "청소년상담",
+      "help": "9~24세 청소년과 보호자의 고민부터 위기까지 함께해요. 문자도 1388로 보낼 수 있어요.",
+      "hours": "24시간",
+      "sms": "1388",
+      "mobile": "휴대전화로 걸 때는 지역번호를 붙여요(예: 02-1388). 문자는 1388 그대로 보내요.",
+      "owner": "성평등가족부",
+      "sources": ["https://www.mogef.go.kr/cc/ccy/cc_ccy_f001.do", "https://www.mogef.go.kr/cc/ccy/cc_ccy_f002.do"]
+    },
+    {
+      "id": "mental-health-crisis",
+      "number": "1577-0199",
+      "name": "정신건강 위기상담전화",
+      "help": "정신건강 전문가와 상담하고 가까운 기관을 안내받을 수 있어요.",
+      "hours": "야간·공휴일에는 광역 센터로 연결돼요",
+      "sms": null,
+      "owner": "보건복지부",
+      "sources": ["https://www.mohw.go.kr/menu.es?mid=a10706040100"]
+    }
+  ],
+  "emergency": [
+    { "id": "police", "number": "112", "name": "경찰", "sms": null, "owner": "경찰청", "sources": ["https://www.korea.kr/news/policyNewsView.do?newsId=148942563"] },
+    { "id": "fire-ems", "number": "119", "name": "구급", "sms": "119", "owner": "소방청", "sources": ["https://www.korea.kr/news/policyNewsView.do?newsId=148921861"] }
+  ],
+  "abroad": "해외에 있다면 그 나라의 응급 번호로 연락해 주세요."
+}

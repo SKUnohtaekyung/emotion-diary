@@ -103,7 +103,8 @@ const SPOTS = [
 const TILT = [-16, 12, -8, 20, -14, 9, -22, 15, -5];
 const LAYER_Z = { art: [1, 4, 7], pebble: [2, 5, 9], fore: [3, 6, 10] }; // 겹 사이 순서: 먼 숲 → 먼 돌 → 먼 풀 → 가운데 숲 → … (돌·안내 글은 11 이상, scene.css)
 
-function buildForest() {
+// 로딩 화면(web/splash.svg)도 같은 숲이다 — scripts/build-splash.mjs가 이 함수로 그림을 만들어 파일로 굳힌다(D-092 ④).
+export function buildForest() {
   const R = rng(11), Rp = rng(41);
   let stars = "", flies = "";
   for (let i = 0; i < 9; i += 1) stars += `<circle class="f-star" cx="${f(14 + R() * 332)}" cy="${f(120 + R() * 130)}" r="${f(0.9 + R() * 0.8)}" style="--sd:${(-R() * 4).toFixed(2)}s"/>`;

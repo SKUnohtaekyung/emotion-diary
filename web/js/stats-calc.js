@@ -70,6 +70,29 @@ export function topWords(sampleDays, dates, limit = 5) {
   return [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
 }
 
+// 날짜 배열의 인덱스마다 그 계열의 크기(없으면 null). 친구 상세 차트가 이번 기간·지난 기간을 같은 x축(1~N일째)에 겹쳐 그릴 때 쓴다(D-091 ②).
+export function valuesByIndex(sampleDays, dates, catCode) {
+  return dates.map((iso) => {
+    const rec = sampleDays.get(iso);
+    if (!rec?.recorded) return null;
+    const c = rec.cats.find((x) => x.code === catCode);
+    return c ? c.size : null;
+  });
+}
+
+// topWords()를 한 계열로 좁힌 버전 — 친구 상세의 "<친구>와 고른 말"(D-091 ②).
+export function topWordsForCategory(sampleDays, dates, catCode, limit = 8) {
+  const freq = new Map();
+  for (const iso of dates) {
+    const rec = sampleDays.get(iso);
+    if (!rec?.recorded) continue;
+    const c = rec.cats.find((x) => x.code === catCode);
+    if (!c) continue;
+    for (const w of c.words) freq.set(w, (freq.get(w) ?? 0) + 1);
+  }
+  return [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+}
+
 // Welch 두 표본 t검정의 95% 양측 임계값. df는 호출 쪽에서 내림(보수적)해 정수로 넘긴다. df>30은 1.96(표를 벗어나면 정규근사).
 const T_TABLE = [12.706, 4.303, 3.182, 2.776, 2.571, 2.447, 2.365, 2.306, 2.262, 2.228, 2.201, 2.179, 2.160, 2.145, 2.131, 2.120, 2.110, 2.101, 2.093, 2.086, 2.080, 2.074, 2.069, 2.064, 2.060, 2.056, 2.052, 2.048, 2.045, 2.042];
 export const tCritical = (df) => (df > 30 ? 1.96 : T_TABLE[Math.max(1, df) - 1]);
@@ -144,14 +167,16 @@ function levelFor(code, dayIndex) {
   return level;
 }
 
-// 60일 표본(오늘에서 거꾸로 59일까지). categories는 data.categories(taxonomy 선언 순서)를 그대로 넘긴다.
+// 60일 표본(어제에서 거꾸로 60일) + 오늘은 늘 비어 있다. categories는 data.categories(taxonomy 선언 순서)를 그대로 넘긴다.
+// 오늘을 비우는 이유(D-091 ②): 달력·오늘 화면은 오늘을 사용자가 직접 쓴 기록으로만 채운다 — 표본이 오늘을 채우면 통계의 '오늘' 줄을 눌러 간 달력이 빈 칸이 된다.
+// 달력(sample.js statsDay)도 이 표본을 그대로 읽으므로 두 화면의 날·계열·크기가 같다.
 export function buildSample(todayISO, categories, seed = SEED) {
   const rng = mulberry32(seed);
   const order = categories.map((c) => c.code);
   const byCode = new Map(categories.map((c) => [c.code, c]));
   const days = new Map();
   for (let i = 0; i < 60; i += 1) {
-    const iso = addDays(todayISO, i - 59);
+    const iso = addDays(todayISO, i - 60);
     if (rng() >= DAY_RECORD_P) { days.set(iso, { recorded: false }); continue; }
     const cats = [];
     for (const code of order) {
@@ -170,6 +195,7 @@ export function buildSample(todayISO, categories, seed = SEED) {
     if (cats.length > 3) cats.length = 3; // 저장 시안 상한(마음 고르기는 여러 개 가능하나 표본은 최대 3개로 둔다, 작업 지시)
     days.set(iso, { recorded: true, cats });
   }
+  days.set(todayISO, { recorded: false });
   return days;
 }
 
@@ -179,7 +205,7 @@ export function buildFewSample(todayISO, categories) {
   for (let i = 0; i < 60; i += 1) days.set(addDays(todayISO, i - 59), { recorded: false });
   const byCode = new Map(categories.map((c) => [c.code, c]));
   const set = (offset, code, size) => days.set(addDays(todayISO, offset), { recorded: true, cats: [{ code, size, words: [byCode.get(code).emotions[0].label] }] });
-  set(0, "sadness", 6);
+  set(-1, "sadness", 6); // 오늘은 비워 둔다(buildSample과 같은 이유)
   set(-2, "anger", 4);
   set(-5, "joy", 7);
   return days;

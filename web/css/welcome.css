@@ -1,0 +1,107 @@
+/* 온보딩(D-092): WHY를 말하는 여섯 장면 이야기 → 시작하기 전에(고지). 전부 ob- 접두사다(전역 .note·.skip·.stone·.halo와 겹치지 않게).
+   무대(.ob-stage)는 390×594 설계 좌표의 상자이고, 화면 높이·폭에 맞춰 통째로 줄고 는다(--ob-k, welcome.js가 잰다). 글자는 무대 밖(rem)이라 확대에 그대로 따라간다.
+   색은 전부 토큰이다 — 언덕·해(land), 노트(paper), 민트·ink(service), 감정 이름 칸(그 계열 100·700). 강조 초록은 민트를 ink에 섞은 값이다(흰 바탕 4.5:1 이상). */
+.screen.ob,.ob-notice{--ob-green:color-mix(in srgb,var(--service-mint) 42%,var(--service-ink))}
+.screen.ob{position:relative;padding:0;min-height:calc(100dvh - var(--banner-h,2rem));overflow:hidden;background:var(--bg);user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;cursor:pointer}
+.screen.ob{--ob-veil:var(--bg)}
+.screen.ob.mint{--ob-veil:color-mix(in srgb,var(--service-mint) 20%,var(--bg));background:var(--ob-veil)}
+.screen.ob.mint :is(.ob-skip,.ob-hint,.ob-pause){color:var(--muted)} /* 민트 20% 위에서 subtle은 4.34:1이라 muted로 올린다 */
+.ob-flash{position:absolute;inset:0;z-index:0;background:var(--bg);pointer-events:none}
+
+/* 위: 장면마다 차오르는 막대 + 건너뛰기 */
+.ob-bars{position:absolute;left:var(--sp-5);right:var(--sp-5);top:16px;display:flex;gap:4px;z-index:6}
+.ob-bars i{position:relative;flex:1;height:3px;border-radius:2px;background:var(--border);overflow:hidden}
+.ob-bars i b{position:absolute;inset:0;background:var(--service-ink);transform-origin:0 50%;transform:scaleX(0)}
+/* 일시정지(WCAG 2.2.2): 왼쪽 위, 건너뛰기와 같은 줄·같은 글자 색. 누르면 ▶로 바뀌고 aria-pressed가 켜진다 */
+.ob-pause{position:absolute;left:var(--sp-2);top:26px;display:grid;place-items:center;width:var(--touch);height:var(--touch);border:0;background:none;color:var(--subtle);z-index:6}
+.ob-pause svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.screen.ob.paused .ob-pause svg{fill:currentColor;stroke-width:1.6}
+.ob-pause:focus-visible{outline:var(--emphasis) solid var(--focus);outline-offset:2px}
+.ob-skip{position:absolute;right:var(--sp-2);top:26px;min-height:var(--touch);padding:0 14px;border:0;background:none;font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--subtle);z-index:6}
+.ob-skip:focus-visible,.ob-cta:focus-visible,.ob-back:focus-visible,.ob-start:focus-visible{outline:var(--emphasis) solid var(--focus);outline-offset:2px}
+
+/* 문장: 큰 문장 하나 + 뒷받침 두 줄까지 */
+.ob-copy{position:absolute;left:var(--sp-6);right:var(--sp-6);top:84px;height:8.25rem;z-index:4;pointer-events:none} /* 높이는 welcome.js가 글 높이에 맞춰 다시 준다(글자 확대) */
+.ob-copy .set{position:absolute;left:0;right:0;top:0}
+/* ④~⑥ 낮은 화면(360×640 등)에서는 무대가 문장 밑까지 올라와 언덕 위에 글자가 얹힌다 — 흰 바탕을 문장 뒤에 깔고 아래 끝만 흐리게 녹인다(높은 화면에서는 언덕이 닿지 않아 보이지 않는다) */
+/* 글자를 크게 키워 무대가 더 줄 수 없을 때(.tight)도 같다 — 받침 색은 그 장면의 바탕(1장면 민트) */
+.screen.ob:is(.veil,.tight) .ob-copy::before{content:"";position:absolute;left:calc(var(--sp-6) * -1);right:calc(var(--sp-6) * -1);top:-100px;bottom:-18px;background:linear-gradient(to bottom,var(--ob-veil) calc(100% - 26px),color-mix(in srgb,var(--ob-veil) 0%,transparent))}
+.ob-copy h2{margin:0;font-size:1.625rem;line-height:2.1875rem;font-weight:800;letter-spacing:-.032em;text-wrap:balance;color:var(--text)}
+.ob-copy p{margin:10px 0 0;font-size:.97rem;line-height:1.5rem;font-weight:500;color:var(--muted);letter-spacing:-.01em}
+.ob-copy em{font-style:normal;color:var(--ob-green)}
+
+/* 무대: 문장 아래(설계 390×594, 아래 가운데 기준으로 --ob-k배) */
+.ob-stage{position:absolute;left:50%;bottom:0;width:390px;height:594px;z-index:1;transform-origin:50% 100%;transform:translateX(-50%) scale(var(--ob-k,1))}
+.ob-layer{position:absolute;inset:0;transform-origin:50% 100%}
+
+/* ①② 답 조각 — 첫 장면은 아래로 갈수록 흐려진다 */
+.ob-answers{position:absolute;inset:0;pointer-events:none}
+.ob-answers.fade{-webkit-mask-image:linear-gradient(to bottom,#000 50%,transparent 88%);mask-image:linear-gradient(to bottom,#000 50%,transparent 88%)}
+.ob-chip{position:absolute;left:0;top:0;padding:10px 16px;border-radius:var(--radius-chip);background:var(--surface-soft);color:var(--subtle);font-size:14px;font-weight:600;white-space:nowrap;will-change:translate,opacity}
+.ob-chip b{font-weight:800;color:color-mix(in srgb,var(--subtle) 65%,var(--bg));margin-right:6px}
+.screen.ob.mint .ob-chip{background:color-mix(in srgb,var(--bg) 72%,transparent);color:var(--muted)}
+.screen.ob.mint .ob-chip b{color:var(--ob-green)}
+.screen.ob.lifting .ob-chip{background:var(--surface-soft);color:var(--subtle)}
+.screen.ob.lifting .ob-chip b{color:color-mix(in srgb,var(--subtle) 65%,var(--bg))}
+.ob-chip,.ob-chip b{transition:color .7s cubic-bezier(.65,0,.35,1),background-color .7s cubic-bezier(.65,0,.35,1)}
+
+/* 나의 돌 */
+.ob-stone{position:absolute;left:0;top:0;width:112px;height:auto}
+.ob-halo{position:absolute;left:0;top:0;width:230px;height:230px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--service-light) 95%,transparent) 0,color-mix(in srgb,var(--service-light) 50%,transparent) 36%,transparent 70%);pointer-events:none}
+
+/* ④⑥ 언덕 */
+.ob-land{position:absolute;left:0;right:0;bottom:0;width:100%;height:540px;overflow:visible}
+.ob-land .hill{transform-box:view-box}
+.ob-land .h-far{fill:var(--land-hill-far)}.ob-land .h-mid{fill:var(--land-hill-mid)}.ob-land .h-near{fill:var(--land-hill-near)}
+.ob-land .sun{fill:var(--land-sun)}.ob-land .sun-ring{fill:none;stroke:var(--land-sun-ring);stroke-width:2.5}
+.ob-land .road{fill:var(--bg)}
+.ob-walker{position:absolute;left:0;top:0}
+.ob-walker img{display:block;width:100%;height:auto;transform-origin:50% 100%}
+.ob-peb{position:absolute;left:0;top:0;height:auto}
+
+/* ⑤ 노트 */
+.ob-note{position:absolute;left:30px;right:30px;top:74px;height:218px;border-radius:12px;background:var(--paper);
+  background-image:repeating-linear-gradient(to bottom,transparent 0 47px,var(--paper-rule) 47px 48px);background-position:0 20px}
+.ob-note .tape{position:absolute;left:-8px;top:-11px;width:76px;height:24px;background:color-mix(in srgb,var(--service-mint) 70%,transparent);transform:rotate(-7deg);border-radius:2px}
+.ob-note .ln{position:absolute;margin:0;left:24px;right:20px;top:33px;font-size:18.5px;line-height:48px;font-weight:600;color:var(--paper-ink);white-space:pre}
+.ob-note .caret{display:inline-block;width:2px;height:19px;margin-left:1px;background:var(--paper-ink);vertical-align:-3px;animation:ob-blink 1.05s steps(1) infinite}
+@keyframes ob-blink{55%{opacity:0}}
+.ob-note .names{position:absolute;left:24px;top:125px;display:flex;gap:8px}
+.ob-note .name{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 13px 0 7px;border-radius:var(--radius-chip);font-size:15px;font-weight:800;opacity:0;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--c) 32%,transparent);color:transparent}
+.ob-note .name img{width:22px;height:auto;opacity:0}
+.ob-note .name.on{background:var(--bgc);color:var(--c);box-shadow:none}
+.ob-note .name.on img{opacity:1}
+
+/* 아래: 안내 한 줄과 버튼(움직임 줄이기에서는 장면마다 '다음' 버튼이 늘 보인다) */
+.ob-cta{position:absolute;left:var(--sp-5);right:var(--sp-5);bottom:calc(var(--sp-6) + env(safe-area-inset-bottom));min-height:56px;border:0;border-radius:var(--radius-chip);background:var(--service-ink);color:var(--bg);font-size:var(--fs-heading);font-weight:var(--fw-body-strong);opacity:0;pointer-events:none;z-index:6}
+.ob-cta{visibility:hidden} /* 보이지 않는 동안은 Tab 순서에서도 빠진다 */
+.ob-cta.show{opacity:1;pointer-events:auto;visibility:visible}
+.ob-hint{position:absolute;left:0;right:0;bottom:calc(34px + env(safe-area-inset-bottom));margin:0;text-align:center;font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--subtle);z-index:3;pointer-events:none}
+
+/* ⑦ 시작하기 전에 — 이야기 뒤에 이어지는 한 장, WHY의 약속 두 줄(D-093). 박스 없이 설정과 같은 조약돌 면 아이콘, 아래는 이야기의 언덕과 나의 돌로 이어지는 길 */
+.ob-notice{position:absolute;inset:0;z-index:8;background:var(--bg);display:flex;flex-direction:column;visibility:hidden;cursor:default}
+.ob-notice.open{visibility:visible}
+.ob-notice .top{display:flex;align-items:center;min-height:56px;padding:8px 8px 0}
+.ob-back{display:grid;place-items:center;width:var(--touch);height:var(--touch);border:0;background:none;color:var(--service-ink)}
+.ob-back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.ob-notice .body{padding:14px var(--sp-6) 0}
+.ob-notice .eyebrow{margin:0 0 8px;font-size:var(--fs-label);font-weight:700;color:var(--ob-green);letter-spacing:-.01em}
+.ob-notice h1{margin:0;font-size:1.75rem;line-height:2.3125rem;font-weight:800;letter-spacing:-.034em;text-wrap:balance}
+.ob-notice .items{list-style:none;margin:30px 0 0;padding:0;display:flex;flex-direction:column;gap:22px}
+.ob-notice li{display:grid;grid-template-columns:44px 1fr;column-gap:14px;align-items:start}
+.ob-face{position:relative;display:grid;place-items:center;width:44px;height:44px}
+.ob-face::before{content:"";position:absolute;inset:0;border-radius:var(--radius-blob);background:color-mix(in srgb,var(--service-mint) 30%,var(--bg))}
+.ob-notice li:nth-child(2) .ob-face::before{transform:scaleX(-1);background:color-mix(in srgb,var(--service-ink) 8%,var(--bg))}
+.ob-face svg{position:relative;width:22px;height:22px;fill:none;stroke:var(--service-ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ob-notice li b{display:block;padding-top:2px;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800;letter-spacing:-.02em}
+.ob-notice li p{margin:4px 0 0;font-size:.9375rem;line-height:1.4375rem;color:var(--muted);text-wrap:balance} /* 끝말 한 단어가 혼자 다음 줄로 넘어가지 않게 */
+.ob-ground{position:relative;flex:1;min-height:14.5rem;margin-top:18px;container-type:inline-size}
+/* 그림은 폭에 맞춰 커지되(390×300 비율) 남은 높이를 넘지 않는다 — 모자라면 위의 빈 하늘부터 잘린다(돌 위 여백이 약 20%라 돌은 남는다) */
+.ob-ground svg{position:absolute;left:0;right:0;bottom:0;width:100%;height:100%;max-height:calc(100cqw * 300 / 390)} /* 100cqh는 이 자리에서 0으로 풀려(크롬 실측) 높이는 %로 잡는다 */
+.ob-ground .h-far{fill:var(--land-hill-far)}.ob-ground .h-mid{fill:var(--land-hill-mid)}.ob-ground .h-near{fill:var(--land-hill-near)}.ob-ground .road{fill:var(--bg)}
+.ob-start{position:absolute;left:var(--sp-5);right:var(--sp-5);bottom:calc(var(--sp-6) + env(safe-area-inset-bottom));min-height:56px;border:0;border-radius:var(--radius-chip);background:var(--service-ink);color:var(--bg);font-size:var(--fs-heading);font-weight:var(--fw-body-strong)}
+/* 따로 연 경우(#/welcome?p=2)는 처음부터 펼쳐져 있다 */
+.screen.ob-solo{padding:0}
+.ob-notice.solo{position:relative;inset:auto;min-height:calc(100dvh - var(--banner-h,2rem))}
+
+@media (prefers-reduced-motion:reduce){.ob-note .caret{animation:none}}

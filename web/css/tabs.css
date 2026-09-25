@@ -52,18 +52,8 @@
 .info-top .dots3{fill:currentColor;stroke:none}
 .screen.record h1{font-size:2.125rem;line-height:2.625rem;margin-top:0}
 
-/* 통계: 규칙은 css/stats.css(sx- 접두어, D-086)로 옮겼다. 여기에는 기간 전환 여백만 남긴다. */
-.stats-screen .segmented{margin-top:var(--sp-3)}
-
-/* 설정 */
-.panel{margin-top:var(--sp-8);padding-top:var(--sp-6);border-top:var(--hairline) solid var(--border)}
-.panel h2{margin-top:0}
-.panel .stack{margin-top:var(--sp-2)}
-.help-link{display:block;padding-left:0;margin-top:var(--sp-1)}
-.danger-zone{margin-top:var(--sp-10);padding:var(--sp-5);border:var(--hairline) solid var(--danger);border-radius:var(--radius-card)}
-.setting-row{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);min-height:var(--touch)}
+/* 설정의 스위치(목록·알림·내보내기가 함께 쓴다 — 설정 화면 규칙은 css/settings.css·settings-data.css, D-091). */
 .switch{width:64px;height:var(--touch);padding:0;border:0;background:none;display:flex;align-items:center}
-/* 꺼짐(aria-checked=false, 이 시안의 실제 상태)은 연한 회색 바탕에 흰 손잡이가 왼쪽이다 — 이전에는 바탕이 늘 ink라 꺼진 상태도 켜진 것처럼 보였다(A4 재작업 3). */
 .switch i{display:block;width:64px;height:36px;border-radius:var(--radius-chip);background:var(--border);position:relative}
 .switch i::after{content:"";position:absolute;left:4px;top:4px;width:28px;height:28px;border-radius:50%;background:var(--bg);border:var(--hairline) solid var(--muted)}
 .switch[aria-checked="true"] i{background:var(--service-ink)}
@@ -71,37 +61,31 @@
 .placeholder-box{border-radius:var(--radius-card);padding:var(--sp-3) var(--sp-4);color:var(--muted);font-size:var(--fs-label);background:var(--surface-soft)}
 .proto-tag{margin-left:var(--sp-1)}
 
-/* 설정 목록 줄(A4, D-081 ①): '이름 · 값 ›' 한 줄. 줄마다 위쪽 실선으로 나뉘고(박스 없이) 44px 이상을 확보한다.
-   큰 글자에서 이름·값이 겹치지 않도록 줄바꿈을 허용하고(flex-wrap), 값은 오른쪽에 붙인다(margin-left:auto). */
-.set-list{margin-top:var(--sp-2)}
-.set-row{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:var(--sp-1) var(--sp-3);width:100%;min-height:var(--touch);padding:var(--sp-3) 0;border:0;border-top:var(--hairline) solid var(--border);background:none;color:var(--text);font-size:var(--fs-body);line-height:var(--lh-body);text-align:left}
-.set-list .set-row:first-child{border-top:0}
-.set-row-name{font-weight:var(--fw-body-strong)}
-.set-row-value{display:inline-flex;align-items:center;gap:2px;margin-left:auto;color:var(--muted);font-weight:var(--fw-label)}
-.set-chev{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.set-note{margin-top:var(--sp-2)}
-/* 위기 연락처 정적 칸(검수 전) — 번호를 적지 않는다. 안내 칸이라 오류·위험처럼 읽히지 않게 중립 테두리를 쓴다(빨강은 영구 삭제에만, A4 재작업 5). */
-.set-crisis{margin-top:var(--sp-3);padding:var(--sp-4);border:var(--hairline) solid var(--border);border-radius:var(--radius-card)}
-.set-crisis h3{margin:0 0 var(--sp-1);font-size:var(--fs-label);color:var(--service-ink)}
-.set-crisis .note{margin:0}
-
-/* 온보딩(D-061): 흰 하늘 아래 색 언덕 위에 아홉 친구와 조약돌 몇 개. 두 번째 쪽은 글이다. */
-.screen.welcome{position:relative;padding:var(--sp-6) 0 0;display:flex;flex-direction:column;overflow:hidden}
-.welcome-head{padding:0 var(--sp-5)}
+/* 위기 안내(#/help)와 완료 화면의 언덕 자리. 온보딩은 welcome.css(D-092 장면 이야기)로 옮겼다. */
 /* 장면 상자는 남은 자리 안에 통째로 들어온다(높이가 모자라면 상자가 줄고, 언덕이 옆으로 뻗어 폭을 채운다) — 해나 윗줄 친구가 잘리지 않는다. */
-.welcome-land,.done-land{position:relative;flex:1;min-height:0;margin-top:var(--sp-2);overflow:hidden}
+.done-land{position:relative;flex:1;min-height:0;margin-top:var(--sp-2);overflow:hidden}
 .welcome-foot{padding:var(--sp-4) var(--sp-5) calc(var(--sp-5) + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:var(--sp-2);background:transparent}
-.welcome-land+.welcome-foot{position:absolute;left:0;right:0;bottom:0;z-index:2}
-.screen.welcome.page2,.screen.help{padding:var(--sp-2) var(--sp-5) 0}
-.screen.help h1,.screen.welcome.page2 h1{font-size:2rem;line-height:2.5rem;margin-top:var(--sp-3)}
-.points{list-style:none;margin:var(--sp-6) 0 var(--sp-8);padding:0;display:flex;flex-direction:column;gap:var(--sp-6)}
-.points li{display:flex;gap:var(--sp-3);align-items:flex-start}
-.points .icb{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
-.points .ico{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
-.points b{display:block;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800}
-.points p{margin:2px 0 0;color:var(--muted);font-size:var(--fs-label);line-height:var(--lh-label)}
-.help-box{margin:var(--sp-6) 0 var(--sp-4);padding:var(--sp-5);border:var(--emphasis) solid var(--danger);border-radius:var(--radius-card)}
-.help-box h2{margin:0 0 var(--sp-2);font-size:var(--fs-heading)}
-.screen.help .welcome-foot{padding-inline:0;margin-top:auto}
-.screen.page2 .welcome-foot{padding-inline:0;margin-top:auto}
+.screen.help{padding:var(--sp-2) var(--sp-5) 0}
+.screen.help h1{font-size:2rem;line-height:2.5rem;margin-top:var(--sp-3)}
+/* 위기 안내(D-094): 상자·빨간 테두리 없이 흰 바탕 위 연락처 줄. 가장 눈에 띄는 것은 ink 전화 버튼이다(떠나기보다 연락하기). 친구·감정 색·움직임 없음. */
+.screen.help .lede{margin:0}
+.hp-body{margin-top:var(--sp-6)}
+.hp-body h2{margin:0 0 var(--sp-3);font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);color:var(--muted)}
+.hp-now{padding-bottom:var(--sp-6)}
+.hp-now-btns{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-2)}
+.hp-call{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:var(--touch);padding:0 16px;border-radius:var(--radius-chip);background:var(--service-ink);color:var(--bg);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-decoration:none;white-space:nowrap;touch-action:manipulation}
+.hp-call.big{min-height:56px;font-size:var(--fs-heading)}
+.hp-call.soft{background:var(--surface-soft);color:var(--service-ink)}
+.hp-call svg{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hp-call:focus-visible{outline:var(--emphasis) solid var(--focus);outline-offset:2px}
+.hp-sub{margin:var(--sp-2) 0 0;font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
+.hp-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp-5)}
+.hp-row{display:grid;grid-template-columns:1fr auto;column-gap:var(--sp-3);align-items:start}
+.hp-info p{margin:0}
+.hp-name{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800;letter-spacing:-.02em}
+.hp-num{display:block;margin-top:2px;font-size:var(--fs-body);line-height:var(--lh-body);font-weight:var(--fw-body-strong);letter-spacing:0;color:var(--text);font-variant-numeric:tabular-nums} /* 번호는 이름 아래 한 줄 — 긴 번호가 이름 뒤에서 꺾이며 들여 쓰이지 않게 */
+.hp-help{margin-top:2px !important;font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted);text-wrap:balance}
+.hp-hours{margin-top:4px !important;font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--subtle)}
+.hp-acts{display:flex;flex-direction:column;gap:var(--sp-2)}
+.hp-foot{margin:var(--sp-8) 0 var(--sp-8)}
 .screen.done .done-head .caption{margin-top:var(--sp-1)}

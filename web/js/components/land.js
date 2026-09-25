@@ -1,4 +1,4 @@
-// 완료·온보딩의 장면(D-061): 흰 하늘 아래 색 언덕 셋과 흰 길, 그 위에 큰 친구와 조약돌. 친구는 테두리·상자 없이 그대로 선다.
+// 완료 화면의 장면(D-061 — 온보딩은 D-092로 welcome.js의 장면 이야기가 같은 언덕 색을 따로 그린다): 흰 하늘 아래 색 언덕 셋과 흰 길, 그 위에 큰 친구와 조약돌. 친구는 테두리·상자 없이 그대로 선다.
 // 좌표는 360×590 설계 상자(%로 옮겨 상자와 함께 커지고 줄어든다. 언덕은 상자 옆으로 더 뻗어 좁은 상자도 화면 폭을 채운다). feet은 친구 발의 y이고 친구 그림의 높이는 그림 비율이 정한다.
 import { el } from "../dom.js";
 import { friendImg, pebbleImg, FRIENDS } from "../data.js";
@@ -61,7 +61,7 @@ export function renderLand({ friends = [], pebbles = [], sun = true }) {
   if (!sun) svg.querySelector(".sun-g")?.remove();
 
   // 완료 화면(doneLayout)은 조약돌이 친구와 1:1(같은 순서·같은 key)이다 — 이때만 둘을 land-cell로 묶어 격자 모드에서 "발치 정렬"이 되게 한다.
-  // 온보딩(WELCOME)은 조약돌이 친구 수보다 적고 따로 흩어진 장식이라 묶지 않는다(격자 모드 대상도 아니다, D-083 ③은 세 화면만 지정).
+  // 친구와 조약돌이 1:1이 아닌 배치는 묶지 않는다(격자 모드 대상도 아니다, D-083 ③은 세 화면만 지정).
   const paired = friends.length > 0 && friends.length === pebbles.length && friends.every((f, i) => pebbles[i]?.key === f.key);
 
   const makeFriend = (f, i) => {
@@ -144,11 +144,3 @@ export function doneLayout(cats) {
   const pebbles = order.slice(0, n).map((key, i) => ({ key, ...L.pebbles[i] }));
   return { friends, pebbles };
 }
-
-// 온보딩 첫 화면: 아홉 친구가 언덕에 서 있고 조약돌이 조금 놓여 있다(D-061, 사용자 요청: 온보딩에 조약돌 조금).
-// 친구는 모두 같은 크기다(크기로 우열을 만들지 않는다 — 앞줄이 크면 슬픔·공포·혐오가 늘 커 보인다). 위치만 줄마다 어긋난다.
-export const WELCOME = {
-  friends: [["enjoyment", 24, 206], ["wish", 138, 200], ["anger", 252, 208], ["joy", 30, 298], ["love", 144, 292], ["hate", 250, 300], ["sadness", 22, 390], ["fear", 138, 396], ["disgust", 254, 388]]
-    .map(([key, x, feet]) => ({ key, w: 84, x, feet })),
-  pebbles: [{ key: "love", w: 22, x: 110, y: 150, r: -14 }, { key: "sadness", w: 26, x: 224, y: 146, r: 8 }, { key: "joy", w: 26, x: 222, y: 250, r: 12 }, { key: "fear", w: 24, x: 108, y: 300, r: 16 }, { key: "anger", w: 24, x: 190, y: 430, r: -8 }]
-};

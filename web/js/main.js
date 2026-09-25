@@ -2,23 +2,27 @@
 // 화면 전환은 주소의 # 뒤(#/today 등)로 한다 — 브라우저의 뒤로 가기가 그대로 동작하고, 앱의 화면 스택 방식은 정하지 않는다.
 // 주소 뒤에 ?를 붙이면 화면의 상태를 강제로 볼 수 있다(QA용): #/today?s=loading|draft|recorded|banner|ai
 import { applyTokens } from "./tokens.js";
-import { loadData } from "./data.js";
+import { loadData, data } from "./data.js";
 import { clearListeners } from "./state.js";
 import { reducedMotion } from "./dom.js";
 import { renderToday } from "./views/today.js";
-import { renderCalendar, renderRecord, renderSettings } from "./views/tabs.js";
+import { renderCalendar, renderRecord } from "./views/tabs.js";
+import { renderSettings, SETTINGS_PAGES } from "./views/settings.js";
 import { renderStats } from "./views/stats.js";
 import { renderWrite } from "./views/write.js";
-import { renderWelcome, renderHelp } from "./views/entry.js";
+import { renderHelp } from "./views/entry.js";
+import { renderWelcome } from "./views/welcome.js";
+import { finishSplash, dropSplash } from "./splash.js";
 
 const main = document.getElementById("main");
 const navRail = document.querySelector(".bottom-nav-rail");
-// fullscreen: 하단 탐색 없이 뒤로 가기가 있는 화면(작성 흐름·기록 상세·안내). scene: 어두운 숲 위에서 탐색이 유리가 된다(D-062).
+// fullscreen: 하단 탐색 없이 뒤로 가기가 있는 화면(작성 흐름·기록 상세·안내). 함수면 하위 경로로 정한다 — 통계의 친구 상세·설정의 하위 화면(D-091). scene: 어두운 숲 위에서 탐색이 유리가 된다(D-062).
 const ROUTES = {
   today: { view: renderToday, tab: "today", scene: "forest" },
   calendar: { view: renderCalendar, tab: "calendar" },
-  stats: { view: renderStats, tab: "stats" },
-  settings: { view: renderSettings, tab: "settings" },
+  // 아는 하위 경로만 전체 화면이다 — 모르는 값(#/stats/foo, #/settings/)은 각 화면이 목록으로 그리므로 탐색을 남겨야 갇히지 않는다.
+  stats: { view: renderStats, tab: "stats", fullscreen: (rest) => data.categories.some((c) => c.code === rest[0]) },
+  settings: { view: renderSettings, tab: "settings", fullscreen: (rest) => SETTINGS_PAGES.includes(rest[0]) },
   write: { view: renderWrite, tab: "today", fullscreen: true },
   record: { view: renderRecord, tab: "calendar", fullscreen: true },
   welcome: { view: renderWelcome, tab: "today", fullscreen: true },
@@ -33,7 +37,8 @@ function render() {
   const route = ROUTES[name];
   clearListeners();
   document.querySelector(".fly-stone")?.remove();
-  if (route.fullscreen) document.body.dataset.fullscreen = ""; else document.body.removeAttribute("data-fullscreen");
+  const fullscreen = typeof route.fullscreen === "function" ? route.fullscreen(rest) : route.fullscreen;
+  if (fullscreen) document.body.dataset.fullscreen = ""; else document.body.removeAttribute("data-fullscreen");
   if (route.scene) document.body.dataset.scene = route.scene; else document.body.removeAttribute("data-scene");
   route.view(main, navigate, new URLSearchParams(query), rest);
   const tab = route.tab;
@@ -71,7 +76,10 @@ try {
     else render();
   });
   render();
+  const first = location.hash.replace(/^#\//, "").split(/[/?]/)[0];
+  finishSplash(ROUTES[first] ? first : "today"); // 로딩 화면을 첫 화면에 맞춰 걷는다(D-092 ④)
 } catch (error) {
+  dropSplash(); // 로딩 화면이 오류 문구를 덮지 않게
   document.documentElement.classList.add("ready");
   main.textContent = "값 파일을 읽지 못했습니다. 이 시안은 미리보기 서버(node scripts/web-preview.mjs)로 열어야 합니다.";
   console.error(error);

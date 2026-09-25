@@ -154,5 +154,6 @@ export function renderLetter(record, { mode = "write", onEdit, onOpened, scene =
   }
   envBtn?.addEventListener("click", open);
   requestAnimationFrame(() => { paint(); markScrollers(); document.fonts?.ready.then(markScrollers); }); // 글꼴이 늦게 들어와 글 길이가 바뀌어도 넘침을 다시 본다
-  return { node: stage, open, isOpen: () => started, count: cards.length };
+  // frame: 달력(tabs.js)이 남는 자리에 맞춰 --card-h를 직접 재설정할 때 쓴다(2026-09-25 — 완료한 날은 미리보기 없이 곧장 이 틀을 연다).
+  return { node: stage, open, isOpen: () => started, count: cards.length, frame: stage.querySelector(".lt-frame") };
 }

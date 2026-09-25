@@ -1,6 +1,6 @@
 // 화면 시안(web/) 미리보기용 최소 정적 서버(의존성 없음). 사용: node scripts/web-preview.mjs [port]
 // web/을 "/"로 제공하고, 시안이 값을 베껴 적지 않도록 정본을 읽기 전용 경로로 함께 제공한다(D-047):
-//   /design/tokens.json, /data/taxonomy/v2.json,
+//   /design/tokens.json, /data/taxonomy/v2.json, /data/crisis-resources/kr.json(위기 안내 연락처, D-094),
 //   /design/fonts/*.woff2 (Pretendard 가변 폰트, D-057),
 //   /design/pebbles/ui/*.png (조약돌 화면용 파생본, D-050),
 //   /design/characters/flat-friends/ui/*.png (평면 친구 화면용 파생본, D-051)
@@ -19,6 +19,7 @@ const types = { ".html": "text/html; charset=utf-8", ".json": "application/json;
 const mounts = [
   ["/design/tokens.json", path.join(repo, "design", "tokens.json"), false],
   ["/data/taxonomy/v2.json", path.join(repo, "data", "taxonomy", "v2.json"), false],
+  ["/data/crisis-resources/kr.json", path.join(repo, "data", "crisis-resources", "kr.json"), false],
   ["/design/fonts/", path.join(repo, "design", "fonts"), true, [".woff2"]],
   ["/design/pebbles/ui/", path.join(repo, "design", "pebbles", "ui"), true, [".png"]],
   ["/design/characters/flat-friends/ui/", path.join(repo, "design", "characters", "flat-friends", "ui"), true, [".png"]],

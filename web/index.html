@@ -20,10 +20,15 @@
 <link rel="stylesheet" href="css/land.css">
 <link rel="stylesheet" href="css/flow.css">
 <link rel="stylesheet" href="css/stats.css">
+<link rel="stylesheet" href="css/settings.css">
+<link rel="stylesheet" href="css/settings-data.css">
+<link rel="stylesheet" href="css/welcome.css">
 <link rel="stylesheet" href="css/film.css">
 <script type="module" src="js/main.js"></script>
 </head>
 <body>
+<!-- 앱 시작 로딩 화면(D-092 ④): 스크립트보다 먼저 그려지는 빈 숲과 돌 하나. 300ms 안에 준비되면 보이지 않는다 — 걷는 일은 js/splash.js -->
+<div class="splash" id="splash" aria-hidden="true"><div class="splash-box"><img class="splash-art" src="splash.svg" alt=""><span class="splash-stone"><img src="/design/pebbles/ui/stone-rest-320.png" alt=""></span></div></div>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 <div class="app">
   <p class="proto-banner" role="note"><b>시안</b> 입력한 내용은 저장되거나 전송되지 않습니다</p>

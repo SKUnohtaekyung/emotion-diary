@@ -1,4 +1,4 @@
-/* 장면 — 오늘 화면의 어두운 숲(D-062)과 흰빛, 완료·온보딩의 색 언덕(D-061). 색은 전부 tokens.json의 변수다. */
+/* 장면 — 오늘 화면의 어두운 숲(D-062)과 흰빛, 완료 화면의 색 언덕(D-061). 색은 전부 tokens.json의 변수다. */
 
 /* ── 오늘: 어두운 숲 ── */
 .screen.today{padding:0;display:flex;flex-direction:column;position:relative;background:var(--forest-sky);color:var(--bg);min-height:calc(100dvh - var(--banner-h,2rem))}
@@ -119,7 +119,7 @@
 @keyframes typeup{0%{opacity:0;transform:translateY(18px)}100%{opacity:1;transform:none}}
 @keyframes skel{0%,100%{opacity:.6}50%{opacity:1}}
 
-/* ── 완료·온보딩: 흰 하늘 · 색 언덕 · 흰 길 ── */
+/* ── 완료: 흰 하늘 · 색 언덕 · 흰 길 ── */
 .screen.done{position:relative;padding:var(--sp-5) 0 0;display:flex;flex-direction:column;background:var(--bg);overflow:hidden}
 .screen.done .done-head{padding:0 var(--sp-5)}
 .screen.done .hero{font-size:clamp(1.6rem,8.6vw,2.1rem);line-height:1.2;margin:0 0 var(--sp-2)}

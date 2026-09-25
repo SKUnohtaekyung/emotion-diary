@@ -1,4 +1,4 @@
-/* ── 완료·온보딩 언덕(.land) 기본 규칙 — 2026-09-25 scene.css·tabs.css에서 이 파일로 모았다(규칙 값은 그대로). ── */
+/* ── 완료 화면 언덕(.land, 온보딩은 welcome.css의 .ob-land) 기본 규칙 — 2026-09-25 scene.css·tabs.css에서 이 파일로 모았다(규칙 값은 그대로). ── */
 @keyframes lfin{0%{opacity:0;transform:translateY(16px) scale(.96)}100%{opacity:1;transform:none}}
 @keyframes lfbob{0%,100%{transform:translateY(0)}50%{transform:translateY(-1.6%)}}
 @keyframes sunpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}

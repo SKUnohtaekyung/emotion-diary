@@ -164,6 +164,36 @@ if (fs.existsSync(path.join(root, "scripts/check-characters.mjs"))) {
   else if (chars.status !== 0) failures.push(`캐릭터 아이콘 검사 실패: ${(chars.stdout + chars.stderr).trim().split(/\r?\n/).slice(-3).join(" | ")}`);
 }
 
+// 위기 안내 연락처(D-094, SAFETY_POLICY §6 ③의 versioned resource): 필수 필드, 공식 출처(정부·공공 누리집)만, 공식 확인을 마친 번호만.
+// 목록 밖 번호(예: 109 통합 뒤 연결 여부 미확인인 1393)가 들어오면 실패한다 — 새 번호는 research 문서에 공식 출처를 남기고 이 목록에 더한다.
+{
+  const crisisPath = path.join(root, "data/crisis-resources/kr.json");
+  if (fs.existsSync(crisisPath)) {
+    const CRISIS_NUMBERS = new Set(["109", "1388", "1577-0199", "112", "119"]);
+    const officialHost = (u) => { try { const h = new URL(u).hostname; return /(^|\.)go\.kr$/.test(h) || h === "www.korea.kr" || h === "korea.kr"; } catch { return false; } };
+    try {
+      const res = JSON.parse(fs.readFileSync(crisisPath, "utf8"));
+      const bad = [];
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(res.checked ?? "")) bad.push("checked(확인일) 형식");
+      if (!res.review || !("clinicalSafety" in res.review)) bad.push("review.clinicalSafety 없음");
+      for (const c of [...(res.contacts ?? []), ...(res.emergency ?? [])]) {
+        if (!CRISIS_NUMBERS.has(c.number)) bad.push(`확인되지 않은 번호 ${c.number}`);
+        if (c.sms && !CRISIS_NUMBERS.has(c.sms)) bad.push(`확인되지 않은 문자 번호 ${c.sms}`);
+        if (!c.name || !c.owner) bad.push(`${c.number} 이름·소관 없음`);
+        if (!Array.isArray(c.sources) || !c.sources.length || !c.sources.every(officialHost)) bad.push(`${c.number} 출처가 공식 누리집이 아님`);
+      }
+      if (!(res.contacts ?? []).every((c) => c.help && c.hours)) bad.push("contacts의 help·hours 없음");
+      if (bad.length) failures.push(`위기 연락처 검사 실패(data/crisis-resources/kr.json): ${bad.slice(0, 4).join(" | ")}`);
+    } catch (error) { failures.push(`위기 연락처 JSON 구문 오류: ${error.message}`); }
+  }
+}
+
+// 로딩 화면 숲 그림(web/splash.svg)이 오늘 화면의 숲(forest.js)·토큰 색과 같은지(D-092 ④). 값 파일보다 먼저 그려져야 해서 색을 굳힌 생성 파일이다.
+if (fs.existsSync(path.join(root, "scripts/build-splash.mjs"))) {
+  const splash = spawnSync(process.execPath, [path.join(root, "scripts/build-splash.mjs"), "--check"], { cwd: root, encoding: "utf8" });
+  if (splash.status !== 0) failures.push(`로딩 화면 그림 검사 실패: ${(splash.stdout + splash.stderr).trim().split(/\r?\n/).slice(-2).join(" | ")}`);
+}
+
 // taxonomy 데이터 검사(TASK-TAXONOMY §9.3): schema 대조 + 등급 도출·매핑 누락·인용 15단어.
 // data/taxonomy/가 없으면 검사기가 pending으로 통과한다.
 if (fs.existsSync(path.join(root, "scripts/check-taxonomy.mjs"))) {
