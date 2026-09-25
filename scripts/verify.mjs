@@ -17,6 +17,8 @@ if (!["quick", "full"].includes(mode)) {
 
 const required = [
   "BOOTSTRAP.md", "README.md", "AGENTS.md", "CLAUDE.md", "PRD.md",
+  // AGENTS §1·CLAUDE.md가 세션 시작 때 읽게 하는 서비스 WHY(2026-09-24). 없으면 그 규칙이 조용히 깨진다.
+  "docs/SERVICE_WHY.md",
   "docs/ARCHITECTURE.md", "docs/DATA_MODEL.md", "docs/UX_SPEC.md",
   "docs/AI_RAG_SPEC.md", "docs/SAFETY_POLICY.md", "docs/EVAL_PLAN.md",
   "docs/AGENT_WORKFLOW.md", "docs/DECISIONS.md", "docs/ROADMAP.md",

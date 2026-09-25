@@ -18,6 +18,18 @@
       "bytes": 221,
       "sha256": "b1d77d38991cf0d4cb07c6f566e759001f90fc70258961736ce611ac1ed80c57",
       "role": "감정일기 원형 6영역과 순서"
+    },
+    {
+      "path": "source/benchmark/emotion_diary_benchmark_integrated.md",
+      "bytes": 220570,
+      "sha256": "6ea9d028002344b64649e0a6db9fbedb8eb865c91b09ae382ceb5aa10574ffc0",
+      "role": "시장·경쟁 벤치마킹 원자료(두 외부 심층 리서치의 통합본, 2026-09-24 사용자 제공) — 분석은 docs/research/benchmark-2026-09-analysis.md"
+    },
+    {
+      "path": "source/why/emotion_diary_service_why_final.md",
+      "bytes": 41379,
+      "sha256": "285df85b627a5ec415ecebe6d00f703269249b19a55401b5e2dd92ed60bf7256",
+      "role": "서비스 WHY(서비스를 만들게 된 핵심 이유) 원본, 2026-09-24 사용자 제공 — 세션마다 읽는 정본은 같은 바이트로 복사한 docs/SERVICE_WHY.md"
     }
   ]
 }
