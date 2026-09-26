@@ -25,8 +25,8 @@
 .cal-big{display:block;font-size:clamp(3.8rem,21vw,5.25rem);font-weight:900;letter-spacing:-.055em;line-height:.92;margin:.04em 0 0 -.05em}
 .cal-arrow{display:grid;place-items:center;flex:none;width:44px;height:44px;border:0;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
 .cal-arrow svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-/* 날짜 칸은 줄 단위로 살짝 튀어 들어온다: 줄마다 50ms, 줄 안에서 12ms 간격(--tb-d는 tabs.js가 준다). 한 번뿐(펼친 달만 — 접힌 한 주는 튀어 들어오지 않는다, 매번 반복되면 산만하다). */
-.calendar .cal:not(.cal-week) .day{animation:tb-pop 340ms var(--spring) backwards;animation-delay:calc(160ms + var(--tb-d,0ms))}
+/* 날짜 칸은 줄 단위로 살짝 튀어 들어온다: 줄마다 50ms, 줄 안에서 12ms 간격(--tb-d는 tabs.js가 준다). 화면에 처음 들어올 때 한 번뿐이다(매번 반복되면 산만하다). */
+.calendar .cal .day{animation:tb-pop 340ms var(--spring) backwards;animation-delay:calc(160ms + var(--tb-d,0ms))}
 /* 처음 들어올 때만 튀어 들어온다 — 날짜 고르기·달 넘기기·펼치기/닫기로 다시 그릴 때는(tabs.js paintGrid가 붙이는 cal-settled) 칸이 가만히 있고,
    누른 날짜 하나만 제자리에서 좌우로 살짝 까딱인다(오늘 화면 가운데 돌의 흔들림과 같은 말투, 420ms 한 번). transform은 조약돌 모양 뒤집기(::before)와
    부딪히지 않게 개별 속성 rotate로 준다. 움직임 줄이기에서는 아래 reduce 규칙이 둘 다 끈다(2026-09-25 사용자 요청). */
@@ -42,8 +42,7 @@
 .screen.calendar.folded .cal-unfold{margin:var(--sp-4) 0 0}
 .screen.calendar.folded .cal-letter-panel:not(:empty){margin-top:var(--sp-4);padding-bottom:0}
 .screen.calendar.folded{padding-bottom:var(--sp-4)} /* 날짜를 고른 동안은 작은 편지가 마지막이다 — 아래 여백을 줄여 6줄 달(375×812)에서도 빈 여백 때문에 페이지가 스크롤되지 않게(D-100 ③) */
-/* "날짜는 골랐지만 아직 안 접힌" 중간 상태(previewing)는 2026-09-25에 없어졌다 — 날짜를 고르면 folded까지 한 번에 간다(위 selectDate).
-   펼친 상태의 윗줄(재작업 3회차, D-090 ② — 구조는 그대로: 왼쪽 닫기 · 가운데 날짜+예시 태그. '크게 보기' 알약은 2026-09-25에 없앴다. 밑줄 링크는 이 줄에 없다.
+/* 날짜를 고른 동안의 윗줄(D-090 ② — 왼쪽 닫기 · 가운데 날짜+예시 태그 · 오른쪽 ⋯, 밑줄 링크 없음).
    × 원은 보이는 높이 36px로 줄이고(전 44px), 누르는 자리는 ::after로 44px을 그대로 지킨다(.cal-pv-pill과 같은 방식). */
 .cal-unfold{display:flex;align-items:center;gap:var(--sp-2);margin:var(--sp-2) 0 0}
 .cal-close-btn,.cal-more-btn{position:relative;width:36px;height:36px;border:0}
@@ -60,15 +59,13 @@
 /* tabs.css .proto-tag{margin-left:var(--sp-1)}(달력 밖 다른 화면을 위한 전역 규칙, 그 파일 소유가 아니라 여기서만 0으로 되돌린다)가 8px gap 위에 4px을 더 얹어
    날짜와 태그가 12px 떨어져 보였다(2배 확대 실측) — 이 줄에서만 지운다. */
 .cal-unfold-tag-slot .proto-tag{white-space:nowrap;margin-left:0}
-/* .cal-biglink-slot·.cal-big-link('크게 보기' 알약)는 2026-09-25 사용자 요청으로 지웠다 — 완료한 날은 이제 이 자리에서 곧장 남는 자리를 다 쓰는
-   큰 편지가 열리므로 따로 "크게" 갈 곳이 필요 없다. 밑줄 링크는 달력 화면에서 모두 없앤다(재작업 2회차 지시) — base.css .link의 기본 밑줄을 이 화면 범위에서만 덮는다. */
+/* 밑줄 링크는 달력 화면에서 모두 없앤다(재작업 2회차 지시) — base.css .link의 기본 밑줄을 이 화면 범위에서만 덮는다. ('크게 보기' 알약 .cal-big-link는 2026-09-25에 지웠다.) */
 .screen.calendar .link{text-decoration:none}
 
 /* 달 아래 남는 자리가 미리보기(또는 편지)를 채운다: .screen이 이미 main 안에서 flex:1로 늘어나 있으니(base.css), tb-body와 panel도 flex 열로 이어 그 남는 높이를 panel이 받는다.
    panel의 min-height:0은 표준적인 flex 눌림 방지 해제다(panel 자신은 내용이 없어도 눌릴 수 있다) — .cal-preview 자신은 min-height 없이
    내용(줄 수)만큼만 자라므로(D-090 ①), 실제 바닥은 그 내용 높이가 잡는다(아무 날도 고르지 않았을 때만 .cal-pv-empty의 min-height:132px가 대신 잡는다, 아래).
-   완료한 날의 큰 편지는 fitLetterHeight(tabs.js)가 이 남는 자리에 맞춰 --card-h를 재지만 376px 밑으로는 줄이지 않으므로(RK-030) 아주 좁은 화면에서는
-   카드가 예산보다 커질 수 있다 — 이때는 이 flex 계산이 자연히 화면 전체(.app min-height:100dvh)를 늘려 페이지 스크롤이 생긴다(D-088 ④가 허용) — 따로 overflow를 막지 않는다. */
+   완료한 날의 작은 편지(D-100 ③)는 tabs.js miniRoom이 남는 높이에 맞춰 높이를 정한다(132~220px) — 132px 밑의 아주 작은 화면에서는 페이지가 조금 스크롤된다. */
 .screen.calendar{display:flex;flex-direction:column}
 .screen.calendar>.tb-body{display:flex;flex-direction:column;flex:1;min-height:0}
 .cal-letter-panel{display:flex;flex-direction:column;flex:1;min-height:0}
@@ -120,12 +117,12 @@
 /* ── 완료한 날 = 작은 편지(D-100 ③, components/mini-letter.js) ──
    편지 카드(write.css .t1·.t2·.t3)와 같은 말투를 작게: 감정 카드는 그 계열 300 면·감정 이름 800·조약돌·세부 감정 알약(흰 72%)·크기,
    있었던 일과 이유는 종이(--paper), 칭찬·감사는 크림(service-light). 높이는 --ml-h(tabs.js가 달 아래 남는 높이로 잰다, 132~220px).
-   카드 전체를 덮는 투명 버튼(.ml-open)이 편지 전체를 열고, 고치기 태그(.ml-edit)만 그 위에서 따로 눌린다. 옆 카드가 20px 보여 넘길 수 있음을 알린다. */
+   카드 전체를 덮는 투명 버튼(.ml-open)이 편지 전체를 열고, 고치기 태그(.ml-edit)만 그 위에서 따로 눌린다. 옆 카드는 엿보이지 않는다(2026-09-25 사용자 "옆에 살짝 보이는 것 없애줘" — 편지와 같다) — 넘길 수 있음은 아래 ‹ 점 ›이 알린다. */
 .ml{--ml-h:180px}
-.ml-pager{display:flex;gap:8px;margin:0 calc(var(--sp-5) * -1);padding:0 var(--sp-5);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--sp-5);scrollbar-width:none}
+.ml-pager{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;border-radius:22px}
 .ml-pager::-webkit-scrollbar{display:none}
 .ml-pager:focus-visible{outline-offset:-3px;border-radius:22px}
-.ml-card{position:relative;flex:0 0 calc(100% - 20px);height:var(--ml-h);display:flex;flex-direction:column;padding:14px 16px;border-radius:22px;overflow:hidden;scroll-snap-align:start;color:var(--service-ink);transition:transform var(--dur-fast) var(--ease)}
+.ml-card{position:relative;flex:0 0 100%;height:var(--ml-h);display:flex;flex-direction:column;padding:14px 16px;border-radius:22px;overflow:hidden;scroll-snap-align:start;color:var(--service-ink);transition:transform var(--dur-fast) var(--ease)}
 .ml-emo{background:var(--tint)}
 .ml-paper{background:var(--paper)}
 .ml-note{background:var(--service-light)}

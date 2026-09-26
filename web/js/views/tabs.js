@@ -17,7 +17,7 @@ const friendsRow = (cats, size = 54) => el("span", { class: "friend-row" }, cats
 const chev = (dir) => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: dir < 0 ? "M14.5 5.5 8 12l6.5 6.5" : "M9.5 5.5 16 12l-6.5 6.5" }));
 // 재작업 2회차(D-088) 아이콘 셋 — 선 두께 2.4·둥근 끝으로 .cal-arrow와 같은 말투다.
 const closeIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M6 6l12 12M18 6 6 18" })); // × (닫기)
-// '펼쳐 읽기'·'크게 보기'는 2026-09-25 사용자 요청으로 없앴다(완료한 날은 곧장 큰 편지가 열린다) — expandGlyph·openIcon도 함께 지웠다.
+// '펼쳐 읽기'·'크게 보기' 알약은 2026-09-25에 없앴다 — expandGlyph·openIcon도 함께 지웠다. 완료한 날은 지금 작은 편지(D-100 ③)다.
 // 재작업 4회차(D-090 ①, 리뷰어 지적 — 문 폭이 원본과 달랐다) 미리보기 버튼 줄 아이콘. 집은 index.html 하단 탐색 '오늘' 아이콘의 ic-line 경로를 그대로 쓴다
 // (거기서도 fill:none;stroke:currentColor로 그리는 닫힌 윤곽선이라 손으로 다시 그리지 않고 같은 d 값을 옮긴다).
 const homeGlyph = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M12 4 4 10.4V20h4.5v-6h7v6H20v-9.6z" })); // 집(오늘 화면으로)
@@ -32,8 +32,7 @@ const parseISO = (s) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s ?? ""); i
   return date.getFullYear() === y && date.getMonth() === mo - 1 && date.getDate() === d ? date : null; };
 // 줄 노트 한 줄(D-090 ①) — 글자를 span(.cal-pv-txt)으로 감싸 CSS의 align-items:flex-end(줄 아래 정렬)에서도 줄임말(ellipsis)이 그대로 된다.
 const pvLine = (text, cls = "") => el("p", { class: `cal-pv-ln${cls}` }, el("span", { class: "cal-pv-txt", text }));
-// fitPreviewCard·nonblank(있었던 일 이하 줄을 남는 높이만큼 채우던 계산)는 2026-09-25 사용자 요청으로 지웠다 — 완료한 날은 더 이상 작은 쪽지를
-// 먼저 보여주지 않고 곧장 큰 편지 카드(buildExpanded)를 연다. 이제 buildPreview는 임시저장·오늘·기록 없음처럼 줄 수가 고정된 상태만 맡는다.
+// fitPreviewCard·nonblank(줄 수를 남는 높이에 맞추던 쪽지 계산)는 2026-09-25에 지웠다. buildPreview는 임시저장·오늘·기록 없음만 맡고, 완료한 날은 작은 편지(buildMini, D-100 ③)다.
 // 요일 전체 판을 다시 그리지 않고 판(panel) 안 내용만 잇는 연속 전환(D-088 ③) — 미리보기↔편지에 같은 view-transition-name(cal-pv-morph, CSS)을 준다.
 // 지원하지 않는 브라우저는 짧은 페이드로 대신한다. 움직임 줄이기에서는 paintPanel이 이 함수를 부르지 않고 즉시 바꾼다.
 function panelTransition(panel, run) {
@@ -89,13 +88,12 @@ export function renderCalendar(main, navigate, params) {
   const protoNote = emptyMode ? el("p", { class: "proto-note" }, el("span", { class: "proto-tag", text: "시안" }), el("span", { text: " 마음을 남기면 여기에 쌓여요." })) : null;
   const weekHead = el("div", { class: "cal-head", "aria-hidden": "true" }, WEEKDAYS7.map((w) => el("span", { text: w })));
   const gridWrap = el("div", { class: "cal-grid-wrap" });
-  // 펼친 상태의 위쪽 줄: 왼쪽 44px 원형 닫기(.cal-arrow) · 가운데 날짜+예시 태그. '크게 보기' 알약은 2026-09-25 사용자 요청으로 없앴다
-  // (완료한 날은 이제 미리보기 없이 곧장 이 자리에서 큰 편지가 열리므로 따로 "크게" 갈 곳이 필요 없다) — bigLinkSlot·cal-big-link도 함께 지웠다.
+  // 날짜를 고른 동안의 위쪽 줄: 왼쪽 원형 닫기(.cal-arrow) · 가운데 날짜+예시 태그 · 오른쪽 ⋯(완료한 날만). '크게 보기' 알약 자리(bigLinkSlot)는 2026-09-25에 지웠다.
   const closeBtn = el("button", { type: "button", class: "cal-arrow cal-close-btn", "aria-label": "한 달 보기로 닫기", onclick: () => closeExpand() }, closeIcon());
   const unfoldName = el("span", { class: "cal-unfold-name" });
   const unfoldTagSlot = el("span", { class: "cal-unfold-tag-slot" });
   const unfoldTitle = el("div", { class: "cal-unfold-title" }, unfoldName, unfoldTagSlot);
-  const unfoldMoreSlot = el("span", { class: "cal-unfold-more" }); // 완료한 날의 큰 편지일 때만 ⋯(기록 메뉴)가 들어온다(D-096)
+  const unfoldMoreSlot = el("span", { class: "cal-unfold-more" }); // 완료한 날일 때만 ⋯(기록 메뉴)가 들어온다(D-096)
   const unfoldRow = el("div", { class: "cal-unfold" }, closeBtn, unfoldTitle, unfoldMoreSlot);
   const panel = el("div", { class: "cal-letter-panel", tabindex: "-1" }); // tabindex: 펼칠 때 이 영역(region)으로 초점을 옮긴다
   const legendItem = (props, text) => el("li", {}, dayCell({ tag: "span", mini: true, "aria-hidden": "true", ...props }), ` ${text}`);
@@ -144,9 +142,7 @@ export function renderCalendar(main, navigate, params) {
     gridWrap.classList.toggle("cal-settled", gridPainted); gridPainted = true;
     gridWrap.replaceChildren(buildMonthGrid()); // 날짜를 골라도 한 달 전체 그대로다(D-100 ① — 2026-09-25의 '그 주 한 줄로 접힘'을 대체)
   }
-  // 미리보기 = 내용만큼의 쪽지(달 아래 남는 자리, D-090 ①). 완료한 날은 2026-09-25부터 이 쪽지를 거치지 않고 곧장 buildExpanded로 간다
-  // (paintPanel이 status로 미리 가른다) — 그래서 이 함수는 이제 임시저장·오늘·기록 없음만 맡고, 날짜·예시 태그는 그리지 않는다
-  // (선택한 날은 항상 위 unfoldRow가 보여준다 — 두 자리에 같은 날짜가 겹쳐 보이지 않게 한다).
+  // 미리보기 = 내용만큼의 쪽지(달 아래 남는 자리, D-090 ①) — 임시저장·오늘·기록 없음만 맡는다(완료한 날은 아래 buildMini). 날짜·예시 태그는 위 unfoldRow가 보인다.
   function buildPreview(iso) {
     const dLabel = shortDay(iso), dLabelFull = shortDayWeekday(iso), date = parseISO(iso), status = statusOf(date);
     let msg, tailLine, btnRow = null;
@@ -285,8 +281,7 @@ function editAt(rec, navigate) {
   };
 }
 
-// 기록 하나의 ⋯ 메뉴(고치기·완료 취소·삭제). 기록 상세(#/record/…)와 달력에서 연 큰 편지(D-096)가 같은 메뉴를 쓴다 —
-// 달력에서 곧장 큰 편지를 열게 되며 기록 상세로 가는 길('크게 보기')이 없어져, 완료 취소·삭제에 닿을 곳이 달력에도 있어야 한다.
+// 기록 하나의 ⋯ 메뉴(고치기·완료 취소·삭제). 기록 상세(#/record/…)와 달력의 날짜 줄(완료한 날, D-096)이 같은 메뉴를 쓴다 —
 function recordMenu(iso, rec, real, navigate) {
   const menu = () => {
     const sh = openSheet({ title: `${shortDay(iso)}의 기록`, secondary: { text: "닫기" }, body: [

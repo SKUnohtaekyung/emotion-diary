@@ -54,7 +54,7 @@ const sceneLayer = (cats) => el("div", { class: "lt-scene", "aria-hidden": "true
   MOTES.map(([x, y, s, t, d, ax, ay, bx, by]) => el("i", { class: "lt-mote", style: { "--x": px(x), "--y": px(y), "--s": px(s), "--t": `${t}s`, "--d": `${d}s`, "--ax": px(ax), "--ay": px(ay), "--bx": px(bx), "--by": px(by) } })),
   arcPebbles(cats));
 
-export function renderLetter(record, { mode = "write", onEdit, onOpened, scene = true } = {}) { // scene:false — 달력 인라인(A2): 책상 장면·봉투 없이 카드 묶음만(코디네이터 지시, 2026-09-24)
+export function renderLetter(record, { mode = "write", onEdit, onOpened } = {}) { // 달력 인라인 갈래(scene:false)는 D-100 ③(달력은 작은 편지 mini-letter.js)으로 쓰는 곳이 없어 2026-09-26 지웠다
   const cats = record.cats.filter((c) => record.emotions.some((e) => e.cat === c));
   const cards = [];
   const CARD_CHIPS = 8, MANY_FROM = 5; // 카드 한 장에 최대 8개(9개부터 이어지는 카드), 5개부터 32px/2열(열마다 최대 4개) — D-079, 2026-09-24 사용자 확정
@@ -112,21 +112,15 @@ export function renderLetter(record, { mode = "write", onEdit, onOpened, scene =
   const prev = el("button", { type: "button", class: "ar", "aria-label": "이전 장" }, chevron(-1)), next = el("button", { type: "button", class: "ar", "aria-label": "다음 장" }, chevron(1));
   const nav = el("div", { class: "letter-nav" }, prev, el("div", { class: "dd", "aria-hidden": "true" }, dots), next);
 
-  let envBtn = null, stage;
-  if (scene) {
-    const { back, front } = envelope();
-    envBtn = el("button", { type: "button", class: "envfront", "aria-label": "편지 봉투 열기" }, front);
-    const flap = el("div", { class: "flapwrap" }, el("div", { class: "flap" }, el("div", { class: "f-out" }), el("div", { class: "f-in" }), el("div", { class: "sealw" }, el("i", { class: "seal" }))));
-    // 배경은 편지 틀(폭 360px, 높이는 --card-h를 따라간다, D-079)에 붙는 한 겹이다. 틀은 위 글과 아래 버튼 줄 사이의 한가운데에 놓인다(letter-scene.css).
-    // 그날 고른 조약돌은 이제 봉투를 열 때 튀어나오는 연출이 아니라 길가에 처음부터 놓여 있다(배경 개편, 2026-09-24) — sceneLayer(cats)가 그린다.
-    stage = el("div", { class: `letter-stage ${mode === "read" ? "opened" : "closed"}` },
-      el("div", { class: "lt-frame" }, sceneLayer(cats),
-        el("div", { class: "envback" }, back), el("div", { class: "pagerclip" }, pager), envBtn, flap,
-        el("p", { class: "envcap", text: "봉투를 눌러 열어요" }), nav));
-  } else {
-    // 달력 인라인: 책상 장면·봉투 없이 카드 묶음+넘김 줄만. 틀 폭은 같은 lt-frame이지만 높이(--card-h)는 write.css .lt-frame-inline이 달력 자리에 맞춰 따로 정한다.
-    stage = el("div", { class: "letter-stage opened" }, el("div", { class: "lt-frame lt-frame-inline" }, el("div", { class: "pagerclip" }, pager), nav));
-  }
+  const { back, front } = envelope();
+  const envBtn = el("button", { type: "button", class: "envfront", "aria-label": "편지 봉투 열기" }, front);
+  const flap = el("div", { class: "flapwrap" }, el("div", { class: "flap" }, el("div", { class: "f-out" }), el("div", { class: "f-in" }), el("div", { class: "sealw" }, el("i", { class: "seal" }))));
+  // 배경은 편지 틀(폭 360px, 높이는 --card-h를 따라간다, D-079)에 붙는 한 겹이다. 틀은 위 글과 아래 버튼 줄 사이의 한가운데에 놓인다(letter-scene.css).
+  // 그날 고른 조약돌은 이제 봉투를 열 때 튀어나오는 연출이 아니라 길가에 처음부터 놓여 있다(배경 개편, 2026-09-24) — sceneLayer(cats)가 그린다.
+  const stage = el("div", { class: `letter-stage ${mode === "read" ? "opened" : "closed"}` },
+    el("div", { class: "lt-frame" }, sceneLayer(cats),
+      el("div", { class: "envback" }, back), el("div", { class: "pagerclip" }, pager), envBtn, flap,
+      el("p", { class: "envcap", text: "봉투를 눌러 열어요" }), nav));
 
   const STEP = () => pager.firstElementChild ? pager.firstElementChild.getBoundingClientRect().width + 8 : 336; // +8은 write.css .pager의 gap, 336은 카드 328 + 그 gap(D-079)
   const index = () => Math.round(pager.scrollLeft / STEP());
@@ -160,8 +154,8 @@ export function renderLetter(record, { mode = "write", onEdit, onOpened, scene =
     stage.className = "letter-stage opening";
     setTimeout(() => done(`편지를 열었어요. 카드 ${cards.length}장, 옆으로 넘겨서 확인해요`), 2400);
   }
-  envBtn?.addEventListener("click", open);
+  envBtn.addEventListener("click", open);
   requestAnimationFrame(() => { paint(); markScrollers(); document.fonts?.ready.then(markScrollers); }); // 글꼴이 늦게 들어와 글 길이가 바뀌어도 넘침을 다시 본다
   // frame: 달력(tabs.js)이 남는 자리에 맞춰 --card-h를 직접 재설정할 때 쓴다(2026-09-25 — 완료한 날은 미리보기 없이 곧장 이 틀을 연다).
-  return { node: stage, open, isOpen: () => started, count: cards.length, frame: stage.querySelector(".lt-frame") };
+  return { node: stage, open, count: cards.length };
 }

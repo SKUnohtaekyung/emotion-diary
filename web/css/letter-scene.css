@@ -36,19 +36,13 @@ main:has(.screen.review),main:has(.screen.record){
    틀의 가운데 = 닫힌 봉투의 가운데 = 열린 카드 묶음(카드 + 페이저 줄)의 가운데라서 열려도 자리가 튀지 않는다. 위아래 최소 간격은 검토 화면에서 안내 글 아래 12px과 버튼 줄 위 패딩 12px, 기록 상세에서 위아래 6px이다. */
 .letter-stage{position:static;left:auto;width:auto;height:auto;margin:auto 0}
 .lt-frame{--lt-h:74px;--card-w:328px;--card-h:clamp(376px, calc(100dvh - 360px), 448px);--frame-h:calc(var(--card-h) + 54px);--lt-shadow-y:24px;position:relative;width:360px;height:var(--frame-h);left:50%;margin:0 0 0 -180px}
-/* 달력 인라인(tabs.js): 책상 장면·봉투가 없어 틀이 카드+페이저 줄만큼만 필요하고, 화면 패딩 안(칸 폭)에 그대로 들어가야 해서 360px 고정폭 트릭을 쓰지 않는다.
-   카드 최솟값은 기록 상세·검토와 같은 376px다 — 그 밑으로는 .t1 안 이름·알약·크기 자리 공식(write.css)이 겹치기 시작해 새로 유도해야 한다(RK-030과 같은 이유).
-   --card-h는 이제(2026-09-25) 고정값이 아니라 tabs.js의 fitLetterHeight가 남는 자리에 맞춰 이 요소에 직접 setProperty한다 — 완료한 날은 미리보기 없이
-   곧장 이 카드가 열리고 하단 탐색 위까지 자리를 다 쓴다(사용자 요청 "첫 번째 화면에선 애초에 크게 볼 수 있게"). 아래 값은 JS가 붙기 전 첫 렌더용 기본값이다. */
-.lt-frame-inline{position:relative;left:auto;width:100%;margin:0;--card-w:100%;--card-h:376px}
 
 /* ── 카드 한 장만 보인다(2026-09-25 사용자 지적 — "옆에 살짝 보이는 것 없애줘. 배경에 파묻힌 느낌") ──
    write.css의 .pager는 자기 padding(0 16px)으로 카드 자리를 안쪽에 잡는데, padding은 overflow:auto의 스크롤 자리(padding box) 안이라
    카드(내용 상자, 100%)를 넘어 그 padding 자리로 다음 카드의 8px(gap)이 넘겨봤다 — pager 자신의 padding을 0으로 지우고, 봉투 틀(.lt-frame, 360px
    고정)에서는 카드 자리를 left/right 16px로 직접 잡아 pager의 스크롤 자리 자체가 카드 폭과 정확히 같아지게 한다(가로 슬랙 0 — 다음 카드는 pager
-   자신의 overflow가 가린다, --card-w:328px과 정확히 같은 계산: 360 − 16 − 16 = 328). 달력 인라인(.lt-frame-inline)은 화면 padding이 이미
-   카드 자리를 주므로 pager를 폭 그대로 둔다(추가 여백 없음, --card-w:100%와 그대로 맞는다). */
-.lt-frame:not(.lt-frame-inline) .pager{left:16px;right:16px;width:auto}
+   자신의 overflow가 가린다, --card-w:328px과 정확히 같은 계산: 360 − 16 − 16 = 328). */
+.lt-frame .pager{left:16px;right:16px;width:auto}
 
 /* ── 종이 카드에 옅고 넓은 그림자 한 겹(2026-09-25 사용자 요청 — "배경보다 위로 올라와 보이게"). DESIGN_SYSTEM §2 원칙6 "그림자 없음"의 새 예외다
    (문서는 메인이 고친다) — 가까운 접지 그림자(작고 조금 진함) + 넓은 확산 그림자(크고 아주 옅음) 두 겹을 한 box-shadow에 담는다. 둘 다 ink를 12% 이하로만
