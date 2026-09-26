@@ -30,7 +30,8 @@ function ruled(id, label, hint, value, onInput, { rows = 5 } = {}) {
   ta.value = value;
   ta.addEventListener("input", () => { onInput(ta.value); autoGrow(ta); if (ta.value.trim()) document.getElementById(`${id}Error`).hidden = true; });
   requestAnimationFrame(() => autoGrow(ta));
-  return el("div", { class: "field" }, el("label", { for: id, class: "field-label", text: label }), ta, el("p", { class: "field-error", id: `${id}Error`, hidden: true }));
+  // aria-describedby가 가리키는 안내 글을 실제로 둔다(D-099 text-input K1) — 자리표시자는 값이 생기면 사라져 다시 들을 수 없다. 화면에는 자리표시자가 같은 말을 보인다.
+  return el("div", { class: "field" }, el("label", { for: id, class: "field-label", text: label }), el("p", { class: "sr", id: `${id}Hint`, text: hint }), ta, el("p", { class: "field-error", id: `${id}Error`, hidden: true }));
 }
 function slots(kind, name, values) {
   return el("fieldset", { class: "field slots-field", id: `slots-${kind}` }, el("legend", { class: "field-label", text: `${name}할 점, 세 가지까지` }),
@@ -49,18 +50,20 @@ function buildSteps() {
 }
 
 // "다음"을 막는 이유(없으면 null). 날짜·사건·이유는 편지에서 남길 때 확인한다.
+// 이 말은 오류가 아니라 할 일을 알려 주는 안내다(D-098 ③) — 고를 자리 바로 위에 ink 글자로 뜬다.
 function blockedReason(step) {
   const d = state.draft;
-  if (step.key === "cats") return d.cats.length ? null : "마음을 하나 이상 골라 주세요.";
-  if (step.cat) return d.emotions.some((e) => e.cat === step.cat) ? null : "세부 감정을 하나 이상 골라 주세요.";
+  if (step.key === "cats") return d.cats.length ? null : "가까운 마음을 하나 고르면 다음으로 갈 수 있어요.";
+  if (step.cat) return d.emotions.some((e) => e.cat === step.cat) ? null : "가까운 말을 하나 고르면 다음으로 갈 수 있어요.";
   if (step.key === "intensity") return d.cats.some((cat) => d.emotions.some((e) => e.cat === cat) && d.repr[cat] == null) ? "모든 계열의 크기를 정해 주세요." : null;
   return null;
 }
 function showBlocked(step) {
   const message = blockedReason(step);
   if (!message) return;
-  if (step.key === "cats") { const n = document.getElementById("catsError"); n.textContent = message; n.hidden = false; document.querySelector(".ff, .fr")?.focus(); }
-  else if (step.cat) { const n = document.getElementById(`detailError-${step.cat}`); n.textContent = message; n.hidden = false; document.querySelector(`#cloud-${step.cat} .choice`)?.focus(); }
+  // 빨간 오류(field-error)는 실제 입력 오류(남기기를 눌렀는데 빈 곳)에만 쓴다. 여기서는 안내 한 줄을 띄우고 첫 선택지로 초점을 옮긴다(D-098 ③).
+  if (step.key === "cats") { const n = document.getElementById("catsHint"); n.textContent = message; n.hidden = false; document.querySelector(".ff, .fr")?.focus(); }
+  else if (step.cat) { const n = document.getElementById(`detailHint-${step.cat}`); n.textContent = message; n.hidden = false; document.querySelector(`#cloud-${step.cat} .choice`)?.focus(); }
   else if (step.key === "intensity") { showIntensitySheet(); return; } // 크기는 인라인 오류만으론 눈에 덜 띄어 시트로 어디가 비었는지 짚어 준다(D-079). announce는 시트 안에서 따로 한다.
   announce(message);
 }
@@ -257,10 +260,11 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
       announce(`아직 채우지 않은 곳이 ${missing.length}군데 있어요. ${first.message}`);
       return;
     }
-    saving = true; sync(); next.textContent = "남기는 중…";
+    next.style.minWidth = `${next.offsetWidth}px`; // 글자가 바뀌어도 폭이 흔들리지 않게 누르기 전 폭을 잡는다(D-099 button F5)
+    saving = true; next.classList.add("is-busy"); sync(); next.textContent = "남기는 중…";
     setTimeout(() => { // 350ms: 저장을 흉내만 낸다 — 이 뒤 봉인 연출까지 합쳐 전체 2초 안쪽(D-084)
       if (params.get("s") === "savefail") { // QA: 실패를 흉내 낸다 — 편지 화면에 머물고 띠로 다시 시도를 권한다
-        saving = false; next.textContent = state.editing ? "저장하기" : "남기기"; sync();
+        saving = false; next.classList.remove("is-busy"); next.textContent = state.editing ? "저장하기" : "남기기"; sync();
         if (savefailBanner) savefailBanner.hidden = false;
         announce("남기지 못했어요. 다시 시도해 주세요.");
         return;
@@ -304,11 +308,11 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
     const d = state.draft;
     // 날짜 칸 없음(과제1, D-082): 새 기록은 그날만 쓴다 — 날짜는 항상 todayISO()(새벽 4시 기준)이고 고칠 곳이 없다. 단계 키는 "date"로 그대로 둔다.
     body = [el("h1", { tabindex: "-1", text: `${day} 있었던 일` }), el("p", { class: "paper-guide", text: guideText(day) }),
-      renderEventScene({ cats: d.cats, dateField: null, day,
+      renderEventScene({ cats: d.cats, day,
         eventField: ruled("event", "무슨 일이 있었나요?", "있었던 일을 떠오르는 대로 적어요.", d.event, (v) => { d.event = v; }) })];
   } else if (step.key === "cats") {
     body = [el("h1", { class: "hero", tabindex: "-1", text: `${day}은 어떤 마음이 머물렀나요?` }), el("p", { class: "lede", text: "여러 개여도 괜찮아요." }),
-      el("p", { class: "field-error", id: "catsError", hidden: true }), state.pick === "grid" ? renderFriendGrid() : renderFriendMeadow()];
+      el("p", { class: "blocked-hint", id: "catsHint", hidden: true }), el("p", { class: "field-error", id: "catsError", hidden: true }), state.pick === "grid" ? renderFriendGrid() : renderFriendMeadow()];
   } else if (step.cat) {
     body = [renderDetail(step.cat, { index: step.index, total: step.total, onSkip: () => {
       const pos = state.draft.cats.indexOf(step.cat), label = category(step.cat).label; toggleCategory(step.cat); announce(`${label}을 뺐어요`);
@@ -343,7 +347,7 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
     el("span", { text: "남기지 못했어요" }), el("button", { type: "button", class: "link", onclick: complete, text: "다시 시도" })) : null;
 
   const saveStatusSpan = el("span", { class: "wf-save" });
-  const moreBtn = state.editing ? null : el("button", { type: "button", class: "back more", "aria-label": "메뉴", onclick: menu }, dotsIcon());
+  const moreBtn = state.editing ? null : el("button", { type: "button", class: "back more", "aria-label": "메뉴", "aria-haspopup": "dialog", onclick: menu }, dotsIcon());
   const top = el("div", { class: "write-top" },
     el("button", { type: "button", class: "back", "aria-label": "닫기", onclick: closeToToday }, closeIcon()),
     el("div", { class: "wf-count" }, el("span", { class: "step-count", text: `${at + 1} / ${now.length}` }), saveStatusSpan),
@@ -363,9 +367,13 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
 
   const pick = step.key === "cats" && state.pick !== "grid"; // 초록 언덕 위 자유 배치: 장면이 아래 버튼 줄 뒤까지 이어지도록 버튼 줄을 화면 안에 겹쳐 둔다
   const screen = el("div", { class: `screen write step-${step.key.replace(/:.*/, "")}${step.cat ? " detail-screen" : ""}${isReview ? " review" : ""}${pick ? " pick" : ""}` },
-    top, bar, editingBanner, finishingBanner, offlineBannerEl, savefailBanner, body);
+    top, bar, el("div", { class: "wf-banners" }, editingBanner, finishingBanner, offlineBannerEl, savefailBanner), body);
   if (step.cat) { setTheme(screen, step.cat); setTheme(footer, step.cat); }
-  const sync = () => next.setAttribute("aria-disabled", String(saving || (!isReview && Boolean(blockedReason(step)))));
+  const sync = () => {
+    const blocked = !isReview && Boolean(blockedReason(step));
+    next.setAttribute("aria-disabled", String(saving || blocked));
+    if (!blocked) screen.querySelectorAll(".blocked-hint").forEach((n) => { n.hidden = true; }); // 고르면 안내가 사라진다(D-098 ③)
+  };
   sync(); screen.addEventListener("click", sync);
   screen.addEventListener("input", () => { sync(); scheduleSave(); });
   if (pick) { footer.classList.add("pick"); screen.append(footer); main.replaceChildren(screen); } else main.replaceChildren(screen, footer);

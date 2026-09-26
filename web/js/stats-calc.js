@@ -59,15 +59,20 @@ export function currentStreak(sampleDays, todayISO) {
   return count;
 }
 
-// 자주 머문 말: 기간 안 세부 감정 낱말 빈도 상위 limit. 동률은 기간 안에서 먼저(더 오래전) 나온 말이 앞선다(안정 정렬 + 날짜 오름차순 순회).
+// 자주 머문 말: 기간 안 세부 감정 빈도 상위 limit. 같은 표기라도 계열이 다르면 다른 감정이다(D-022) — 계열별로 따로 센다(D-099 chip G1).
+// shared: 같은 표기가 기간 안에서 두 계열 이상에 나왔는가(화면은 그때만 계열 이름을 붙인다). 동률은 기간 안에서 먼저(더 오래전) 나온 말이 앞선다(안정 정렬 + 날짜 오름차순 순회).
 export function topWords(sampleDays, dates, limit = 5) {
-  const freq = new Map();
+  const freq = new Map(), codesOf = new Map();
   for (const iso of dates) {
     const rec = sampleDays.get(iso);
     if (!rec?.recorded) continue;
-    for (const c of rec.cats) for (const w of c.words) freq.set(w, (freq.get(w) ?? 0) + 1);
+    for (const c of rec.cats) for (const w of c.words) {
+      const key = `${c.code}:${w}`;
+      freq.set(key, { word: w, code: c.code, count: (freq.get(key)?.count ?? 0) + 1 });
+      codesOf.set(w, (codesOf.get(w) ?? new Set()).add(c.code));
+    }
   }
-  return [...freq.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit);
+  return [...freq.values()].sort((a, b) => b.count - a.count).slice(0, limit).map((x) => ({ ...x, shared: codesOf.get(x.word).size > 1 }));
 }
 
 // 날짜 배열의 인덱스마다 그 계열의 크기(없으면 null). 친구 상세 차트가 이번 기간·지난 기간을 같은 x축(1~N일째)에 겹쳐 그릴 때 쓴다(D-091 ②).

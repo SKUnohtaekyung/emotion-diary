@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>상태 표현 비교 — 1라운드</title>
+<style>
+/* TASK-DS-REF 1라운드 결정용 비교 화면(D-097). 누름·비활성·선택을 부품마다 따로가 아니라 하나의 공통 규칙으로 정하기 위해
+   선택지별로 같은 부품을 나란히 둔다. 값은 design/tokens.json에서 옮겨 적었다(character-compare.html과 같은 임시 방식).
+   결정이 나면 DESIGN_SYSTEM·tokens·style-guide가 정본이 되고, 이 파일은 결정 기록으로만 남는다. web/은 바꾸지 않았다. */
+@font-face{font-family:"Pretendard Variable";src:url("fonts/PretendardVariable.woff2") format("woff2");font-weight:45 920;font-display:swap}
+:root{--ink:#092328;--mint:#62FDB4;--bg:#FFFFFF;--surface-soft:#F3F2EE;--border:#E6E4DE;--border-strong:#C9C7BF;
+  --text:#1F1F1D;--muted:#5F5E5A;--subtle:#767570;--focus:#2F6FB5;--danger:#C62828;
+  --joy-300:#F8DE66;--hill-far:#CFE9DD;--hill-mid:#9FD3BE;--fast:120ms;--ease:cubic-bezier(0.2,0,0,1);
+  --sans:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo","Noto Sans KR","Segoe UI",Roboto,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:400 16px/1.5 var(--sans);word-break:keep-all}
+.wrap{max-width:1180px;margin:0 auto;padding:24px 16px 80px}
+h1{margin:0 0 4px;font:800 28px/1.25 var(--sans);letter-spacing:-.02em;color:var(--ink)}
+h2{margin:48px 0 4px;font:700 22px/1.35 var(--sans);color:var(--ink)}
+.lede{max-width:72ch;margin:0 0 8px;color:var(--muted)}
+.now{margin:0 0 16px;color:var(--muted);font-size:14px;max-width:80ch}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.opt{border:1px solid var(--border);border-radius:12px;padding:16px;background:var(--bg)}
+.opt h3{margin:0 0 2px;font:700 18px/1.4 var(--sans);color:var(--ink)}
+.opt .say{margin:0 0 14px;color:var(--muted);font-size:14px;line-height:1.5}
+.rec{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--mint);color:var(--ink);font:700 12px/1.6 var(--sans);vertical-align:2px}
+.cap{margin:14px 0 6px;color:var(--subtle);font:500 13px/1.4 var(--sans)}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;align-items:center}
+.pair>span{color:var(--subtle);font-size:12px;text-align:center}
+.stack{display:flex;flex-direction:column;gap:8px}
+.rowline{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.field{border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.field.white{background:var(--bg);border:1px dashed var(--border)}
+.field.joy{background:var(--joy-300)}
+.field.hill{background:var(--hill-mid)}
+.field>b{font:600 12px/1.3 var(--sans);color:var(--ink);opacity:.8}
+
+/* 부품(시안 web/css의 모양을 그대로 따른다) */
+button{font:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.btn{position:relative;overflow:hidden;min-height:48px;padding:0 24px;border:0;border-radius:999px;font:600 16px/1 var(--sans);display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.secondary{background:var(--surface-soft);color:var(--ink)}
+.chip{position:relative;overflow:hidden;min-height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--border-strong);background:var(--bg);color:var(--ink);font:500 15px/1 var(--sans);display:inline-flex;align-items:center;gap:6px}
+.pill{position:relative;overflow:hidden;min-height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--surface-soft);color:var(--ink);font:500 15px/1 var(--sans)}
+.seg{display:inline-flex;padding:4px;gap:4px;border-radius:999px;background:var(--surface-soft)}
+.seg button{position:relative;min-height:40px;padding:0 18px;border:0;border-radius:999px;background:transparent;color:var(--ink);font:600 14px/1 var(--sans);display:inline-flex;align-items:center;gap:6px}
+.row{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between;min-height:56px;padding:0 16px;border:0;border-radius:12px;background:var(--bg);color:var(--text);font:500 16px/1.4 var(--sans);width:100%;text-align:left}
+.row .v{color:var(--muted);font-size:14px}
+.step{width:44px;height:44px;border-radius:999px;border:0;background:var(--surface-soft);color:var(--ink);font:600 22px/1 var(--sans);display:inline-flex;align-items:center;justify-content:center}
+.ck{display:inline-block;width:16px;height:16px;flex:none}
+.ck path{fill:none;stroke:var(--mint);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+
+/* 선택됨의 공통 바탕: ink 면 + 흰 글자 */
+[aria-pressed="true"].chip,[aria-checked="true"].pill,.seg [aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.ck-slot{display:none}
+.q4a [aria-pressed="true"] .ck-slot,.q4a [aria-checked="true"] .ck-slot{display:inline-block}
+.q4b .multi [aria-pressed="true"] .ck-slot{display:inline-block}
+
+/* Q1 누름 — 세 가지 공통 규칙. .pressed는 '누르는 순간'을 멈춰 보여 주는 복사본이다 */
+.q1 .btn,.q1 .chip,.q1 .pill,.q1 .row,.q1 .step{transition:transform var(--fast) var(--ease)}
+.q1 .btn::after,.q1 .chip::after,.q1 .pill::after,.q1 .row::after,.q1 .step::after{content:"";position:absolute;inset:0;border-radius:inherit;background:var(--ink);opacity:0;transition:opacity var(--fast) var(--ease);pointer-events:none}
+.q1 .btn.primary::after{background:#fff}
+.q1 .step{position:relative;overflow:hidden}
+/* A: 모두 작아짐 */
+.q1a :is(.btn,.chip,.pill,.row,.step):is(:active,.pressed){transform:scale(.97)}
+/* B: 모두 옅은 면, 크기 그대로 */
+.q1b :is(.btn,.chip,.pill,.row,.step):is(:active,.pressed)::after{opacity:.08}
+.q1b .btn.primary:is(:active,.pressed)::after{opacity:.14}
+/* C: 모양별 — 알약형은 작아짐, 줄형은 옅은 면 + 아주 조금 작아짐 */
+.q1c :is(.btn,.chip,.pill,.step):is(:active,.pressed){transform:scale(.97)}
+.q1c .row:is(:active,.pressed){transform:scale(.985)}
+.q1c .row:is(:active,.pressed)::after{opacity:.06}
+@media (prefers-reduced-motion:reduce){.q1 *{transition:none!important}}
+
+/* Q2 비활성 */
+.q2a [aria-disabled="true"]{opacity:.4;cursor:default}
+.q2b .field{--base:var(--bg)}
+.q2b .field.joy{--base:var(--joy-300)} .q2b .field.hill{--base:var(--hill-mid)}
+.q2b .btn.primary[aria-disabled="true"],.q2b .pill[aria-disabled="true"],.q2b .step[aria-disabled="true"],.q2b .btn.secondary[aria-disabled="true"]{background:color-mix(in srgb,var(--ink) 12%,var(--base));color:color-mix(in srgb,var(--ink) 50%,var(--base));cursor:default}
+.q2c .btn[aria-disabled="true"]{opacity:.45;cursor:default}
+.q2c .pill[aria-disabled="true"]{opacity:.6;cursor:default}
+.q2c .step[aria-disabled="true"]{opacity:.35;cursor:default}
+
+/* Q3 할 수 없는 주 버튼 */
+.pick{background:var(--hill-far);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:250px}
+.pick p.q{margin:0;font:700 20px/1.4 var(--sans);color:var(--ink)}
+.pick .msg{margin:-4px 0 0;font:500 14px/1.5 var(--sans)}
+.pick .msg-a{color:color-mix(in srgb,var(--danger) 75%,var(--ink))}
+.pick .msg-a::before{content:"! ";font-weight:700}
+.pick .msg-b{color:var(--ink)}
+.pick .why{min-height:22px;margin:0;font:500 14px/1.5 var(--sans);color:var(--ink);text-align:center;opacity:0;transition:opacity var(--fast) var(--ease)}
+.pick .why.on{opacity:1}
+.pick .btn.primary[aria-disabled="true"]{background:color-mix(in srgb,var(--ink) 12%,var(--hill-far));color:color-mix(in srgb,var(--ink) 50%,var(--hill-far));cursor:default}
+.pick .chip{background:var(--bg);border-color:var(--bg)}
+.pick [aria-pressed="true"].chip{background:var(--ink);border-color:var(--ink)}
+.pick [aria-pressed="true"] .ck-slot{display:inline-block}
+.reset{margin-top:auto;align-self:flex-start;border:0;background:none;color:var(--muted);font:500 13px/1 var(--sans);text-decoration:underline;padding:8px 0}
+.foot{margin-top:40px;color:var(--subtle);font-size:13px}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <h1>상태 표현 비교 — 1라운드</h1>
+  <p class="lede">기본 부품의 <b>누름 · 비활성 · 선택</b>을 부품마다 따로가 아니라 공통 규칙 하나로 정하려고 합니다. 각 선택지는 같은 부품을 같은 규칙으로 보여 줍니다. 직접 눌러 보세요. 친구·달력 칸 같은 <b>장면 부품은 자기 표현(친구 확대, 달력 고리)을 그대로 둡니다.</b></p>
+
+  <!-- Q1 -->
+  <h2>1. 누를 때</h2>
+  <p class="now">지금: 방식 셋이 섞여 있음 — 버튼은 작아짐, 설정 목록 줄은 옅은 면+작아짐, 친구는 통통 튐. 세부 감정 chip과 설정의 고르기 알약에는 반응이 없음.</p>
+  <div class="opts">
+    <section class="opt q1 q1a"><h3>A. 모두 작아짐</h3><p class="say">크기만 살짝 줄어요. 면 색은 그대로.</p>
+      <div class="stack"><button class="btn primary">이대로 남길게요</button><button class="btn secondary">나중에 할게요</button></div>
+      <p class="cap">chip · 알약 · 증감</p><div class="rowline"><button class="chip">설렘</button><button class="pill">밤 10시</button><button class="step" aria-label="줄이기">−</button></div>
+      <p class="cap">목록 줄</p><button class="row">알림 시각 <span class="v">밤 10시</span></button>
+      <p class="cap">누르는 순간(멈춤)</p><div class="pair"><span>평소</span><span>누름</span><button class="btn primary" tabindex="-1">남길게요</button><button class="btn primary pressed" tabindex="-1">남길게요</button><button class="row" tabindex="-1">알림</button><button class="row pressed" tabindex="-1">알림</button></div>
+    </section>
+    <section class="opt q1 q1b"><h3>B. 모두 옅은 면</h3><p class="say">크기는 그대로, 위에 옅은 색이 덮여요. 진한 버튼은 밝아지고 옅은 부품은 어두워져요.</p>
+      <div class="stack"><button class="btn primary">이대로 남길게요</button><button class="btn secondary">나중에 할게요</button></div>
+      <p class="cap">chip · 알약 · 증감</p><div class="rowline"><button class="chip">설렘</button><button class="pill">밤 10시</button><button class="step" aria-label="줄이기">−</button></div>
+      <p class="cap">목록 줄</p><button class="row">알림 시각 <span class="v">밤 10시</span></button>
+      <p class="cap">누르는 순간(멈춤)</p><div class="pair"><span>평소</span><span>누름</span><button class="btn primary" tabindex="-1">남길게요</button><button class="btn primary pressed" tabindex="-1">남길게요</button><button class="row" tabindex="-1">알림</button><button class="row pressed" tabindex="-1">알림</button></div>
+    </section>
+    <section class="opt q1 q1c"><h3>C. 모양별로 둘<span class="rec">추천</span></h3><p class="say">알약 모양(버튼·chip·알약·증감)은 작아지고, 줄 모양(목록 줄)은 옅은 면 + 아주 조금 작아져요. 지금 버튼과 설정 목록의 방식을 규칙으로 만들고, 반응이 없던 chip·알약에 더해요.</p>
+      <div class="stack"><button class="btn primary">이대로 남길게요</button><button class="btn secondary">나중에 할게요</button></div>
+      <p class="cap">chip · 알약 · 증감</p><div class="rowline"><button class="chip">설렘</button><button class="pill">밤 10시</button><button class="step" aria-label="줄이기">−</button></div>
+      <p class="cap">목록 줄</p><button class="row">알림 시각 <span class="v">밤 10시</span></button>
+      <p class="cap">누르는 순간(멈춤)</p><div class="pair"><span>평소</span><span>누름</span><button class="btn primary" tabindex="-1">남길게요</button><button class="btn primary pressed" tabindex="-1">남길게요</button><button class="row" tabindex="-1">알림</button><button class="row pressed" tabindex="-1">알림</button></div>
+    </section>
+  </div>
+
+  <!-- Q2 -->
+  <h2>2. 비활성일 때의 모습</h2>
+  <p class="now">지금: 다섯 가지 — 투명도 .45(버튼) · .35(증감·달 넘김·편지 화살표) · .6(고르기 알약) · 색 섞기(마음 고르기의 '다음') · 색 바꾸기(영구 삭제).</p>
+  <div class="opts">
+    <section class="opt q2a"><h3>A. 투명도 하나(40%)</h3><p class="say">모든 부품을 같은 비율로 흐리게. 바탕이 비쳐 보여요.</p>
+      <div class="field white"><b>흰 바탕</b><button class="btn primary" aria-disabled="true">다음</button><div class="rowline"><button class="pill" aria-disabled="true">밤 10시</button><button class="step" aria-disabled="true" aria-label="줄이기">−</button></div></div>
+      <div class="field joy" style="margin-top:8px"><b>감정 색 면(기쁨 300)</b><button class="btn primary" aria-disabled="true">다음</button><div class="rowline"><button class="pill" aria-disabled="true">밤 10시</button><button class="step" aria-disabled="true" aria-label="줄이기">−</button></div></div>
+      <div class="field hill" style="margin-top:8px"><b>초록 언덕</b><button class="btn primary" aria-disabled="true">다음</button></div>
+    </section>
+    <section class="opt q2b"><h3>B. 바탕에서 만든 색<span class="rec">추천</span></h3><p class="say">면은 바탕에 ink 12%, 글자는 바탕에 ink 50%를 섞어요. 어느 바탕 위에서도 같은 규칙이고, 비치지 않아 또렷해요. 지금 '다음'·영구 삭제가 이미 이 방향이에요.</p>
+      <div class="field white"><b>흰 바탕</b><button class="btn primary" aria-disabled="true">다음</button><div class="rowline"><button class="pill" aria-disabled="true">밤 10시</button><button class="step" aria-disabled="true" aria-label="줄이기">−</button></div></div>
+      <div class="field joy" style="margin-top:8px"><b>감정 색 면(기쁨 300)</b><button class="btn primary" aria-disabled="true">다음</button><div class="rowline"><button class="pill" aria-disabled="true">밤 10시</button><button class="step" aria-disabled="true" aria-label="줄이기">−</button></div></div>
+      <div class="field hill" style="margin-top:8px"><b>초록 언덕</b><button class="btn primary" aria-disabled="true">다음</button></div>
+    </section>
+    <section class="opt q2c"><h3>C. 지금 그대로(참고)</h3><p class="say">부품마다 다른 투명도.</p>
+      <div class="field white"><b>흰 바탕</b><button class="btn primary" aria-disabled="true">다음</button><div class="rowline"><button class="pill" aria-disabled="true">밤 10시</button><button class="step" aria-disabled="true" aria-label="줄이기">−</button></div></div>
+      <div class="field joy" style="margin-top:8px"><b>감정 색 면(기쁨 300)</b><button class="btn primary" aria-disabled="true">다음</button><div class="rowline"><button class="pill" aria-disabled="true">밤 10시</button><button class="step" aria-disabled="true" aria-label="줄이기">−</button></div></div>
+      <div class="field hill" style="margin-top:8px"><b>초록 언덕</b><button class="btn primary" aria-disabled="true">다음</button></div>
+    </section>
+  </div>
+
+  <!-- Q3 (2026-09-26 다시 물음: 처음 판의 '지금 = 반응 없음'은 틀렸다) -->
+  <h2>3. 아직 누를 수 없는 주 버튼을 눌렀을 때 — 다시 묻기</h2>
+  <p class="now"><b>바로잡음:</b> 처음 판은 '지금은 반응이 없다'고 적었지만 틀렸어요. 지금 시안은 누르면 <b>질문 바로 아래에 빨간 "!" 오류 문구</b>를 띄우고, <b>첫 선택지로 초점을 옮기고</b>, 스크린리더로 읽어 줘요. 고르면 문구가 사라지고, 크기 화면은 빈 곳을 시트로 짚어 줘요. 셋 모두 '다음'은 흐린 모습(1라운드 B 규칙)이에요.</p>
+  <div class="opts">
+    <section class="opt q3 q3a"><h3>A. 지금 그대로</h3><p class="say">질문 아래 빨간 "!" 오류 문구, 첫 선택지로 초점 이동, 고를 때까지 남아요.</p><div class="pick" data-mode="a"><p class="q">어떤 마음이 머물렀나요?</p><p class="msg msg-a" aria-live="polite" hidden></p><div class="rowline"><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>기쁨</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>슬픔</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>바람</button></div><p class="why" aria-live="polite"></p><button class="btn primary next" aria-disabled="true">다음</button><button class="reset">처음으로</button></div></section>
+    <section class="opt q3 q3b"><h3>B. 같은 자리, 오류가 아니라 안내로<span class="rec">추천</span></h3><p class="say">자리·초점 이동·남아 있는 방식은 지금과 같고, 빨간색과 "!"를 빼고 ink 글자로 '무엇을 하면 되는지'를 말해요. 아직 안 고른 건 잘못이 아니라서요.</p><div class="pick" data-mode="b"><p class="q">어떤 마음이 머물렀나요?</p><p class="msg msg-b" aria-live="polite" hidden></p><div class="rowline"><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>기쁨</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>슬픔</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>바람</button></div><p class="why" aria-live="polite"></p><button class="btn primary next" aria-disabled="true">다음</button><button class="reset">처음으로</button></div></section>
+    <section class="opt q3 q3c"><h3>C. 버튼 위 한 줄, 3초</h3><p class="say">처음 판의 B예요. 버튼 바로 위에 한 줄이 3초 떴다 사라지고, 초점은 버튼에 남아요.</p><div class="pick" data-mode="c"><p class="q">어떤 마음이 머물렀나요?</p><p class="msg msg-c" aria-live="polite" hidden></p><div class="rowline"><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>기쁨</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>슬픔</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>바람</button></div><p class="why" aria-live="polite"></p><button class="btn primary next" aria-disabled="true">다음</button><button class="reset">처음으로</button></div></section>
+  </div>
+
+  <!-- Q4 -->
+  <h2>4. 선택됨의 모습</h2>
+  <p class="now">지금: 여럿 고르는 세부 감정 chip은 ink 면 + 민트 체크, 하나만 고르는 설정 알약·통계 기간은 ink 면만.</p>
+  <div class="opts">
+    <section class="opt q4a"><h3>A. 어디든 ink 면 + 체크</h3><p class="say">선택된 것에는 모두 체크가 붙어요.</p>
+      <p class="cap">여럿 고르기(세부 감정)</p><div class="rowline multi"><button class="chip" aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>설렘</button><button class="chip" aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>뿌듯함</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>안도</button></div>
+      <p class="cap">하나 고르기(알림 시각)</p><div class="rowline" role="radiogroup" aria-label="알림 시각"><button class="pill" role="radio" aria-checked="false">밤 9시</button><button class="pill" role="radio" aria-checked="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>밤 10시</button><button class="pill" role="radio" aria-checked="false">밤 11시</button></div>
+      <p class="cap">하나 고르기(통계 기간)</p><div class="seg"><button aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>7일</button><button aria-pressed="false">30일</button></div>
+    </section>
+    <section class="opt q4b"><h3>B. 여럿 고르기에만 체크<span class="rec">추천</span></h3><p class="say">'더 고를 수 있다'는 곳에만 체크, 하나만 고르는 곳은 ink 면만. 지금 모습을 규칙으로 적는 안이에요.</p>
+      <p class="cap">여럿 고르기(세부 감정)</p><div class="rowline multi"><button class="chip" aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>설렘</button><button class="chip" aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>뿌듯함</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>안도</button></div>
+      <p class="cap">하나 고르기(알림 시각)</p><div class="rowline" role="radiogroup" aria-label="알림 시각"><button class="pill" role="radio" aria-checked="false">밤 9시</button><button class="pill" role="radio" aria-checked="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>밤 10시</button><button class="pill" role="radio" aria-checked="false">밤 11시</button></div>
+      <p class="cap">하나 고르기(통계 기간)</p><div class="seg"><button aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>7일</button><button aria-pressed="false">30일</button></div>
+    </section>
+    <section class="opt q4c"><h3>C. 어디든 ink 면만</h3><p class="say">체크를 빼고 면으로만. 가장 조용해요.</p>
+      <p class="cap">여럿 고르기(세부 감정)</p><div class="rowline multi"><button class="chip" aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>설렘</button><button class="chip" aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>뿌듯함</button><button class="chip" aria-pressed="false"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>안도</button></div>
+      <p class="cap">하나 고르기(알림 시각)</p><div class="rowline" role="radiogroup" aria-label="알림 시각"><button class="pill" role="radio" aria-checked="false">밤 9시</button><button class="pill" role="radio" aria-checked="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>밤 10시</button><button class="pill" role="radio" aria-checked="false">밤 11시</button></div>
+      <p class="cap">하나 고르기(통계 기간)</p><div class="seg"><button aria-pressed="true"><svg class="ck ck-slot" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>7일</button><button aria-pressed="false">30일</button></div>
+    </section>
+  </div>
+  <p class="foot">값은 design/tokens.json에서 옮겨 적은 임시 비교 화면입니다(TASK-DS-REF, D-097). 시안(web/)은 바꾸지 않았습니다.</p>
+</main>
+<script>
+// Q3: chip을 고르면 '다음'이 켜진다. 모자랄 때 누르면 a=질문 아래 빨간 오류, b=질문 아래 ink 안내(둘 다 첫 선택지로 초점, 고를 때까지 남음), c=버튼 위 한 줄 3초.
+document.querySelectorAll(".pick").forEach((pick) => {
+  const mode = pick.dataset.mode, next = pick.querySelector(".next"), why = pick.querySelector(".why"), msg = pick.querySelector(".msg");
+  const chips = [...pick.querySelectorAll(".chip")];
+  let timer;
+  const sync = () => next.setAttribute("aria-disabled", String(!chips.some((c) => c.getAttribute("aria-pressed") === "true")));
+  chips.forEach((c) => c.addEventListener("click", () => { c.setAttribute("aria-pressed", String(c.getAttribute("aria-pressed") !== "true")); sync(); why.classList.remove("on"); msg.hidden = true; }));
+  next.addEventListener("click", () => {
+    if (next.getAttribute("aria-disabled") !== "true") { why.textContent = "다음 화면으로 가요"; why.classList.add("on"); clearTimeout(timer); timer = setTimeout(() => why.classList.remove("on"), 1500); return; }
+    if (mode === "a") { msg.textContent = "마음을 하나 이상 골라 주세요."; msg.hidden = false; chips[0].focus(); return; }
+    if (mode === "b") { msg.textContent = "가까운 마음을 하나 고르면 다음으로 갈 수 있어요."; msg.hidden = false; chips[0].focus(); return; }
+    why.textContent = "가까운 마음을 하나 고르면 다음으로 갈 수 있어요"; why.classList.add("on"); clearTimeout(timer); timer = setTimeout(() => why.classList.remove("on"), 3000);
+  });
+  pick.querySelector(".reset").addEventListener("click", () => { chips.forEach((c) => c.setAttribute("aria-pressed", "false")); sync(); why.classList.remove("on"); msg.hidden = true; });
+});
+</script>
+</body>
+</html>

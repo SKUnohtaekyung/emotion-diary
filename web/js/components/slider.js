@@ -194,13 +194,17 @@ function renderPanel(cat, index = 0) {
   const rows = state.draft.emotions.filter((e) => e.cat === cat).map((e) => {
     const tag = el("span", { class: "own-tag", text: "따로 정함" });
     const reset = el("button", { type: "button", class: "link", text: "대표 크기와 같게", "aria-label": `${e.label} 크기를 대표 크기와 같게`, onclick: () => { e.own = null; emit("intensity", { cat, motion: "spring" }); announce(`${e.label} 크기를 대표 크기와 같게 했어요`); document.getElementById(`own-${e.code}`)?.focus({ preventScroll: true }); } });
-    const s = createSlider({ kind: "mini", cat, id: `own-${e.code}`, field: `own:${e.code}`, label: `${e.label} 크기, 10점 만점`,
+    // 세부 크기에도 대표 크기와 같은 앵커 문구와 aria-describedby를 둔다(§6.4 '대표와 세부에 똑같이', D-099 intensity E1).
+    const miniAnchor = el("p", { class: "anchor-line", id: `anchor-own-${e.code}` });
+    const s = createSlider({ kind: "mini", cat, id: `own-${e.code}`, field: `own:${e.code}`, label: `${e.label} 크기, 10점 만점`, describedBy: [`anchor-own-${e.code}`],
       get: () => effectiveIntensity(state.draft, e),
       set: (v, motion) => { e.own = v; emit("intensity", { cat, motion }); },
-      onPaint: () => { tag.hidden = e.own == null; reset.hidden = e.own == null; } });
+      onPaint: (v) => { tag.hidden = e.own == null; reset.hidden = e.own == null; miniAnchor.textContent = v == null ? BEFORE : band(v); } });
     sliders.push(s);
-    return el("div", { class: "mini sz-mini" }, el("div", { class: "sz-head" }, el("span", { class: "sl-name" }, e.label, " ", tag), el("div", { class: "sz-ctrl sl-row" }, s.minus, s.value, s.plus)), s.scene, reset);
+    return el("div", { class: "mini sz-mini" }, el("div", { class: "sz-head" }, el("span", { class: "sl-name" }, e.label, " ", tag), el("div", { class: "sz-ctrl sl-row" }, s.minus, s.value, s.plus)), s.scene, miniAnchor, reset);
   });
+  // 접힌 채 시작하되, 세부 크기를 따로 정한 값이 하나라도 있으면 펼친 채 시작한다 — 사용자가 정한 값을 접어 숨기지 않는다(D-099 disclosure G1).
+  if (state.draft.emotions.some((e) => e.cat === cat && e.own != null)) expanded.add(cat);
   const details = el("div", { class: "int-details", id: detailsId, hidden: !expanded.has(cat) }, rows);
   const toggle = el("button", { type: "button", class: "link int-more", "aria-expanded": String(expanded.has(cat)), "aria-controls": detailsId, text: "세부 감정도 크기를 정하고 싶어요",
     onclick: () => {

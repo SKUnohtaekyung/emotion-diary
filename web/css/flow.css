@@ -3,14 +3,14 @@
 /* 완료 화면 버튼 줄(D-078, 사용자 요청): '오늘로 돌아가기'를 빼고 달력·통계 두 버튼(균등 폭)으로 바꾼다 — write.js가 순서대로 달력(보조)·통계(주)를 넣는다.
    scene.css의 .done-bar는 담는 조상에 위치 지정이 없어 데스크톱(앱 열 480px보다 넓은 창)에서 left:0·right:0가 창 전체 폭으로 늘어난다(D-078 조사).
    margin:auto + max-width로 .app·.sheet·.toast와 같은 앱 열 폭에 가운데로 고정한다. padding(=버튼 줄 높이)은 scene.css 값을 그대로 쓴다. */
-.done-bar{margin:0 auto;max-width:var(--content-max);grid-template-columns:1fr 1fr;gap:var(--sp-3)}
+.done-bar{margin:0 auto;max-width:var(--content-max);display:flex;flex-wrap:wrap-reverse;gap:var(--sp-3)}
+.done-bar .btn{flex:1 1 0;min-width:max-content} /* 같은 폭 두 버튼, 글자가 한 줄에 들어가지 않으면 위아래로(주 버튼 위, D-099 button I2) */
 
 /* 작성 흐름 예외 처리(D-082·D-083, 과제1~9): 날짜 칸이 없어진 위 줄(닫기·단계 수+저장 상태·⋯ 메뉴), 첫 단계의 '이전' 없는 버튼 줄, 안내 띠들. */
-.step-footer.solo{grid-template-columns:1fr} /* 첫 단계는 '다음' 하나뿐이다 — ×가 나가기를 맡는다(과제3) */
+.step-footer.solo .btn.primary{flex:1 1 auto} /* 첫 단계는 '다음' 하나뿐이다 — ×가 나가기를 맡는다(과제3) */
 .write-top .dots3{fill:currentColor;stroke:none} /* tabs.css의 .info-top .dots3와 같은 채움, 여기서는 .write-top 조상이라 따로 넣는다 */
 .wf-count{display:flex;align-items:baseline;gap:var(--sp-2);min-width:0}
 .wf-save{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted);white-space:nowrap}
-.wf-banner{margin:var(--sp-2) 0 var(--sp-3)} /* editing-banner와 같은 자리·짜임(과제2) — banner 전체가 아니라 이 화면에 쓰는 것만 좁혀 건드린다 */
 
 /* 재작업 1회차: 작은 시각 결함 둘. */
 .wf-fail{align-items:center;justify-content:space-between;gap:var(--sp-3)} /* 남기기 실패 띠 — 메시지·'다시 시도'를 한 줄 양 끝에, 세로 가운데로(.banner 기본 flex-start를 덮는다) */

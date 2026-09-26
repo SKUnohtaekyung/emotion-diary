@@ -64,18 +64,38 @@ function wordsSection(periodLen, sample, todayIso) {
     el("h2", { class: "sx-eyebrow", text: "자주 머문 말" }),
     el("p", { class: "sx-headline", text: `이번 ${periodLen}일에 자주 고른 말이에요` }),
     el("p", { class: "caption", text: "세부 감정 기준이에요. 많이 골랐다고 좋거나 나쁜 게 아니에요." }),
-    el("div", { class: "sx-pillrow" }, words.map(([w, n]) => el("span", { class: "sx-pill" }, w, el("em", { text: String(n) })))));
+    el("div", { class: "sx-pillrow" }, words.map(({ word, code, count, shared }) => el("span", { class: "sx-pill" }, shared ? `${word} · ${category(code).label}` : word, el("em", { text: String(count) })))));
 }
 
 // ── 첫 화면(요약 → 친밀도 → 자주 머문 말) ──
+// 기간 고르기(7일/30일): 둘 중 하나를 고르는 radiogroup이다(D-099 segmented K1 — 고르기 알약과 같은 '하나 고르기'). 고른 항목만 Tab 순서에 들고,
+// ← →(↑ ↓)로 옮기면 곧바로 고른다(라디오 관행). 이미 고른 항목을 다시 누르면 아무 일도 없다.
+function periodPicker(periodLen, onPick) {
+  const buttons = [7, 30].map((p) => el("button", { type: "button", role: "radio", "aria-checked": String(p === periodLen), tabindex: p === periodLen ? "0" : "-1", "data-p": String(p), text: `최근 ${p}일` }));
+  const choose = (btn, focus) => {
+    buttons.forEach((b) => { const on = b === btn; b.setAttribute("aria-checked", String(on)); b.setAttribute("tabindex", on ? "0" : "-1"); });
+    if (focus) btn.focus();
+    onPick(Number(btn.dataset.p));
+  };
+  buttons.forEach((b, i) => {
+    b.addEventListener("click", () => { if (b.getAttribute("aria-checked") !== "true") choose(b, false); });
+    b.addEventListener("keydown", (ev) => {
+      const d = ev.key === "ArrowRight" || ev.key === "ArrowDown" ? 1 : ev.key === "ArrowLeft" || ev.key === "ArrowUp" ? -1 : 0;
+      if (!d) return;
+      ev.preventDefault(); choose(buttons[(i + d + buttons.length) % buttons.length], true);
+    });
+  });
+  return el("div", { class: "segmented", role: "radiogroup", "aria-label": "기간" }, buttons);
+}
+
 function renderStatsList(main, navigate, params, sample, todayIso, few, sParam) {
   const body = el("div", { class: "sx-body" });
   let periodLen = periodFromParams(params);
 
   function draw(p, animate) {
     periodLen = p;
-    if (sParam === "loading" || sParam === "error") {
-      body.replaceChildren(renderStatus({ kind: sParam, onRetry: sParam === "error" ? () => navigate("stats") : undefined }));
+    if (sParam === "loading" || sParam === "error" || sParam === "offline") { // 오류·연결 끊김 모두 '다시 시도'(D-099 status-block F1)
+      body.replaceChildren(renderStatus({ kind: sParam, onRetry: sParam !== "loading" ? () => navigate("stats") : undefined }));
       return;
     }
     const order = CAT_ORDER();
@@ -96,8 +116,7 @@ function renderStatsList(main, navigate, params, sample, todayIso, few, sParam) 
     history.replaceState(null, "", `#/stats?p=${periodLen}${few ? "&s=few" : ""}`); // 친구 상세에서 ‹로 돌아왔을 때 기간이 이어지도록 주소도 맞춘다(D-091 ①, 쌓지 않음)
   }
 
-  const seg = el("div", { class: "segmented", role: "group", "aria-label": "기간" }, [7, 30].map((p) => el("button", { type: "button", "aria-pressed": String(p === periodLen), text: `최근 ${p}일`,
-    onclick: (ev) => { seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === ev.currentTarget))); draw(p, false); announce(`최근 ${p}일 통계`); } })));
+  const seg = periodPicker(periodLen, (p) => { draw(p, false); announce(`최근 ${p}일 통계`); });
   draw(periodLen, !reducedMotion()); // 화면에 들어올 때 한 번만 걷는다 — 움직임 줄이기에서는 처음부터 최종 자리다.
 
   main.replaceChildren(el("div", { class: "screen stats-screen" },
@@ -273,8 +292,7 @@ function renderFriendDetail(main, navigate, params, code, sample, todayIso, few)
     history.replaceState(null, "", `#/stats/${code}?p=${periodLen}${few ? "&s=few" : ""}`); // 기간 전환은 쌓지 않는다(D-091 ②)
   }
 
-  const seg = el("div", { class: "segmented", role: "group", "aria-label": "기간" }, [7, 30].map((p) => el("button", { type: "button", "aria-pressed": String(p === periodLen), text: `최근 ${p}일`,
-    onclick: (ev) => { seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b === ev.currentTarget))); draw(p); announce(`최근 ${p}일 통계`); } })));
+  const seg = periodPicker(periodLen, (p) => { draw(p); announce(`최근 ${p}일 통계`); });
 
   main.replaceChildren(screen); // 빈 screen을 먼저 문서에 붙이고 draw()가 그 안을 채운다(열 점 기둥은 flex라 폭을 따로 재지 않는다).
   draw(periodLen);

@@ -40,7 +40,6 @@
 .sd-pill-btn{display:inline-flex;align-items:center;min-height:var(--touch);margin-top:var(--sp-2);padding:0;border:0;background:none;align-self:flex-start}
 .sd-pill-inner{display:inline-flex;align-items:center;gap:var(--sp-1);height:40px;padding:0 var(--sp-3) 0 var(--sp-4);border-radius:var(--radius-chip);background:var(--surface-soft);color:var(--service-ink);font-size:var(--fs-label);font-weight:var(--fw-body-strong)}
 .sd-pill-chev{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.sd-pill-btn:active .sd-pill-inner{transform:scale(.98)}
 
 .sd-confirm-field{margin-top:var(--sp-8)}
 .sd-confirm-phrase{margin:var(--sp-1) 0 var(--sp-3);font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:var(--fw-heading);color:var(--service-ink)}
@@ -49,9 +48,8 @@
 /* 제목만 danger(D-091 ⑤) — 본문·목록·안내는 중립색 그대로. */
 .sd-danger-title{color:var(--danger)}
 
-/* 영구 삭제는 진짜 disabled다(aria-disabled 아님) — 흐림은 opacity가 아니라 색을 바꿔서 흰 글자/빨강 배경이 옅어져 대비가 무너지는 일을 막는다(.proto-note와 같은 surface-soft+muted 조합). */
-.sd-delete .btn.danger:disabled{background:var(--surface-soft);color:var(--muted);cursor:not-allowed}
-.sd-delete .btn.danger:disabled:active{transform:none}
+/* 영구 삭제는 진짜 disabled다(aria-disabled 아님, 확인 문구를 다 쳐야 풀린다) — 모습은 §5.1 비활성: 면 바탕+ink 12%, 글자 바탕+ink 50%(D-098 ②). 투명도로 흐리지 않는다. */
+.sd-delete .btn.danger:disabled{background:color-mix(in srgb,var(--service-ink) var(--dis-surface),var(--bg));color:color-mix(in srgb,var(--service-ink) var(--dis-content),var(--bg));cursor:not-allowed}
 
 /* 주 동작 — 화면 아래 폭 전체 큰 버튼. 작성 흐름의 step-footer와 같은 결(sticky bottom + safe-area, 짧은 화면은 margin-top:auto로 바닥에 붙고 긴 화면은 스크롤 중 계속 바닥에 떠 있는다). */
 .sd-actions{margin-top:auto;position:sticky;bottom:0;z-index:var(--z-sticky);padding:var(--sp-4) 0 calc(var(--sp-5) + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:var(--sp-2);background:var(--bg)}

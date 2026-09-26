@@ -17,8 +17,6 @@
 .sz-num b{font-size:2.25rem;line-height:1;font-weight:800;letter-spacing:-.03em}
 .sz-num small{font-size:var(--fs-label);line-height:1;font-weight:var(--fw-label);color:var(--muted)}
 .sz-num.unset b{font-weight:300;color:var(--subtle)}
-.int-panel .step[aria-disabled="true"]{opacity:.35;cursor:default}
-.int-panel .step:not([aria-disabled="true"]):active{transform:scale(.94)}
 
 /* 무대 */
 .sz-scene{position:relative;height:var(--sz-h);--sz-t:0ms;--sz-e:var(--ease);-webkit-user-select:none;user-select:none}
@@ -76,5 +74,4 @@
   .int-panel.sz-block{animation:none}
   .sz-scene[data-kind="main"] .sz-body{animation:none}
   .sz-walker,.sz-fill,.sz-far,.sz-near,.sz-body{transition:none !important}
-  .int-panel .step:not([aria-disabled="true"]):active{transform:none}
 }

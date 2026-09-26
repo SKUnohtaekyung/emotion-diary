@@ -8,9 +8,15 @@
 | TASK-WEB-UI-02 사용자 QA와 디자인 수정 | in_progress(2026-09-21 착수, 브랜치 `web-ui/qa`) — 2026-09-25 QA #50~#54(D-090~D-096) 반영·검수, 사용자 확인 대기 | 이 파일 아래(끝의 '세션 인수인계') |
 | TASK-HOOK-AUTO auto 모드에서 가드 훅 확인창 없애기 | 구현·검증 완료(2026-09-21, D-060 accepted) — 다른 세션에서의 사용자 확인 대기 | 이 파일 아래 |
 | [TASK-MOBILE](TASK-MOBILE.md) 설치형 홈 화면 웹앱 | 보류 — Phase 1 착수 시 재개(이슈 #1~#9) | 별도 파일 |
-| [TASK-DS-REF](TASK-DS-REF.md) TDS 규칙 참고 | 보류(이슈 #10~#14, D-039 reserved) | 별도 파일 |
+| [TASK-DS-REF](TASK-DS-REF.md) 기본 부품 명세를 빠짐없이(D-039·D-097) | in_progress(2026-09-26 재개·범위 확장, 브랜치 `ds/component-spec`) — 조사 3갈래 → 틀·인벤토리 → 결정 라운드 | 별도 파일(§0) + 이 파일 아래 |
 | [TASK-TAXONOMY](TASK-TAXONOMY.md) · [V1](TASK-TAXONOMY-V1.md) · [PLAN-V2](TASK-TAXONOMY-PLAN-V2.md) | 완료(2026-09-05, D-038·D-040 accepted) | 별도 파일(다른 문서가 경로로 인용해 옮기지 않았다) |
 | TASK-INFRA-01 · ISSUE-26 · ISSUE-27 · CBM · DESIGN · BOOTSTRAP | 완료·보류 기록 | [archive/](archive/README.md) |
+
+# TASK-DS-REF — 기본 부품 명세 (2026-09-26 재개)
+
+계획·단계·불변·기준은 [TASK-DS-REF.md](TASK-DS-REF.md) §0이 정본이다. 이 절은 소유 파일 선언만 둔다(가드 훅은 이 파일만 읽는다).
+
+- 소유 파일: `tasks/TASK-DS-REF.md`, `docs/design-system/**`, `design/compare-states.html`, `docs/DESIGN_SYSTEM.md`, `docs/DECISIONS.md`, `design/tokens.json`, `design/style-guide.html`, `scripts/check-harness.mjs`, `scripts/test-check-harness.mjs`, `README.md`, `docs/TRACEABILITY.md`, `docs/RISK_REGISTER.md`, `docs/STATUS.md`, `web/**`, `scripts/check-design-system.mjs`, `docs/UX_SPEC.md`
 
 # TASK-HOOK-AUTO — auto 모드에서 가드 훅이 확인창을 띄우지 않게
 
