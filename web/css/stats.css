@@ -121,12 +121,7 @@
 
 /* 함께한 날: 줄 앞에 그날의 조약돌(달력 칸과 같은 그림). 하이라인 구분선·›를 없애고 설정(§6.16)과 같은 눌림 면으로 누를 수 있음을 알린다. */
 .sxd-days{margin-top:var(--sp-2);display:flex;flex-direction:column}
-.sxd-day-row{position:relative;display:flex;align-items:center;gap:var(--sp-3);width:100%;min-height:var(--touch);padding:var(--sp-2) 0;text-decoration:none;color:inherit;transition:transform var(--dur-fast) var(--ease)}
-.sxd-day-row::after{content:"";position:absolute;inset:0 -10px;z-index:0;border-radius:14px;background:var(--surface-soft);opacity:0;transition:opacity var(--dur-fast) var(--ease);pointer-events:none}
-.sxd-day-row>*{position:relative;z-index:1}
-.sxd-day-row:active::after{opacity:1}
-.sxd-day-row:active{transform:scale(.985)}
-@media (hover:hover){.sxd-day-row:hover::after{opacity:.6}}
+.sxd-day-row{display:flex;align-items:center;gap:var(--sp-3);width:100%;min-height:var(--touch);padding:var(--sp-2) 0;text-decoration:none;color:inherit} /* 누름 면·hover는 base.css 줄 모양 공통 규칙(D-098 ①) */
 .sxd-day-row .pebble-img{flex:none}
 /* 본문 굵기(400)로 가볍게 — 연도 없는 "9월 25일 금요일"과 함께 30일 최대 19줄이 나와도 화면이 무겁지 않게 한다. */
 .sxd-day-date{flex:1;min-width:0;font-weight:var(--fw-body)}
@@ -134,6 +129,4 @@
 
 @media (prefers-reduced-motion:reduce){
   .sx-pos,.sx-pos .friend-img,.sx-dot-mark{animation:none !important}
-  .sxd-day-row{transition:none}
-  .sxd-day-row:active{transform:none}
 }

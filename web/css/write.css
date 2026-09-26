@@ -6,14 +6,20 @@ body[data-fullscreen] .bottom-nav{display:none}
 .write-top .back{display:grid;place-items:center;width:var(--touch);height:var(--touch);border:0;background:none;color:var(--service-ink)}
 .write-top .back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .step-count{font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--muted);font-variant-numeric:tabular-nums}
-.progress{height:3px;margin:0 0 var(--sp-3);border-radius:var(--radius-chip);background:var(--border);overflow:hidden}
+.progress{height:3px;margin:0 0 var(--sp-3);border-radius:var(--radius-chip);background:color-mix(in srgb,var(--service-ink) var(--dis-surface),var(--state-bg,var(--bg)));overflow:hidden} /* 빈 트랙 = 바탕+ink 12%(D-099 progress E1) — 흰 종이·감정 색 면·초록 언덕 모두 같은 규칙 */
 .progress i{display:block;height:100%;background:var(--service-ink)}
-.editing-banner{margin:var(--sp-2) 0 var(--sp-3)}
-.step-footer{position:sticky;bottom:0;z-index:var(--z-sticky);display:grid;grid-template-columns:minmax(96px,auto) 1fr;gap:var(--sp-2);align-items:center;padding:var(--sp-3) var(--sp-5) calc(var(--sp-4) + env(safe-area-inset-bottom));background:var(--bg)}
-.step-footer .btn.text{padding:0 var(--sp-3)}
+.step-footer{position:sticky;bottom:0;z-index:var(--z-sticky);display:flex;flex-wrap:wrap-reverse;gap:var(--sp-2);align-items:center;padding:var(--sp-3) var(--sp-5) calc(var(--sp-4) + env(safe-area-inset-bottom));background:var(--bg)}
+.step-footer .btn.text{flex:1 0 auto;min-width:96px;padding:0 var(--sp-3)}
+/* 두 버튼이 한 줄에 들어가지 않으면(글자 확대 200% 등) 위아래로 쌓는다 — 주 버튼이 위(D-099 button I2). wrap-reverse라 뒤에 오는 주 버튼이 위 줄로 간다. */
+.step-footer .btn.primary{flex:999 1 auto}
 .write h1{font-size:2.125rem;line-height:2.625rem;margin:var(--sp-3) 0 var(--sp-2)}
 .write .lede{margin-bottom:var(--sp-4)}
 .paper-guide{font-size:var(--fs-heading);line-height:var(--lh-heading);color:var(--muted);margin:0 0 var(--sp-6)}
+/* 못 누르는 '다음'을 눌렀을 때의 안내(D-098 ③): 오류가 아니다 — ink 글자 한 줄, "!"·빨간색 없음. 고를 자리 바로 위에 뜨고 고르면 사라진다. */
+.blocked-hint{margin:0 0 var(--sp-2);font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);color:var(--service-ink)}
+/* 안내 띠 묶음(D-099 banner H1): 띠가 여럿 뜨면 사이 8px. 모두 숨으면 묶음도 자리를 차지하지 않는다. */
+.wf-banners{display:flex;flex-direction:column;gap:var(--sp-2);margin:var(--sp-2) 0 var(--sp-3)}
+.wf-banners:not(:has(>:not([hidden]))){display:none}
 
 /* 마음 고르기: 친구 아홉을 박스 없이(D-061). 세 줄 세 칸, 모두 같은 크기이고 위아래로 살짝 어긋난다. */
 .write .hero{font-size:clamp(1.5rem,8.4vw,1.9rem);line-height:1.25;margin:var(--sp-1) 0 var(--sp-1)}
@@ -32,11 +38,11 @@ body[data-fullscreen] .bottom-nav{display:none}
 /* 마음 고르기 — 초록 언덕 위의 친구들(D-066 시안). 배경은 land 초록 한 계열(하늘=먼 언덕색), 해·구름·조약돌 없음.
    친구는 모두 같은 크기의 자리를 쓰고 위치·기울기만 제멋대로다. 장면 상자는 남은 자리 안에 들어오고 언덕이 옆으로 뻗어 폭을 채운다. */
 .screen.pick,.step-footer.pick{--muted:var(--text);--subtle:var(--text);--focus:var(--service-ink)}
+.screen.pick{--state-bg:var(--land-hill-far)}
+.step-footer.pick{--state-bg:var(--land-hill-mid)} /* 버튼 줄은 언덕 위에 겹쳐 있다 — 비활성 '다음'은 그 언덕 색에서 만든다(D-098 ②) */
 .screen.pick{position:relative;padding-bottom:0;background:var(--land-hill-far)}
 .screen.pick .write-top{background:var(--land-hill-far)}
 .screen.pick .field-error{color:color-mix(in srgb,var(--danger) 75%,var(--service-ink))} /* danger 원색은 초록 하늘 위 4.38:1이라 ink를 25% 섞어 6.2:1로 올린다 */
-.screen.pick .progress{background:color-mix(in srgb,var(--service-ink) 14%,transparent)}
-.screen.pick .btn.primary[aria-disabled="true"]{opacity:1;background:color-mix(in srgb,var(--service-ink) 34%,var(--land-hill-mid))}
 .screen.pick .step-footer{position:sticky;bottom:0;z-index:2;margin:calc(84px * -1 - env(safe-area-inset-bottom)) calc(var(--sp-5) * -1) 0;background:transparent}
 .pick-scene{position:relative;flex:1;min-height:31rem;margin:0 calc(var(--sp-5) * -1);overflow:hidden}
 .meadow-fit{position:absolute;inset:0;container-type:size;display:flex;align-items:flex-end;justify-content:center}
@@ -101,7 +107,6 @@ html:has(.detail-stage){scroll-padding-top:calc(var(--banner-h,2rem) + 170px);sc
 .sl-val{min-width:2ch;font-size:2.25rem;line-height:1;font-weight:800;font-variant-numeric:tabular-nums;text-align:right;letter-spacing:-.03em}
 .sl-row{display:flex;align-items:center;gap:var(--sp-2)}
 .step{width:var(--touch);height:var(--touch);flex:none;border:0;background:var(--surface-soft);color:var(--service-ink);border-radius:50%;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center}
-.step:disabled{opacity:.35;cursor:default}
 .sl{position:relative;flex:1;height:var(--touch);min-width:0}
 .sl-track{position:absolute;left:0;right:0;top:50%;height:12px;margin-top:-6px;border-radius:var(--radius-chip);background:var(--border);overflow:hidden}
 .sl-fill{position:absolute;inset:0 auto 0 0;border-radius:var(--radius-chip);background:var(--c);width:0}
@@ -156,7 +161,7 @@ html:has(.detail-stage){scroll-padding-top:calc(var(--banner-h,2rem) + 170px);sc
 .pager:focus-visible{outline-offset:-4px;border-radius:28px}
 .card{flex:0 0 var(--card-w);height:var(--card-h);border-radius:28px;position:relative;scroll-snap-align:start;color:var(--service-ink);overflow:hidden;overflow-y:auto}
 .card.t2{overflow:visible}
-.edit-tag{position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:5px;min-height:34px;padding:0 12px 0 10px;border-radius:9px;background:var(--bg);border:var(--hairline) solid color-mix(in srgb,var(--service-ink) 16%,transparent);font-size:.8125rem;font-weight:800;color:var(--service-ink);transform:rotate(-3deg);z-index:2}
+.edit-tag{position:absolute;right:14px;top:14px;display:flex;align-items:center;gap:5px;min-height:34px;padding:0 12px 0 10px;border-radius:var(--radius);background:var(--bg);border:var(--hairline) solid color-mix(in srgb,var(--service-ink) 16%,transparent);font-size:.8125rem;font-weight:800;color:var(--service-ink);transform:rotate(-3deg);z-index:2}
 .edit-tag .ico{fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .tape{position:absolute;display:block;width:26px;height:11px;left:-9px;top:-7px;background:color-mix(in srgb,var(--service-mint) 85%,transparent);transform:rotate(-32deg);clip-path:polygon(0 12%,10% 0,20% 14%,30% 0,100% 0,100% 100%,30% 100%,20% 86%,10% 100%,0 88%)}
 .tape.big{width:78px;height:24px;left:108px;top:-12px;transform:rotate(-3deg)}
@@ -210,7 +215,6 @@ html:has(.detail-stage){scroll-padding-top:calc(var(--banner-h,2rem) + 170px);sc
 .letter-nav .dd i{width:7px;height:7px;border-radius:4px;display:block;transition:width .25s,background .25s}
 .letter-nav .dd i.on{width:20px;background:var(--service-ink)}
 .letter-nav .ar{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
-.letter-nav .ar[disabled]{opacity:.35;cursor:default}
 .letter-nav .ico{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .letter-sub{font-size:var(--fs-label);color:var(--muted)}
 

@@ -6,6 +6,7 @@ import { state, toISO, formatDate, resetDraft, editCompleted, discardDraft } fro
 import { STATUS, dayStatus, sampleRecord, effectiveToday } from "../sample.js";
 import { dayCell } from "../components/day.js";
 import { renderLetter } from "../components/letter.js";
+import { renderMiniLetter } from "../components/mini-letter.js";
 import { openSheet } from "../components/sheet.js";
 
 const recordOf = (iso) => state.completed?.date === iso ? state.completed : sampleRecord(iso);
@@ -24,28 +25,11 @@ const pencilGlyph = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "t
 const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r; };
 const sameDay = (a, b) => startOfDay(a).getTime() === startOfDay(b).getTime();
-const weekDatesOf = (d) => { const start = addDays(d, -d.getDay()); return Array.from({ length: 7 }, (_, i) => addDays(start, i)); };
 const WEEKDAYS7 = ["일", "월", "화", "수", "목", "금", "토"];
 // "2026-13-45" 같은 값은 Date가 다음 달·해로 넘겨 버리므로 되돌린 값과 비교해 걸러낸다(A2 완료 기준 8).
 const parseISO = (s) => { const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s ?? ""); if (!m) return null;
   const y = Number(m[1]), mo = Number(m[2]), d = Number(m[3]), date = new Date(y, mo - 1, d);
   return date.getFullYear() === y && date.getMonth() === mo - 1 && date.getDate() === d ? date : null; };
-// 접힘·펼침 사이 높이를 부드럽게 잇는다(write.css .detail-stage::before와 같은 방식). 움직임 줄이기에서는 즉시 바뀐다.
-function foldTransition(container, rebuild) {
-  if (reducedMotion()) { rebuild(); return; }
-  const before = container.getBoundingClientRect().height;
-  rebuild();
-  const after = container.scrollHeight;
-  container.style.height = `${before}px`; container.style.overflow = "hidden";
-  void container.offsetHeight;
-  container.style.transition = "height 320ms ease";
-  requestAnimationFrame(() => { container.style.height = `${after}px`; });
-  container.addEventListener("transitionend", function done(ev) {
-    if (ev.target !== container) return;
-    container.removeEventListener("transitionend", done);
-    container.style.removeProperty("height"); container.style.removeProperty("overflow"); container.style.removeProperty("transition");
-  });
-}
 // 줄 노트 한 줄(D-090 ①) — 글자를 span(.cal-pv-txt)으로 감싸 CSS의 align-items:flex-end(줄 아래 정렬)에서도 줄임말(ellipsis)이 그대로 된다.
 const pvLine = (text, cls = "") => el("p", { class: `cal-pv-ln${cls}` }, el("span", { class: "cal-pv-txt", text }));
 // fitPreviewCard·nonblank(있었던 일 이하 줄을 남는 높이만큼 채우던 계산)는 2026-09-25 사용자 요청으로 지웠다 — 완료한 날은 더 이상 작은 쪽지를
@@ -72,10 +56,11 @@ function panelTransition(panel, run) {
 export function renderCalendar(main, navigate, params) {
   const qs = params instanceof URLSearchParams ? params : new URLSearchParams();
   const globalStatus = qs.get("s"), dParam = qs.get("d");
-  if ((globalStatus === "loading" || globalStatus === "error") && !dParam) { // 달력 전체 불러오기 상태. 날짜(d)가 있으면 편지 자리만(아래 panelContentFor)
+  const isLoadState = (k) => k === "loading" || k === "error" || k === "offline"; // QA ?s= 불러오기 상태. 오류·연결 끊김 모두 '다시 시도'를 준다(D-099 status-block F1)
+  if (isLoadState(globalStatus) && !dParam) { // 달력 전체 불러오기 상태. 날짜(d)가 있으면 편지 자리만(아래 panelContentFor)
     const screen = el("div", { class: "screen calendar" }, el("div", { class: "tb-body" },
       el("h1", { tabindex: "-1", text: "달력" }),
-      renderStatus({ kind: globalStatus, onRetry: globalStatus === "error" ? () => navigate("calendar") : undefined })));
+      renderStatus({ kind: globalStatus, onRetry: globalStatus !== "loading" ? () => navigate("calendar") : undefined })));
     main.replaceChildren(screen);
     screen.querySelector("h1").focus({ preventScroll: true });
     return;
@@ -99,8 +84,9 @@ export function renderCalendar(main, navigate, params) {
   const titleKicker = el("span", { class: "tb-kicker" });
   const titleBig = el("span", { class: "cal-big" });
   const h1 = el("h1", { tabindex: "-1", class: "cal-title" }, prevBtn, el("span", { class: "cal-title-text" }, titleKicker, " ", titleBig), nextBtn);
-  const protoNote = el("p", { class: "proto-note" }, el("span", { class: "proto-tag", text: "시안" }),
-    el("span", { text: emptyMode ? " 마음을 남기면 여기에 쌓여요." : " 오늘을 뺀 날짜의 상태와 내용은 지어낸 예시입니다." }));
+  // 달력 위 시안 안내 상자는 빈 달력(?s=empty)의 안내만 남긴다(D-100 ③) — '지어낸 예시'라는 말은 날짜 줄의 예시 태그와 맨 위 시안 띠가 이미 하고,
+  // 그 상자(80px)가 한 달과 작은 편지를 한 화면에 넣을 자리를 먹었다.
+  const protoNote = emptyMode ? el("p", { class: "proto-note" }, el("span", { class: "proto-tag", text: "시안" }), el("span", { text: " 마음을 남기면 여기에 쌓여요." })) : null;
   const weekHead = el("div", { class: "cal-head", "aria-hidden": "true" }, WEEKDAYS7.map((w) => el("span", { text: w })));
   const gridWrap = el("div", { class: "cal-grid-wrap" });
   // 펼친 상태의 위쪽 줄: 왼쪽 44px 원형 닫기(.cal-arrow) · 가운데 날짜+예시 태그. '크게 보기' 알약은 2026-09-25 사용자 요청으로 없앴다
@@ -125,44 +111,15 @@ export function renderCalendar(main, navigate, params) {
   // ── 자리별 다시 그리기 ──
   function syncURL() { history.replaceState(null, "", `#/calendar${selectedIso ? `?d=${selectedIso}` : ""}`); } // 날짜·주 이동은 지금처럼 replaceState다
   function focusDay(iso) { requestAnimationFrame(() => gridWrap.querySelector(`[data-iso="${iso}"]`)?.focus({ preventScroll: true })); }
-  // 작은 화면: 고른 날의 내용이 보이는 곳 밖이면 부드럽게 스크롤한다. 움직임 줄이기에서는 즉시.
-  // 편지 카드 높이는 fitLetterHeight가 나중에(글꼴 로드·전환 뒤) 정하므로, 고른 직후 잠깐(wantScroll) 동안은 fit이 끝날 때마다 다시 본다.
-  let wantScroll = false, wantTimer = 0;
-  function scrollPanelIntoView() {
-    wantScroll = true; clearTimeout(wantTimer); wantTimer = setTimeout(() => { wantScroll = false; }, 1500);
-    requestAnimationFrame(checkPanelVisible); document.fonts?.ready.then(() => requestAnimationFrame(checkPanelVisible));
-  }
-  function checkPanelVisible() {
-    if (!wantScroll) return;
-    if (gridWrap.style.transition) return; // 달→주로 접히는 중에는 재지 않는다 — 아직 긴 달 높이로 재면 필요 이상 올렸다가 접힌 뒤 페이지가 짧아져 달 제목이 띠에 반쯤 걸린다. 접힘이 끝나면(transitionend) 다시 잰다
-    {
-      const r = panel.getBoundingClientRect(), behavior = reducedMotion() ? "auto" : "smooth";
-      const inner = Math.max(r.bottom, ...[...panel.children].map((c) => c.getBoundingClientRect().bottom)); // panel은 flex로 줄어 종이가 밖으로 넘칠 수 있다 — 종이 끝까지 잰다
-      // 보이는 아래 끝은 창 아래가 아니라 하단 탐색 흐림 띠의 위 끝이다(D-091 ③) — 그 아래는 알약과 흐림이 가린다(전에는 창 아래로 재서 알약 뒤의 종이를 못 봤다).
-      const rail = document.querySelector(".bottom-nav-rail"), nav = rail?.parentElement;
-      const bottom = rail ? rail.getBoundingClientRect().top - 8 - (parseFloat(getComputedStyle(nav).getPropertyValue("--nav-fade")) || 0) : window.innerHeight;
-      if (r.top < 0) panel.scrollIntoView({ behavior, block: "nearest" });
-      else if (inner - bottom > 32) { // 32px 이하는 종이 그림자 자리(24px)·흐림 띠가 덮는 몫이라 올리지 않는다 — 조금 올리면 달 제목이 띠에 반쯤 걸린다
-        // 종이 끝을 보이려고 올릴 때는 접힌 주의 위 끝이 띠 아래 8px에 오는 데까지 올린다 — 더 올리면 접힌 주와 날짜 줄(✕)이 시안 띠 밑으로 숨고, 덜 올리면 달 제목이 띠에 반쯤 걸린다(작은 화면은 종이 아래가 탐색 뒤로 조금 남는다)
-        const week = document.querySelector(".cal-week") ?? panel, band = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--banner-h")) || 0;
-        const room = Math.max(0, week.getBoundingClientRect().top - band - 8);
-        const by = room; // 조금만 올리면 달 제목이 띠에 반쯤 걸려 잘린 채 남는다 — 올릴 때는 접힌 주가 맨 위에 오도록 끝까지 올린다(종이가 더 넉넉히 보인다)
-        if (by > 1) window.scrollBy({ top: by, behavior });
-      }
-    }
-  }
+  // 날짜를 골라도 화면을 스크롤하지 않는다(D-100 ①) — 한 달이 늘 다 보여야 해서, 편지는 달 아래에서 윗부분만 보이고 나머지는 사용자가 스크롤해 읽는다.
+  // (2026-09-25까지는 달을 한 주로 접고 편지가 보이게 올렸다.)
+  // 경계에 닿은 화살표는 disabled가 아니라 aria-disabled다 — 초점을 잃지 않고, 모습은 바탕에서 만든 색(base.css, D-099 icon-button K1).
+  function setArrowOff(btn, off) { if (off) btn.setAttribute("aria-disabled", "true"); else btn.removeAttribute("aria-disabled"); }
   function paintTitle() {
-    const rep = folded ? weekDatesOf(parseISO(selectedIso))[3] : new Date(year, month, 15); // 접힌 주는 대표 요일(수)로 달 표시, 펼친 달은 그 달 자체
-    titleKicker.textContent = `${rep.getFullYear()}년 달력`; titleBig.textContent = `${rep.getMonth() + 1}월`;
-    if (folded) {
-      const wk = weekDatesOf(parseISO(selectedIso));
-      nextBtn.disabled = startOfDay(addDays(wk[6], 1)) > startOfDay(today);
-      prevBtn.setAttribute("aria-label", "이전 주"); nextBtn.setAttribute("aria-label", "다음 주");
-    } else {
-      nextBtn.disabled = startOfDay(new Date(year, month + 1, 1)) > startOfDay(today);
-      prevBtn.setAttribute("aria-label", "이전 달"); nextBtn.setAttribute("aria-label", "다음 달");
-    }
-    prevBtn.disabled = false;
+    titleKicker.textContent = `${year}년 달력`; titleBig.textContent = `${month + 1}월`;
+    setArrowOff(nextBtn, startOfDay(new Date(year, month + 1, 1)) > startOfDay(today)); // ‹ ›는 늘 달을 옮긴다(D-100 ①)
+    prevBtn.setAttribute("aria-label", "이전 달"); nextBtn.setAttribute("aria-label", "다음 달");
+    setArrowOff(prevBtn, false);
   }
   function dayProps(date) {
     const iso = toISO(date), status = statusOf(date), isToday = sameDay(date, today);
@@ -180,46 +137,12 @@ export function renderCalendar(main, navigate, params) {
     }
     return el("div", { class: "cal" }, cells);
   }
-  function buildWeekRow() { return el("div", { class: "cal cal-week" }, weekDatesOf(parseISO(selectedIso)).map((d) => dayCell(dayProps(d)))); }
   // 한 달은 날짜를 골라도 그대로다(D-088 ①) — folded일 때만 그 주로 줄어든다.
   // 날짜 칸이 튀어 들어오는 연출(tb-pop)은 화면에 처음 들어올 때 한 번뿐이다: 두 번째 그리기부터(날짜 고르기·달 넘기기·펼치기/닫기) cal-settled로 끈다(2026-09-25 사용자 요청 — 누를 때마다 달력이 새로 나오는 것처럼 보였다).
   let gridPainted = false;
   function paintGrid() {
     gridWrap.classList.toggle("cal-settled", gridPainted); gridPainted = true;
-    gridWrap.replaceChildren(folded ? buildWeekRow() : buildMonthGrid());
-  }
-  // 편지 틀(.lt-frame-inline)이 아래 남는 자리를 다 쓰도록 --card-h를 잰다(2026-09-25 사용자 요청 — "첫 번째 화면에선 애초에 크게 볼 수 있게").
-  // 끝선은 fitPreviewCard가 쓰던 것과 같은 기준(탐색 알약 위 8px, 종이 아래 12px 여백) — checkPanelVisible의 bottom 계산과 같은 값이다.
-  // 세부 감정 알약이 36px 밑으로 줄지 않아(D-079) 카드가 376px 밑으로는 못 줄어든다(RK-030과 같은 바닥) — 그 밑에서는 카드 안 스크롤(letter.js lt-scroll)에 맡긴다.
-  // 위쪽 한도 448px은 기록 상세·검토 화면과 같은 D-079 상한을 그대로 물려받는다(실측 판단, 2026-09-25) — 큰 화면에서 예산을 그대로 다 주면(실측 600px대)
-  // 감정 카드(.t1)의 이름·조약돌은 위에, 세부 감정·크기는 --card-h 기준 아래에 붙어 있어(write.css) 가운데가 텅 빈 채로 늘어나 보였다. 448을 넘는 남는 자리는
-  // 다른 "남는 자리" 카드들과 같은 방식(D-090 ①)으로 카드 아래 흰 여백으로 둔다.
-  function fitLetterHeight(frameEl) {
-    if (!frameEl) return;
-    const nav = document.querySelector(".bottom-nav"), rail = nav?.querySelector(".bottom-nav-rail");
-    // 틀에는 카드 말고도 아래 ‹ 점 › 줄과 그림자 자리가 있다 — 그만큼(틀 높이 − 지금 카드 높이)을 빼야 틀 끝이 탐색 흐림 위에서 멈춘다.
-    // 빼지 않으면 375×812에서도 29px 넘쳐 페이지가 조금 올라가고, 달 제목이 시안 띠에 반쯤 걸린 채 남았다(메인 재측정 2026-09-25).
-    const f = frameEl.getBoundingClientRect(), cur = parseFloat(getComputedStyle(frameEl).getPropertyValue("--card-h")) || 448, extra = Math.max(0, f.height - cur);
-    const fade = parseFloat(getComputedStyle(nav).getPropertyValue("--nav-fade")) || 0;
-    const budget = rail ? rail.getBoundingClientRect().top - 8 - fade - f.top - extra : 448;
-    frameEl.style.setProperty("--card-h", `${Math.max(376, Math.min(448, Math.floor(budget)))}px`);
-  }
-  // 뷰포트가 바뀌거나 글꼴이 늦게 들어와도 다시 잰다(scheduleFit이 쓰던 것과 같은 패턴) — frameEl 자신이 아니라 panel을 관찰해야
-  // --card-h를 바꾸는 것 자체가 다시 관찰을 부르는 되먹임 루프가 생기지 않는다(panel은 바깥 flex 배분이라 --card-h와 무관하게 크기가 정해진다).
-  // 날짜를 바꿀 때마다 앞 편지의 관찰을 거둔다 — 그러지 않으면 resize 리스너·ResizeObserver·transitionend가 날짜마다 쌓이고 화면을 떠나도 남았다(마감 검토 2026-09-25).
-  let unfitLetter = () => {};
-  function scheduleFitLetter(frameEl) {
-    unfitLetter();
-    if (!frameEl) return;
-    const fit = () => { if (!frameEl.isConnected) { unfitLetter(); return; } fitLetterHeight(frameEl); if (wantScroll) requestAnimationFrame(checkPanelVisible); };
-    requestAnimationFrame(fit); document.fonts?.ready.then(fit);
-    window.addEventListener("resize", fit);
-    const ro = new ResizeObserver(fit); ro.observe(panel);
-    // 첫 클릭(달→주로 접히는 중)은 foldTransition이 gridWrap 높이를 320ms에 걸쳐 줄이는 동안 panel의 남는 높이도 함께 늘어난다 — 그 사이에 rAF로 먼저
-    // 잰 예산은 아직 안 줄어든 gridWrap 기준이라 작게 나올 수 있어(2026-09-25 실측: 375×812에서 376px로 눌어붙음), 접힘이 끝나는 순간(transitionend) 한 번 더 잰다.
-    const onEnd = (ev) => { if (ev.target === gridWrap && ev.propertyName === "height") fit(); };
-    gridWrap.addEventListener("transitionend", onEnd);
-    unfitLetter = () => { window.removeEventListener("resize", fit); ro.disconnect(); gridWrap.removeEventListener("transitionend", onEnd); unfitLetter = () => {}; };
+    gridWrap.replaceChildren(buildMonthGrid()); // 날짜를 골라도 한 달 전체 그대로다(D-100 ① — 2026-09-25의 '그 주 한 줄로 접힘'을 대체)
   }
   // 미리보기 = 내용만큼의 쪽지(달 아래 남는 자리, D-090 ①). 완료한 날은 2026-09-25부터 이 쪽지를 거치지 않고 곧장 buildExpanded로 간다
   // (paintPanel이 status로 미리 가른다) — 그래서 이 함수는 이제 임시저장·오늘·기록 없음만 맡고, 날짜·예시 태그는 그리지 않는다
@@ -247,17 +170,23 @@ export function renderCalendar(main, navigate, params) {
     const card = el("div", { class: "cal-preview" }, tailLine, btnRow);
     return { name: dLabel, msg, node: card, centerLabel: dLabelFull, centerTag: null };
   }
-  // 큰 편지(2026-09-25 — 완료한 날은 미리보기 없이 곧장 이 카드를 연다): 기존 달력 인라인 편지(letter.js scene:false)를 그대로 쓰되
-  // 틀 높이(--card-h)는 fitLetterHeight가 아래 남는 자리에 맞춰 잰다. centerLabel·centerTag는 위 unfoldRow 가운데(unfoldTitle)에 들어간다.
-  // '크게 보기' 알약은 없앴다 — 이 카드가 이미 남는 자리를 다 쓰므로 따로 "크게" 갈 곳이 필요 없다.
-  function buildExpanded(iso) {
+  // 완료한 날 = 작은 편지(D-100 ③, 2026-09-26 사용자 — 한 달을 늘 다 보이면서 스크롤 없이 보려면 휴대폰에서 큰 편지 카드(최소 376px)가
+  // 달 아래에 들어가지 않는다. 요약 쪽지를 먼저 해 봤으나 "별로"라서, 편지 모양 그대로 남는 높이에 맞춘 작은 카드로 바꿨다(components/mini-letter.js).
+  // 카드 높이 = 탐색 흐림 띠 위까지 남는 높이 − 넘김 줄. 너무 작으면(6줄 달의 아주 작은 화면) 바닥값 132px에서 멈추고 조금 스크롤된다. 큰 화면은 220px에서 멈춘다.
+  const ML_NAV = 34, ML_MIN = 132, ML_MAX = 220;
+  function miniRoom() {
+    const rail = document.querySelector(".bottom-nav-rail"), nav = rail?.parentElement;
+    const bottom = rail ? rail.getBoundingClientRect().top - 8 - (parseFloat(getComputedStyle(nav).getPropertyValue("--nav-fade")) || 0) : window.innerHeight;
+    return Math.max(ML_MIN, Math.min(ML_MAX, Math.floor(bottom - panel.getBoundingClientRect().top - ML_NAV)));
+  }
+  function buildMini(iso) {
     const dLabel = shortDay(iso), dLabelFull = shortDayWeekday(iso), rec = recordOf(iso), isReal = state.completed?.date === iso;
-    const letter = renderLetter(rec, { mode: "read", scene: false, onEdit: () => { editCompleted(rec); navigate("write"); } });
-    scheduleFitLetter(letter.frame);
-    return { name: `${dLabel}의 편지`, msg: `${dLabel}, 완료. 편지를 열었어요`, node: el("div", { class: "cal-expand-wrap" }, letter.node),
-      centerLabel: dLabelFull, // 윗줄 가운데는 날짜만(좁은 폭에서 '…의 편지'가 말줄임으로 잘렸다 — 편지라는 뜻은 region 이름이 맡는다)
+    const node = renderMiniLetter(rec, { onOpen: () => navigate(`record/${iso}?from=calendar`), onEdit: editAt(rec, navigate) });
+    node.setHeight(miniRoom());
+    return { name: `${dLabel}의 편지`, msg: `${dLabel}, 완료. 편지를 열었어요`, node,
+      centerLabel: dLabelFull,
       centerTag: isReal ? null : el("span", { class: "proto-tag", text: "예시" }),
-      more: el("button", { type: "button", class: "cal-arrow cal-more-btn", "aria-label": `${dLabel} 기록 더보기`, onclick: recordMenu(iso, rec, isReal, navigate) },
+      more: el("button", { type: "button", class: "cal-arrow cal-more-btn", "aria-label": `${dLabel} 기록 더보기`, "aria-haspopup": "dialog", onclick: recordMenu(iso, rec, isReal, navigate) },
         svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "dots3" }, svgEl("circle", { cx: "5", cy: "12", r: "1.7" }), svgEl("circle", { cx: "12", cy: "12", r: "1.7" }), svgEl("circle", { cx: "19", cy: "12", r: "1.7" }))) };
   }
   function paintPanel(opts = {}) {
@@ -269,21 +198,22 @@ export function renderCalendar(main, navigate, params) {
         unfoldName.textContent = ""; unfoldTagSlot.replaceChildren(); unfoldMoreSlot.replaceChildren();
         opts.onDone?.(); return;
       }
-      if (globalStatus === "loading" || globalStatus === "error") { // ?d=…&s=…: 달력은 정상, 편지 자리만 불러오기·오류(완료 기준 10)
+      if (isLoadState(globalStatus)) { // ?d=…&s=…: 달력은 정상, 편지 자리만 불러오기·오류(완료 기준 10)
         const dLabel = shortDay(selectedIso);
         panel.setAttribute("role", "region"); panel.setAttribute("aria-label", dLabel);
-        panel.replaceChildren(renderStatus({ kind: globalStatus, onRetry: globalStatus === "error" ? () => navigate(`calendar?d=${selectedIso}`) : undefined }));
+        panel.replaceChildren(renderStatus({ kind: globalStatus, onRetry: globalStatus !== "loading" ? () => navigate(`calendar?d=${selectedIso}`) : undefined }));
         unfoldName.textContent = ""; unfoldTagSlot.replaceChildren(); unfoldMoreSlot.replaceChildren();
         announce(`${dLabel}, 불러오는 중`); opts.onDone?.(); return;
       }
-      const useExpanded = statusOf(parseISO(selectedIso)) === "completed";
-      const { name, msg, node, centerLabel, centerTag, more } = useExpanded ? buildExpanded(selectedIso) : buildPreview(selectedIso);
+      const completed = statusOf(parseISO(selectedIso)) === "completed";
+      const { name, msg, node, centerLabel, centerTag, more } = completed ? buildMini(selectedIso) : buildPreview(selectedIso);
       panel.setAttribute("role", "region"); panel.setAttribute("aria-label", name);
       panel.replaceChildren(node);
       unfoldName.textContent = centerLabel ?? "";
       unfoldTagSlot.replaceChildren(...(centerTag ? [centerTag] : []));
       unfoldMoreSlot.replaceChildren(...(more ? [more] : []));
-      announce(msg); opts.onDone?.();
+      if (!opts.quiet) announce(msg);
+      opts.onDone?.();
     };
     if (opts.instant || reducedMotion()) { run(); return; } // 움직임 줄이기에서는 즉시 바뀐다(D-088 ③)
     panelTransition(panel, run);
@@ -299,19 +229,16 @@ export function renderCalendar(main, navigate, params) {
   // 날짜를 고른다(2026-09-25 — 미리보기 단계 없이 곧장 그 주로 접히고 남는 자리에 그날의 내용이 올라온다. D-088 ①의 "한 달은 그대로 두고
   // 미리보기만 바꾼다"를 대체한다). 한 달에서 처음 고르는 클릭만 pushState(뒤로 가기 = 닫기, 예전 expand()와 같은 방식) — 이미 접힌 채
   // 다른 날짜로 바꾸는 클릭은 replaceState(주 이동과 같은 방식, 뒤로 가기 기록이 날짜마다 쌓이지 않는다)이고 누른 칸만 살짝 흔들린다(cal-wiggle).
+  // D-100 ①: 한 달은 접히지 않는다 — 누른 칸이 고리를 두르고 제자리에서 살짝 까딱이며, 편지는 달 아래에 온다. 달 위쪽(제목·안내)은 움직이지 않아
+  // 누른 손가락 밑에서 달력이 밀려나지 않는다.
   function selectDate(iso) {
     const already = folded;
     selectedIso = iso; folded = true;
     paintFold();
-    if (already) {
-      syncURL(); paintTitle(); paintGrid(); paintPanel({ instant: true }); focusDay(iso); scrollPanelIntoView();
-      gridWrap.querySelector(`[data-iso="${iso}"]`)?.classList.add("cal-wiggle");
-    } else {
-      history.pushState(null, "", `#/calendar?d=${iso}`);
-      paintTitle(); foldTransition(gridWrap, paintGrid);
-      paintPanel({ onDone: () => panel.focus({ preventScroll: true }) }); // 초점은 편지·안내 영역으로
-      scrollPanelIntoView(); // 큰 편지가 하단 탐색 아래로 넘치는 작은 화면에서는 이 첫 클릭도 스크롤해 보여준다
-    }
+    if (already) syncURL(); else history.pushState(null, "", `#/calendar?d=${iso}`);
+    paintGrid(); gridWrap.querySelector(`[data-iso="${iso}"]`)?.classList.add("cal-wiggle");
+    if (already) { paintPanel({ instant: true }); focusDay(iso); }
+    else paintPanel({ onDone: () => panel.focus({ preventScroll: true }) }); // 처음 고르면 초점은 편지·안내 영역으로(스크롤은 하지 않는다)
   }
   // 닫기(✕) — 이 자리에서 바로 접는다(history.back을 쓰지 않는다: main.js의 hashchange 렌더는 화면마다 h1로 초점을 보내
   // "닫으면 날짜 칸으로 돌아간다"는 완료 기준과 어긋난다). pushState로 쌓인 항목은 그대로 남지만 실제 브라우저 뒤로 가기는 별도로 계속 닫기 역할을 한다.
@@ -319,7 +246,7 @@ export function renderCalendar(main, navigate, params) {
     const prevIso = selectedIso;
     selectedIso = null; folded = false;
     paintFold();
-    syncURL(); paintTitle(); foldTransition(gridWrap, paintGrid);
+    syncURL(); paintGrid();
     paintPanel({ onDone: () => focusDay(prevIso) }); // 초점은 방금 닫은 날짜 칸으로
   }
   function goMonth(delta) {
@@ -330,16 +257,32 @@ export function renderCalendar(main, navigate, params) {
     syncURL(); paintTitle(); paintGrid(); paintPanel({ instant: true });
     requestAnimationFrame(() => h1.focus({ preventScroll: true }));
   }
-  // 펼친 상태에서 ‹ ›로 주를 옮긴다(D-088 ③, '펼친 상태에 남는다') — 옮긴 날이 완료가 아니면 그 날의 안내 카드를 같은 접힌 주 안에서 보여 준다.
-  function stepWeek(delta) {
-    selectedIso = toISO(addDays(parseISO(selectedIso), delta * 7));
-    syncURL(); paintTitle(); paintGrid(); paintPanel({ instant: true }); focusDay(selectedIso);
-  }
-  prevBtn.onclick = () => { folded ? stepWeek(-1) : goMonth(-1); };
-  nextBtn.onclick = () => { if (!nextBtn.disabled) (folded ? stepWeek(1) : goMonth(1)); };
+  const arrowOff = (btn) => btn.getAttribute("aria-disabled") === "true";
+  prevBtn.onclick = () => { if (!arrowOff(prevBtn)) goMonth(-1); };
+  nextBtn.onclick = () => { if (!arrowOff(nextBtn)) goMonth(1); };
 
   paintFold(); paintTitle(); paintGrid(); paintPanel({ instant: true });
-  if (selectedIso) scrollPanelIntoView(); // 주소(?d=)로 바로 연 날도 누른 날과 같이 남는 자리가 보이게
+  // 창 높이가 바뀌면 완료한 날 작은 편지의 높이를 다시 맞춘다(D-100 ③). 화면을 떠나면 리스너를 거둔다.
+  let resizeTimer = 0;
+  const onResize = () => {
+    if (!screenRoot.isConnected) { window.removeEventListener("resize", onResize); return; }
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => { panel.querySelector(".ml")?.setHeight(miniRoom()); }, 120);
+  };
+  window.addEventListener("resize", onResize);
+  document.fonts?.ready.then(() => { if (screenRoot.isConnected) panel.querySelector(".ml")?.setHeight(miniRoom()); });
+}
+
+// 편지 카드의 '고치기'(D-100 ②): 편지 검토 화면을 거치지 않고 그 카드가 가리키는 단계(세부 감정·사건·이유·칭찬·감사)로 곧장 간다.
+// 작성 흐름의 편지에서 고칠 때와 같이 fromReview로 들어가 아래 버튼이 '편지로 돌아가기'가 된다 — 고친 뒤 편지를 보고 저장한다.
+// ⋯ 메뉴의 '고치기'는 어느 부분인지 모르므로 지금처럼 편지부터 연다.
+function editAt(rec, navigate) {
+  return (target) => {
+    editCompleted(rec);
+    if (!target) { navigate("write"); return; }
+    state.step = target; state.fromReview = true;
+    navigate(`write?step=${target}`);
+  };
 }
 
 // 기록 하나의 ⋯ 메뉴(고치기·완료 취소·삭제). 기록 상세(#/record/…)와 달력에서 연 큰 편지(D-096)가 같은 메뉴를 쓴다 —
@@ -377,11 +320,11 @@ export function renderRecord(main, navigate, params, rest) {
   }
   const iso = toISO(parsed);
   const s = params?.get("s");
-  if (s === "loading" || s === "error") { // 기록 상세(#/record/…?s=…)는 편지 자리에 불러오기·오류(완료 기준 10)
+  if (s === "loading" || s === "error" || s === "offline") { // 기록 상세(#/record/…?s=…)는 편지 자리에 불러오기·오류·연결 끊김(완료 기준 10, D-099 status-block F1)
     main.replaceChildren(el("div", { class: "screen record" },
       el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": "달력으로", onclick: () => navigate("calendar") }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M14.5 5.5 8 12l6.5 6.5" })))),
       el("h1", { tabindex: "-1", text: `${shortDay(iso)}의 편지` }),
-      renderStatus({ kind: s, onRetry: s === "error" ? () => navigate(`record/${iso}`) : undefined })));
+      renderStatus({ kind: s, onRetry: s !== "loading" ? () => navigate(`record/${iso}`) : undefined })));
     main.querySelector("h1").focus({ preventScroll: true });
     return;
   }
@@ -394,11 +337,13 @@ export function renderRecord(main, navigate, params, rest) {
     real = false;
   }
   const menu = recordMenu(iso, rec, real, navigate);
+  // 달력의 작은 편지에서 왔으면(D-100 ③) 뒤로 가기와 같게 돌아가 같은 날이 골라진 달력을 본다 — 새 기록을 쌓지 않는다. 주소로 곧장 왔으면 그날을 고른 달력으로 간다.
+  const backToCalendar = () => { if (params?.get("from") === "calendar" && history.length > 1) history.back(); else navigate(`calendar?d=${iso}`); };
 
-  const letter = renderLetter(rec, { mode: "read", onEdit: () => { editCompleted(rec); navigate("write"); } });
+  const letter = renderLetter(rec, { mode: "read", onEdit: editAt(rec, navigate) });
   main.replaceChildren(el("div", { class: "screen record" },
-    el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": "달력으로", onclick: () => navigate("calendar") }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M14.5 5.5 8 12l6.5 6.5" }))),
-      el("button", { type: "button", class: "back more", "aria-label": "더보기", onclick: menu }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "dots3" }, svgEl("circle", { cx: "5", cy: "12", r: "1.7" }), svgEl("circle", { cx: "12", cy: "12", r: "1.7" }), svgEl("circle", { cx: "19", cy: "12", r: "1.7" })))),
+    el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": "달력으로", onclick: backToCalendar }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M14.5 5.5 8 12l6.5 6.5" }))),
+      el("button", { type: "button", class: "back more", "aria-label": "더보기", "aria-haspopup": "dialog", onclick: menu }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "dots3" }, svgEl("circle", { cx: "5", cy: "12", r: "1.7" }), svgEl("circle", { cx: "12", cy: "12", r: "1.7" }), svgEl("circle", { cx: "19", cy: "12", r: "1.7" })))),
     el("h1", { tabindex: "-1", text: `${shortDay(iso)}의 편지` }),
     el("p", { class: "letter-sub", text: real ? "옆으로 넘겨서 다시 읽어요." : "옆으로 넘겨서 다시 읽어요. (지어낸 예시 기록이에요)" }),
     letter.node));

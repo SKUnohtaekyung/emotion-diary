@@ -67,8 +67,8 @@ function renderExportDone(main, navigate) {
     backBar(navigate),
     iconFace(checkIcon(), "mint"),
     el("h1", { tabindex: "-1", text: "파일을 만들었어요" }),
+    el("p", { class: "lede", text: saveLocationNote }), // 결과 화면은 큰 설명(상황) 먼저, 세부(파일 이름)는 그 아래 — 실패·삭제 완료와 같은 순서(D-099 result I1)
     el("p", { class: "note", text: exportFileName() }),
-    el("p", { class: "lede", text: saveLocationNote }),
     el("div", { class: "sd-actions" },
       el("button", { type: "button", class: "btn primary big", text: "설정으로 돌아가기", onclick: () => navigate("settings") }))));
 }

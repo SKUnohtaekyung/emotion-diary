@@ -18,6 +18,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { checkDesignSystem } from "./check-design-system.mjs";
 
 const STARTED = new Set(["in_progress", "verifying", "done"]);
 const STALE_COMMITS = 20;
@@ -198,6 +199,8 @@ function main() {
     failures.push(...checkCategoryContract(readJson("data/taxonomy/v2.json"), schemas));
   }
   if (exists("design/style-guide.html") && exists("design/tokens.json")) failures.push(...checkStyleGuideTokens(read("design/style-guide.html"), readJson("design/tokens.json")));
+  // 기본 부품 명세와 시안 CSS의 토큰 밖 값(D-097·D-098, scripts/check-design-system.mjs).
+  failures.push(...checkDesignSystem({ exists, read, list: (relative) => fs.readdirSync(path.join(root, relative)) }));
 
   // 얕은 clone(CI 기본)이나 git이 없는 환경에서는 거리를 잴 수 없다 — 조용히 건너뛴다.
   if (git(root, ["rev-parse", "--is-shallow-repository"]) === "false") {

@@ -18,6 +18,7 @@ export function renderDetail(cat, { index, total, onSkip } = {}) {
   const basket = createBasket(cat);
   const stage = el("div", { class: "detail-stage" }, el("div", { class: "stage-art" }, friendSpot(cat, { size: 200, label: true, breathe: true }), basket.node));
   const error = el("p", { class: "field-error", id: `detailError-${cat}`, hidden: true });
+  const hint = el("p", { class: "blocked-hint", id: `detailHint-${cat}`, hidden: true }); // 못 누르는 '다음'을 눌렀을 때 고를 자리 바로 위에 뜨는 안내(D-098 ③, write.js showBlocked)
   const cloud = el("div", { class: "cloud", id: `cloud-${cat}`, role: "group", "aria-label": `${c.label}의 세부 감정, 여러 개 선택` });
 
   for (const e of emotions) {
@@ -49,5 +50,5 @@ export function renderDetail(cat, { index, total, onSkip } = {}) {
     el("h1", { tabindex: "-1", text: `${c.label} 중에서 어떤 마음이었나요?` }),
     el("p", { class: "lede", text: "가까운 말을 여러 개 골라도 돼요. 정답은 없어요." }),
     onSkip ? el("button", { type: "button", class: "link detail-skip", text: "이 계열은 빼기", onclick: onSkip }) : null,
-    cloud, error);
+    hint, cloud, error);
 }

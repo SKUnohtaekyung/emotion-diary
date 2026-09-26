@@ -90,19 +90,36 @@ body[data-scene="forest"] .bottom-nav{display:none}
 .btn.secondary{background:var(--surface-soft);color:var(--service-ink)}
 .btn.danger{background:var(--danger);color:var(--bg)}
 .btn.text{background:transparent;color:var(--service-ink)}
-.btn:active{transform:scale(.98)}
-.btn[aria-disabled="true"]{opacity:.45;cursor:default}
-.btn[aria-disabled="true"]:active{transform:none}
+.btn[aria-disabled="true"]{cursor:default}
+
+/* ── 상태 표현(D-098·D-099, DESIGN_SYSTEM §5.1) — 기본 부품 공통. 값은 tokens.json state를 tokens.js가 올린다(--press-*, --dis-*). ──
+   --state-bg는 부품이 놓인 바탕이다(흰 종이 기본, 감정 색 면·초록 언덕은 그 화면이 바꾼다). 비활성 색과 진행 막대 트랙이 이 바탕에서 만들어진다. */
+[data-theme-cat]{--state-bg:var(--tint)}
+/* 누름 — 알약 모양: 97%로 작아진다. hover는 두지 않는다(손가락 화면에서 눌린 뒤 남는다). */
+:is(.btn,.choice,.st-pill,.segmented button,.step,.back,.cal-arrow,.letter-nav .ar,.ml-ar,.hp-call,.ob-cta,.ob-start,.cal-pv-pill,.sd-pill-inner,.st-pill-link-face){transition:transform var(--dur-fast) var(--ease)}
+:is(.btn,.choice,.st-pill,.segmented button,.step,.back,.cal-arrow,.letter-nav .ar,.ml-ar,.hp-call,.ob-cta,.ob-start,.cal-pv-pill):active:not([aria-disabled="true"],:disabled),
+:is(.sd-pill-btn,.st-pill-link):active :is(.sd-pill-inner,.st-pill-link-face){transform:scale(var(--press-pill))}
+/* 스위치는 보이는 알약(i)만 작아진다 — 누르는 자리(44px 버튼)는 그대로다. */
+.switch i{transition:transform var(--dur-fast) var(--ease)}
+.switch:active i{transform:scale(var(--press-pill))}
+/* 비활성 — 투명도가 아니라 바탕에서 만든 색: 면 = 바탕+ink 12%, 글자·아이콘 = 바탕+ink 50%.
+   면이 이미 옅은 회색(surface-soft, ink 약 5%)인 부품은 면을 그대로 두고 글자·아이콘만 바꾼다 — 12% 면이 켜진 면보다 진해 오히려 눌릴 것처럼 보인다. */
+.btn:is(.primary,.danger)[aria-disabled="true"]{background:color-mix(in srgb,var(--service-ink) var(--dis-surface),var(--state-bg,var(--bg)))}
+:is(.btn,.st-pill,.step,.cal-arrow,.letter-nav .ar,.ml-ar)[aria-disabled="true"]{color:color-mix(in srgb,var(--service-ink) var(--dis-content),var(--state-bg,var(--bg)));cursor:default}
+/* 고른 채로 못 쓰게 된 알약(예: 알림이 꺼진 뒤의 고른 시각): ink 면 대신 바탕+ink 12% 면 — 고른 자리는 옆 알약(옅은 회색)보다 한 단계 진해 보이되 켜진 것처럼 보이지 않는다. */
+:is(.st-pill[aria-checked="true"],.segmented button[aria-checked="true"])[aria-disabled="true"]{background:color-mix(in srgb,var(--service-ink) var(--dis-surface),var(--state-bg,var(--bg)))}
+/* 로딩(D-099 button F5): 글자만 "남기는 중…"으로 바뀌고 폭·면은 그대로다 — 비활성 모습으로 바꾸지 않는다(write.js가 누르기 전 폭을 min-width로 잡는다). */
+.btn.primary.is-busy[aria-disabled="true"]{background:var(--service-ink);color:var(--bg)}
 .link{background:none;border:0;padding:0 var(--sp-2);min-height:var(--touch);min-width:var(--touch);font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--text);text-decoration:underline;text-underline-offset:3px}
 .segmented{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;padding:var(--sp-1);gap:var(--sp-1);border-radius:var(--radius-chip);background:var(--surface-soft)}
 .segmented button{min-height:44px;padding:0 var(--sp-4);border:0;border-radius:var(--radius-chip);background:transparent;font-size:var(--fs-label);font-weight:var(--fw-label);color:var(--muted)}
-.segmented button[aria-pressed="true"]{background:var(--service-ink);color:var(--bg);font-weight:var(--fw-body-strong)}
+.segmented button[aria-checked="true"]{background:var(--service-ink);color:var(--bg);font-weight:var(--fw-body-strong)}
 .segmented button:focus-visible{outline-offset:-4px}
 
 /* 입력(§6.5): 옅은 회색 면에 테두리 없음. 이유·사건은 줄 노트 위에 쓴다. */
 .field{padding:0;border:0;min-width:0}
 .field-label{display:block;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);padding:0}
-input[type="date"],.slot-input{display:block;width:100%;border:0;font-size:var(--fs-body);line-height:var(--lh-body)}
+.slot-input{display:block;width:100%;border:0;font-size:var(--fs-body);line-height:var(--lh-body)}
 input::placeholder,textarea::placeholder{color:var(--subtle)}
 .ruled{display:block;padding:0;border:0;border-radius:0;font-size:var(--fs-heading);line-height:2rem;resize:none;overflow:hidden}
 .field-error{font-size:var(--fs-label);color:var(--danger);margin:var(--sp-1) 0 0}
@@ -132,6 +149,17 @@ input::placeholder,textarea::placeholder{color:var(--subtle)}
 .menu-row small{display:block;font-size:var(--fs-label);font-weight:var(--fw-body);color:var(--muted)}
 .menu-row.danger{color:var(--danger)}
 .menu-row.danger small{color:var(--danger)}
+/* 누름 — 줄 모양(D-098 ①): 목록 줄·시트 메뉴 줄·함께한 날 줄은 ink 6% 면을 덮고 98.5%로 조금 작아진다. 면은 줄 좌우로 10px 넘쳐 글자에 붙지 않는다.
+   hover는 마우스 화면(hover:hover)에서만 면을 옅게 보인다. 설정 목록뿐 아니라 하위 화면의 줄도 같다(D-099 list-row F1). */
+:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row){position:relative;transition:transform var(--dur-fast) var(--ease)}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row)::after{content:"";position:absolute;inset:0 -10px;z-index:0;border-radius:14px;background:color-mix(in srgb,var(--service-ink) var(--press-row-overlay),transparent);opacity:0;transition:opacity var(--dur-fast) var(--ease);pointer-events:none}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row)>*{position:relative;z-index:1}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row):active::after{opacity:1}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row):active{transform:scale(var(--press-row))}
+@media (hover:hover){:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row):hover::after{opacity:.6}}
+/* 배경 없는 글자 줄 버튼(.link)도 줄 모양이다(D-099 disclosure F1) — 밑줄 글자는 작아지면 뭉개져 보여 면이 주가 된다. */
+.link{border-radius:var(--radius);transition:transform var(--dur-fast) var(--ease),background-color var(--dur-fast) var(--ease)}
+.link:active{background-color:color-mix(in srgb,var(--service-ink) var(--press-row-overlay),transparent);transform:scale(var(--press-row))}
 .banner{display:flex;gap:var(--sp-3);align-items:flex-start;padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-card);background:var(--service-light);color:var(--service-ink);font-size:var(--fs-label);font-weight:var(--fw-body-strong)}
 .banner small{display:block;margin-top:2px;font-weight:var(--fw-body);color:var(--service-ink)}
 .banner.soft{background:var(--surface-soft)}
@@ -141,8 +169,19 @@ input::placeholder,textarea::placeholder{color:var(--subtle)}
   .bottom-nav-indicator,.bottom-nav a{transition:none}
   .bottom-nav-rail.is-moving .bottom-nav-indicator{animation:none}
   .breathe{animation:none}
-  .btn:active{transform:none}
+  /* 누름: 작아짐 대신 옅은 면만(ink 8%, ink 면 위에서는 흰색 14%) */
+  :is(.btn,.choice,.st-pill,.segmented button,.step,.back,.cal-arrow,.letter-nav .ar,.ml-ar,.hp-call,.ob-cta,.ob-start,.cal-pv-pill,.sd-pill-inner,.st-pill-link-face){transition:none}
+  :is(.btn,.choice,.st-pill,.segmented button,.step,.back,.cal-arrow,.letter-nav .ar,.ml-ar,.hp-call,.ob-cta,.ob-start,.cal-pv-pill):active:not([aria-disabled="true"],:disabled),
+  :is(.sd-pill-btn,.st-pill-link):active :is(.sd-pill-inner,.st-pill-link-face){transform:none;--press-face:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent);background-image:linear-gradient(var(--press-face),var(--press-face))}
+  :is(.btn.primary,.btn.danger,.choice[aria-pressed="true"],.st-pill[aria-checked="true"],.segmented button[aria-checked="true"],.hp-call:not(.soft),.ob-cta,.ob-start,.cal-pv-pill):active:not([aria-disabled="true"],:disabled){--press-face:color-mix(in srgb,var(--bg) var(--press-reduced-ink),transparent)}
+  .switch i{transition:none}
+  .switch:active i{transform:none;--press-face:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent);background-image:linear-gradient(var(--press-face),var(--press-face))}
+  .switch[aria-checked="true"]:active i{--press-face:color-mix(in srgb,var(--bg) var(--press-reduced-ink),transparent)}
   .sheet-dim,.sheet{animation:none}
+  :is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row),:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row)::after,.link{transition:none}
+  :is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row):active,.link:active{transform:none}
+  :is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row)::after{background:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent)}
+  .link:active{background-color:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent)}
 }
 
 /* 불러오기 상태(D-083, dom.js renderStatus): 뼈대는 옅은 막대 셋이 숨 쉬듯 깜빡이고, 오류·연결 끊김은 두 줄 글과 '다시 시도'. 어두운 숲 위에서는 .dark */
@@ -158,7 +197,7 @@ input::placeholder,textarea::placeholder{color:var(--subtle)}
 .status-block.dark .status-detail{color:color-mix(in srgb,var(--bg) 78%,transparent)}
 .status-block.dark.is-loading i{background:color-mix(in srgb,var(--bg) 14%,transparent)}
 @media (prefers-reduced-motion:reduce){.status-block.is-loading i{animation:none}}
-/* 토스트(dom.js toast): 위쪽 가운데, 앱 폭 안, ink 알약에 흰 글자. 4초 뒤 사라진다. 움직임 줄이기에서는 나타나는 연출 없음 */
-.toast{position:fixed;left:50%;top:calc(var(--sp-4) + env(safe-area-inset-top));z-index:250;transform:translateX(-50%);max-width:min(440px,calc(100vw - 2 * var(--sp-4)));padding:var(--sp-2) var(--sp-4);border-radius:var(--radius-chip);background:var(--service-ink);color:var(--bg);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-align:center;animation:toast-in var(--dur-base) var(--ease) both}
+/* 토스트(dom.js toast): 위쪽 가운데, 앱 폭 안, ink 알약에 흰 글자. 4초 뒤 사라진다. 폭은 글자만큼(max-content) — left:50%라 그대로 두면 화면 폭의 절반에서 줄바꿈된다. 움직임 줄이기에서는 나타나는 연출 없음 */
+.toast{position:fixed;left:50%;top:calc(var(--sp-4) + env(safe-area-inset-top));z-index:250;transform:translateX(-50%);width:max-content;max-width:min(440px,calc(100vw - 2 * var(--sp-4)));padding:var(--sp-2) var(--sp-4);border-radius:var(--radius-chip);background:var(--service-ink);color:var(--bg);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-align:center;animation:toast-in var(--dur-base) var(--ease) both}
 @keyframes toast-in{0%{opacity:0;translate:0 -8px}}
 @media (prefers-reduced-motion:reduce){.toast{animation:none}}

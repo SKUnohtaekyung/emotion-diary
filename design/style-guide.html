@@ -84,7 +84,24 @@ section{scroll-margin-top:16px}
 .btn.secondary{background:var(--surface-soft);color:var(--text)}
 .btn.text{background:transparent;color:var(--text)}
 .btn.danger{background:var(--danger);color:var(--bg)}
-.btn.disabled{opacity:.45}
+.btn.disabled{background:color-mix(in srgb,var(--state-mix) 12%,var(--bg));color:color-mix(in srgb,var(--state-mix) 50%,var(--bg))} /* D-098 ② 바탕에서 만든 색 — 투명도를 쓰지 않는다 */
+/* 상태 표현 표(D-098, DESIGN_SYSTEM §5.1) */
+html{--state-mix:var(--service-ink)} /* 비활성 색을 만들 때 섞는 색: 밝은 바탕은 ink, 어두운 바탕은 밝은 글자색(D-098 ②) */
+@media (prefers-color-scheme: dark){html:not([data-theme="light"]){--state-mix:var(--text)}} html[data-theme="dark"]{--state-mix:var(--text)}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:8px 0 0}
+.st-cell{border:1px solid var(--border);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.st-cell>b{font-size:12px;font-weight:600;color:var(--muted)}
+.st-cell.joy{background:var(--joy-300);border-color:var(--joy-300)} .st-cell.hill{background:var(--land-hill-mid);border-color:var(--land-hill-mid)}
+.st-cell.joy .btn.disabled{background:color-mix(in srgb,var(--service-ink) 12%,var(--joy-300));color:color-mix(in srgb,var(--service-ink) 50%,var(--joy-300))}
+.st-cell.hill .btn.disabled{background:color-mix(in srgb,var(--service-ink) 12%,var(--land-hill-mid));color:color-mix(in srgb,var(--service-ink) 50%,var(--land-hill-mid))}
+.st-press{transform:scale(.97)}
+.st-row{position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;width:100%;min-height:56px;padding:0 16px;border-radius:12px;background:var(--bg);border:1px solid var(--border)}
+.st-row.st-press{transform:scale(.985)} .st-row.st-press::after{content:"";position:absolute;inset:0;background:var(--service-ink);opacity:.06}
+.st-pill{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;border-radius:999px;background:var(--surface-soft);color:var(--text);font-weight:500}
+.st-pill.on{background:var(--service-ink);color:#FFF}
+.st-pill .ck{width:16px;height:16px} .st-pill .ck path{fill:none;stroke:var(--service-mint);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.st-guide{margin:0;font-size:14px;font-weight:500;color:var(--service-ink)}
+.st-row{color:var(--text)}
 /* 상태 */
 .status{display:flex;flex-wrap:wrap;gap:16px;font-size:14px}
 .status span::before{content:"●";margin-right:8px}
@@ -659,7 +676,7 @@ ul.note li{margin:0 0 6px}
 
 <section>
 <h2>버튼과 저장 상태</h2>
-<p class="note">눌리는 것은 <b>ink 알약 하나</b>(주), 보조는 옅은 회색 면, 나머지는 글자입니다. 굵은 윤곽과 그림자가 없습니다(D-061). 삭제만 danger 채움입니다. 아직 못 누르는 주 버튼은 불투명도 45%로 보이되 눌러 보면 이유를 알려 줍니다(오류는 필드 아래).</p>
+<p class="note">눌리는 것은 <b>ink 알약 하나</b>(주), 보조는 옅은 회색 면, 나머지는 글자입니다. 굵은 윤곽과 그림자가 없습니다(D-061). 삭제만 danger 채움입니다. 아직 못 누르는 주 버튼은 바탕에서 만든 흐린 색(바탕+ink 12% 면, +ink 50% 글자)으로 보이되 눌러 보면 고를 자리 위에 할 일을 안내합니다(D-098). 빨간 오류는 실제 입력 오류에만 씁니다.</p>
 <div class="btns">
   <span class="btn primary">남기기</span>
   <span class="btn secondary">편지로 돌아가기</span>
@@ -669,6 +686,29 @@ ul.note li{margin:0 0 6px}
 </div>
 <h3>자동 저장</h3>
 <div class="status"><span class="st-saving">저장 중…</span><span class="st-saved">저장됨 · 방금</span><span class="st-fail">저장 실패 · 다시 시도</span></div>
+</section>
+
+<section>
+<h2>상태 표현 — 기본 부품 공통 규칙 (D-098)</h2>
+<p class="note">누름·비활성·선택을 부품마다 따로 정하지 않고 하나의 규칙으로 보입니다(DESIGN_SYSTEM §5.1, <code>tokens.json</code> <code>state</code>). 친구 토글·달력 칸·가운데 돌 같은 장면 부품은 자기 표현을 유지합니다. 부품별 명세는 <code>docs/design-system/components/</code>.</p>
+<h3>누름 — 모양별 둘</h3><div class="st-grid">
+<div class="st-cell"><b>알약 모양 · 평소</b><span class="btn primary">이대로 남길게요</span></div>
+<div class="st-cell"><b>알약 모양 · 누름(97%)</b><span class="btn primary st-press">이대로 남길게요</span></div>
+<div class="st-cell"><b>줄 모양 · 평소</b><span class="st-row">알림 시각 <span class="note">밤 10시</span></span></div>
+<div class="st-cell"><b>줄 모양 · 누름(ink 6% + 98.5%)</b><span class="st-row st-press">알림 시각 <span class="note">밤 10시</span></span></div>
+</div>
+<h3>비활성 — 바탕에서 만든 색</h3><div class="st-grid">
+<div class="st-cell"><b>흰 바탕</b><span class="btn primary disabled">다음</span></div>
+<div class="st-cell joy"><b>감정 색 면(기쁨 300)</b><span class="btn primary disabled">다음</span></div>
+<div class="st-cell hill"><b>초록 언덕</b><span class="btn primary disabled">다음</span></div>
+</div>
+<h3>못 누르는 주 버튼을 눌렀을 때 — 같은 자리 안내</h3><div class="st-grid">
+<div class="st-cell hill"><b>질문 아래 안내(ink, "!" 없음) → 첫 선택지로 초점</b><p class="st-guide">가까운 마음을 하나 고르면 다음으로 갈 수 있어요.</p><span class="btn primary disabled">다음</span></div>
+</div>
+<h3>선택됨 — 여럿 고르기에만 체크</h3><div class="st-grid">
+<div class="st-cell"><b>여럿 고르기(세부 감정)</b><span class="btns"><span class="st-pill on"><svg class="ck" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5"/></svg>설렘</span><span class="st-pill">안도</span></span></div>
+<div class="st-cell"><b>하나 고르기(알림 시각·기간)</b><span class="btns"><span class="st-pill">밤 9시</span><span class="st-pill on">밤 10시</span></span></div>
+</div>
 </section>
 
 <section>
@@ -1007,7 +1047,8 @@ ul.note li{margin:0 0 6px}
   <div class="day today done">2<span class="st"></span></div>
   <div class="day future">3</div>
 </div>
-<h3>날짜를 누르면 — 그 주로 접히고 곧장 편지 카드 (D-096)</h3>
+<h3>날짜를 누르면 — 곧장 편지 카드 (D-096, 접힘은 D-100으로 없앰)</h3>
+<p class="note"><b>D-100(2026-09-26)</b>: 시안은 이제 달을 접지 않는다 — 한 달 전체가 그대로 있고, 완료한 날은 달 아래에 <b>작은 편지</b>(편지 카드와 같은 모양을 남는 높이 132~220px로, 옆으로 넘김, 카드마다 고치기)가 오며 누르거나 '크게 보기 ›'로 기록 상세의 편지 전체가 열린다. 아래 그림(주 한 줄 + 편지 카드)은 옛 모양이다.</p>
 <p class="note">날짜를 누르면 달이 <b>그 주 한 줄</b>로 접히고 그 아래 남는 자리를 완료한 날은 미리보기 없이 <b>곧장 편지 카드</b>가 다 씁니다 — 작은 미리보기 → '크게 보기' 두 단계와 '크게 보기 ↗' 알약을 없앴습니다(D-088·D-090의 미리보기 단계 대체). 임시저장·오늘·기록 없는 지난 날은 지금처럼 줄 노트 쪽지입니다. 윗줄은 왼쪽 원형 <b>×</b> 닫기, 날짜(와 예시 표시), 오른쪽 <b>⋯</b>(완료한 날만 — 고치기·완료 취소·삭제)입니다.</p>
 <div class="cal-top"><span class="x">✕</span><b>9월 2일 (화)<span class="ex">예시</span></b><span class="more">⋯</span></div>
 <div class="cal-week">

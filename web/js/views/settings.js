@@ -1,6 +1,6 @@
 // 설정: 목록 → 하위 화면(D-091 ④⑤). 목록 줄은 '옅은 조약돌 면 아이콘 + 이름 + 지금 값(muted) + ›' 한 모양(st-row)으로 통일하고 설명은 모두 하위 화면으로 옮긴다.
 // 하위 화면 뼈대(뒤로 가기·h1)는 tabs.css의 .info-top·.back을 그대로 쓴다(기록 상세와 같은 원형 ‹). 내보내기·삭제 화면은 settings-data.js(Sub-I)가 채운다 — 여기서는 라우팅만 한다.
-import { el, svgEl, announce } from "../dom.js";
+import { el, svgEl, announce, toast } from "../dom.js";
 import { openSheet } from "../components/sheet.js";
 import { stoneImg } from "../data.js";
 import { now } from "../state.js";
@@ -51,7 +51,15 @@ function switchRow({ icon, name, checked, onclick, locked }) {
       : el("button", { type: "button", class: "switch", role: "switch", "aria-checked": String(checked), "aria-label": name, onclick },
           el("i", { "aria-hidden": "true" })));
 }
-function group(title, rows) { return el("div", { class: "st-group" }, el("p", { class: "st-group-head", text: title }), el("div", { class: "st-rows" }, rows)); }
+// 묶음 머리는 화면 제목(h1) 아래 단계의 제목(h2)이다 — 스크린리더의 제목 건너뛰기로 묶음을 훑는다(D-099 section-header K1). 모습은 작은 muted 글자 그대로.
+function group(title, rows) { return el("div", { class: "st-group" }, el("h2", { class: "st-group-head", text: title }), el("div", { class: "st-rows" }, rows)); }
+
+// 스위치 적용이 실패하면 스위치를 원래 자리로 되돌리고 토스트로 알린다(D-099 switch G1) — '바뀌었다'는 착각을 남기지 않는다.
+// 시안은 서버 저장이 없어 실패가 없다. QA: #/settings?s=switchfail(또는 #/settings/reminder?s=switchfail)이면 한 번 실패를 흉내 낸다.
+function applySwitch(params, apply) {
+  if (params?.get("s") === "switchfail") { toast("바꾸지 못했어요. 다시 시도해 주세요"); return false; }
+  apply(); return true;
+}
 
 // ── 시각 표기 ──
 const formatKoreanClock = (hhmm) => {
@@ -68,10 +76,10 @@ function subHead(navigate, title) {
 }
 
 // ══════════════════════ 1. 설정 목록 #/settings ══════════════════════
-function renderList(main, navigate) {
+function renderList(main, navigate, params) {
   rowSeq = 0;
   function toggleReminder() {
-    settingsState.reminderOn = !settingsState.reminderOn;
+    applySwitch(params, () => { settingsState.reminderOn = !settingsState.reminderOn; });
     draw();
     main.querySelector(".st-switch-row .switch")?.focus();
   }
@@ -111,26 +119,33 @@ function renderList(main, navigate) {
 }
 
 // ══════════════════════ 2. 알림 #/settings/reminder (D-081) ══════════════════════
-function renderReminder(main, navigate) {
+function renderReminder(main, navigate, params) {
   function draw(focusSel) {
     rowSeq = 0;
     const on = settingsState.reminderOn;
     const isCustom = !PRESET_TIMES.includes(settingsState.reminderTime);
     const timeInput = el("input", { type: "time", class: "st-time-native", tabindex: "-1", "aria-hidden": "true", value: settingsState.reminderTime,
       onchange: (ev) => { if (ev.target.value) { settingsState.reminderTime = ev.target.value; draw(".st-pill.is-custom"); } } });
-    const openPicker = () => { if (typeof timeInput.showPicker === "function") { try { timeInput.showPicker(); return; } catch { /* 지원 안 함 → 초점으로 대신 연다 */ } } timeInput.focus(); };
+    // showPicker()가 없거나 막히면 숨은 칸을 그 자리에 보이는 시각 입력 칸으로 드러내고 초점을 준다(D-099 native-picker G1) —
+    // 화면 밖 1px 칸에 초점만 가 있어 아무 일도 없어 보이는 상태를 두지 않는다.
+    const revealInput = () => {
+      timeInput.classList.add("is-revealed"); timeInput.removeAttribute("aria-hidden"); timeInput.removeAttribute("tabindex");
+      timeInput.setAttribute("aria-label", "알림 시각 직접 입력"); timeInput.focus();
+    };
+    const openPicker = () => { if (typeof timeInput.showPicker === "function") { try { timeInput.showPicker(); return; } catch { /* 지원 안 함 → 입력 칸을 드러낸다 */ } } revealInput(); };
     const pillBtn = (checked, text, onclick, extraClass = "") => el("button", { type: "button", class: `st-pill${extraClass}`, role: "radio", "aria-checked": String(checked),
       "aria-disabled": on ? null : "true", text, onclick: on ? onclick : () => announce("작성 알림이 꺼져 있어요: 먼저 켜 주세요") });
 
     main.replaceChildren(el("div", { class: "screen settings-sub st-reminder" },
       ...subHead(navigate, "알림"),
-      switchRow({ icon: ICONS.bell, name: "작성 알림", checked: on, onclick: () => { settingsState.reminderOn = !settingsState.reminderOn; draw(".st-switch-row .switch"); } }),
+      switchRow({ icon: ICONS.bell, name: "작성 알림", checked: on, onclick: () => { applySwitch(params, () => { settingsState.reminderOn = !settingsState.reminderOn; }); draw(".st-switch-row .switch"); } }),
 
       el("div", { class: `st-block${on ? "" : " is-dim"}` },
         el("p", { class: "st-block-label", text: "알림 시각" }),
         el("div", { class: "st-pills", role: "radiogroup", "aria-label": "알림 시각" },
           ...PRESET_TIMES.map((t) => pillBtn(!isCustom && t === settingsState.reminderTime, formatKoreanClock(t), () => { settingsState.reminderTime = t; draw(); })),
-          pillBtn(isCustom, isCustom ? formatKoreanClock(settingsState.reminderTime) : "다른 시각…", openPicker, isCustom ? " is-custom" : ""),
+          // 고른 뒤에도 라디오다 — 라벨이 고른 시각을 보이고, 다시 누르면 선택기가 다시 열린다(D-099 radio-pill G1).
+          pillBtn(isCustom, isCustom ? `다른 시각 · ${formatKoreanClock(settingsState.reminderTime)}` : "다른 시각…", openPicker, isCustom ? " is-custom" : ""),
           timeInput),
         el("p", { class: "note st-block-note", text: "이 시각이 지나도 오늘 기록이 없으면 오늘 화면에 알려요." })),
 
@@ -212,11 +227,11 @@ function renderPrivacy(main, navigate) {
 export const SETTINGS_PAGES = ["reminder", "day", "privacy", "export", "delete", "deleted"];
 export function renderSettings(main, navigate, params, rest = []) {
   const sub = rest[0];
-  if (sub === "reminder") return renderReminder(main, navigate);
+  if (sub === "reminder") return renderReminder(main, navigate, params);
   if (sub === "day") return renderDayStart(main, navigate);
   if (sub === "privacy") return renderPrivacy(main, navigate);
   if (sub === "export") return renderExport(main, navigate, params);
   if (sub === "delete") return renderDelete(main, navigate, params);
   if (sub === "deleted") return renderDeleted(main, navigate);
-  return renderList(main, navigate);
+  return renderList(main, navigate, params);
 }

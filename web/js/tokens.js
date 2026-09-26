@@ -47,6 +47,12 @@ export async function applyTokens() {
   const stone = tokens.motion.stone; // 가운데 돌(D-062)
   set("stone-rock", `${stone.rock}ms`); set("stone-hop", `${stone.hop}ms`); set("stone-flood", `${stone.flood}ms`); set("stone-flood-reduced", `${stone.reducedFlood}ms`);
   set("ease", tokens.motion.easing); set("spring", tokens.motion["easing-spring"]);
-  set("z-sticky", tokens.z.sticky); set("z-nav", tokens.z["bottom-nav"]);
+  set("z-sticky", tokens.z.sticky); set("z-nav", tokens.z["bottom-nav"]); set("z-sheet", tokens.z.sheet);
+  // 상태 표현(D-098, DESIGN_SYSTEM §5.1): 누름 비율과 옅은 면·비활성 섞는 양. 섞는 양은 color-mix에 바로 넣도록 %로 올린다.
+  const pct = (value) => `${Math.round(value * 1000) / 10}%`;
+  const { pressed, disabled } = tokens.state;
+  set("press-pill", pressed["pill-scale"]); set("press-row", pressed["row-scale"]);
+  set("press-row-overlay", pct(pressed["row-overlay"])); set("press-reduced", pct(pressed["reduced-overlay"])); set("press-reduced-ink", pct(pressed["reduced-overlay-on-ink"]));
+  set("dis-surface", pct(disabled["surface-mix"])); set("dis-content", pct(disabled["content-mix"]));
   return tokens;
 }

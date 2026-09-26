@@ -18,7 +18,7 @@
 .day.today.completed::after,.day.today.draft::after{content:"";position:absolute;inset:9px 10px;z-index:0;border-radius:var(--radius-blob)}
 .day.today.completed::after{background:var(--service-ink)}
 .day.today.draft::after{border:var(--emphasis) dashed color-mix(in srgb,var(--service-ink) 55%,transparent)}
-.day.future{opacity:.4;cursor:default}
+.day.future{color:color-mix(in srgb,var(--service-ink) var(--dis-content),var(--bg));cursor:default} /* 바탕에서 만든 색(D-099 calendar-day F1) — 투명도로 흐리지 않는다 */
 .day.future::before{border-color:transparent}
 .day.blank::before{display:none}
 .day:focus-visible{outline-offset:-2px}
@@ -37,8 +37,6 @@
 .day.mini .pencil{width:9px;height:9px}
 
 /* 시트 안 요약 */
-.chipline{display:flex;gap:var(--sp-2);align-items:center;margin:0 0 var(--sp-3)}
-.chip{display:inline-flex;align-items:center;min-height:28px;padding:0 var(--sp-3);border-radius:var(--radius-chip);background:var(--surface-soft);font-size:var(--fs-caption);font-weight:var(--fw-body-strong)}
 .sum-row{display:flex;align-items:center;gap:var(--sp-3)}
 .sum-row .note{margin:0}
 .friend-row{display:inline-flex;align-items:flex-end;gap:var(--sp-1)}

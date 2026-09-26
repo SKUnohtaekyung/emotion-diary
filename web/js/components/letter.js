@@ -130,10 +130,18 @@ export function renderLetter(record, { mode = "write", onEdit, onOpened, scene =
 
   const STEP = () => pager.firstElementChild ? pager.firstElementChild.getBoundingClientRect().width + 8 : 336; // +8은 write.css .pager의 gap, 336은 카드 328 + 그 gap(D-079)
   const index = () => Math.round(pager.scrollLeft / STEP());
-  const paint = () => { const i = index(); dots.forEach((d, k) => d.classList.toggle("on", k === i)); prev.disabled = i === 0; next.disabled = i >= cards.length - 1; };
+  // 양 끝 화살표는 disabled가 아니라 aria-disabled다 — 누른 뒤 초점이 사라지지 않는다(D-099 icon-button K1). 모습은 base.css의 바탕에서 만든 색.
+  const setOff = (btn, off) => { if (off) btn.setAttribute("aria-disabled", "true"); else btn.removeAttribute("aria-disabled"); };
+  // 장이 바뀌면 '3장 중 2장, 칭찬'을 aria-live(polite)로 읽는다(D-099 pager K1). 편지가 열린 뒤에만 — 열 때는 open()이 따로 알린다.
+  let spoken = 0;
+  const paint = () => {
+    const i = index(); dots.forEach((d, k) => d.classList.toggle("on", k === i)); setOff(prev, i === 0); setOff(next, i >= cards.length - 1);
+    if (started && i !== spoken && cards[i]) { spoken = i; announce(`${cards.length}장 중 ${i + 1}장, ${cards[i].label}`); }
+  };
   pager.addEventListener("scroll", () => requestAnimationFrame(paint), { passive: true });
-  prev.addEventListener("click", () => pager.scrollTo({ left: (index() - 1) * STEP(), behavior: reducedMotion() ? "auto" : "smooth" }));
-  next.addEventListener("click", () => pager.scrollTo({ left: (index() + 1) * STEP(), behavior: reducedMotion() ? "auto" : "smooth" }));
+  const go = (delta) => pager.scrollTo({ left: (index() + delta) * STEP(), behavior: reducedMotion() ? "auto" : "smooth" });
+  prev.addEventListener("click", () => { if (prev.getAttribute("aria-disabled") !== "true") go(-1); });
+  next.addEventListener("click", () => { if (next.getAttribute("aria-disabled") !== "true") go(1); });
   pager.addEventListener("keydown", (ev) => { if (ev.key === "ArrowRight") { next.click(); ev.preventDefault(); } if (ev.key === "ArrowLeft") { prev.click(); ev.preventDefault(); } });
 
   // 카드 안의 글 영역: 스크롤하는 동안만 막대가 조금 진해지고(.lt-scrolling), 넘치는 영역만 키보드로 닿는다(tabindex).

@@ -43,7 +43,22 @@ function baseline() {
       semantic: { danger: { light: "#C62828", dark: "#F28B82" } },
       emotion: { fear: { 50: "#EAF5F3", 500: "#199A8C", label: "공포" } }
     } }),
-    "design/style-guide.html": "<style>\n:root{\n  --bg:#FFFFFF;--surface:#FAFAF8;--raised:#FFFFFF;--border:#E6E4DE;--border-strong:#C9C7BF;\n  --text:#1F1F1D;--muted:#5F5E5A;--subtle:#767570;--focus:#2F6FB5;--danger:#C62828;\n  --fear-50:#EAF5F3;--fear-500:#199a8c;--radius:8px;\n}\n:root[data-theme=\"dark\"]{\n  --bg:#121211;--surface:#1B1B19;--raised:#232320;--border:#33322E;--border-strong:#4A4842;--text:#F0EFEA;--muted:#B5B3AA;--subtle:#8F8E87;--focus:#7FB3F0;--danger:#F28B82;}\n</style>\n"
+    "design/style-guide.html": "<style>\n:root{\n  --bg:#FFFFFF;--surface:#FAFAF8;--raised:#FFFFFF;--border:#E6E4DE;--border-strong:#C9C7BF;\n  --text:#1F1F1D;--muted:#5F5E5A;--subtle:#767570;--focus:#2F6FB5;--danger:#C62828;\n  --fear-50:#EAF5F3;--fear-500:#199a8c;--radius:8px;\n}\n:root[data-theme=\"dark\"]{\n  --bg:#121211;--surface:#1B1B19;--raised:#232320;--border:#33322E;--border-strong:#4A4842;--text:#F0EFEA;--muted:#B5B3AA;--subtle:#8F8E87;--focus:#7FB3F0;--danger:#F28B82;}\n</style>\n",
+    // 디자인 시스템 검사(scripts/check-design-system.mjs, D-097·D-098)용 최소 fixture
+    "web/css/a.css": `.x{color:var(--text)}
+`,
+    "docs/design-system/components/b.md": `# b
+
+**상태: 결정 대기 0건**
+
+${"ABCDEFGHIJKLMNO".split("").map((letter) => `## ${letter}. 항목
+`).join(`
+`)}`,
+    "docs/design-system/INVENTORY.md": `| 부품 | \`components/b.md\` |
+
+## 2. 미사용
+| 체크박스 | \`components/nope.md\`는 미사용 표에서 세지 않는다 |
+`
   };
 }
 
@@ -73,6 +88,15 @@ const cases = [
   { name: "style-guide에 변수가 빠지면 실패한다", mutate: edit("design/style-guide.html", "--fear-50:#EAF5F3;", ""), expect: "fail", match: "--fear-50이 없다" },
   { name: "dark 블록의 값이 tokens와 다르면 실패한다", mutate: edit("design/style-guide.html", "--danger:#F28B82", "--danger:#FF0000"), expect: "fail", match: "dark --danger" },
   { name: "16진수 대소문자 차이는 어긋남이 아니다", mutate: () => {}, expect: "pass" },
+  { name: "시안 CSS에 색 리터럴이 새로 들어오면 실패한다", mutate: edit("web/css/a.css", "color:var(--text)", "color:#123456"), expect: "fail", match: "색 리터럴" },
+  { name: "시안 CSS가 비활성을 투명도로 흐리면 실패한다(D-098 ②)", mutate: (files) => { files["web/css/a.css"] += ".y:disabled{opacity:.4}"; }, expect: "fail", match: "투명도로 흐린다" },
+  { name: "예외 목록이 가리키는 글이 사라지면 낡은 예외로 실패한다", mutate: (files) => { files["web/css/film.css"] = ".z{color:var(--text)}"; }, expect: "fail", match: "낡은 CSS 예외" },
+  { name: "부품 명세에 A~O 절이 빠지면 실패한다", mutate: edit("docs/design-system/components/b.md", "## O. 항목", "## 오. 항목"), expect: "fail", match: "'## O.' 절이 없다" },
+  { name: "부품 명세 머리의 결정 대기 수가 본문과 다르면 실패한다", mutate: edit("docs/design-system/components/b.md", "결정 대기 0건", "결정 대기 1건"), expect: "fail", match: "≠ 본문" },
+  { name: "달력 미래 날짜처럼 못 쓰는 상태를 투명도로 흐려도 실패한다", mutate: (files) => { files["web/css/a.css"] += ".day.future{opacity:.4}"; }, expect: "fail", match: "투명도로 흐린다" },
+  { name: "부품 토큰이 있는 기초 토큰을 가리키면 통과한다", mutate: (files) => { const t = JSON.parse(files["design/tokens.json"]); t.component = { button: { danger: "color.semantic.danger" } }; files["design/tokens.json"] = JSON.stringify(t); }, expect: "pass" },
+  { name: "부품 토큰이 없는 토큰을 가리키면 실패한다", mutate: (files) => { const t = JSON.parse(files["design/tokens.json"]); t.component = { button: { danger: "color.semantic.alarm" } }; files["design/tokens.json"] = JSON.stringify(t); }, expect: "fail", match: "color.semantic.alarm" },
+  { name: "INVENTORY가 가리키는 부품 명세가 없으면 실패한다", mutate: edit("docs/design-system/INVENTORY.md", "`components/b.md`", "`components/b.md` `components/c.md`"), expect: "fail", match: "components/c.md이 없다" },
   { name: "taxonomy·style-guide가 아직 없는 저장소는 그 검사를 건너뛴다", mutate: (files) => { delete files["data/taxonomy/v2.json"]; delete files["design/style-guide.html"]; }, expect: "pass" },
   { name: "STATUS가 오래됐어도 git 없는 루트에서는 경고 없이 통과한다(시간 신호는 FAIL이 아니다)", mutate: edit("docs/STATUS.md", "2026-09-18", "2020-01-01"), expect: "pass" }
 ];

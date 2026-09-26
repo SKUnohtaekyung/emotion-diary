@@ -59,6 +59,7 @@
 | taxonomy/label | source review, seed/migration, UI, dashboard, prompts, eval fixtures |
 | 색·글자·간격 토큰 | DESIGN_SYSTEM, design/tokens.json, `scripts/check-contrast.mjs`(quick 하네스: WCAG 대비 + 감정 계열 색차 ΔE≥7 + 서비스 색·감정 테마·오늘 숲·초록 언덕·편지·편지 책상·세부 감정 연한 배경·이유 노트 조합, 331건), UX §8, 이 표 UI-MOOD-001 |
 | 화면 구성·문구(오늘·작성 흐름·편지·통계, `web/` 시안 포함) | UX_SPEC §3~4·§7~9·§11~12, DESIGN_SYSTEM §6, 이 표 §6(UI-MOOD-*), RISK_REGISTER RK-020~RK-029 |
+| 기본 부품 명세·상태 공통 규칙(D-097~D-099) | `docs/design-system/`(CHECKLIST·INVENTORY·components 24개), DESIGN_SYSTEM §5.1, `design/tokens.json` `state`·`component`, `design/style-guide.html` 상태 표현 절, `scripts/check-design-system.mjs`(quick: 부품 명세 A~O·결정 대기 수·인벤토리 파일·시안 CSS 색 리터럴과 투명도 비활성·부품 토큰 참조) |
 | 인증/hosting/DB | ARCHITECTURE, DATA_MODEL migration, SAFETY, B/F/Security tests |
 | 통계 정의 | DATA_MODEL, dashboard UX, analysis snapshots, RAG observation eval |
 | 모델/prompt/schema | AI_RAG_SPEC version, journal/RAG/safety 전체 고정 eval |
@@ -89,6 +90,6 @@
 | UI-MOOD-006 provisional 시안·실기기 | PR-005, PR-010; D-066(provisional) | `UX_SPEC` §4; RK-027 | **미검증(사용자 확인 대기)**: 마음 고르기의 초록 자유 배치는 시안이고 사용자가 확인하기 전까지 provisional이다. 320px 폭·200% 글자 확대에서의 블록 겹침 확인과 격자 폴백의 자동 전환은 아직 없다. iPhone Safari·Android Chrome 실기기 검수는 하지 않았다 |
 | UI-MOOD-007 온보딩 장면 이야기·로딩 화면 | PR-006, PR-010, PR-015; D-092·D-093 | `UX_SPEC` §3; `DESIGN_SYSTEM` §6.17 | **코드·헤드리스 확인**(2026-09-25): 여섯 장면 문장이 D-092 ②와 같음, 움직임 줄이기에서 자동 진행 없음·장면마다 '다음', 일시정지(멈춤 6.5초 동안 장면·진행 막대·글자 쓰기 정지 → 이어 가면 남은 시간 뒤 다음 장면), '시작하기 전에' 열림 때 뒤 이야기 `inert`, 글자 200%에서 문장 상자 확장·받침, 로딩 화면 300ms 전 준비 시 미표시·보이면 0.6초 이상·오늘 화면은 숲 FLIP·온보딩은 흰빛·시작 실패 때 걷힘. `web/splash.svg`는 `node scripts/build-splash.mjs --check`(verify)가 forest.js·tokens.json과 대조. 실기기·실제 OS 움직임 줄이기는 미확인 |
 | UI-MOOD-008 통계 친구 상세 | PR-010, PR-012, PR-015; D-095 | `UX_SPEC` §9; `DESIGN_SYSTEM` §6.9 | **코드·헤드리스 확인**(2026-09-25): 열 점 기둥 role=img 요약 + 날짜별 sr 목록, 채운 점(흰 바탕 계열 강조색 3:1 이상)·빈 점(속 빈 고리)을 모양으로 구별, 소수 평균 반올림, 320·360·375에서 30일 가로 넘침 없음, 축 글자 caption 크기, 감정 chip 개수 글자 대비 4.5:1 이상(opacity 제거), 크기를 조약돌 크기·색 농도로 그리지 않음(D-050) |
-| UI-MOOD-009 달력 큰 편지 카드·기록 메뉴 | PR-006, PR-009, PR-015; D-096 | `UX_SPEC` §7; `DESIGN_SYSTEM` §6.7·§6.14 | **코드·헤드리스 확인**(2026-09-25): 완료한 날 → 그 주로 접힘 + 큰 편지(376~448px), 옆 카드 엿보기 0px·흐림 마스크 없음, 그림자는 `.card`에만, 날짜 줄 ⋯에서 기록 상세와 같은 고치기·완료 취소·삭제(예시 기록은 상태 불변), 자동 스크롤이 접힌 주를 시안 띠 밑으로 숨기지 않음(375는 스크롤 0, 360은 77px에서 정지·손으로 ‹ 점 › 줄까지), 날짜를 바꿔도 리스너가 쌓이지 않음, → 키·‹ ›·가로 휠 넘기기 정상 |
+| UI-MOOD-009 달력 큰 편지 카드·기록 메뉴 | PR-006, PR-009, PR-015; D-096, D-100(한 달 유지·고치기 곧장·완료한 날 작은 편지) | `UX_SPEC` §7; `DESIGN_SYSTEM` §6.7·§6.14 | **코드·헤드리스 확인**(2026-09-25): 완료한 날 → 그 주로 접힘 + 큰 편지(376~448px), 옆 카드 엿보기 0px·흐림 마스크 없음, 그림자는 `.card`에만, 날짜 줄 ⋯에서 기록 상세와 같은 고치기·완료 취소·삭제(예시 기록은 상태 불변), 자동 스크롤이 접힌 주를 시안 띠 밑으로 숨기지 않음(375는 스크롤 0, 360은 77px에서 정지·손으로 ‹ 점 › 줄까지), 날짜를 바꿔도 리스너가 쌓이지 않음, → 키·‹ ›·가로 휠 넘기기 정상 |
 
 위 항목은 PRD 범위·저장 계약·출시 게이트를 바꾸지 않는다.

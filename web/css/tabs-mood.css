@@ -25,7 +25,6 @@
 .cal-big{display:block;font-size:clamp(3.8rem,21vw,5.25rem);font-weight:900;letter-spacing:-.055em;line-height:.92;margin:.04em 0 0 -.05em}
 .cal-arrow{display:grid;place-items:center;flex:none;width:44px;height:44px;border:0;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
 .cal-arrow svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.cal-arrow:disabled{opacity:.35;cursor:default}
 /* 날짜 칸은 줄 단위로 살짝 튀어 들어온다: 줄마다 50ms, 줄 안에서 12ms 간격(--tb-d는 tabs.js가 준다). 한 번뿐(펼친 달만 — 접힌 한 주는 튀어 들어오지 않는다, 매번 반복되면 산만하다). */
 .calendar .cal:not(.cal-week) .day{animation:tb-pop 340ms var(--spring) backwards;animation-delay:calc(160ms + var(--tb-d,0ms))}
 /* 처음 들어올 때만 튀어 들어온다 — 날짜 고르기·달 넘기기·펼치기/닫기로 다시 그릴 때는(tabs.js paintGrid가 붙이는 cal-settled) 칸이 가만히 있고,
@@ -35,16 +34,14 @@
 @keyframes cal-wiggle{0%,100%{rotate:0deg}20%{rotate:-5deg}45%{rotate:4deg}70%{rotate:-2deg}}
 .calendar .cal-settled .cal .day.cal-wiggle{animation:cal-wiggle 420ms var(--ease)}
 
-/* ── 날짜를 고르면 곧장 그 주로 접힌다(2026-09-25 사용자 요청 — D-088의 "먼저 작은 미리보기, '펼쳐 읽기'를 눌러야 접힘" 두 단계를 하나로 줄인다.
-   완료한 날은 남는 자리를 다 쓰는 큰 편지(letter.js), 그 밖은 D-090의 내용만큼의 쪽지다). 375×812에서 카드까지 스크롤 없이 들어가도록
-   달 제목을 줄이고 안내·요일 줄·범례를 감춘다(실측: 펼친 채로는 1060px, 이 셋을 감추고 제목을 줄이면 812 안에 들어간다. D-080의 원래 실측을 그대로 물려받는다). */
-.screen.calendar.folded .proto-note,.screen.calendar.folded .cal-head,.screen.calendar.folded .legend{display:none}
-/* 펼친 윗줄 앞뒤 여백(D-090 ②, 재작업 3회차 — 구조는 그대로 두고 여백만 준다): 제목→주 12px, 주→윗줄 16px, 윗줄→편지 16px.
-   전에는 8·4·12px이라 줄들이 빽빽하게 쌓였다(2배 확대 실측으로 발견, D-090 근거). */
-.screen.calendar.folded .cal-title{margin-bottom:var(--sp-3)}
-.screen.calendar.folded .cal-big{font-size:2.25rem;margin-top:0}
+/* ── 날짜를 골라도 한 달 전체가 그대로다(D-100 ①, 2026-09-26 사용자 — 2026-09-25의 '곧장 그 주 한 줄로 접힘'을 대체한다).
+   달 위쪽(제목·안내·요일 줄)은 움직이지 않아 누른 손가락 밑에서 달력이 밀려나지 않는다. 달 아래의 범례만 감추고 그 자리에 날짜 줄과 편지가 온다.
+   한 달과 편지 카드(최소 376px)가 375×812 한 화면에 함께 들어가지 않으므로, tabs.js checkPanelVisible이 요일 줄이 위에 닿는 데까지만 올리고 나머지는 스크롤로 읽는다.
+   (folded는 이제 '날짜를 고른 상태'라는 뜻이다 — 이름은 코드 호환을 위해 그대로 둔다.) */
+.screen.calendar.folded .legend{display:none}
 .screen.calendar.folded .cal-unfold{margin:var(--sp-4) 0 0}
-.screen.calendar.folded .cal-letter-panel:not(:empty){margin-top:var(--sp-4);padding-bottom:4px}
+.screen.calendar.folded .cal-letter-panel:not(:empty){margin-top:var(--sp-4);padding-bottom:0}
+.screen.calendar.folded{padding-bottom:var(--sp-4)} /* 날짜를 고른 동안은 작은 편지가 마지막이다 — 아래 여백을 줄여 6줄 달(375×812)에서도 빈 여백 때문에 페이지가 스크롤되지 않게(D-100 ③) */
 /* "날짜는 골랐지만 아직 안 접힌" 중간 상태(previewing)는 2026-09-25에 없어졌다 — 날짜를 고르면 folded까지 한 번에 간다(위 selectDate).
    펼친 상태의 윗줄(재작업 3회차, D-090 ② — 구조는 그대로: 왼쪽 닫기 · 가운데 날짜+예시 태그. '크게 보기' 알약은 2026-09-25에 없앴다. 밑줄 링크는 이 줄에 없다.
    × 원은 보이는 높이 36px로 줄이고(전 44px), 누르는 자리는 ::after로 44px을 그대로 지킨다(.cal-pv-pill과 같은 방식). */
@@ -73,8 +70,6 @@
    완료한 날의 큰 편지는 fitLetterHeight(tabs.js)가 이 남는 자리에 맞춰 --card-h를 재지만 376px 밑으로는 줄이지 않으므로(RK-030) 아주 좁은 화면에서는
    카드가 예산보다 커질 수 있다 — 이때는 이 flex 계산이 자연히 화면 전체(.app min-height:100dvh)를 늘려 페이지 스크롤이 생긴다(D-088 ④가 허용) — 따로 overflow를 막지 않는다. */
 .screen.calendar{display:flex;flex-direction:column}
-/* 편지를 펼친 달력: 작은 화면(360×640)에서는 카드 아래 ‹ 점 › 줄이 하단 탐색 흐림 띠에 걸린 채 더 올릴 수 없었다 — 아래 자리를 흐림 띠+알약만큼 더 줘 손으로 올려 볼 수 있게 한다(메인 재측정 2026-09-25) */
-.screen.calendar:has(.lt-frame-inline){padding-bottom:calc(var(--sp-8) + 48px)}
 .screen.calendar>.tb-body{display:flex;flex-direction:column;flex:1;min-height:0}
 .cal-letter-panel{display:flex;flex-direction:column;flex:1;min-height:0}
 .cal-letter-panel:not(:empty){margin-top:var(--sp-5);padding-bottom:var(--sp-4)}
@@ -83,7 +78,7 @@
 /* 미리보기·펼친 편지가 같은 자리에서 잇는다(D-088 ③): 같은 view-transition-name을 줘 브라우저가 크기·자리를 이어 바꾼다. 미지원 브라우저는 tabs.js의 panelTransition이 짧은 페이드로 대신한다.
    old/new를 겹쳐 크로스페이드하는 기본값은 서로 다른 두 카드(미리보기 글자·편지 카드)가 한동안 유령처럼 겹쳐 보였다(메인 재검수 지적) — film.css의 film-step-out/in과 같은 방식으로,
    옛 내용은 앞 40%에서 사라지고 새 카드는 그 뒤에 나타나게 나눠 겹치지 않게 한다. */
-.cal-preview,.cal-expand-wrap{view-transition-name:cal-pv-morph}
+.cal-preview{view-transition-name:cal-pv-morph}
 ::view-transition-group(cal-pv-morph){animation-duration:340ms;animation-timing-function:var(--ease)}
 ::view-transition-old(cal-pv-morph){animation:cal-pv-old-out 340ms var(--ease) both}
 ::view-transition-new(cal-pv-morph){animation:cal-pv-new-in 340ms var(--ease) both}
@@ -120,7 +115,64 @@
   gap:var(--sp-2);border-bottom:1px solid var(--paper-rule);overflow:hidden;flex:none}
 /* 글자만 감싸는 span(.cal-pv-txt, tabs.js pvLine)에 줄임말을 준다 — 부모(.cal-pv-ln)에 직접 주면 앞뒤에 함께 놓일 수 있는 아이콘·배지까지 같은 글꼴로 눌린다. */
 .cal-pv-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1;font-size:var(--fs-label);color:var(--text)}
-.cal-pv-ln.muted .cal-pv-txt{color:var(--muted)} /* 임시저장·오늘·지난 빈 날의 안내 줄 */
+.cal-pv-ln.muted .cal-pv-txt{color:var(--muted)} /* 임시저장·오늘·지난 빈 날의 안내 줄, 완료 요약의 세부 감정 줄 */
+
+/* ── 완료한 날 = 작은 편지(D-100 ③, components/mini-letter.js) ──
+   편지 카드(write.css .t1·.t2·.t3)와 같은 말투를 작게: 감정 카드는 그 계열 300 면·감정 이름 800·조약돌·세부 감정 알약(흰 72%)·크기,
+   있었던 일과 이유는 종이(--paper), 칭찬·감사는 크림(service-light). 높이는 --ml-h(tabs.js가 달 아래 남는 높이로 잰다, 132~220px).
+   카드 전체를 덮는 투명 버튼(.ml-open)이 편지 전체를 열고, 고치기 태그(.ml-edit)만 그 위에서 따로 눌린다. 옆 카드가 20px 보여 넘길 수 있음을 알린다. */
+.ml{--ml-h:180px}
+.ml-pager{display:flex;gap:8px;margin:0 calc(var(--sp-5) * -1);padding:0 var(--sp-5);overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--sp-5);scrollbar-width:none}
+.ml-pager::-webkit-scrollbar{display:none}
+.ml-pager:focus-visible{outline-offset:-3px;border-radius:22px}
+.ml-card{position:relative;flex:0 0 calc(100% - 20px);height:var(--ml-h);display:flex;flex-direction:column;padding:14px 16px;border-radius:22px;overflow:hidden;scroll-snap-align:start;color:var(--service-ink);transition:transform var(--dur-fast) var(--ease)}
+.ml-emo{background:var(--tint)}
+.ml-paper{background:var(--paper)}
+.ml-note{background:var(--service-light)}
+.ml-lab{display:flex;align-items:center;min-height:30px;margin:-2px 0 0;padding-right:84px;font-size:.8125rem;line-height:1.1rem;font-weight:800;color:color-mix(in srgb,var(--service-ink) 78%,transparent)} /* 오른쪽 위 고치기 태그(30px)와 같은 줄을 쓰고, 그 자리만큼 비워 아래 글이 태그 밑으로 들어가지 않게 한다 */
+.ml-paper .ml-lab,.ml-note .ml-lab{color:var(--paper-ink)}
+.ml-name{margin:0;font-size:2.25rem;line-height:2.5rem;font-weight:800;letter-spacing:-.035em}
+.ml-pebble{position:absolute;right:14px;top:calc(50% - 30px);width:64px;height:64px}
+.ml-foot{margin-top:auto;display:flex;align-items:flex-end;gap:var(--sp-3)}
+.ml-chips{flex:1;min-width:0;display:flex;gap:6px;overflow:hidden} /* 들어가는 만큼만 보이고 남은 수는 +N(mini-letter.js fitChips) — 흐림으로 자르지 않는다 */
+.ml-chips span{flex:none;display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:15px;background:color-mix(in srgb,var(--bg) 72%,transparent);font-size:.875rem;font-weight:700}
+.ml-chips .ml-more{background:transparent;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--service-ink) 28%,transparent);padding:0 10px;font-variant-numeric:tabular-nums} /* '+N'은 고른 말이 아니라 개수라 면 없이 선만 — 알약과 구분된다 */
+.ml-size{flex:none;margin:0;display:flex;align-items:baseline;gap:2px;font-size:.875rem;font-weight:700}
+.ml-size b{font-size:1.75rem;line-height:1;font-weight:800;letter-spacing:-.04em}
+.ml-line{margin:4px 0 0;font-size:var(--fs-body);line-height:1.4rem;color:var(--text);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.ml-line b{margin-right:6px;font-size:.8125rem;font-weight:800;color:var(--paper-ink)}
+.ml-quote{margin:4px 0 0;font-size:1.25rem;line-height:1.75rem;font-weight:750;letter-spacing:-.02em;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.ml.compact .ml-pebble{display:none}
+.ml.compact .ml-name{font-size:1.75rem;line-height:2rem}
+.ml.compact .ml-line,.ml.compact .ml-quote{-webkit-line-clamp:2}
+/* 누르는 자리: 카드를 덮는 투명 버튼. 누르면 줄 모양 누름(D-098 ①)처럼 카드가 98.5%로 작아지고 옅은 면이 덮인다. */
+.ml-open{position:absolute;inset:0;z-index:1;margin:0;padding:0;border:0;border-radius:inherit;background:transparent;cursor:pointer}
+.ml-open:focus-visible{outline:var(--emphasis) solid var(--focus);outline-offset:-3px}
+.ml-card:has(.ml-open:active){transform:scale(var(--press-row))}
+.ml-open:active{background:color-mix(in srgb,var(--service-ink) var(--press-row-overlay),transparent)}
+/* 고치기 태그: 편지 카드의 .edit-tag와 같은 흰 딱지(반경 control 8, D-099 tag E1), 작게. 보이는 높이 30px, 누르는 자리는 ::after로 44px. */
+.ml-edit{position:absolute;right:12px;top:12px;z-index:2;display:flex;align-items:center;gap:4px;height:30px;padding:0 10px 0 8px;border-radius:var(--radius);background:var(--bg);border:var(--hairline) solid color-mix(in srgb,var(--service-ink) 16%,transparent);font-size:.75rem;font-weight:800;color:var(--service-ink);transform:rotate(-3deg)}
+.ml-edit::after{content:"";position:absolute;inset:-7px -4px}
+.ml-edit:active{transform:rotate(-3deg) scale(var(--press-pill))}
+.ml-ico{width:14px;height:14px;flex:none;fill:none;stroke:currentColor;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round}
+/* 넘김 줄: 왼쪽 ‹ 점 ›, 오른쪽 '크게 보기 ›'. 화살표는 보이는 28px, 누르는 자리 44px(::after). */
+.ml-nav{display:flex;align-items:center;justify-content:space-between;height:26px;margin-top:8px}
+.ml-steps{display:flex;align-items:center;gap:10px}
+.ml-ar{position:relative;display:grid;place-items:center;width:28px;height:28px;padding:0;border:0;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
+.ml-ar::after{content:"";position:absolute;inset:-8px}
+.ml-ar .ml-ico{width:16px;height:16px}
+.ml-dots{display:flex;align-items:center;gap:6px}
+.ml-dots i{display:block;width:6px;height:6px;border-radius:3px;background:var(--border-strong);transition:width var(--dur-base) var(--ease)}
+.ml-dots i.on{width:16px;background:var(--service-ink)}
+.ml-nav.single .ml-steps{visibility:hidden}
+.ml-big{position:relative;display:inline-flex;align-items:center;gap:2px;min-height:var(--touch);margin:-9px 0;padding:0 0 0 var(--sp-2);border:0;background:none;font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--service-ink)}
+.ml-big .ml-ico{width:16px;height:16px}
+@media (prefers-reduced-motion:reduce){
+  .ml-card,.ml-dots i{transition:none}
+  .ml-card:has(.ml-open:active){transform:none}
+  .ml-open:active{background:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent)}
+  .ml-edit:active{transform:rotate(-3deg)}
+}
 /* .cal-pv-row1·.cal-pv-date(날짜+예시 태그 줄)·.cal-pv-row2·.cal-pv-pebbles·.cal-pv-names(조약돌+이름 줄)는 2026-09-25에 지웠다 — 완료한 날은 이제
    이 쪽지(buildPreview)를 거치지 않고(위 unfoldRow가 날짜를 이미 보여준다), 남은 draft·오늘·기록 없음 상태는 애초에 이름·조약돌이 없다. */
 /* 버튼 줄(D-090 ① — 재작업 3회차: 오른쪽 아래에 종이와 겹쳐 놓던 것을 그만두고, 마지막 글 줄 다음의 흐름 안으로 옮긴다. 줄 없는 종이 여백이라 border-bottom이 없다).
