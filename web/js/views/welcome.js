@@ -46,20 +46,41 @@ const icon = (d) => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }
 const chevron = (d) => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d }));
 
 // ── 시작하기 전에 ── 이야기 끝의 '다음'으로 옆에서 들어오거나(overlay), ?p=2로 혼자 열린다(solo).
-function buildNotice(navigate, { solo, onBack }) {
-  const ground = el("div", { class: "ob-ground" });
-  // 이야기의 언덕을 이어 붙이고, 아래에서 올라온 흰 길이 나의 돌에서 끝난다(길 끝은 돌 밑에 숨는다). '시작하기'는 그 길 위에 선다.
-  // 그림은 설계 좌표(390×170)를 1.5배로 키워(사용자 2026-09-25 '밑에 디자인 사이즈를 키워') 위에 하늘 여백을 둔 390×300 상자에 담는다 —
-  // 넓은 화면에서 아래 기준으로 잘려도 잘리는 것은 빈 하늘이고 돌은 잘리지 않는다(전에는 높이 170 고정 + slice라 넓으면 돌 윗부분이 잘렸다).
-  const gsvg = svgEl("svg", { viewBox: "0 0 390 300", preserveAspectRatio: "xMidYMax slice", "aria-hidden": "true" },
-    svgEl("g", { transform: "translate(-97.5 45) scale(1.5)" },
+// 이야기의 언덕을 이어 붙이고, 아래에서 올라온 흰 길이 나의 돌에서 끝난다(길 끝은 돌 밑에 숨는다).
+// 그림은 설계 좌표(390×170)를 1.5배로 키워(사용자 2026-09-25 '밑에 디자인 사이즈를 키워') 위에 하늘 여백을 둔 390×300 상자에 담는다 —
+// 넓은 화면에서 아래 기준으로 잘려도 잘리는 것은 빈 하늘이고 돌은 잘리지 않는다(전에는 높이 170 고정 + slice라 넓으면 돌 윗부분이 잘렸다).
+// 로그인·가입·가입 완료·내 계정(auth.js, settings.js)도 이 그림을 쓴다(D-104) — 선택지:
+//   extra: 가까운 언덕을 아래로 더 늘인 높이(설계 좌표). 로그인은 버튼 세 개가 언덕 위에 서야 해서 돌을 그만큼 위로 올린다.
+//   top: 그림 위 하늘 여백(화면 px 기준 설계값). anchor "top"이면 위를 기준으로 붙여 아래가 잘린다(작은 이름 장면 — 돌과 먼 언덕만 보인다).
+//   stoneW: 돌 폭(설계 좌표, 바닥선 52 고정). glow: 돌 뒤 크림빛 한 겹(가입 완료 장면이 은은하게 숨 쉬게 한다).
+// 돌 둘레에 다른 요소가 따라 놓일 수 있게 at(x, y)가 설계 좌표를 그림 좌표(390 폭 기준)로 바꿔 준다.
+export function hillGround({ extra = 0, top = 45, stoneW = 40, anchor = "bottom", glow = false } = {}) {
+  const H = top + (170 + extra) * 1.5, bottom = 170 + extra;
+  const sx = 196 - stoneW / 2, sy = 52 - stoneW * .75;
+  const ground = el("div", { class: `ob-ground${anchor === "top" ? " top" : ""}`, style: { "--ob-ground-h": H } });
+  const gsvg = svgEl("svg", { viewBox: `0 0 390 ${H}`, preserveAspectRatio: anchor === "top" ? "xMidYMin slice" : "xMidYMax slice", "aria-hidden": "true" },
+    glow ? svgEl("defs", {}, svgEl("radialGradient", { id: "obGlow" },
+      svgEl("stop", { offset: "0", "stop-color": "var(--service-light)", "stop-opacity": "1" }),
+      svgEl("stop", { offset: ".55", "stop-color": "var(--service-light)", "stop-opacity": ".55" }),
+      svgEl("stop", { offset: "1", "stop-color": "var(--service-light)", "stop-opacity": "0" }))) : null,
+    svgEl("g", { transform: `translate(-97.5 ${top}) scale(1.5)` },
       svgEl("path", { class: "h-far", d: "M-240 58C60 30 170 26 250 42C320 56 360 50 630 42V170H-240Z" }),
       svgEl("path", { class: "h-mid", d: "M-240 92C90 66 240 70 630 98V170H-240Z" }),
-      svgEl("path", { class: "h-near", d: "M-240 128C110 110 260 116 630 132V170H-240Z" }),
+      svgEl("path", { class: "h-near", d: `M-240 128C110 110 260 116 630 132V${bottom}H-240Z` }),
       svgEl("path", { class: "road" }),
-      svgEl("image", { href: STONE_SRC, x: "176", y: "22", width: "40", height: "30" })));
+      glow ? svgEl("ellipse", { class: "glow", cx: "196", cy: String(sy + stoneW * .4), rx: String(stoneW * 1.15), ry: String(stoneW), fill: "url(#obGlow)" }) : null,
+      svgEl("image", { class: "ob-hill-stone", href: STONE_SRC, x: String(sx), y: String(sy), width: String(stoneW), height: String(stoneW * .75) })));
   ground.append(gsvg);
-  const start = el("button", { type: "button", class: "ob-start", text: "시작하기", onclick: (e) => { e.stopPropagation(); navigate("today"); } });
+  // 길은 붙은 뒤에야 길이를 잴 수 있다 — 화면에 붙인 다음 그린다(road()). 길 끝(196,38)은 돌 가운데 밑.
+  const road = () => gsvg.querySelector(".road").setAttribute("d", taper(gsvg, `M${210 + extra * .04} ${214 + extra}C204 160 190 96 196 38`, 156, 8));
+  const at = (x, y) => ({ x: x * 1.5 - 97.5, y: y * 1.5 + top });
+  return { ground, road, H, at, stoneBottom: at(196, 52).y, stoneCenter: at(196, sy + stoneW * .375) };
+}
+
+function buildNotice(navigate, { solo, onBack }) {
+  const { ground, road } = hillGround();
+  // 공개 서비스 시안(D-104): 이야기 → 시작하기 전에 → 로그인 → 가입(이름·동의) → 오늘. 계정을 묻는 일은 왜 쓰는지 들은 뒤에 온다.
+  const start = el("button", { type: "button", class: "ob-start", text: "시작하기", onclick: (e) => { e.stopPropagation(); navigate("auth?from=welcome"); } });
   const notice = el("section", { class: `ob-notice${solo ? " solo open" : ""}`, "aria-labelledby": "obNoticeTitle" },
     el("div", { class: "top" }, el("button", { type: "button", class: "ob-back", "aria-label": "이야기로 돌아가기", onclick: (e) => { e.stopPropagation(); onBack(); } }, chevron("M14.5 5.5 8 12l6.5 6.5"))),
     el("div", { class: "body" },
@@ -69,8 +90,6 @@ function buildNotice(navigate, { solo, onBack }) {
         el("li", {}, el("span", { class: "ob-face" }, icon(ICON.pen)), el("div", {}, el("b", { text: "정답을 정해 주지 않아요" }), el("p", { text: "감정을 진단하거나 판단하지 않아요. 어떤 마음이었는지는 내가 정해요." }))),
         el("li", {}, el("span", { class: "ob-face" }, icon(ICON.lock)), el("div", {}, el("b", { text: "내 기록은 나만의 것이에요" }), el("p", { text: "직접 쓴 일기를 자동으로 분석하거나 지켜보지 않아요." }))))),
     ground, start);
-  // 길은 붙은 뒤에야 길이를 잴 수 있다 — 화면에 붙인 다음 그린다(road()).
-  const road = () => gsvg.querySelector(".road").setAttribute("d", taper(gsvg, "M210 214C204 160 190 96 196 38", 156, 8)); // 길 끝(196,38)은 돌 가운데 밑
   notice.addEventListener("click", (e) => e.stopPropagation());
   return { notice, ground, road, start };
 }

@@ -97,7 +97,7 @@
 .ob-notice li p{margin:4px 0 0;font-size:.9375rem;line-height:1.4375rem;color:var(--muted);text-wrap:balance} /* 끝말 한 단어가 혼자 다음 줄로 넘어가지 않게 */
 .ob-ground{position:relative;flex:1;min-height:14.5rem;margin-top:18px;container-type:inline-size}
 /* 그림은 폭에 맞춰 커지되(390×300 비율) 남은 높이를 넘지 않는다 — 모자라면 위의 빈 하늘부터 잘린다(돌 위 여백이 약 20%라 돌은 남는다) */
-.ob-ground svg{position:absolute;left:0;right:0;bottom:0;width:100%;height:100%;max-height:calc(100cqw * 300 / 390)} /* 100cqh는 이 자리에서 0으로 풀려(크롬 실측) 높이는 %로 잡는다 */
+.ob-ground svg{position:absolute;left:0;right:0;bottom:0;width:100%;height:100%;max-height:calc(100cqw * var(--ob-ground-h,300) / 390)} /* 100cqh는 이 자리에서 0으로 풀려(크롬 실측) 높이는 %로 잡는다 */
 .ob-ground .h-far{fill:var(--land-hill-far)}.ob-ground .h-mid{fill:var(--land-hill-mid)}.ob-ground .h-near{fill:var(--land-hill-near)}.ob-ground .road{fill:var(--bg)}
 .ob-start{position:absolute;left:var(--sp-5);right:var(--sp-5);bottom:calc(var(--sp-6) + env(safe-area-inset-bottom));min-height:56px;border:0;border-radius:var(--radius-chip);background:var(--service-ink);color:var(--bg);font-size:var(--fs-heading);font-weight:var(--fw-body-strong)}
 /* 따로 연 경우(#/welcome?p=2)는 처음부터 펼쳐져 있다 */
@@ -105,3 +105,8 @@
 .ob-notice.solo{position:relative;inset:auto;min-height:calc(100dvh - var(--banner-h,2rem))}
 
 @media (prefers-reduced-motion:reduce){.ob-note .caret{animation:none}}
+
+/* 위 기준 언덕(hillGround anchor:"top", D-104): 작은 이름 장면 — 그림은 폭에 맞고 아래가 잘린다 */
+.ob-ground.top{overflow:hidden}
+.ob-ground.top svg{top:0;bottom:auto;height:auto;max-height:none;aspect-ratio:390 / var(--ob-ground-h)}
+.ob-ground .glow{transform-box:fill-box;transform-origin:50% 50%}

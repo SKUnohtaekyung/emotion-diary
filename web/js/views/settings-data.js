@@ -6,8 +6,8 @@ import { todayISO } from "../state.js";
 
 // 뒤로 가기(tabs.css .info-top·.back과 같은 모양) — 범위·성공·실패·영구 삭제 네 화면이 설정으로 돌아간다. 삭제 완료에는 두지 않는다(되돌릴 수 없는 일이 끝난 화면).
 const backIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M14.5 5.5 8 12l6.5 6.5" }));
-const backBar = (navigate) => el("div", { class: "info-top" },
-  el("button", { type: "button", class: "back", "aria-label": "설정으로", onclick: () => navigate("settings") }, backIcon()));
+const backBar = (navigate, to = "settings", label = "설정으로") => el("div", { class: "info-top" },
+  el("button", { type: "button", class: "back", "aria-label": label, onclick: () => navigate(to) }, backIcon()));
 
 // 선 아이콘(24 viewBox, 선 1.8, 둥근 끝·이음, 채움 없음) — 조약돌 모양(radius-blob) 면은 무늬일 뿐 조약돌 그림이 아니다.
 const checkIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "sd-icon-svg" }, svgEl("path", { d: "M5 12.5 9.3 17 19 7" }));
@@ -130,6 +130,18 @@ export function renderDeleted(main, navigate) {
     el("h1", { tabindex: "-1", text: "모두 삭제했어요" }),
     el("p", { class: "lede", text: "이 앱에서는 더 볼 수 없어요." }),
     // 기간 숫자를 적지 않는다(확인 전, DATA_MODEL §8·SAFETY_POLICY) — 백업·공급자 쪽 보존 지연만 정직하게 고지한다.
+    el("p", { class: "note", text: "백업이나 서비스 제공사 쪽에는 정해진 기간 동안 남을 수 있어요." }),
+    el("div", { class: "sd-actions" },
+      el("button", { type: "button", class: "btn primary big", text: "처음으로", onclick: () => navigate("welcome") }))));
+}
+
+// ══════ 탈퇴 완료(D-104) — 삭제 완료와 같은 결. 탈퇴 두 단계(떠나기 전에 → 마지막 확인)는 settings.js가 그린다(설정 줄·아이콘을 같이 쓴다). ══════
+export function renderLeft(main, navigate) {
+  // 삭제 완료와 같다 — 뒤로 가기 없이 출구는 '처음으로' 하나다.
+  main.replaceChildren(el("div", { class: "screen sd-screen sd-deleted center" },
+    iconFace(checkIcon(), "neutral"),
+    el("h1", { tabindex: "-1", text: "탈퇴했어요" }),
+    el("p", { class: "lede", text: "계정과 기록을 모두 지웠어요." }),
     el("p", { class: "note", text: "백업이나 서비스 제공사 쪽에는 정해진 기간 동안 남을 수 있어요." }),
     el("div", { class: "sd-actions" },
       el("button", { type: "button", class: "btn primary big", text: "처음으로", onclick: () => navigate("welcome") }))));

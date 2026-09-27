@@ -12,6 +12,7 @@ import { renderStats } from "./views/stats.js";
 import { renderWrite } from "./views/write.js";
 import { renderHelp } from "./views/entry.js";
 import { renderWelcome } from "./views/welcome.js";
+import { renderAuth } from "./views/auth.js";
 import { finishSplash, dropSplash } from "./splash.js";
 
 const main = document.getElementById("main");
@@ -26,6 +27,7 @@ const ROUTES = {
   write: { view: renderWrite, tab: "today", fullscreen: true },
   record: { view: renderRecord, tab: "calendar", fullscreen: true },
   welcome: { view: renderWelcome, tab: "today", fullscreen: true },
+  auth: { view: renderAuth, tab: "today", fullscreen: true }, // 로그인·가입(공개 서비스 시안, D-104)
   help: { view: renderHelp, tab: "settings", fullscreen: true }
 };
 const navigate = (route) => { if (location.hash === `#/${route}`) render(); else location.hash = `#/${route}`; };

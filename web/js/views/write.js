@@ -378,8 +378,8 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
   screen.addEventListener("input", () => { sync(); scheduleSave(); });
   if (pick) { footer.classList.add("pick"); screen.append(footer); main.replaceChildren(screen); } else main.replaceChildren(screen, footer);
 
-  if (params.get("s") === "expired") { // 과제7: 접근 만료 — 글은 그대로 두고 다시 들어오라는 시트만 덮는다(시안은 닫기만).
-    openSheet({ title: "다시 들어와야 해요", body: [el("p", { text: "쓰던 글은 그대로 있어요." })], primary: { text: "다시 들어가기" } });
+  if (params.get("s") === "expired") { // 과제7: 접근 만료 — 글은 그대로 두고 다시 들어오라는 시트를 덮는다. '다시 들어가기'는 로그인의 다시 들어오기 변형으로 간다(D-104, UX_SPEC §14).
+    openSheet({ title: "다시 들어와야 해요", body: [el("p", { text: "쓰던 글은 그대로 있어요." })], primary: { text: "다시 들어가기", onclick: () => navigate("auth?s=expired") } });
   }
 }
 
