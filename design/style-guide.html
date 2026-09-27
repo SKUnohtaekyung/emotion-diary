@@ -499,18 +499,26 @@ ul.note li{margin:0 0 6px}
 .pillrow{display:flex;flex-wrap:wrap;gap:8px;max-width:340px}
 .pillrow button{height:44px;padding:0 16px;border-radius:999px;border:1px solid var(--border-strong);background:var(--raised);font-size:15px;font-weight:600;color:var(--text);font-family:inherit}
 .pillrow button.sel{background:var(--service-ink);border-color:var(--service-ink);color:#FFF}
-/* 통계 친구 상세(D-095): 작은 언덕 위 친구 · 날마다 열 점 기둥 · 표시용 chip · 조약돌 붙은 목록 */
+/* 통계 친구 상세(D-095·D-101): 작은 언덕 위 친구 · 7일은 숫자·요일 붙은 열 점 기둥 · 30일은 요일 격자 · 표시용 chip (날짜 목록 없음) */
 .fd-head{position:relative;height:140px;border-radius:var(--radius-card);overflow:hidden;background:#FFF;max-width:340px}
 .fd-head .h1{position:absolute;left:-10%;right:-10%;bottom:0;height:58%;background:var(--land-hill-far);border-radius:50% 50% 0 0/40px 40px 0 0}
 .fd-head .h2{position:absolute;left:-10%;right:-10%;bottom:0;height:32%;background:var(--land-hill-mid);border-radius:50% 50% 0 0/28px 28px 0 0}
 .fd-head img{position:absolute;left:50%;bottom:12%;width:112px;transform:translateX(-50%)}
-.dotcols{display:flex;align-items:flex-end;gap:3px;height:90px;margin-top:16px;max-width:340px}
+.dotcols{display:flex;align-items:flex-end;gap:3px;margin-top:16px;max-width:340px}
 .dotcol{flex:1;display:flex;flex-direction:column-reverse;gap:3px;align-items:center}
+.dotcol b{order:-1;min-height:18px;font-size:13px;font-weight:800;line-height:18px}
+.dotcol span{order:-2;font-size:12px;line-height:16px;color:var(--muted)}
 .dotcol i{width:7px;height:7px;border-radius:50%;background:var(--border)}
 .dotcol i.on{background:var(--c)}
-.fd-list{list-style:none;margin:12px 0 0;padding:0;display:flex;flex-direction:column;gap:4px;max-width:340px}
-.fd-list li{display:flex;align-items:center;gap:10px;min-height:44px;padding:0 8px;border-radius:10px;font-size:14px}
-.fd-list img{width:22px;height:22px}
+.fd-mg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;max-width:340px;margin-top:12px;text-align:center}
+.fd-mg span{font-size:12px;color:var(--muted)}
+.fd-mg i{position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between;align-items:center;height:64px;padding:5px 0 7px;border-radius:12px;font-style:normal;font-size:12px;color:var(--subtle)}
+.fd-mg i.on{color:var(--text);font-weight:600}
+.fd-mg i.on::before{content:"";position:absolute;left:50%;bottom:6px;width:36px;height:30px;margin-left:-18px;border-radius:58% 42% 52% 48% / 56% 50% 50% 44%;background:linear-gradient(to top,var(--anger-300) calc(var(--v) * 10%),var(--anger-100) 0)}
+.fd-mg i.sel::before{background:url(pebbles/ui/anger-128.png) center/42px no-repeat;width:42px;height:40px;margin-left:-21px;bottom:6px;border-radius:0}
+.fd-peek{position:relative;max-width:340px;margin-top:20px;padding:18px 18px 10px;border-radius:20px;background:var(--service-light);color:var(--paper-ink);font-size:14px}
+.fd-peek::before{content:"";position:absolute;top:-10px;left:50%;width:72px;height:22px;margin-left:-36px;background:color-mix(in srgb,var(--service-mint) 85%,transparent);transform:rotate(-3deg)}
+.fd-mg i b{position:relative;font-size:16px;font-weight:800;line-height:20px;min-height:20px;color:var(--anger-900)}
 /* 달력 — 날짜를 누르면 그 주로 접히고 곧장 편지 카드(D-096) */
 .cal-top{display:flex;align-items:center;justify-content:space-between;max-width:340px;margin:16px 0 8px}
 .cal-top .x{width:36px;height:36px;border-radius:50%;background:var(--surface-soft);display:grid;place-items:center;font-size:16px;color:var(--text)}
@@ -1098,31 +1106,32 @@ ul.note li{margin:0 0 6px}
   <li><b>'나' 표식은 나의 돌</b>입니다(D-070) — 오늘 화면 가운데 돌의 쉬는 모습(34px, 감정 색 없이 정적, 흔들림·반짝임 없음)입니다. 통계 화면 자체는 <b>밝은 바탕과 원래 하단 탐색 그대로</b>입니다 — 어두운 숲·유리 탐색은 오늘 화면 한 곳뿐입니다. 무드 통일은 진입 연출로 합니다: 친구가 길 왼쪽 끝에서 1200ms 걸어오고(D-080 ②), 움직임 줄이기에서는 곧바로 자리에 있습니다.</li>
 </ul>
 <h3>통계 — 친구 상세 (D-095)</h3>
-<p class="note">친밀도 줄의 <code>보기 ›</code>를 누르면 그 친구의 상세(<code>#/stats/&lt;계열&gt;?p=7|30</code>, 하단 탐색 없음)로 갑니다. 머리는 <b>작은 언덕 위에 선 친구</b>(크기 화면 '길 위의 친구'와 같은 결, 124px)이고 화면 배경은 흰색 그대로입니다(D-095 ②). '&lt;계열&gt;의 크기'는 <b>날마다 점 열 개 기둥</b>입니다 — 그날 크기만큼 아래부터 계열 강조색으로 채우고, 기록 없는 날은 빈 기둥(0이 아니라 값 없음, D-095 ③이 옛 선 차트를 대체). '&lt;계열&gt;에서 고른 말'은 표시용 <b>감정 chip</b>이고(한 화면이 한 계열이라 색으로 순위가 생기지 않습니다, D-095 ④), '함께한 날' 목록은 줄 앞에 그날의 조약돌이 붙고 누르면 그 날의 달력으로 갑니다(D-095 ⑤).</p>
+<p class="note">친밀도 줄의 <code>보기 ›</code>를 누르면 그 친구의 상세(<code>#/stats/&lt;계열&gt;?p=7|30</code>, 하단 탐색 없음)로 갑니다. 머리는 <b>작은 언덕 위에 선 친구</b>(크기 화면 '길 위의 친구'와 같은 결, 124px)이고 화면 배경은 흰색 그대로입니다(D-095 ②). '&lt;계열&gt;의 크기'는 머리말이 비교 문장('지난 7일보다 1.6 낮아요', 크게)이고 그 아래 작게 '평균 · 기록한 날 수'입니다(D-101). 7일은 <b>날마다 점 열 개 기둥</b> — 그날 크기만큼 아래부터 계열 강조색으로 채우고, 기둥 위에 크기 숫자, 아래에 요일이 붙습니다. 기록 없는 날은 빈 기둥(0이 아니라 값 없음). 30일은 <b>일요일 시작 요일 격자의 조약돌 칸</b> — 네모 칸 없이 날짜 아래 조약돌 모양 면에 크기/10 높이로 계열 300이 차오르고 가운데 굵은 숫자, <b>고른 날은 검정 테두리가 아니라 그 계열 조약돌 그림</b>으로 바뀌어 살짝 들립니다(D-103). 기록한 날 기둥·칸을 누르면 차트 아래에 <b>그날의 작은 편지</b>(크림빛 종이·테이프·줄 노트 위 있었던 일 두 줄·조약돌 봉인·그날 고른 말·'— 그날의 나에게'·편지 열기)가 제자리에 펼쳐지고(처음엔 가장 최근 기록한 날), '편지 열기'가 그날 편지로 곧장 갑니다. 편지의 ‹ '통계로'가 같은 기간의 이 화면으로 돌려보냅니다. '&lt;계열&gt;에서 고른 말'은 표시용 <b>감정 chip</b>이고(한 화면이 한 계열이라 색으로 순위가 생기지 않습니다, D-095 ④). 따로 있던 '함께한 날' 날짜 목록은 차트와 같은 정보를 한 번 더 보여 줘 D-101에서 없앴습니다.</p>
 <div class="fd-head" role="img" aria-label="작은 언덕 위에 선 타온, 분노">
   <i class="h1"></i><i class="h2"></i>
   <img src="characters/flat-friends/ui/taon--anger-480.png" alt="">
 </div>
 <p style="margin:12px 0 2px;font-size:15px;font-weight:700">분노의 크기</p>
-<div class="dotcols" style="--c:var(--anger-500)" role="img" aria-label="날마다 분노의 크기, 점 10개 기둥">
-  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i></div>
-  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="dotcol"></div>
-  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i></div>
-  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i></div>
-  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+<div class="dotcols" style="--c:var(--anger-500)" role="img" aria-label="날마다 분노의 크기, 점 10개 기둥 위에 크기 숫자와 요일">
+  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><b>6</b><span>월</span></div>
+  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b>3</b><span>화</span></div>
+  <div class="dotcol"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><b></b><span>수</span></div>
+  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><b>7</b><span>목</span></div>
+  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><b>4</b><span>금</span></div>
+  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><b>5</b><span>토</span></div>
+  <div class="dotcol"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i><b>8</b><span>오늘</span></div>
 </div>
-<p class="cap" style="margin-top:6px">n=6 · 범위 3~8 · 평균 5.6 — 지난 기간과 비슷해요.</p>
+<p class="cap" style="margin-top:6px">위: 7일 · 아래: 30일(일부) — 머리말 '지난 7일과 비슷해요', 작은 줄 '평균 5.5 · 6일 기록'</p>
+<div class="fd-mg" role="img" aria-label="30일 요일 격자 예시, 기록한 날만 색 칸에 크기">
+  <span>일</span><span>월</span><span>화</span><span>수</span><span>목</span><span>금</span><span>토</span>
+  <i>7<b></b></i><i class="on" style="--v:6"><span style="position:relative">8</span><b>6</b></i><i class="on" style="--v:3"><span style="position:relative">9</span><b>3</b></i><i>10<b></b></i><i class="on sel" style="--v:7"><span style="position:relative">11</span><b>7</b></i><i class="on" style="--v:4"><span style="position:relative">12</span><b>4</b></i><i>13<b></b></i>
+</div>
+<div class="fd-peek" role="img" aria-label="고른 날의 작은 편지 예시"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><b style="font-size:15px">9월 11일의 편지</b><div style="font-size:12px">분노 7</div></div><img src="pebbles/ui/anger-128.png" alt="" style="width:34px;transform:rotate(-10deg)"></div><p style="margin:10px 0 10px;line-height:30px;background:linear-gradient(to bottom,transparent 29px,var(--paper-rule) 29px) 0 0/100% 30px repeat-y;min-height:60px">약속이 말없이 취소됐다.</p><span class="chip" style="background:var(--anger-100);border-color:var(--anger-300);color:var(--anger-900)"><i class="dot" style="background:var(--anger-500)"></i>답답한</span><div style="display:flex;justify-content:space-between;margin-top:10px;font-weight:600"><span style="font-size:13px">— 그날의 나에게</span><span style="color:var(--service-ink)">편지 열기 ›</span></div></div>
 <p style="margin:16px 0 2px;font-size:15px;font-weight:700">분노에서 고른 말</p>
 <div class="chips">
   <span class="chip" style="background:var(--anger-100);border-color:var(--anger-300);color:var(--anger-900)"><i class="dot" style="background:var(--anger-500)"></i>답답한 · 4</span>
   <span class="chip" style="background:var(--anger-100);border-color:var(--anger-300);color:var(--anger-900)"><i class="dot" style="background:var(--anger-500)"></i>억울한 · 2</span>
 </div>
-<ul class="fd-list">
-  <li><img src="pebbles/ui/anger-128.png" alt="">9월 2일 · 크기 8</li>
-  <li><img src="pebbles/ui/anger-128.png" alt="">9월 1일 · 크기 5</li>
-</ul>
 </section>
 
 <section>

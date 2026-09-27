@@ -2,8 +2,8 @@
 // 계산은 stats-calc.js(순수 함수, DOM 없음)에 있고 이 파일은 그 결과를 그린다.
 import { el, svgEl, announce, renderStatus, reducedMotion } from "../dom.js";
 import { data, friendImg, pebbleImg, stoneImg, FRIENDS, category } from "../data.js";
-import { toISO } from "../state.js";
-import { effectiveToday } from "../sample.js";
+import { state, toISO } from "../state.js";
+import { effectiveToday, sampleRecord } from "../sample.js";
 import { periodDates, periodSummary, currentStreak, topWords, topWordsForCategory, valuesByIndex, compare, buildSample, buildFewSample, addDays, MIN_DAYS, MIN_N_FOR_MEAN } from "../stats-calc.js";
 
 const CAT_ORDER = () => data.categories.map((c) => c.code);
@@ -180,9 +180,10 @@ function rangePhrase(c) {
   if (c.min === c.max) return { text: `모두 ${c.min}`, aria: `모두 ${c.min}` };
   return { text: `범위 ${c.min}~${c.max}`, aria: `범위 ${c.min}에서 ${c.max}` };
 }
+// 범위는 날마다 숫자가 보이므로(D-101) 줄에서 뺐다 — 스크린리더 설명(chartAria)에만 남긴다.
 function statLine(c) {
-  if (c.n < MIN_N_FOR_MEAN) return `${c.n}일 · 평균은 ${MIN_N_FOR_MEAN}일부터`;
-  return `평균 ${c.mean.toFixed(1)} · ${c.n}일 · ${rangePhrase(c).text}`;
+  if (c.n < MIN_N_FOR_MEAN) return `${c.n}일 기록 · 평균은 ${MIN_N_FOR_MEAN}일부터`;
+  return `평균 ${c.mean.toFixed(1)} · ${c.n}일 기록`;
 }
 function compareText(cmp, periodLabel) {
   if (!cmp) return null;
@@ -190,9 +191,6 @@ function compareText(cmp, periodLabel) {
   const abs1 = (Math.round(Math.abs(cmp.delta) * 10) / 10).toFixed(1);
   return `지난 ${periodLabel}보다 ${abs1} ${cmp.dir === "up" ? "높아요" : "낮아요"}`;
 }
-const axisLabel = (iso) => { const [, m, d] = iso.split("-"); return `${Number(m)}/${Number(d)}`; };
-// 날짜 축에 보일 인덱스: 7일 이하는 처음·끝(오늘), 그보다 길면 처음·가운데·끝(오늘)도 더한다.
-function axisIndices(n) { return n <= 7 ? [0, n - 1] : [0, Math.floor((n - 1) / 2), n - 1]; }
 
 // "9월 25일 금요일"(오늘이면 "오늘 · 9월 25일") — formatDate()의 "2026년 9월 25일 (금)"보다 가볍다. (아래 열 점 기둥의 스크린리더 목록과
 // '함께한 날'이 함께 쓴다 — 함수를 sizeTrendDetail보다 앞으로 옮겼다.)
@@ -203,38 +201,130 @@ function dayLine(iso, todayIso) {
   return `${m}월 ${d}일 ${WEEKDAYS_FULL[new Date(y, m - 1, d).getDay()]}`;
 }
 
-// 크기 추세(D-050·D-086·2026-09-25 재개편): 큰 선 차트 대신 편지 카드의 '숫자와 열 점'(§6.14)과 같은 말로 — 날마다 점 열 개가 선 기둥 하나,
-// 그날 크기만큼 아래부터 계열 강조색으로 채운다. 축 숫자(1·5·10)·점선 평균선·범례·읽는 법 접기·지난 기간 겹침은 없앴다(사용자 결정).
-// 비교 문장(지난 기간보다 높다/낮다/비슷하다)은 글 한 줄로만 남긴다. host 폭을 재는 SVG가 아니라 flex 열이라 DOM에 붙기 전에도 완성해 그릴 수 있다.
+// 크기 추세(D-050·D-086·2026-09-25 재개편, D-101 — 2026-09-27 사용자 QA, D-102 '고른 날 펼쳐 보기'):
+// 이 화면의 1순위 경험은 '이 감정이 머문 날을 알아보고 그날로 돌아가 보기'다(D-102). 날짜·숫자만으로는 그날을 알아볼 수 없다 — 알아보는 단서는
+// 그날 적은 '있었던 일'이다(recognition over recall). 그래서 차트는 날을 '고르는' 자리이고, 고른 날의 작은 편지(있었던 일·고른 말·편지 열기)가
+// 차트 바로 아래 제자리에 펼쳐진다 — 페이지를 옮기지 않으니 여러 날을 톡톡 눌러 견줄 수 있다. 처음에는 가장 최근 기록한 날이 펼쳐져 있다.
+// 7일: 날마다 점 열 개 기둥(편지 카드의 '숫자와 열 점', §6.14) 위에 크기 숫자, 아래에 요일.
+// 30일: 달력 탭과 같은 일요일 시작 요일 격자의 물 채움 칸 — 날짜는 위에 또렷하게, 칸 아래부터 크기/10 높이로 계열색이 차오르고 가운데 굵은 숫자.
+// 한 주 줄이 7일 기둥처럼 읽힌다(첫 시안의 작은 기둥 칸은 작은 것 셋이 쌓여 읽히지 않았다 — 사용자 지적).
+// 고르기는 기간 고르기(periodPicker)와 같은 radiogroup이다: 고른 날만 Tab 순서에 들고 ← →(↑ ↓)로 기록한 날 사이를 옮긴다, Home·End는 처음·끝.
+// 크기가 소수(그날 여러 행의 평균)면 소수 한 자리, 점·기둥은 반올림한 값으로 그린다(UX_SPEC).
+const WEEKDAYS_SHORT = ["일", "월", "화", "수", "목", "금", "토"];
+const sizeText = (v) => (Number.isInteger(v) ? String(v) : v.toFixed(1));
+// 편지 열기는 그날 편지(기록 상세)로 곧장 간다(D-101 ④). from=stats·cat·p는 편지 화면의 ‹가 이 친구 상세(같은 기간)로 돌아오게 하는 표시다(tabs.js renderRecord).
+const recordHref = (code, periodLen) => (iso) => `#/record/${iso}?from=stats&cat=${code}&p=${periodLen}`;
+
+// 30일 칸은 조약돌 칸(D-103, 2026-09-27 사용자 선택 A): 네모 칸·테두리 없이 날짜 아래 조약돌 모양 면 하나, 그 안에 크기/10 높이로 계열색이 차오르고 가운데 숫자.
+// 조약돌 윤곽은 날짜마다 세 가지 중 하나라 줄이 찍어 낸 격자처럼 보이지 않는다(크기와 무관 — D-050, 조약돌 크기·모양으로 크기를 그리지 않는다).
+const PEB_SHAPES = ["a", "b", "c"];
+function dayCell(iso, i, v, todayIso, month) {
+  const [y, m, d] = iso.split("-").map(Number);
+  const isToday = iso === todayIso;
+  let inner;
+  if (month) {
+    const dateText = isToday ? "오늘" : i === 0 || d === 1 ? `${m}/${d}` : String(d); // 첫 칸과 달이 바뀌는 칸만 월을 붙인다
+    inner = [el("span", { class: "sxd-mg-date", "aria-hidden": "true", text: dateText }),
+      v == null ? null : el("span", { class: `sxd-mg-peb peb-${PEB_SHAPES[d % 3]}`, "aria-hidden": "true", style: { "--v": String(Math.round(v)) } },
+        el("span", { class: "sxd-mg-fill" }), el("span", { class: "sxd-mg-val", text: sizeText(v) }))];
+  } else {
+    const filled = v == null ? 0 : Math.round(v);
+    inner = [el("span", { class: "sxd-col-val", "aria-hidden": "true", text: v == null ? "" : sizeText(v) }),
+      el("div", { class: "sxd-col", "aria-hidden": "true" }, Array.from({ length: 10 }, (_, k) => el("i", { class: k < filled ? "f" : "" }))),
+      el("span", { class: "sxd-col-axis", "aria-hidden": "true", text: isToday ? "오늘" : WEEKDAYS_SHORT[new Date(y, m - 1, d).getDay()] })];
+  }
+  const cls = month ? "sxd-mg-cell" : "sxd-col-wrap";
+  if (v == null) return el("span", { class: `${cls} empty` }, inner, el("span", { class: "sr", text: `${dayLine(iso, todayIso)}: 기록 없음` }));
+  return el("button", { type: "button", role: "radio", "aria-checked": "false", tabindex: "-1", class: cls, "data-iso": iso, "aria-label": `${dayLine(iso, todayIso)}, 크기 ${sizeText(v)}` }, inner);
+}
+
+// 고른 날의 작은 편지(D-103 — 편지 카드의 결): 크림빛 종이(칭찬·감사 카드와 같은 --service-light) 위에 테이프 한 조각, '9월 26일의 편지'와
+// 봉인 자리의 그 계열 조약돌, '<계열> 4'와 열 점, 줄 노트 위 있었던 일 두 줄, 그날 고른 말, 맨 아래 '— 그날의 나에게'와 '편지 열기 ›'.
+// 소품은 테이프·줄 노트·조약돌 봉인 셋만(BRAND_STORY §6 '한 화면에 세 곳 안팎'). 차트에서 고른 날 위에 얹힌 조약돌과 같은 그림이라 둘이 짝으로 읽힌다.
+// 기록은 달력·편지와 같은 표본(sample.js sampleRecord — 통계 표본의 그날을 그대로 쓴다)이고, 오늘 실제로 남긴 기록이면 그것을 쓴다.
+const PEEK_WORDS = 4;
+function dayPeek(code, iso, v, todayIso, hrefOf) {
+  const rec = state.completed?.date === iso ? state.completed : sampleRecord(iso);
+  const words = rec.emotions.filter((e) => e.cat === code).map((e) => e.label);
+  const filled = Math.round(v);
+  const [, m, d] = iso.split("-").map(Number);
+  const vars = { "--chip-fill": `var(--${code}-chip-fill)`, "--chip-border": `var(--${code}-chip-border)`, "--chip-text": `var(--${code}-chip-text)`, "--dot": `var(--${code}-accent)` };
+  const seal = pebbleImg(code, { size: 34 }); seal.classList.add("sxd-peek-seal");
+  return el("article", { class: "sxd-peek", style: vars, "aria-label": `${dayLine(iso, todayIso)}의 편지 미리보기` },
+    el("i", { class: "sxd-peek-tape", "aria-hidden": "true" }),
+    el("div", { class: "sxd-peek-top" },
+      el("div", {},
+        el("p", { class: "sxd-peek-date" }, `${m}월 ${d}일의 편지`, el("span", { class: "sr", text: ` (${dayLine(iso, todayIso)})` })),
+        el("p", { class: "sxd-peek-size" }, el("span", { text: `${category(code).label} ${sizeText(v)}` }),
+          el("span", { class: "sxd-peek-dots", "aria-hidden": "true" }, Array.from({ length: 10 }, (_, k) => el("i", { class: k < filled ? "f" : "" }))))),
+      seal),
+    // 긴 글(글자 수 제한 없음): 미리보기는 그날을 알아보는 단서만 — 줄 노트 두 줄까지 보이고 넘치면 말줄임, 전체는 '편지 열기'에서. 짧아도 두 줄 자리를 지켜
+    // 날을 바꿔 눌러도 아래 줄이 제자리에 있다(stats.css). 비워 둔 날은 빈칸 대신 옅은 안내.
+    el("div", { class: "sxd-peek-lines" }, rec.event?.trim()
+      ? el("p", { class: "sxd-peek-event", text: rec.event.trim() })
+      : el("p", { class: "sxd-peek-event empty", text: "있었던 일은 비워 둔 날이에요" })),
+    // 고른 말은 네 개까지, 나머지는 '+N'(미리보기가 세 줄로 길어지지 않게 — 전부는 편지에서).
+    words.length ? el("div", { class: "sxd-peek-chips" }, words.slice(0, PEEK_WORDS).map((w) => el("span", { class: "sxd-chip" },
+      el("i", { class: "sxd-chip-dot", "aria-hidden": "true" }), el("span", { class: "sxd-chip-label", text: w }))),
+      words.length > PEEK_WORDS ? el("span", { class: "sxd-peek-more", "aria-label": `고른 말 ${words.length - PEEK_WORDS}개 더`, text: `+${words.length - PEEK_WORDS}` }) : null) : null,
+    el("div", { class: "sxd-peek-sign" },
+      el("span", { class: "sxd-peek-sig", text: "— 그날의 나에게" }),
+      el("a", { class: "sxd-peek-open", href: hrefOf(iso) }, "편지 열기", chevIcon())));
+}
+
 function sizeTrendDetail(code, cur, prev, dates, sample, periodLen, todayIso) {
   const periodLabel = `${periodLen}일`;
   const cmp = compare(cur, prev);
   const cmpText = compareText(cmp, periodLabel);
   const curByIdx = valuesByIndex(sample, dates, code);
-  const small = dates.length > 7; // 30일은 점을 줄여 폭 안에 넣는다
-  const axisSet = new Set(axisIndices(dates.length));
-  const cols = dates.map((iso, i) => {
-    const v = curByIdx[i];
-    const filled = v == null ? 0 : Math.round(v); // 그날 크기가 여럿이면 평균 — 점은 반올림한 개수만큼 채운다(UX_SPEC)
-    const dots = Array.from({ length: 10 }, (_, k) => el("i", { class: k < filled ? "f" : "" }));
-    const label = axisSet.has(i) ? (i === dates.length - 1 ? `${axisLabel(iso)} 오늘` : axisLabel(iso)) : "";
-    return el("div", { class: `sxd-col-wrap${v == null ? " empty" : ""}` },
-      el("div", { class: "sxd-col" }, dots), el("span", { class: "sxd-col-axis", "aria-hidden": "true", text: label }));
-  });
+  const month = dates.length > 7;
+  const hrefOf = recordHref(code, periodLen);
   // 친구는 사용자의 글에 반응하지 않고 마음의 주인도 아니다(UX_SPEC) — 계열을 주어로 둔다("설이, 슬픔 크기"처럼 친구 이름을 앞세우지 않는다).
-  let chartAria = `${category(code).label} 크기, 날마다 채운 점 개수가 그날 크기예요. 최근 ${periodLen}일 중 ${cur.n}일 기록`;
+  let chartAria = `${category(code).label} 크기, 최근 ${periodLen}일 중 ${cur.n}일 기록`;
   if (cur.n >= MIN_N_FOR_MEAN) chartAria += `, 평균 ${cur.mean.toFixed(1)}`;
-  chartAria += `, ${rangePhrase(cur).aria}.`;
-  if (cmpText) chartAria += ` ${cmpText}`;
-  // 날마다 값을 스크린리더가 읽을 수 있는 목록(색·점 개수만으로 전달하지 않는다, DESIGN_SYSTEM §3.3).
-  const dayList = el("ul", { class: "sr" }, dates.map((iso, i) => el("li", { text: `${dayLine(iso, todayIso)}: ${curByIdx[i] != null ? `크기 ${curByIdx[i]}` : "기록 없음"}` })));
-  // 상세의 세 섹션 머리를 같은 모양(h2 제목 하나)으로 통일한다.
+  chartAria += `, ${rangePhrase(cur).aria}. 기록한 날을 고르면 아래에 그날 편지 미리보기가 나와요.`;
+
+  const cells = dates.map((iso, i) => dayCell(iso, i, curByIdx[i], todayIso, month));
+  const radios = cells.filter((c) => c.tagName === "BUTTON");
+  const peekHost = el("div", { class: "sxd-peek-host" });
+  const pickPebble = pebbleImg(code, { size: month ? 42 : 30 }); pickPebble.classList.add("sxd-pick-peb"); pickPebble.setAttribute("aria-hidden", "true");
+  const select = (btn, { focus = false, reveal = false } = {}) => {
+    radios.forEach((r) => { const on = r === btn; r.setAttribute("aria-checked", String(on)); r.setAttribute("tabindex", on ? "0" : "-1"); });
+    // 고른 날에는 검정 테두리가 아니라 그 계열 조약돌 하나가 얹힌다(D-103) — 친구가 그날 남긴 흔적을 집어 든다는 이야기, 아래 편지의 봉인 조약돌과 짝.
+    (btn.querySelector(".sxd-mg-peb") ?? btn).prepend(pickPebble); // 30일은 조약돌 면 자리에(숫자 밑), 7일은 기둥 위
+    const iso = btn.dataset.iso;
+    peekHost.replaceChildren(dayPeek(code, iso, curByIdx[dates.indexOf(iso)], todayIso, hrefOf));
+    if (focus) btn.focus();
+    // 30일 격자는 휴대폰에서 미리보기가 화면 아래로 밀릴 수 있다 — 누른 뒤 미리보기가 보이도록 필요한 만큼만 스크롤한다(초안 2의 30일 조건).
+    if (reveal) peekHost.scrollIntoView({ block: "nearest", behavior: reducedMotion() ? "auto" : "smooth" });
+  };
+  radios.forEach((b, k) => {
+    b.addEventListener("click", () => { if (b.getAttribute("aria-checked") !== "true") select(b, { reveal: true }); });
+    b.addEventListener("keydown", (ev) => {
+      const map = { ArrowRight: k + 1, ArrowDown: k + 1, ArrowLeft: k - 1, ArrowUp: k - 1, Home: 0, End: radios.length - 1 };
+      if (!(ev.key in map)) return;
+      ev.preventDefault();
+      const t = radios[Math.max(0, Math.min(radios.length - 1, map[ev.key]))];
+      if (t !== b) select(t, { focus: true, reveal: true });
+    });
+  });
+  if (radios.length) select(radios[radios.length - 1]); // 처음엔 가장 최근 기록한 날
+
+  let head = [], lead = [];
+  if (month) {
+    const [y0, m0, d0] = dates[0].split("-").map(Number);
+    head = WEEKDAYS_SHORT.map((w) => el("span", { class: "sxd-mg-wd", "aria-hidden": "true", text: w }));
+    lead = Array.from({ length: new Date(y0, m0 - 1, d0).getDay() }, () => el("span", { class: "sxd-mg-cell blank", "aria-hidden": "true" }));
+  }
+  // 비교 문장이 이 절의 머리말이다(D-101) — '평균·범위' 같은 통계 말보다 '지난 기간보다 낮아요'가 사람이 읽는 요지라 크게 두고, 수치 줄은 그 아래 작게.
+  // 색·점 개수만으로 전하지 않는다(DESIGN_SYSTEM §3.3): 칸마다 날짜·크기(또는 '기록 없음')를 스크린리더가 읽는다.
   return el("section", { class: "sx-sec" },
     el("h2", { text: `${category(code).label}의 크기` }),
+    cmpText ? el("p", { class: "sxd-cmp-head", text: cmpText }) : null,
     el("p", { class: "sxd-stat-line", text: statLine(cur) }),
-    cmpText ? el("p", { class: "sxd-cmp-line", text: cmpText }) : null,
-    el("div", { class: `sxd-cols${small ? " small" : ""}`, role: "img", "aria-label": chartAria, style: { "--dot": `var(--${code}-accent)` } }, cols),
-    dayList);
+    el("div", { class: month ? "sxd-mg" : "sxd-cols", role: "radiogroup", "aria-label": chartAria, style: { "--dot": `var(--${code}-accent)`, "--chip-fill": `var(--${code}-chip-fill)`, "--chip-border": `var(--${code}-chip-border)` } },
+      head, lead, cells),
+    peekHost);
 }
 
 function wordsDetail(code, sample, dates) {
@@ -250,14 +340,7 @@ function wordsDetail(code, sample, dates) {
       el("i", { class: "sxd-chip-dot", "aria-hidden": "true" }), el("span", { class: "sxd-chip-label", text: w }), el("em", { class: "sxd-chip-count", text: String(n) })))));
 }
 
-// 함께한 날: 줄 앞에 그날의 조약돌(달력 칸과 같은 그림, data.js pebbleImg) — 하이라인 구분선과 ›를 빼고, 줄 전체가 링크임은 눌림 면(설정 §6.16의
-// .st-row 눌림 결과 같은 규칙)으로 알린다. 2026-09-25 사용자 지적으로 옛 구분선 목록에서 바꿨다.
-function togetherDaysDetail(code, cur, todayIso) {
-  if (!cur.n) return null;
-  const rows = [...cur.days].reverse().map((d) => el("a", { class: "sxd-day-row", href: `#/calendar?d=${d.date}` },
-    pebbleImg(code, { size: 28 }), el("span", { class: "sxd-day-date", text: dayLine(d.date, todayIso) }), el("span", { class: "sxd-day-size", text: `크기 ${d.v}` })));
-  return el("section", { class: "sx-sec" }, el("h2", { text: "함께한 날" }), el("div", { class: "sxd-days" }, rows));
-}
+// '함께한 날' 날짜 목록은 D-101에서 없앴다 — 그날로 가는 입구는 위 크기 차트의 기둥·칸이 맡는다.
 
 function renderFriendDetail(main, navigate, params, code, sample, todayIso, few) {
   let periodLen = periodFromParams(params);
@@ -277,11 +360,11 @@ function renderFriendDetail(main, navigate, params, code, sample, todayIso, few)
     if (!enough) {
       bodyNode = el("div", { class: "sx-empty" },
         el("p", { class: "sx-headline", text: "기록이 더 필요해요" }),
-        el("p", { class: "caption", text: `기록이 ${MIN_DAYS}일 이상 쌓이면 ${category(code).label}의 크기와 함께한 날을 보여 드려요.` }));
+        el("p", { class: "caption", text: `기록이 ${MIN_DAYS}일 이상 쌓이면 ${category(code).label}의 크기를 날마다 보여 드려요.` }));
     } else if (cur.n === 0) {
       bodyNode = el("div", { class: "sx-empty" }, el("p", { class: "sx-headline", text: "이번 기간에는 오지 않았어요" }));
     } else {
-      bodyNode = el("div", {}, sizeTrendDetail(code, cur, prev, dates, sample, periodLen, todayIso), wordsDetail(code, sample, dates), togetherDaysDetail(code, cur, todayIso));
+      bodyNode = el("div", {}, sizeTrendDetail(code, cur, prev, dates, sample, periodLen, todayIso), wordsDetail(code, sample, dates));
     }
     const sub = enough ? `${category(code).label} · 최근 ${periodLen}일 중 ${cur.n}일 함께했어요` : category(code).label;
 
