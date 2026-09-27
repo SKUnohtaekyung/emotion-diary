@@ -114,7 +114,9 @@ main:has(.screen.review),main:has(.screen.record){
 
 /* ── 위 바·아래 버튼 줄·페이저는 밝은 화면 스타일 그대로다. 아래만 장면에 맞춘다 ── */
 .screen.review .write-top{background:var(--bg)} /* 위 바는 붙어 다닌다: 화면이 낮아 스크롤될 때 글이 바 밑으로 지나가며 겹치지 않도록 흰색으로 채운다 */
-main:has(.screen.review) .step-footer{background:var(--bg)} /* 버튼 줄은 불투명이다: 화면이 낮거나 수정 중 배너로 글이 길어 카드가 줄 밑으로 지나가도 버튼 글자가 카드 위에 뜨지 않는다 */
+/* 버튼 줄은 장면의 맨 아래 색(fc-deep)으로 불투명하다: 화면이 낮거나 수정 중 배너로 글이 길어 카드가 줄 밑으로 지나가도 버튼 글자가 카드 위에 뜨지 않는다.
+   흰색(--bg)이던 것을 D-101에서 바꿨다 — 흰 띠가 숲 장면을 가로로 잘라 버튼 줄이 다른 화면처럼 떨어져 보였다(2026-09-27 사용자 QA). 위 28px은 투명→장면색으로 녹여 이음매를 없앤다. */
+main:has(.screen.review) .step-footer{background:linear-gradient(to bottom,color-mix(in srgb,var(--fc-deep) 0%,transparent) 0,var(--fc-deep) 28px)}
 .letter-stage .letter-nav .dd i{background:color-mix(in srgb,var(--service-ink) 50%,transparent)} /* 안 켜진 점: 흰 바탕 위에서 3:1 이상 */
 .letter-stage .letter-nav{visibility:hidden} /* 닫힌 동안 안 보이는 화살표가 초점을 받지 않게 */
 .opened .letter-nav{visibility:visible}

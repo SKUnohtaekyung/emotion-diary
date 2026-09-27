@@ -333,11 +333,20 @@ export function renderRecord(main, navigate, params, rest) {
   }
   const menu = recordMenu(iso, rec, real, navigate);
   // 달력의 작은 편지에서 왔으면(D-100 ③) 뒤로 가기와 같게 돌아가 같은 날이 골라진 달력을 본다 — 새 기록을 쌓지 않는다. 주소로 곧장 왔으면 그날을 고른 달력으로 간다.
-  const backToCalendar = () => { if (params?.get("from") === "calendar" && history.length > 1) history.back(); else navigate(`calendar?d=${iso}`); };
+  // 통계 친구 상세의 기둥·칸에서 왔으면(D-101 ④) ‹는 그 친구 상세(같은 기간)로 돌아간다 — 뒤로 가기와 같게 history.back()이라 기간·스크롤이 그대로다.
+  // 주소로 곧장 왔으면 cat·p로 그 친구 상세를 새로 연다(없는 계열이면 통계 첫 화면).
+  const from = params?.get("from");
+  const statsCat = data.categories.some((c) => c.code === params?.get("cat")) ? params.get("cat") : null;
+  const statsBack = `stats${statsCat ? `/${statsCat}` : ""}?p=${params?.get("p") === "30" ? 30 : 7}`;
+  const backLabel = from === "stats" ? "통계로" : "달력으로";
+  const backToCalendar = () => {
+    if ((from === "calendar" || from === "stats") && history.length > 1) history.back();
+    else navigate(from === "stats" ? statsBack : `calendar?d=${iso}`);
+  };
 
   const letter = renderLetter(rec, { mode: "read", onEdit: editAt(rec, navigate) });
   main.replaceChildren(el("div", { class: "screen record" },
-    el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": "달력으로", onclick: backToCalendar }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M14.5 5.5 8 12l6.5 6.5" }))),
+    el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": backLabel, onclick: backToCalendar }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M14.5 5.5 8 12l6.5 6.5" }))),
       el("button", { type: "button", class: "back more", "aria-label": "더보기", "aria-haspopup": "dialog", onclick: menu }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "dots3" }, svgEl("circle", { cx: "5", cy: "12", r: "1.7" }), svgEl("circle", { cx: "12", cy: "12", r: "1.7" }), svgEl("circle", { cx: "19", cy: "12", r: "1.7" })))),
     el("h1", { tabindex: "-1", text: `${shortDay(iso)}의 편지` }),
     el("p", { class: "letter-sub", text: real ? "옆으로 넘겨서 다시 읽어요." : "옆으로 넘겨서 다시 읽어요. (지어낸 예시 기록이에요)" }),

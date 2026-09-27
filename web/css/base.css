@@ -151,12 +151,12 @@ input::placeholder,textarea::placeholder{color:var(--subtle)}
 .menu-row.danger small{color:var(--danger)}
 /* 누름 — 줄 모양(D-098 ①): 목록 줄·시트 메뉴 줄·함께한 날 줄은 ink 6% 면을 덮고 98.5%로 조금 작아진다. 면은 줄 좌우로 10px 넘쳐 글자에 붙지 않는다.
    hover는 마우스 화면(hover:hover)에서만 면을 옅게 보인다. 설정 목록뿐 아니라 하위 화면의 줄도 같다(D-099 list-row F1). */
-:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row){position:relative;transition:transform var(--dur-fast) var(--ease)}
-:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row)::after{content:"";position:absolute;inset:0 -10px;z-index:0;border-radius:14px;background:color-mix(in srgb,var(--service-ink) var(--press-row-overlay),transparent);opacity:0;transition:opacity var(--dur-fast) var(--ease);pointer-events:none}
-:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row)>*{position:relative;z-index:1}
-:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row):active::after{opacity:1}
-:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row):active{transform:scale(var(--press-row))}
-@media (hover:hover){:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row):hover::after{opacity:.6}}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row){position:relative;transition:transform var(--dur-fast) var(--ease)}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row)::after{content:"";position:absolute;inset:0 -10px;z-index:0;border-radius:14px;background:color-mix(in srgb,var(--service-ink) var(--press-row-overlay),transparent);opacity:0;transition:opacity var(--dur-fast) var(--ease);pointer-events:none}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row)>*{position:relative;z-index:1}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row):active::after{opacity:1}
+:is(button.st-row,.st-me,.st-delete-row,.menu-row):active{transform:scale(var(--press-row))}
+@media (hover:hover){:is(button.st-row,.st-me,.st-delete-row,.menu-row):hover::after{opacity:.6}}
 /* 배경 없는 글자 줄 버튼(.link)도 줄 모양이다(D-099 disclosure F1) — 밑줄 글자는 작아지면 뭉개져 보여 면이 주가 된다. */
 .link{border-radius:var(--radius);transition:transform var(--dur-fast) var(--ease),background-color var(--dur-fast) var(--ease)}
 .link:active{background-color:color-mix(in srgb,var(--service-ink) var(--press-row-overlay),transparent);transform:scale(var(--press-row))}
@@ -178,9 +178,9 @@ input::placeholder,textarea::placeholder{color:var(--subtle)}
   .switch:active i{transform:none;--press-face:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent);background-image:linear-gradient(var(--press-face),var(--press-face))}
   .switch[aria-checked="true"]:active i{--press-face:color-mix(in srgb,var(--bg) var(--press-reduced-ink),transparent)}
   .sheet-dim,.sheet{animation:none}
-  :is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row),:is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row)::after,.link{transition:none}
-  :is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row):active,.link:active{transform:none}
-  :is(button.st-row,.st-me,.st-delete-row,.menu-row,.sxd-day-row)::after{background:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent)}
+  :is(button.st-row,.st-me,.st-delete-row,.menu-row),:is(button.st-row,.st-me,.st-delete-row,.menu-row)::after,.link{transition:none}
+  :is(button.st-row,.st-me,.st-delete-row,.menu-row):active,.link:active{transform:none}
+  :is(button.st-row,.st-me,.st-delete-row,.menu-row)::after{background:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent)}
   .link:active{background-color:color-mix(in srgb,var(--service-ink) var(--press-reduced),transparent)}
 }
 

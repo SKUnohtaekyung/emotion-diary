@@ -92,14 +92,17 @@
 /* bottom은 stats.js가 계열마다 발 보정을 더해 인라인으로 정한다(고정값을 두면 그림마다 다른 여백을 못 맞춘다). */
 .sxd-scene .friend-img{position:absolute;left:50%;transform:translateX(-50%);width:auto;height:124px}
 
-.sxd-stat-line{margin:var(--sp-3) 0 0;font-size:var(--fs-label);font-weight:var(--fw-body-strong);font-variant-numeric:tabular-nums}
-.sxd-cmp-line{margin:2px 0 0;font-size:var(--fs-caption);color:var(--muted)}
+/* 절 머리말(D-101): 비교 문장이 요지라 크게, 수치 줄(평균·기록한 날 수)은 그 아래 작게 — 전에는 수치 줄이 굵고 비교가 작은 회색이라 강조가 거꾸로였다. */
+.sxd-cmp-head{margin:var(--sp-2) 0 0;font-size:1.25rem;line-height:1.75rem;font-weight:800;letter-spacing:-.02em}
+.sxd-stat-line{margin:2px 0 0;font-size:var(--fs-label);color:var(--muted);font-variant-numeric:tabular-nums}
 
-/* 크기 추세 — 날마다 열 점 기둥(2026-09-25 재개편, D-050 그대로 지킨다: 조약돌 크기·색 농도로 그리지 않는다).
-   축 숫자(1·5·10)·점선 평균선·범례·읽는 법 접기·지난 기간 겹침은 없앴다 — 위 sxd-cmp-line 한 줄이 비교를 맡는다.
-   기둥마다 flex:1이라 7일은 넉넉히 퍼지고 30일은 폭 안에 저절로 들어간다(폭을 재는 JS 없이 CSS만으로). */
-.sxd-cols{display:flex;align-items:flex-end;gap:2px;margin-top:var(--sp-4);padding:0 2px}
-.sxd-col-wrap{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+/* 크기 추세 — 7일은 날마다 열 점 기둥(2026-09-25 재개편, D-050 그대로 지킨다: 조약돌 크기·색 농도로 그리지 않는다).
+   D-101: 기둥 위에 그날 크기 숫자, 아래에 요일(오늘은 '오늘')을 모든 날에 둔다 — 첫날·오늘에만 날짜가 있어 가운데 기둥이 무슨 날인지 몰랐고,
+   점 5개 넘게는 세어야 읽혔다. D-102: 기록한 날 기둥은 그날을 '고르는' 단추(radio)다 — 고른 날의 작은 편지가 차트 아래에 펼쳐진다.
+   기둥마다 flex:1(360px에서 약 45px 폭 — 누름 44px 이상). */
+.sxd-cols{display:flex;align-items:stretch;gap:2px;margin-top:var(--sp-4)}
+.sxd-col-wrap{position:relative;flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px;padding:var(--sp-2) 0;border-radius:12px;color:inherit}
+.sxd-col-val{min-height:var(--lh-label);font-size:var(--fs-label);line-height:var(--lh-label);font-weight:800;font-variant-numeric:tabular-nums}
 /* column-reverse: DOM 첫 점(k=0, 크기 1을 뜻함)이 맨 아래에 온다 — 아래부터 채워지는 기둥. */
 .sxd-col{display:flex;flex-direction:column-reverse;align-items:center;gap:2px}
 .sxd-col i{width:8px;height:8px;border-radius:50%;background:transparent;box-shadow:inset 0 0 0 1.25px var(--border-strong)}
@@ -107,10 +110,72 @@
 /* 빈 점은 속이 빈 고리다 — 채운 점과 빈 점을 색 대비(회색 면과는 1.9~2.6:1로 3:1 미달이었다)가 아니라 모양(속 채움)으로 가른다. 채운 점은 흰 바탕 위 계열 강조색이라 3:1 이상(WCAG 1.4.11, 마감 검토 2026-09-25). */
 /* 기록 없는 날은 기둥 전체가 더 옅다(채워진 점이 없으니 값 0이 아니라 '비어 있음'으로 읽힌다). */
 .sxd-col-wrap.empty .sxd-col i{box-shadow:inset 0 0 0 1px var(--border)}
-.sxd-cols.small .sxd-col i{width:5px;height:5px;box-shadow:inset 0 0 0 1px var(--border-strong)}
-.sxd-cols.small .sxd-col i.f{box-shadow:none}
-.sxd-cols.small .sxd-col{gap:1.4px}
-.sxd-col-axis{min-height:var(--lh-caption);font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--subtle);white-space:nowrap;font-variant-numeric:tabular-nums}
+.sxd-col-axis{min-height:var(--lh-caption);font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted);white-space:nowrap}
+.sxd-col-wrap.empty .sxd-col-axis{color:var(--subtle)}
+
+/* 30일 — 달력 탭과 같은 일요일 시작 요일 격자의 조약돌 칸(D-103, 2026-09-27 사용자 선택 A). 네모 칸·테두리는 없다(BRAND_STORY §6 '박스 없음').
+   칸마다 위에 날짜, 아래에 조약돌 모양 면 하나 — 그 안에 크기/10 높이로 계열 300이 차오르고 가운데 굵은 숫자(4·5·6이 면 높이의 40·50·60%).
+   조약돌 윤곽은 날짜마다 세 가지(peb-a·b·c) 중 하나라 찍어 낸 격자처럼 보이지 않는다 — 크기와 무관하다(D-050).
+   기록 없는 날은 날짜만 옅게. 칸(누름 영역)은 360px에서 44×72px(가로 틈 1px — 실측 내용 폭 318, 4px면 42px였다).
+   *(D-102 물 채움 칸: 네모 칸 전체가 채움·hairline 테두리·고른 칸은 ink 2px 테두리 — 사용자 '검정 선택이 별로, 우리 무드로'.)* */
+.sxd-mg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px 1px;margin-top:var(--sp-4)}
+.sxd-mg-wd{padding-bottom:2px;text-align:center;font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted)}
+.sxd-mg-cell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:9px;min-width:0;height:72px;padding:4px 0 0;color:inherit} /* 날짜와 조약돌 사이 9px: 고른 날 조약돌이 들려도 날짜를 덮지 않는 틈(사용자 지적) */
+.sxd-mg-cell.blank{visibility:hidden}
+.sxd-mg-date{font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:var(--fw-body-strong);color:var(--text);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sxd-mg-cell.empty .sxd-mg-date{font-weight:var(--fw-body);color:var(--subtle)}
+.sxd-mg-peb{position:relative;display:grid;place-items:center;width:36px;height:30px;overflow:hidden;background:var(--chip-fill);transition:transform var(--dur-fast) var(--ease)}
+.sxd-mg-peb.peb-a{border-radius:58% 42% 52% 48% / 56% 50% 50% 44%}
+.sxd-mg-peb.peb-b{border-radius:46% 54% 44% 56% / 52% 58% 42% 48%}
+.sxd-mg-peb.peb-c{border-radius:52% 48% 58% 42% / 48% 44% 56% 52%}
+.sxd-mg-fill{position:absolute;left:0;right:0;bottom:0;height:calc(var(--v, 0) * 10%);background:var(--chip-border)}
+.sxd-mg-val{position:relative;z-index:1;font-size:.9375rem;line-height:1;font-weight:800;color:var(--chip-text);font-variant-numeric:tabular-nums}
+
+/* 고르는 단추(기둥·칸): 버튼 기본 모양을 지운다. 고른 날은 테두리·면이 아니라 그 계열 조약돌 그림 하나가 얹힌다(D-103, .sxd-pick-peb) —
+   친구가 그날 남긴 흔적을 집어 든다는 이야기이고, 아래 편지의 봉인 조약돌과 같은 그림이라 짝으로 읽힌다. 날짜·요일 글자는 ink로 한 단계 진해진다.
+   눌림은 살짝 작아지기만(면 겹을 두면 네모 상자가 드러난다). hover는 마우스 화면에서 조약돌 면만 살짝 들린다. */
+button.sxd-col-wrap,button.sxd-mg-cell{border:0;margin:0;background:transparent;font:inherit;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
+:is(button.sxd-col-wrap,button.sxd-mg-cell):active{transform:scale(var(--press-row))}
+@media (hover:hover){button.sxd-mg-cell:hover .sxd-mg-peb{transform:translateY(-2px)}}
+.sxd-pick-peb{position:absolute;z-index:1;width:24px;height:auto;pointer-events:none}
+/* 30일: 고른 날의 납작한 조약돌 면이 진짜 조약돌 그림으로 바뀐다(면·채움은 감추고 그림 위에 숫자) — 옆에 작은 돌을 얹으면 숫자를 가리고 잘 안 보였다. */
+button.sxd-mg-cell .sxd-pick-peb{z-index:0;left:50%;top:50%;width:42px;transform:translate(-50%,-50%) rotate(-6deg)}
+/* 집어 든 느낌(사용자 '올라간 건 좋은데 티가 안 난다'): 2px이던 들림을 4px로(날짜를 덮지 않는 한도 — 대신 납작한 면이 진짜 조약돌 그림으로 바뀌어 티가 난다), 발밑에 옅은 땅 그림자 하나(편지 장면 조약돌의 접지 그림자와 같은 색 —
+   글로시 조약돌은 그림자 예외, D-050), 고를 때 한 번 톡 튀어 오른다(움직임 줄이기에서는 튀지 않고 바로 자리). */
+button.sxd-mg-cell[aria-checked="true"] .sxd-mg-peb{overflow:visible;background:transparent;transform:translateY(-4px);animation:sxd-pick 420ms var(--ease)}
+button.sxd-mg-cell[aria-checked="true"]::before{content:"";position:absolute;left:50%;top:63px;width:32px;height:6px;margin-left:-16px;border-radius:50%;background:color-mix(in srgb,var(--land-hill-near) 40%,transparent);filter:blur(1.5px)}
+@keyframes sxd-pick{0%{transform:translateY(0) scale(.9)}55%{transform:translateY(-7px) scale(1.06)}100%{transform:translateY(-4px) scale(1)}}
+button.sxd-mg-cell[aria-checked="true"] .sxd-mg-fill{visibility:hidden}
+button.sxd-mg-cell[aria-checked="true"] .sxd-mg-date,button.sxd-col-wrap[aria-checked="true"] .sxd-col-axis{color:var(--service-ink);font-weight:800}
+/* 7일 기둥: 위에 조약돌(30px)이 앉을 자리를 모든 기둥에 비워 둬 고른 날이 바뀌어도 기둥이 들썩이지 않는다. */
+.sxd-cols .sxd-col-wrap{padding-top:36px}
+button.sxd-col-wrap .sxd-pick-peb{top:2px;left:50%;width:30px;margin-left:-15px;transform:rotate(-8deg);animation:sxd-drop 420ms var(--ease)}
+@keyframes sxd-drop{0%{transform:translateY(8px) rotate(-8deg) scale(.8);opacity:0}60%{transform:translateY(-3px) rotate(-8deg) scale(1.05);opacity:1}100%{transform:rotate(-8deg)}}
+
+/* 고른 날의 작은 편지(D-103 — 편지 카드의 결): 크림빛 종이(칭찬·감사 카드와 같은 --service-light, 둥글기 20)에 테이프 한 조각(편지의 .tape와 같은
+   민트·톱니 끝), 머리 '9월 26일의 편지'(종이 글자 --paper-ink)와 봉인 자리의 그 계열 조약돌(34px), '<계열> 4'와 열 점, 줄 노트(--paper-rule, 30px 간격)
+   위 있었던 일 두 줄 고정(넘치면 말줄임, 짧아도 두 줄 — 날을 바꿔도 아래 줄이 흔들리지 않는다, 띄어쓰기 없는 글자열도 끊는다), 고른 말 chip,
+   맨 아래 '— 그날의 나에게'와 '편지 열기 ›'. 소품은 테이프·줄 노트·조약돌 봉인 셋(BRAND_STORY §6). 그림자 없음(§2 원칙6). */
+.sxd-peek-host{margin-top:var(--sp-5);scroll-margin-bottom:var(--sp-5)}
+.sxd-peek{position:relative;padding:var(--sp-5) var(--sp-5) var(--sp-2);border-radius:20px;background:var(--service-light);color:var(--paper-ink)}
+.sxd-peek-tape{position:absolute;top:-10px;left:50%;width:72px;height:22px;margin-left:-36px;background:color-mix(in srgb,var(--service-mint) 85%,transparent);transform:rotate(-3deg);
+  clip-path:polygon(0 12%,6% 0,12% 14%,18% 0,100% 0,100% 100%,18% 100%,12% 86%,6% 100%,0 88%)}
+.sxd-peek-top{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-3)}
+.sxd-peek-date{margin:0;font-size:var(--fs-body);line-height:var(--lh-body);font-weight:800;letter-spacing:-.01em}
+.sxd-peek-seal{flex:none;width:34px;height:auto;margin:-2px -4px 0 0;transform:rotate(-10deg)}
+.sxd-peek-size{display:flex;align-items:center;gap:var(--sp-2);margin:2px 0 0;font-size:var(--fs-caption);color:var(--paper-ink);font-variant-numeric:tabular-nums}
+.sxd-peek-dots{display:flex;gap:2px}
+.sxd-peek-dots i{width:6px;height:6px;border-radius:50%;box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--paper-ink) 45%,transparent)}
+.sxd-peek-dots i.f{background:var(--dot);box-shadow:none}
+.sxd-peek-lines{margin-top:var(--sp-3);background:linear-gradient(to bottom,transparent 29px,var(--paper-rule) 29px) 0 0 / 100% 30px repeat-y} /* 30px 한 칸 무늬를 세로로 반복 — repeating-linear-gradient는 칸 이음새가 첫 줄 위에 옅은 선으로 비쳤다 */
+.sxd-peek-event{margin:0;min-height:60px;line-height:30px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
+.sxd-peek-event.empty{color:color-mix(in srgb,var(--paper-ink) 60%,transparent)}
+.sxd-peek-chips{display:flex;flex-wrap:wrap;gap:var(--sp-2);margin-top:var(--sp-3)}
+.sxd-peek-more{display:inline-flex;align-items:center;height:36px;padding:0 var(--sp-2);font-size:var(--fs-label);color:var(--paper-ink);font-variant-numeric:tabular-nums}
+.sxd-peek-sign{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-top:var(--sp-2)}
+.sxd-peek-sig{font-size:.84rem;font-weight:700;color:var(--paper-ink)}
+.sxd-peek-open{display:inline-flex;align-items:center;gap:4px;min-height:var(--touch);margin-right:calc(var(--sp-2) * -1);padding:0 var(--sp-2);border-radius:var(--radius-button);color:var(--service-ink);font-weight:var(--fw-body-strong);text-decoration:none}
+.sxd-peek-open .sx-chev{stroke:var(--service-ink)}
 
 /* '<계열>에서 고른 말' — 감정 chip(표시용, §6.3.1): fill 100/border 300/text 900, 높이 36, 좌우 12, label 14/500, 왼쪽 계열 점.
    첫 화면의 '자주 머문 말'(중립 sx-pill)과 다른 규칙이다 — 여기는 한 계열뿐이라 그 계열 chip을 그대로 쓴다(2026-09-25 사용자 결정). */
@@ -119,14 +184,11 @@
 .sxd-chip-dot{width:8px;height:8px;border-radius:50%;background:var(--dot);flex:none}
 .sxd-chip-count{font-style:normal;font-size:var(--fs-caption);font-weight:var(--fw-body);margin-left:2px} /* 흐리게(opacity) 하면 12px 글자가 chip 면 위 4.5:1 아래로 내려간다 — 굵기만 낮춘다 */
 
-/* 함께한 날: 줄 앞에 그날의 조약돌(달력 칸과 같은 그림). 하이라인 구분선·›를 없애고 설정(§6.16)과 같은 눌림 면으로 누를 수 있음을 알린다. */
-.sxd-days{margin-top:var(--sp-2);display:flex;flex-direction:column}
-.sxd-day-row{display:flex;align-items:center;gap:var(--sp-3);width:100%;min-height:var(--touch);padding:var(--sp-2) 0;text-decoration:none;color:inherit} /* 누름 면·hover는 base.css 줄 모양 공통 규칙(D-098 ①) */
-.sxd-day-row .pebble-img{flex:none}
-/* 본문 굵기(400)로 가볍게 — 연도 없는 "9월 25일 금요일"과 함께 30일 최대 19줄이 나와도 화면이 무겁지 않게 한다. */
-.sxd-day-date{flex:1;min-width:0;font-weight:var(--fw-body)}
-.sxd-day-size{color:var(--muted);font-size:var(--fs-label);font-variant-numeric:tabular-nums;white-space:nowrap}
+/* '함께한 날' 날짜 목록(.sxd-days·.sxd-day-row)은 D-101에서 없앴다 — 그날로 가는 입구는 위 기둥·칸이 맡는다. */
 
 @media (prefers-reduced-motion:reduce){
   .sx-pos,.sx-pos .friend-img,.sx-dot-mark{animation:none !important}
+  :is(button.sxd-col-wrap,button.sxd-mg-cell),.sxd-mg-peb{transition:none}
+  button.sxd-mg-cell[aria-checked="true"] .sxd-mg-peb,button.sxd-col-wrap .sxd-pick-peb{animation:none}
+  :is(button.sxd-col-wrap,button.sxd-mg-cell):active{transform:none}
 }

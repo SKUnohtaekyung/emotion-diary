@@ -108,9 +108,16 @@ export function renderLetter(record, { mode = "write", onEdit, onOpened } = {}) 
   }
 
   const pager = el("div", { class: "pager", tabindex: "0", role: "region", "aria-roledescription": "carousel", "aria-label": "오늘의 편지" }, cards.map((c, i) => { c.node.setAttribute("aria-label", `${i + 1} / ${cards.length}, ${c.label}`); return c.node; }));
-  const dots = cards.map(() => el("i"));
+  // 점은 10장까지만(D-101): 그 이상은 점을 셀 수 없어 위치를 알려 주지 못하고, 한 줄에 다 넣으려다 화살표가 44px 밑으로 찌그러졌다(2026-09-27 사용자 QA, 19장에서 30px).
+  // 11장부터는 같은 자리에 '3 / 18' 숫자로 보인다. 둘 다 장식(aria-hidden)이고 위치는 카드 aria-label과 넘김 알림이 전한다.
+  const MAX_DOTS = 10, useCount = cards.length > MAX_DOTS;
+  const dots = useCount ? [] : cards.map(() => el("i"));
+  const countNow = el("b", { text: "1" });
+  const indicator = useCount
+    ? el("div", { class: "dd count", "aria-hidden": "true" }, countNow, el("span", { text: `/ ${cards.length}` }))
+    : el("div", { class: "dd", "aria-hidden": "true" }, dots);
   const prev = el("button", { type: "button", class: "ar", "aria-label": "이전 장" }, chevron(-1)), next = el("button", { type: "button", class: "ar", "aria-label": "다음 장" }, chevron(1));
-  const nav = el("div", { class: "letter-nav" }, prev, el("div", { class: "dd", "aria-hidden": "true" }, dots), next);
+  const nav = el("div", { class: "letter-nav" }, prev, indicator, next);
 
   const { back, front } = envelope();
   const envBtn = el("button", { type: "button", class: "envfront", "aria-label": "편지 봉투 열기" }, front);
@@ -129,7 +136,7 @@ export function renderLetter(record, { mode = "write", onEdit, onOpened } = {}) 
   // 장이 바뀌면 '3장 중 2장, 칭찬'을 aria-live(polite)로 읽는다(D-099 pager K1). 편지가 열린 뒤에만 — 열 때는 open()이 따로 알린다.
   let spoken = 0;
   const paint = () => {
-    const i = index(); dots.forEach((d, k) => d.classList.toggle("on", k === i)); setOff(prev, i === 0); setOff(next, i >= cards.length - 1);
+    const i = index(); dots.forEach((d, k) => d.classList.toggle("on", k === i)); countNow.textContent = String(Math.min(i, cards.length - 1) + 1); setOff(prev, i === 0); setOff(next, i >= cards.length - 1);
     if (started && i !== spoken && cards[i]) { spoken = i; announce(`${cards.length}장 중 ${i + 1}장, ${cards[i].label}`); }
   };
   pager.addEventListener("scroll", () => requestAnimationFrame(paint), { passive: true });

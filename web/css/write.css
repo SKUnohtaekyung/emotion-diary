@@ -214,7 +214,9 @@ html:has(.detail-stage){scroll-padding-top:calc(var(--banner-h,2rem) + 170px);sc
 .letter-nav .dd{display:flex;gap:8px;align-items:center}
 .letter-nav .dd i{width:7px;height:7px;border-radius:4px;display:block;transition:width .25s,background .25s}
 .letter-nav .dd i.on{width:20px;background:var(--service-ink)}
-.letter-nav .ar{display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
+.letter-nav .dd.count{min-width:4.5rem;justify-content:center;gap:4px;font-size:var(--fs-label);color:var(--service-ink);font-weight:var(--fw-body);font-variant-numeric:tabular-nums;white-space:nowrap}
+.letter-nav .dd.count b{color:var(--service-ink);font-weight:800}
+.letter-nav .ar{flex:none;display:grid;place-items:center;width:44px;height:44px;border:0;border-radius:50%;background:var(--surface-soft);color:var(--service-ink)}
 .letter-nav .ico{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
 .letter-sub{font-size:var(--fs-label);color:var(--muted)}
 

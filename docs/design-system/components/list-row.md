@@ -2,7 +2,7 @@
 
 기본 부품 · 틀은 [CHECKLIST.md](../CHECKLIST.md) · 상태 공통 규칙은 [DESIGN_SYSTEM §5.1](../../DESIGN_SYSTEM.md)(D-098) · 측정 기준 시안 `1bfd066`
 
-**상태: 결정 대기 0건**(2026-09-26 D-099로 2건을 위임 판단으로 정함 — 각 항목의 '정함'을 보라). 설정 화면(`web/js/views/settings.js`, `web/css/settings.css`)의 `.st-row`가 대상이다. 통계 화면의 `.sxd-day-row`("함께한 날" 줄)는 같은 눌림 결(면+scale)을 흉내 내지만 클래스가 다르고(`.sxd-day-row`) 화살표가 없어(§6.9 "구분선과 ›는 없다") 이 부품에 넣지 않았다 — 참고로만 남긴다.
+**상태: 결정 대기 0건**(2026-09-26 D-099로 2건을 위임 판단으로 정함 — 각 항목의 '정함'을 보라). 설정 화면(`web/js/views/settings.js`, `web/css/settings.css`)의 `.st-row`가 대상이다. 통계 화면의 옛 `.sxd-day-row`("함께한 날" 줄)는 D-101에서 목록과 함께 없어졌다 — 같은 눌림 결은 이제 친구 상세 크기 차트의 기둥·칸(`stats.css`)이 쓴다.
 
 ## A. 쓰임
 
