@@ -4,7 +4,10 @@ import { el, svgEl, announce, toast } from "../dom.js";
 import { openSheet } from "../components/sheet.js";
 import { stoneImg } from "../data.js";
 import { now } from "../state.js";
-import { renderExport, renderDelete, renderDeleted } from "./settings-data.js";
+import { renderExport, renderDelete, renderDeleted, renderLeft } from "./settings-data.js";
+import { dayStatus, effectiveToday } from "../sample.js";
+import { account, PROVIDERS, cleanName, nameLength, joinedLabel } from "../account.js";
+import { providerMark, nameScene, nameField } from "./auth.js";
 
 // ── 시안 안의 설정 값(D-091 — 실제로 저장·전송하지 않고 모듈 변수로만 들고 있는다. 목록·알림 화면이 이 하나를 같이 본다) ──
 const settingsState = { reminderOn: true, reminderTime: "22:00", dayStartHour: 4 };
@@ -24,7 +27,10 @@ const ICONS = {
   hourglass: () => ic("M6.4 4.4h11.2", "M6.4 19.6h11.2", "M7.5 4.4c0 3.3 2 5.1 4.5 6.1 2.5-1 4.5-2.8 4.5-6.1", "M7.5 19.6c0-3.3 2-5.1 4.5-6.1 2.5 1 4.5 2.8 4.5 6.1"), // 푸시 알림(잠긴 자리)
   heart: () => ic("M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"), // 도움이 필요할 때 · 진단·치료 앱이 아니에요(둘 다 '힘든 순간의 돌봄'이라는 같은 뜻 축이라 유지 — 아래 표)
   replay: () => ic("M5.2 12a6.8 6.8 0 1 0 2.1-4.9", "M5.2 4.6v4.4h4.4"), // 처음 화면 다시 보기
-  logout: () => ic("M9.8 4.6H6.4a2 2 0 0 0-2 2v10.8a2 2 0 0 0 2 2h3.4", "M11 12h9.2", "M17 8.4l3.6 3.6-3.6 3.6") // 접근 끊기
+  logout: () => ic("M9.8 4.6H6.4a2 2 0 0 0-2 2v10.8a2 2 0 0 0 2 2h3.4", "M11 12h9.2", "M17 8.4l3.6 3.6-3.6 3.6"), // 로그아웃
+  person: () => ic("M12 12.2a3.6 3.6 0 1 0 0-7.2 3.6 3.6 0 0 0 0 7.2z", "M5.2 19.4c.9-3.2 3.6-5.2 6.8-5.2s5.9 2 6.8 5.2"), // 부를 이름 · 계정
+  note: () => ic("M7 3.8h6.6L18 8.2v10a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5.8a2 2 0 0 1 2-2z", "M13.4 3.8v4.4H18", "M8.6 12.4h6.8", "M8.6 15.8h4.4"), // 기록
+  chart: () => ic("M4.8 19.4h14.4", "M8 16.2v-4", "M12 16.2V7.8", "M16 16.2v-5.6") // 분석 결과와 설정
 };
 const chevIcon = () => { const s = svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "st-chev" }, svgEl("path", { d: "M9.5 5.5 16 12l-6.5 6.5" })); return s; };
 const backIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M14.5 5.5 8 12l6.5 6.5" }));
@@ -70,9 +76,22 @@ const formatKoreanClock = (hhmm) => {
 const hourLabel = (h) => h === 0 ? "자정" : `새벽 ${h}시`;
 
 // ── 하위 화면 공통 머리(뒤로 가기 + 제목) ──
-function subHead(navigate, title) {
-  return [el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": "설정으로", onclick: () => navigate("settings") }, backIcon())),
+function subHead(navigate, title, back = { to: "settings", label: "설정으로" }) {
+  return [el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": back.label, onclick: () => navigate(back.to) }, backIcon())),
     el("h1", { tabindex: "-1", text: title })];
+}
+
+// 로그아웃(D-104) — 설정 목록과 탈퇴 '떠나기 전에'가 같이 쓴다. 아직 올라가지 않은 글이 있으면 그 글이 이 기기에서 사라진다는 경고로 바뀐다(IA 예외 — 데이터 손실). QA: #/settings?s=unsynced
+function openLogoutSheet(navigate, params) {
+  const out = () => navigate("auth?s=loggedout");
+  if (params?.get("s") === "unsynced") {
+    openSheet({ title: "아직 저장되지 않은 글이 있어요", danger: true,
+      body: [el("p", { text: "지금 로그아웃하면 그 글은 이 기기에서 사라져요. 인터넷에 연결돼 저장된 뒤에 로그아웃해 주세요." })],
+      primary: { text: "그래도 로그아웃", onclick: out }, secondary: { text: "취소" } });
+    return;
+  }
+  openSheet({ title: "로그아웃할까요?", body: [el("p", { text: "기록은 계정에 그대로 남아 있어요. 다시 로그인하면 이어서 볼 수 있어요." })],
+    primary: { text: "로그아웃", onclick: out }, secondary: { text: "취소" } });
 }
 
 // ══════════════════════ 1. 설정 목록 #/settings ══════════════════════
@@ -83,19 +102,15 @@ function renderList(main, navigate, params) {
     draw();
     main.querySelector(".st-switch-row .switch")?.focus();
   }
-  function openAccessSheet() {
-    openSheet({ title: "접근을 끊을까요?", body: [el("p", { text: "로그아웃하면 이 기기에서 다시 로그인해야 기록을 볼 수 있어요." })],
-      primary: { text: "로그아웃", onclick: () => announce("로그아웃: 시안이라 동작하지 않습니다") }, secondary: { text: "취소" } });
-  }
   function draw() {
     rowSeq = 0;
     main.replaceChildren(el("div", { class: "screen settings" },
       el("div", { class: "tb-body tb-rise" },
         el("h1", { tabindex: "-1", text: "설정" }),
         el("p", { class: "proto-note" }, el("span", { class: "proto-tag", text: "시안" }), " 이 화면의 동작은 자리만 있고 실제로 움직이지 않습니다."),
-        // 나의 돌 머리(D-091 ⑥): 오늘 화면 가운데 돌의 쉬는 모습 + 신뢰 한 줄. 아래 목록의 값을 되풀이하지 않고, 누르면 개인정보 안내로 간다.
-        el("button", { type: "button", class: "st-me", "aria-label": "나의 기록 공간. 내 기록은 나만 볼 수 있어요. 개인정보 안내 보기", onclick: () => navigate("settings/privacy") },
-          stoneImg("rest"), el("span", { class: "st-me-text", "aria-hidden": "true" }, el("b", { text: "나의 기록 공간" }), el("span", { text: "내 기록은 나만 볼 수 있어요" })), chevIcon()),
+        // 나의 돌 머리(D-091 ⑥ → D-104): 오늘 화면 가운데 돌의 쉬는 모습 + 부를 이름. 누르면 내 계정으로 간다(개인정보 안내는 아래 '내 기록 지키기'에 그대로 있다).
+        el("button", { type: "button", class: "st-me", "aria-label": `${account.name}의 기록 공간. ${PROVIDERS[account.via].label}로 연결됨. 내 계정 보기`, onclick: () => navigate("settings/profile") },
+          stoneImg("rest"), el("span", { class: "st-me-text", "aria-hidden": "true" }, el("b", { text: `${account.name}의 기록 공간` }), el("span", { text: `${PROVIDERS[account.via].label}로 연결됨 · 내 계정` })), chevIcon()),
 
         group("기록 리듬", [
           switchRow({ icon: ICONS.bell, name: "작성 알림", checked: settingsState.reminderOn, onclick: toggleReminder }),
@@ -110,7 +125,7 @@ function renderList(main, navigate, params) {
           navRow({ icon: ICONS.heart, name: "도움이 필요할 때", onclick: () => navigate("help") }),
           navRow({ icon: ICONS.replay, name: "처음 화면 다시 보기", onclick: () => navigate("welcome") })
         ]),
-        group("계정", [navRow({ icon: ICONS.logout, name: "접근 끊기", value: "로그아웃", onclick: openAccessSheet })]),
+        group("계정", [navRow({ icon: ICONS.logout, name: "로그아웃", onclick: () => openLogoutSheet(navigate, params) })]),
 
         el("button", { type: "button", class: "st-delete-row", onclick: () => navigate("settings/delete") },
           el("span", { text: "모든 기록 영구 삭제" }), chevIcon()))));
@@ -222,9 +237,141 @@ function renderPrivacy(main, navigate) {
       el("span", { class: "st-pill-link-face" }, "도움이 필요할 때 보기", chevIcon()))));
 }
 
+// ══════════════════════ 5. 내 계정 #/settings/profile (D-104) ══════════════════════
+// 머리는 가입 때의 이름 장면(먼 언덕 위 나의 돌 + 이름 칸) 그대로다. 줄은 부를 이름·로그인 방식 둘뿐 — 가입에서 받은 것이 이것뿐이다(이메일은 받지 않아 보이지 않는다).
+// 탈퇴는 맨 아래 따로 떨어진 한 줄(영구 삭제와 같은 모양).
+function renderProfile(main, navigate) {
+  rowSeq = 0;
+  const p = PROVIDERS[account.via];
+  const scene = nameScene(account.name);
+  main.replaceChildren(el("div", { class: "screen settings-sub st-profile" },
+    ...subHead(navigate, "내 계정"),
+    scene.node,
+    el("p", { class: "st-profile-since", text: `${joinedLabel(account.joined)}부터 함께했어요` }),
+    el("div", { class: "st-rows" },
+      navRow({ icon: ICONS.person, name: "부를 이름", value: account.name, onclick: () => navigate("settings/name") }),
+      el("div", { class: "st-row", role: "group", "aria-label": `로그인, ${p.label}로 연결됨` },
+        el("span", { class: `st-ic-frame st-provider ${account.via}`, "aria-hidden": "true" }, providerMark(account.via)),
+        el("span", { class: "st-row-name", "aria-hidden": "true", text: "로그인" }),
+        el("span", { class: "st-row-trail", "aria-hidden": "true" }, el("span", { class: "st-row-value", text: `${p.label}로 연결됨` })))),
+    el("p", { class: "note st-profile-note", text: "이메일·전화번호는 받지 않아요. 부를 이름과 로그인 연결 정보만 가지고 있어요." }),
+    el("button", { type: "button", class: "st-delete-row st-leave-row", onclick: () => navigate("settings/leave") },
+      el("span", { text: "계정 탈퇴" }), chevIcon())));
+  scene.road();
+}
+
+// ══════════════════════ 6. 부를 이름 #/settings/name (D-104) ══════════════════════
+// 가입과 같은 이름 장면·이름 칸 — 적는 대로 돌 아래 이름 칸이 바뀐다. 바뀐 것이 없거나 비어 있으면 '저장'은 흐리고, 누르면 이유를 버튼 위에 알린다(D-098 ③).
+function renderName(main, navigate, params) {
+  const scene = nameScene(account.name);
+  const hint = el("p", { class: "blocked-hint au-hint", id: "stNameHint", hidden: true, role: "status" });
+  const save = el("button", { type: "button", class: "btn primary big", text: "저장", "aria-describedby": "stNameHint", onclick: submit });
+  const field = nameField("stName", account.name, (v) => { scene.set(v); sync(); });
+  const problem = () => nameLength(field.input.value) < 1 ? "부를 이름을 적어 주세요." : cleanName(field.input.value) === account.name ? "지금 이름과 같아요." : null;
+  function sync() { const bad = problem(); save.setAttribute("aria-disabled", String(Boolean(bad))); if (!bad) hint.hidden = true; }
+  function submit() {
+    const bad = problem();
+    if (bad) { hint.textContent = bad; hint.hidden = false; field.input.focus(); return; }
+    if (params?.get("s") === "fail") { toast("바꾸지 못했어요. 다시 시도해 주세요"); return; } // 저장 실패: 적은 이름은 그대로 둔다
+    account.name = cleanName(field.input.value);
+    navigate("settings/profile"); toast("부를 이름을 바꿨어요");
+  }
+  field.input.addEventListener("keydown", (ev) => { if (ev.key === "Enter" && !ev.isComposing) submit(); });
+  main.replaceChildren(el("div", { class: "screen settings-sub st-name" },
+    ...subHead(navigate, "부를 이름", { to: "settings/profile", label: "내 계정으로" }),
+    scene.node, field.node,
+    el("div", { class: "sd-actions" }, hint, save)));
+  scene.road(); field.update();
+}
+
+// ══════════════════════ 7. 계정 탈퇴 — 두 단계 #/settings/leave → ?step=confirm (D-104, 사용자 2026-09-27 '탈퇴 UI를 다시 신경 써서') ══════════════════════
+// ① 탈퇴하기 전에: 읽는 단계 — 지워지는 것(기록한 날 수까지)과 탈퇴 대신 할 수 있는 일 셋. 빨간색이 없고 '탈퇴 계속하기'는 회색 버튼이다(떠나는 쪽도 붙잡는 쪽도 밀지 않는다).
+// ② 마지막으로 확인해요: 결심하는 단계 — 확인 문구 '계정 탈퇴'를 직접 입력해야 풀리는 빨간 '탈퇴하기' 하나. 영구 삭제와 같은 무게(UX_SPEC §7·§13).
+// 은유(친구·조약돌 그림)는 쓰지 않고 설정 줄·조약돌 면 아이콘·말투로만 무드를 잇는다(D-091). QA: #/settings/leave?step=confirm&s=fail(탈퇴 실패)
+function recordedDays() { // 가입한 날부터 오늘까지 완료·임시저장인 날 수(시안은 예시 기록 기준)
+  const [y, m, d] = account.joined.split("-").map(Number);
+  const today = effectiveToday(); let n = 0;
+  for (const day = new Date(y, m - 1, d); day <= today; day.setDate(day.getDate() + 1)) if (["completed", "draft"].includes(dayStatus(day, today))) n++;
+  return n;
+}
+function renderLeave(main, navigate, params) {
+  rowSeq = 0;
+  const via = PROVIDERS[account.via].label, days = recordedDays();
+  const [, jm, jd] = account.joined.split("-").map(Number);
+  if (params?.get("step") === "confirm") return renderLeaveConfirm(main, navigate, params, days);
+  main.replaceChildren(el("div", { class: "screen settings-sub st-leave" },
+    ...subHead(navigate, "탈퇴하기 전에", { to: "settings/profile", label: "내 계정으로" }),
+    el("p", { class: "lede st-leave-lede", text: "탈퇴하면 아래 것이 모두 지워지고, 되돌릴 수 없어요." }),
+    // 무게를 숫자 하나로(사용자 '가독성이 안 좋다' — 요약·목록·설명이 같은 말을 세 번 했다). 면은 옅은 언덕색의 조약돌 모양 — 무드는 모양·색만(이름·돌·친구는 두지 않는다, 떠나는 사람을 붙잡지 않게).
+    leaveSummary(days, jm, jd),
+    el("h2", { class: "st-group-head st-leave-head", text: "지워지는 것" }),
+    el("ul", { class: "st-leave-list", role: "list" },
+      [[ICONS.note, "기록"], [ICONS.person, `계정과 ${via} 연결`], [ICONS.chart, "분석 결과와 설정"]].map(([icon, name]) => el("li", {}, iconFrame(icon, rowSeq++), el("span", { text: name })))),
+    el("h2", { class: "st-group-head st-leave-head", text: "대신 이런 방법도 있어요" }),
+    el("div", { class: "st-rows" },
+      navRow({ icon: ICONS.download, name: "내 기록 내보내기", onclick: () => navigate("settings/export") }),
+      navRow({ icon: ICONS.trash, name: "기록만 지우기", onclick: () => navigate("settings/delete") }),
+      navRow({ icon: ICONS.logout, name: "로그아웃만 하기", onclick: () => openLogoutSheet(navigate, params) })),
+    el("div", { class: "sd-actions" },
+      el("button", { type: "button", class: "btn secondary big", text: "탈퇴 계속하기", onclick: () => navigate("settings/leave?step=confirm") }),
+      el("button", { type: "button", class: "btn text", text: "그만두기", onclick: () => navigate("settings/profile") }))));
+}
+// 요약 면(사용자 2026-09-27 초안 셋 중 S1): 옅은 언덕색 둥근 네모 면에 '기록 N일 · O월 O일부터', 오른쪽에 작은 조약돌 조각 셋(언덕 세 색).
+// 무드는 모양·색만 — 이름 붙은 돌·친구는 두지 않는다. ① 탈퇴하기 전에와 ② 마지막으로 확인해요가 같은 면을 쓴다(같은 정보는 같은 모양, 초안 G3).
+function leaveSummary(days, jm, jd) {
+  const peb = (cls) => el("i", { class: `st-sum-peb ${cls}` });
+  return el("div", { class: "st-leave-sum" },
+    el("div", { class: "st-sum-text" }, el("b", { text: `기록 ${days}일` }), el("span", { text: `${jm}월 ${jd}일부터` })),
+    el("span", { class: "st-sum-pebs", "aria-hidden": "true" }, peb("a"), peb("b"), peb("c")));
+}
+const LEAVE_PHRASE = "계정 탈퇴";
+// 떠나는 이유(사용자 2026-09-27 '선택형으로'): 고르지 않아도 탈퇴된다 — 필수로 막으면 탈퇴가 가입보다 무거워지고(개인정보보호법 동의 철회 취지) 억지 응답만 쌓인다.
+// 여럿 고르기 알약(작성 흐름의 세부 감정 알약 .choice와 같은 부품). 계정과 연결하지 않은 익명 집계로만 남긴다는 전제이고, 고른 이유에 따라 붙잡는 제안을 띄우지 않는다.
+const LEAVE_REASONS = ["기록할 시간이 없어요", "기록이 오히려 부담돼요", "원하는 기능이 없어요", "다른 앱을 써요", "개인정보가 걱정돼요", "기타"];
+function leaveReasons() {
+  const other = el("input", { type: "text", class: "sd-confirm-input st-reason-other", maxlength: "100", placeholder: "짧게 적어 주세요(선택)", "aria-label": "기타 이유", hidden: true });
+  const chips = LEAVE_REASONS.map((label) => {
+    const b = el("button", { type: "button", class: "choice", "aria-pressed": "false", onclick: () => {
+      const on = b.getAttribute("aria-pressed") !== "true";
+      b.setAttribute("aria-pressed", String(on));
+      if (label === "기타") { other.hidden = !on; if (on) other.focus(); else other.value = ""; }
+      announce(`${label} ${on ? "선택됨" : "선택 해제됨"}`);
+    } }, el("span", { class: "ck", "aria-hidden": "true", text: "✓" }), el("span", { text: label }));
+    return b;
+  });
+  return el("div", { class: "st-reasons" },
+    el("p", { class: "field-label", id: "stReasonsLabel" }, "떠나는 이유 ", el("span", { class: "st-optional", text: "선택" })),
+    el("p", { class: "note st-reasons-note", text: "알려 주면 더 나은 앱을 만드는 데 써요. 계정과 연결하지 않고 익명으로만 모아요." }),
+    el("div", { class: "st-reason-chips", role: "group", "aria-labelledby": "stReasonsLabel" }, chips),
+    other);
+}
+function renderLeaveConfirm(main, navigate, params, days) { // 결심하는 단계 — 요약 면·본문 한 문단·떠나는 이유(선택)·확인 문구
+  const input = el("input", { type: "text", class: "sd-confirm-input", id: "sdLeaveConfirm", "aria-describedby": "sdLeavePhrase", autocomplete: "off", autocapitalize: "off", spellcheck: false });
+  const go = el("button", { type: "button", class: "btn danger big", text: "탈퇴하기", disabled: true, onclick: () => {
+    if (input.value !== LEAVE_PHRASE) return;
+    if (params?.get("s") === "fail") { toast("탈퇴하지 못했어요. 기록은 그대로예요. 잠시 뒤 다시 시도해 주세요"); return; }
+    navigate("settings/left");
+  } });
+  input.addEventListener("input", () => { go.disabled = input.value !== LEAVE_PHRASE; });
+  const [, jm, jd] = account.joined.split("-").map(Number);
+  main.replaceChildren(el("div", { class: "screen settings-sub sd-delete st-leave st-leave-confirm" },
+    ...subHead(navigate, "마지막으로 확인해요", { to: "settings/leave", label: "탈퇴하기 전으로" }),
+    leaveSummary(days, jm, jd), // 지워지는 무게를 결심하는 자리에서 한 번 더(초안 G3) — 입력 칸과 버튼 사이의 빈 공간 문제도 이것이 메운다
+    el("p", { class: "st-leave-say", text: `${account.name} 님의 계정과 기록 ${days}일이 지워져요. 같은 ${PROVIDERS[account.via].label} 계정으로 다시 가입해도 돌아오지 않아요.` }),
+    leaveReasons(),
+    el("div", { class: "field sd-confirm-field st-leave-field" },
+      el("label", { for: "sdLeaveConfirm", class: "field-label", text: "확인하려면 아래 문구를 그대로 입력해요" }),
+      el("p", { id: "sdLeavePhrase", class: "sd-confirm-phrase", text: LEAVE_PHRASE }),
+      input),
+    // 기간 숫자를 적지 않는다(DATA_MODEL §8) — 백업·공급자 쪽 보존 지연만 정직하게 미리 알린다
+    el("p", { class: "note st-leave-note", text: "백업이나 서비스 제공사 쪽에는 정해진 기간 동안 남을 수 있어요." }),
+    el("div", { class: "sd-actions" }, go,
+      el("button", { type: "button", class: "btn text", text: "그만두기", onclick: () => navigate("settings/profile") }))));
+}
+
 // ══════════════════════ 진입점 ══════════════════════
 // 하위 화면 이름 — main.js가 이 목록에 있는 경로만 전체 화면(하단 탐색 없음)으로 만든다.
-export const SETTINGS_PAGES = ["reminder", "day", "privacy", "export", "delete", "deleted"];
+export const SETTINGS_PAGES = ["reminder", "day", "privacy", "export", "delete", "deleted", "profile", "name", "leave", "left"];
 export function renderSettings(main, navigate, params, rest = []) {
   const sub = rest[0];
   if (sub === "reminder") return renderReminder(main, navigate, params);
@@ -233,5 +380,9 @@ export function renderSettings(main, navigate, params, rest = []) {
   if (sub === "export") return renderExport(main, navigate, params);
   if (sub === "delete") return renderDelete(main, navigate, params);
   if (sub === "deleted") return renderDeleted(main, navigate);
+  if (sub === "profile") return renderProfile(main, navigate);
+  if (sub === "name") return renderName(main, navigate, params);
+  if (sub === "leave") return renderLeave(main, navigate, params);
+  if (sub === "left") return renderLeft(main, navigate);
   return renderList(main, navigate, params);
 }

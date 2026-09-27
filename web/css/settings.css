@@ -104,3 +104,53 @@ button.st-row{cursor:pointer}
 .screen.settings .st-group:nth-of-type(2) .st-ic-frame::before{background:color-mix(in srgb,var(--service-ink) 9%,var(--bg))}
 .screen.settings .st-row.is-dim .st-ic-frame::before{background:var(--surface-soft)}
 /* ④의 누름 면·살짝 눌림은 base.css의 줄 모양 공통 규칙(D-098 ①)이 맡는다 — 설정 하위 화면의 줄에도 같이 걸린다(D-099 list-row F1). */
+
+/* ── 내 계정·부를 이름(D-104): 머리는 가입의 이름 장면(auth.css .au-scene), 줄은 설정 줄 한 모양 ── */
+.st-profile .au-scene{margin-bottom:var(--sp-2)}
+.st-profile-since{margin:0 0 var(--sp-4);text-align:center;font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
+.st-provider::before{background:var(--surface-soft)}
+.st-provider .au-mark{position:relative;z-index:1;width:20px;height:20px}
+.st-provider.kakao .au-mark{color:var(--login-kakao-mark)}
+.st-provider.apple .au-mark{color:var(--login-apple-bg)}
+.st-profile-note{margin:var(--sp-4) 0 0}
+.st-leave-row{margin-top:var(--sp-10)}
+.st-name .au-scene{margin-bottom:var(--sp-4)}
+
+/* ── 계정 탈퇴 두 단계(D-104): 빨간 제목 없이 설정 하위 화면의 결 그대로. 무드는 모양·색만(사용자 2026-09-27 — 이름·돌·친구 없음) ── */
+.st-leave{display:flex;flex-direction:column;padding-bottom:0}
+.screen.settings-sub.st-leave h1{margin-bottom:var(--sp-2)}
+.st-leave-lede{margin:0 0 var(--sp-5);text-wrap:pretty}
+/* 요약(초안 S1): 옅은 언덕색(land-hill-far, ink 글자 12.75:1) 둥근 네모 면 + 오른쪽 작은 조약돌 조각 셋(언덕 가운데·가까운 색, 흰 돌 하나). 조각은 장식이다(aria-hidden) */
+.st-leave-sum{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-4);padding:var(--sp-5) var(--sp-5) var(--sp-5) var(--sp-6);border-radius:var(--radius-card);background:var(--land-hill-far);color:var(--service-ink)}
+.st-sum-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.st-leave-sum b{font-size:1.75rem;line-height:2.25rem;font-weight:800;letter-spacing:-.025em;font-variant-numeric:tabular-nums}
+.st-leave-sum .st-sum-text span{font-size:var(--fs-body);line-height:var(--lh-body);font-weight:600}
+.st-sum-pebs{position:relative;flex:none;width:86px;height:58px}
+.st-sum-peb{position:absolute;display:block}
+.st-sum-peb.a{left:0;bottom:2px;width:40px;height:30px;background:var(--land-hill-mid);border-radius:46% 54% 42% 58% / 58% 46% 54% 42%}
+.st-sum-peb.b{left:30px;bottom:0;width:52px;height:38px;background:var(--land-hill-near);border-radius:52% 48% 44% 56% / 60% 54% 46% 40%}
+.st-sum-peb.c{left:46px;top:0;width:26px;height:20px;background:var(--bg);border-radius:54% 46% 58% 42% / 50% 58% 42% 50%}
+.st-leave-head{margin:var(--sp-8) 0 var(--sp-2)}
+/* 지워지는 것: 설명 없이 이름만, 본문 크기·본문 색. 누르는 줄이 아니므로 선·›가 없다 */
+.st-leave-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp-2)}
+.st-leave-list li{display:flex;align-items:center;gap:var(--sp-3);min-height:44px;font-size:1.0625rem;font-weight:700;letter-spacing:-.01em;color:var(--text)}
+.st-leave-list .st-ic-frame::before{background:var(--surface-soft)}
+.st-leave .st-rows .st-ic-frame::before{background:color-mix(in srgb,var(--service-ink) 9%,var(--bg))}
+.st-leave .st-rows .st-row-name{font-size:1.0625rem;font-weight:700;letter-spacing:-.01em}
+.st-leave .sd-actions{margin-top:auto;padding-top:var(--sp-8)}
+/* ① 읽는 단계는 버튼을 바닥에 붙이지 않는다 — 붙이면 '대신 이런 방법도 있어요'가 가려졌다. 끝까지 읽고 내려가야 계속할 수 있다 */
+.st-leave:not(.st-leave-confirm) .sd-actions{position:static}
+/* ② 결심하는 단계: 본문 한 문단은 회색 설명이 아니라 본문 색·크기 */
+.st-leave-confirm .st-leave-sum{margin:var(--sp-2) 0 var(--sp-5)}
+.st-leave-say{margin:0 0 var(--sp-2);font-size:var(--fs-heading);line-height:1.625rem;font-weight:600;color:var(--text);text-wrap:pretty}
+.st-leave-field{margin-top:var(--sp-6)}
+.st-leave-note{margin:var(--sp-4) 0 0}
+
+/* 떠나는 이유(선택, D-104): 여럿 고르기 알약(.choice, write.css)을 흰 바탕에 쓰므로 옅은 면을 준다. 고르면 ink 면 + 민트 체크 그대로 */
+.st-reasons{margin-top:var(--sp-6)}
+.st-optional{margin-left:2px;font-weight:var(--fw-label);color:var(--muted)}
+.st-reasons-note{margin:var(--sp-1) 0 var(--sp-3)}
+.st-reason-chips{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
+.st-reasons .choice{background:var(--surface-soft)}
+.st-reasons .choice[aria-pressed="true"]{background:var(--service-ink)}
+.st-reason-other{margin-top:var(--sp-3)}

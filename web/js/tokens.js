@@ -16,6 +16,7 @@ export async function applyTokens() {
   for (const [key, value] of Object.entries(tokens.color.forest ?? {})) if (value?.light) set(`forest-${key}`, value.light); // 오늘 화면의 어두운 숲(D-062)
   for (const [key, value] of Object.entries(tokens.color.land ?? {})) if (value?.light) set(`land-${key}`, value.light); // 완료·온보딩의 색 언덕(D-061)
   for (const [key, value] of Object.entries(tokens.color.paper ?? {})) if (value?.light) set(key.startsWith("paper") ? key : key, value.light); // 편지 종이·봉투(D-063): --paper, --paper-rule, --paper-ink, --envelope-*
+  for (const [key, value] of Object.entries(tokens.color.login ?? {})) if (value?.light) set(`login-${key}`, value.light); // 소셜 로그인 버튼(D-104): --login-kakao-bg 등
 
   const usage = tokens.color["emotion-usage"];
   for (const [key, steps] of Object.entries(tokens.color.emotion)) {
