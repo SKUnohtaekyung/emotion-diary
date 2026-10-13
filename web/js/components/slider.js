@@ -231,7 +231,7 @@ export function renderIntensity() {
     if (drawn && !host.isConnected) return; // 다른 화면으로 떠난 뒤의 이벤트는 무시한다(리스너는 지워지지 않는다)
     drawn = true;
     const cats = state.draft.cats.filter((cat) => state.draft.emotions.some((e) => e.cat === cat));
-    if (!cats.length) { host.replaceChildren(el("p", { class: "note", text: "세부 감정을 고르면 계열마다 크기를 정하는 칸이 생겨요." })); return; }
+    if (!cats.length) { host.replaceChildren(el("p", { class: "note", text: "마음을 고르면 크기를 정하는 칸이 생겨요." })); return; }
     host.replaceChildren(...cats.map((cat, i) => renderPanel(cat, i)));
     requestAnimationFrame(() => [...host.children].forEach((n) => n.repaint?.()));
   }

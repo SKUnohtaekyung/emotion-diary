@@ -4,7 +4,6 @@
 .stats-screen .segmented{margin-top:var(--sp-3)}
 .sx-body{margin-top:var(--sp-2)}
 .sx-sec{margin-top:var(--sp-8)}
-.sx-ai-note{margin-top:var(--sp-8)}
 
 /* 요약 칸 둘 — '평균 크기' 칸은 없앴다: 서로 다른 감정의 크기를 한데 섞은 평균은 어느 마음의 크기도 아니다(SERVICE_WHY §12, DESIGN_SYSTEM §6.10). */
 .sx-summary{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-4);margin:var(--sp-6) 0}

@@ -17,7 +17,6 @@ const reminderDue = () => { const t = now(); return REMINDER.on && sinceDayStart
 // 오늘 기록을 새로 시작하면 쓰던 지난 날 글이 사라지지 않게 잠시 맡겨 둔다(시안은 글을 하나만 들고 있어서다 — 실제 앱에서는 날짜마다 따로 저장된다).
 let parked = null;
 const chevron = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true"); const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", "M9 6l6 6-6 6"); s.append(p); return s; };
-const moon = () => { const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true"); const p = document.createElementNS("http://www.w3.org/2000/svg", "path"); p.setAttribute("d", "M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"); s.append(p); return s; };
 // '지난 기록' 알약 아이콘(D-090 ③): 하단 탐색 달력 탭(index.html .bottom-nav)과 같은 모양 — 둥근 사각 + 가로 칸막이 + 고리 둘 — 을 채움·겹레이어 없이 선만으로 그린다.
 const calendarIcon = () => {
   const s = document.createElementNS("http://www.w3.org/2000/svg", "svg"); s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true");
@@ -85,10 +84,6 @@ export function renderToday(main, navigate, params) {
     const isYesterday = !pastDate || pastDate === `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, "0")}-${String(y.getDate()).padStart(2, "0")}`;
     const label = isYesterday ? "어제 쓰던 글이 있어요" : `${Number(pastDate.slice(5, 7))}월 ${Number(pastDate.slice(8, 10))}일에 쓰던 글이 있어요`;
     box.append(el("p", { class: "yline" }, el("a", { href: "#/write", onclick: resumePast }, label, chevron())));
-  }
-  if (force === "ai" || (!force && mode === "none") || force === "yesterday") {
-    // AI 진입은 구독 경로가 확인되지 않으면 '현재 제공되지 않음'으로 비활성이다(D-019, UX_SPEC §5).
-    if (!failed) box.append(el("p", { class: "ailine", id: "aiNote" }, moon(), "AI와 대화하며 쓰기 · 지금은 쉬고 있어요"));
   }
   if (force === "loading") box.append(el("div", { class: "ldk" },
     el("i", { style: { left: "31.7%", top: "63%", width: "36.7%", height: "13%", "border-radius": "58% 42% 54% 46% / 46% 54% 42% 58%" } }), el("i", { style: { left: "31%", top: "81.5%", width: "38%", height: "2.2%" } })));

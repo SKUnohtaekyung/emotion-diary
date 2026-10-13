@@ -69,7 +69,6 @@ button.st-row{cursor:pointer}
 .st-info-name{margin:0;font-weight:var(--fw-body-strong)}
 .st-info-desc{margin:var(--sp-1) 0 0;font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
 
-.st-lock-note{margin:calc(var(--sp-2) * -1) 0 0 52px}
 /* 시간대 줄: st-row(navRow)로 통일한 뒤 설명은 그 아래 한 줄 — 줄 이름 시작선(52px)에 맞춘다. */
 .st-tz-note{margin:calc(var(--sp-2) * -1) 0 0 52px}
 .st-foot-note{margin-top:var(--sp-8)}
@@ -154,3 +153,6 @@ button.st-row{cursor:pointer}
 .st-reasons .choice{background:var(--surface-soft)}
 .st-reasons .choice[aria-pressed="true"]{background:var(--service-ink)}
 .st-reason-other{margin-top:var(--sp-3)}
+
+/* 앱 잠금(D-106): 스위치 줄·바꾸기 줄 아래 설명 두 줄 */
+.st-lock .st-lock-note{margin:var(--sp-3) 0 0}

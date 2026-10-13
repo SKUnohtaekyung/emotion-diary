@@ -20,7 +20,7 @@ html:has(.rs-scene){scroll-padding-top:calc(var(--banner-h,2rem) + 3.5rem);scrol
 .rs-note .ruled::placeholder{color:var(--muted)}
 .rs-note .field-error{margin:0;font-size:var(--fs-label);line-height:2rem}
 @supports selector(:has(*)){
-  .rs-note:has(.ruled:focus-visible){outline:var(--emphasis) solid var(--focus);outline-offset:4px}
+  .rs-note:has(.ruled:focus-visible){outline:var(--emphasis) solid var(--service-ink);outline-offset:4px}
   .rs-note .ruled:focus-visible{outline:none}
 }
 

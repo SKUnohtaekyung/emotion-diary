@@ -97,3 +97,7 @@
 .au-sheet-list.muted{color:var(--muted)}
 
 @media (prefers-reduced-motion:reduce){.au-done .glow{animation:none;opacity:.8}.au-provider{transition:none}.au-provider.is-busy span{animation:none}.au-check-face::before{transition:none}}
+
+/* 가입 끝의 잠금 입구(D-106 ②): 주 버튼 위의 조용한 글자 버튼 — 주 버튼은 하나다 */
+.au-done-lock{position:absolute;left:50%;translate:-50% 0;width:max-content;max-width:calc(100% - var(--sp-5) * 2);padding:0 var(--sp-4);bottom:calc(var(--sp-6) + 56px + var(--sp-3) + env(safe-area-inset-bottom));min-height:var(--touch);border:0;border-radius:var(--radius-chip);background:color-mix(in srgb,var(--bg) 86%,transparent);color:var(--service-ink);font:inherit;font-size:var(--fs-label);font-weight:var(--fw-body-strong);cursor:pointer}
+.au-done-lock:focus-visible{outline:var(--emphasis) solid var(--service-ink);outline-offset:-2px;border-radius:var(--radius-chip)}

@@ -70,7 +70,7 @@ export function missingFields() {
   if (!d.cats.length) missing.push({ field: "cats", step: "cats", message: "마음을 하나 이상 골라 주세요." });
   for (const cat of d.cats) {
     if (!d.emotions.some((e) => e.cat === cat)) missing.push({ field: `detail:${cat}`, step: `detail:${cat}`, cat, message: "세부 감정을 하나 이상 골라 주세요." });
-    else if (d.repr[cat] == null) missing.push({ field: `repr:${cat}`, step: "intensity", cat, message: "이 계열의 크기를 정해 주세요." });
+    else if (d.repr[cat] == null) missing.push({ field: `repr:${cat}`, step: "intensity", cat, message: "이 마음의 크기를 정해 주세요." });
   }
   if (!d.reason.trim()) missing.push({ field: "reason", step: "reason", message: "왜 이런 마음이 들었다고 느끼는지 적어 주세요." });
   return missing;

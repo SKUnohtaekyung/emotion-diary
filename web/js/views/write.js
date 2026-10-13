@@ -21,7 +21,16 @@ const closeIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "tru
 // ⋯ 메뉴 아이콘은 기록 상세(tabs.js)의 더보기와 같은 모양이다(dots3 채움은 flow.css에서 .write-top으로 넓힌다).
 const dotsIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "dots3" }, svgEl("circle", { cx: "5", cy: "12", r: "1.7" }), svgEl("circle", { cx: "12", cy: "12", r: "1.7" }), svgEl("circle", { cx: "19", cy: "12", r: "1.7" }));
 // 지난 날 글을 마무리할 때(state.draft.date !== todayISO()) 화면 말의 '오늘'을 '그날'로 바꾼다(재작업 1회차 — 마무리 띠와 제목이 어긋나던 결함).
-const guideText = (day) => `잘 설명하지 못해도 괜찮아요. ${day}의 마음을, 처음 이름 붙이듯 적어 보세요.`;
+// 있었던 일 안내는 쓴 기간에 따라 네 단계로 바뀐다(2026-10-13 QA R10, tasks/qa/2026-10-13/UX-WRITING.md) — 처음에는 문턱을 낮추고, 익숙해질수록 도움을 덜어 낸다.
+// 단계는 첫 기록일부터 지난 날로 정한다: 0~29일 ① · 30~59일 ② · 60~89일 ③ · 90일~ ④(이후 유지). 시안은 기록이 없어 ①이 기본이고 QA는 ?tenure=0~3으로 본다.
+const GUIDES = [
+  () => "잘 쓰지 않아도 괜찮아요. 기억나는 장면 하나부터 적어 보세요.",
+  () => "누구와 어디서 있었던 일인지 함께 적어 보세요.",
+  () => "있었던 일과 그때 든 생각을 나눠서 적어 보세요.",
+  (day) => `${day} 남은 장면을 적어 보세요.`
+];
+let guideStage = 0;
+const guideText = (day) => GUIDES[guideStage](day);
 const monthDay = (iso) => { const [, m, d] = iso.split("-").map(Number); return `${m}월 ${d}일`; }; // '지우기 2단계'·'마무리 배너'의 짧은 날짜꼴(연도·요일 없이)
 
 const autoGrow = (ta) => { ta.style.height = "auto"; ta.style.height = `${Math.max(ta.scrollHeight, ta.clientHeight)}px`; };
@@ -49,20 +58,22 @@ function buildSteps() {
   ];
 }
 
-// "다음"을 막는 이유(없으면 null). 날짜·사건·이유는 편지에서 남길 때 확인한다.
+// "다음"을 막는 이유(없으면 null). 있었던 일은 비면 여기서 막는다(2026-10-13 QA R6 — 나중에 돌아볼 재료라 한 줄이라도 권한다). 이유는 편지에서 남길 때 확인한다.
 // 이 말은 오류가 아니라 할 일을 알려 주는 안내다(D-098 ③) — 고를 자리 바로 위에 ink 글자로 뜬다.
 function blockedReason(step) {
   const d = state.draft;
+  if (step.key === "date") return d.event.trim() ? null : "한 줄만 적어도 충분해요.";
   if (step.key === "cats") return d.cats.length ? null : "가까운 마음을 하나 고르면 다음으로 갈 수 있어요.";
   if (step.cat) return d.emotions.some((e) => e.cat === step.cat) ? null : "가까운 말을 하나 고르면 다음으로 갈 수 있어요.";
-  if (step.key === "intensity") return d.cats.some((cat) => d.emotions.some((e) => e.cat === cat) && d.repr[cat] == null) ? "모든 계열의 크기를 정해 주세요." : null;
+  if (step.key === "intensity") return d.cats.some((cat) => d.emotions.some((e) => e.cat === cat) && d.repr[cat] == null) ? "크기를 정하지 않은 마음이 있어요." : null;
   return null;
 }
 function showBlocked(step) {
   const message = blockedReason(step);
   if (!message) return;
   // 빨간 오류(field-error)는 실제 입력 오류(남기기를 눌렀는데 빈 곳)에만 쓴다. 여기서는 안내 한 줄을 띄우고 첫 선택지로 초점을 옮긴다(D-098 ③).
-  if (step.key === "cats") { const n = document.getElementById("catsHint"); n.textContent = message; n.hidden = false; document.querySelector(".ff, .fr")?.focus(); }
+  if (step.key === "date") { const n = document.getElementById("eventHintBlocked"); n.textContent = message; n.hidden = false; document.getElementById("event")?.focus(); }
+  else if (step.key === "cats") { const n = document.getElementById("catsHint"); n.textContent = message; n.hidden = false; document.querySelector(".ff, .fr")?.focus(); }
   else if (step.cat) { const n = document.getElementById(`detailHint-${step.cat}`); n.textContent = message; n.hidden = false; document.querySelector(`#cloud-${step.cat} .choice`)?.focus(); }
   else if (step.key === "intensity") { showIntensitySheet(); return; } // 크기는 인라인 오류만으론 눈에 덜 띄어 시트로 어디가 비었는지 짚어 준다(D-079). announce는 시트 안에서 따로 한다.
   announce(message);
@@ -72,7 +83,7 @@ function showBlocked(step) {
 // 패널 아래 인라인 오류(#reprError-<cat>)는 지금처럼 함께 켜 둔다 — 시트를 닫은 뒤에도 어느 계열이 비었는지 화면에 남도록.
 function showIntensitySheet() {
   const missing = state.draft.cats.filter((cat) => state.draft.emotions.some((e) => e.cat === cat) && state.draft.repr[cat] == null);
-  for (const cat of missing) { const n = document.getElementById(`reprError-${cat}`); if (n) { n.textContent = "이 계열의 크기를 정해 주세요."; n.hidden = false; } }
+  for (const cat of missing) { const n = document.getElementById(`reprError-${cat}`); if (n) { n.textContent = "이 마음의 크기를 정해 주세요."; n.hidden = false; } }
   const list = el("ul", { class: "missing-list" }, missing.map((cat) => el("li", { text: `${FRIENDS[cat].name} · ${category(cat).label}` })));
   openSheet({ title: "크기를 정하지 않은 마음이 있어요", body: list,
     primary: { text: "정하러 가기", onclick: () => {
@@ -185,6 +196,7 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
   const step = steps[i], isReview = step.key === "review";
   state.step = step.key;
   document.body.dataset.fullscreen = "";
+  if (params.has("tenure")) guideStage = Math.min(3, Math.max(0, Number(params.get("tenure")) || 0)); // QA: 안내 단계 보기(R10)
   const day = state.draft.date === todayISO() ? "오늘" : "그날"; // 지난 날 글 마무리 중에는 화면 말의 '오늘'을 모두 '그날'로 바꾼다(재작업 1회차)
   // 주소에 아직 step이 없으면(새로 들어왔거나 today.js가 state만 옮겨 둔 경우) 방문 기록을 새로 쌓지 않고 지금 단계로 주소만 맞춘다.
   // 다른 QA 조각(?s=·?net= 등)은 그대로 둔다 — step만 없거나 다를 뿐이라 통째로 새로 짓지 않고 여기만 채운다.
@@ -307,7 +319,7 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
   if (step.key === "date") {
     const d = state.draft;
     // 날짜 칸 없음(과제1, D-082): 새 기록은 그날만 쓴다 — 날짜는 항상 todayISO()(새벽 4시 기준)이고 고칠 곳이 없다. 단계 키는 "date"로 그대로 둔다.
-    body = [el("h1", { tabindex: "-1", text: `${day} 있었던 일` }), el("p", { class: "paper-guide", text: guideText(day) }),
+    body = [el("h1", { tabindex: "-1", text: `${day} 있었던 일` }), el("div", { class: "guide-slot" }, el("p", { class: "paper-guide", text: guideText(day) }), el("p", { class: "blocked-hint", id: "eventHintBlocked", hidden: true })), // 안내와 막힘 안내가 같은 자리를 쓴다 — 떠도 종이가 밀리지 않는다
       renderEventScene({ cats: d.cats, day,
         eventField: ruled("event", "무슨 일이 있었나요?", "있었던 일을 떠오르는 대로 적어요.", d.event, (v) => { d.event = v; }) })];
   } else if (step.key === "cats") {
@@ -319,7 +331,7 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
       const rest = state.draft.cats; goStep(!rest.length ? "cats" : pos < rest.length ? `detail:${rest[pos]}` : "intensity");
     } })];
   } else if (step.key === "intensity") {
-    body = [el("h1", { tabindex: "-1", text: "얼마나 컸나요?" }), el("p", { class: "lede", text: "1은 스쳐 지나간 정도, 10은 하루에 크게 남은 정도예요. 색은 마음을 알려 줄 뿐 좋고 나쁨이 아니에요." }), renderIntensity()];
+    body = [el("h1", { tabindex: "-1", text: "얼마나 컸나요?" }), el("p", { class: "lede" }, "1은 스쳐 지나간 정도, 10은 일상에 큰 영향을 준 정도예요.", el("br"), "색은 마음을 알려 줄 뿐 좋고 나쁨이 아니에요."), renderIntensity()];
   } else if (step.key === "reason") {
     body = [el("h1", { tabindex: "-1", text: "이유" }), renderReasonScene({ cats: state.draft.cats, field: ruled("reason", "왜 이런 마음이 들었다고 느끼나요?", "정답은 없어요. 느낀 대로 적어요.", state.draft.reason, (v) => { state.draft.reason = v; }) })];
   } else if (step.key === "praise") {
@@ -337,7 +349,7 @@ export function renderWrite(main, navigate, params = new URLSearchParams()) {
   // 안내 띠(과제2·5·9): 완료 기록 수정 중 / 지난 날 글 마무리 중 / 연결 끊김 / 남기기 실패. 필요한 만큼 같은 자리에 쌓인다.
   const editingBanner = state.editing ? el("div", { class: "banner editing-banner wf-banner", role: "status" },
     svgEl("svg", { viewBox: "0 0 24 24", width: "20", height: "20", "aria-hidden": "true", style: "flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round" }, svgEl("path", { d: "M4 20l4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20z" })),
-    el("div", {}, "완료된 기록을 수정 중이에요", el("small", { text: "저장하면 이 기록의 분석이 최신이 아니게 될 수 있어요." }))) : null;
+    el("div", {}, "완료된 기록을 수정 중이에요")) : null;
   // 지난 날 글 마무리(과제2, D-082): 그날 시작한 임시저장은 기한 없이 마무리할 수 있다는 사용자 결정을 알려 준다. 완료 기록 수정 중과는 겹치지 않는다.
   const finishingBanner = (!state.editing && state.draft.date < todayISO())
     ? el("div", { class: "banner wf-banner", role: "status", text: `${monthDay(state.draft.date)}의 기록을 마무리하고 있어요` }) : null;

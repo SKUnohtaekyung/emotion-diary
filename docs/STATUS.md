@@ -1,6 +1,6 @@
 # 진행 상황과 다음 할 일
 
-최종 갱신: 2026-09-26. 세부 증거는 [../tasks/CURRENT_TASK.md](../tasks/CURRENT_TASK.md)와 [../tasks/archive/](../tasks/archive/README.md), 결정 근거는 [DECISIONS.md](DECISIONS.md)에 있다. 이 문서는 한눈에 보는 요약이다. 이 날짜가 HEAD 커밋일보다 14일 넘게 앞서면 `verify`가 경고한다.
+최종 갱신: 2026-10-13. 세부 증거는 [../tasks/CURRENT_TASK.md](../tasks/CURRENT_TASK.md)와 [../tasks/archive/](../tasks/archive/README.md), 결정 근거는 [DECISIONS.md](DECISIONS.md)에 있다. 이 문서는 한눈에 보는 요약이다. 이 날짜가 HEAD 커밋일보다 14일 넘게 앞서면 `verify`가 경고한다.
 
 ## 1. 지금 어디에 있나
 
@@ -43,6 +43,8 @@
 `work-graph`에서는 이 판정에 맞춰 `hosting-identity-spike`·`model-access-spike`가 `verifying`, `data-store-spike`가 선행 미완으로 `blocked`다. partial이 pass가 돼야 `app-scaffold`가 열린다.
 
 ## 4. 다음 할 일 (우선순위 순)
+
+> **2026-10-13 사용자 QA(D-105·D-106)**: 사용자가 시안을 처음부터 써 보며 낸 요청 14건을 `tasks/qa/2026-10-13/`(요청·계획·글쓰기 원칙)에 적고 처리했다 — 없는 기능 안내 삭제, 뒤쪽 조약돌 호버, 2단계 길, 빈칸 안내, UX 라이팅 원칙 여덟 가지(UX_SPEC §6.1)와 작성 흐름 문구, 있었던 일 안내 네 단계, 앱 잠금 비밀번호(UX_SPEC §15). 보류: 메인(제목용) 글꼴 추가(후보 셋 비교 뒤 Pretendard 유지). 남은 것: 작성 흐름 밖 문구 점검, 달력 화면 사용자 확인, 잠금의 전시장 견본·실기기 확인, 처음부터 남은 QA 점검표 8개.
 
 1. **TASK-WEB-UI-02 브랜드·디자인 개편과 시안 재구성**(in_progress, 2026-09-21) — 결정 D-050~D-059는 끝났다(문서·토큰·전시장). `web/` 시안을 새 언어(흰 바탕 + 숲색 무대 + 감정 테마 300 + 조약돌·빛 + 친구)로 재구성하고 메인이 헤드리스 Chromium으로 캡처·측정한다. 증거와 남은 것은 `tasks/CURRENT_TASK.md`. 사용자 눈 검수 대상: 300 면의 인상, 친구가 면에 묻히는지, 돌 더미 애니메이션, 작성 단계 수(계열 셋이면 10단계). **남은 검수(TASK-WEB-UI-01 유래)**: iPhone Safari·Android Chrome 실기기, 실제 OS reduced-motion 설정, 회색조·label 없음 상태의 사람 눈 판독. **추후 계획**: 오늘의 한 줄 질문 목록 작성, 앱 이름·로고(D-058).
 2. **디자인 시스템 잔여 실행 항목** — TASK-DS-REF(2026-09-26 완료)에서 넘어온 것: 기기 뒤로가기로 시트 닫기(작성 흐름 `flowDepth`와 함께, B-08)·키보드가 올라올 때 버튼 줄(잠정 그대로)의 실기기 확인, 누른 채의 모습·움직임 줄이기 대체의 실측, 전시장에 부품별 상태표, `.sx-headline`(24/800) 글자 단계 맞춤, 360×640 달력 스크롤. 그 전부터: 실기기에서 chip 대비·40px 아이콘 판독성·44px 터치·별자리 다중 선택 조작감 확인. 위기 안내 연락처는 공식 출처로 채웠고(D-094, `data/crisis-resources/kr.json`) **임상·안전 검토와 휴대전화 1388 통신사 실측이 출시 차단**으로 남았다.

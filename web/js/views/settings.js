@@ -8,6 +8,7 @@ import { renderExport, renderDelete, renderDeleted, renderLeft } from "./setting
 import { dayStatus, effectiveToday } from "../sample.js";
 import { account, PROVIDERS, cleanName, nameLength, joinedLabel } from "../account.js";
 import { providerMark, nameScene, nameField } from "./auth.js";
+import { pinPad, setPin, clearPin, hasPin, checkPin, lockScene } from "../lock.js";
 
 // ── 시안 안의 설정 값(D-091 — 실제로 저장·전송하지 않고 모듈 변수로만 들고 있는다. 목록·알림 화면이 이 하나를 같이 본다) ──
 const settingsState = { reminderOn: true, reminderTime: "22:00", dayStartHour: 4 };
@@ -20,11 +21,12 @@ const ICONS = {
   clock: () => ic("M12 3.6a8.4 8.4 0 1 0 .01 0", "M12 7.8V12l3 2"), // 알림 시각
   horizon: () => ic("M4 16.6h16", "M7.6 16.6a4.4 4.4 0 0 1 8.8 0", "M12 6.6v2.2", "M6.7 10.6l1.5 1.5", "M17.3 10.6l-1.5 1.5"), // 하루 기준 시각 — 지평선 위로 뜨는 해(하루의 경계)
   timezone: () => ic("M12 3.6a8.4 8.4 0 1 0 .01 0", "M3.9 12h16.2", "M12 3.6c2 2.3 3.1 5.3 3.1 8.4s-1.1 6.1-3.1 8.4c-2-2.3-3.1-5.3-3.1-8.4S10 5.9 12 3.6z"), // 시간대 — 자오선 있는 지구본
+  keypad: () => ic("M7.4 7h.01", "M12 7h.01", "M16.6 7h.01", "M7.4 12h.01", "M12 12h.01", "M16.6 12h.01", "M7.4 17h.01", "M12 17h.01", "M16.6 17h.01"), // 앱 잠금(숫자판)
+  swap: () => ic("M5 9h12.5", "M14.5 5.8 17.8 9l-3.3 3.2", "M19 15H6.5", "M9.5 11.8 6.2 15l3.3 3.2"), // 비밀번호 바꾸기
   lock: () => ic("M6.2 11.2a2 2 0 0 1 2-2h7.6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H8.2a2 2 0 0 1-2-2z", "M8.6 9.2V7.6a3.4 3.4 0 0 1 6.8 0v1.6"), // 개인정보 안내 전용(직접 쓴 일기는 그대로예요와도 같은 뜻)
   download: () => ic("M12 4v9.6", "M8.2 10 12 13.8 15.8 10", "M4.8 15.2v3a2 2 0 0 0 2 2h10.4a2 2 0 0 0 2-2v-3"), // 내보내기 전용
   bubble: () => ic("M6.2 5.6h11.6a2 2 0 0 1 2 2v6.4a2 2 0 0 1-2 2h-7.6L7 19.4v-3.4H6.2a2 2 0 0 1-2-2V7.6a2 2 0 0 1 2-2z", "M9.4 10.4h.01", "M12 10.4h.01", "M14.6 10.4h.01"), // AI 분석을 켜면
   trash: () => ic("M5 7h14", "M9.4 7V5.6A1.6 1.6 0 0 1 11 4h2a1.6 1.6 0 0 1 1.6 1.6V7", "M6.6 7l.7 11.2A2 2 0 0 0 9.3 20h5.4a2 2 0 0 0 2-1.8L18 7", "M10 10.6v6M14 10.6v6"), // 보관과 삭제
-  hourglass: () => ic("M6.4 4.4h11.2", "M6.4 19.6h11.2", "M7.5 4.4c0 3.3 2 5.1 4.5 6.1 2.5-1 4.5-2.8 4.5-6.1", "M7.5 19.6c0-3.3 2-5.1 4.5-6.1 2.5 1 4.5 2.8 4.5 6.1"), // 푸시 알림(잠긴 자리)
   heart: () => ic("M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"), // 도움이 필요할 때 · 진단·치료 앱이 아니에요(둘 다 '힘든 순간의 돌봄'이라는 같은 뜻 축이라 유지 — 아래 표)
   replay: () => ic("M5.2 12a6.8 6.8 0 1 0 2.1-4.9", "M5.2 4.6v4.4h4.4"), // 처음 화면 다시 보기
   logout: () => ic("M9.8 4.6H6.4a2 2 0 0 0-2 2v10.8a2 2 0 0 0 2 2h3.4", "M11 12h9.2", "M17 8.4l3.6 3.6-3.6 3.6"), // 로그아웃
@@ -49,12 +51,10 @@ function navRow({ icon, name, value, onclick, dim }) {
     iconFrame(icon, rowSeq++), el("span", { class: "st-row-name", text: name }),
     el("span", { class: "st-row-trail" }, value != null ? el("span", { class: "st-row-value", "aria-hidden": "true", text: value }) : null, chevIcon()));
 }
-function switchRow({ icon, name, checked, onclick, locked }) {
-  return el("div", { class: `st-row st-switch-row${locked ? " is-dim" : ""}` },
+function switchRow({ icon, name, checked, onclick }) {
+  return el("div", { class: "st-row st-switch-row" },
     iconFrame(icon, rowSeq++), el("span", { class: "st-row-name", text: name }),
-    locked
-      ? el("span", { class: "st-row-trail" }, el("span", { class: "st-row-value", "aria-hidden": "true", text: "준비 중" }))
-      : el("button", { type: "button", class: "switch", role: "switch", "aria-checked": String(checked), "aria-label": name, onclick },
+    el("button", { type: "button", class: "switch", role: "switch", "aria-checked": String(checked), "aria-label": name, onclick },
           el("i", { "aria-hidden": "true" })));
 }
 // 묶음 머리는 화면 제목(h1) 아래 단계의 제목(h2)이다 — 스크린리더의 제목 건너뛰기로 묶음을 훑는다(D-099 section-header K1). 모습은 작은 muted 글자 그대로.
@@ -118,6 +118,7 @@ function renderList(main, navigate, params) {
           navRow({ icon: ICONS.horizon, name: "하루 기준 시각", value: hourLabel(settingsState.dayStartHour), onclick: () => navigate("settings/day") })
         ]),
         group("내 기록 지키기", [
+          navRow({ icon: ICONS.keypad, name: "앱 잠금", value: hasPin() ? "켜짐" : "꺼짐", onclick: () => navigate("settings/lock") }),
           navRow({ icon: ICONS.lock, name: "개인정보 안내", onclick: () => navigate("settings/privacy") }),
           navRow({ icon: ICONS.download, name: "내 기록 내보내기", onclick: () => navigate("settings/export") })
         ]),
@@ -167,9 +168,6 @@ function renderReminder(main, navigate, params) {
       // 다른 줄과 같은 모양(아이콘+이름+값+›)으로 맞추고, 설명은 그 아래 muted 한 줄로 뗀다. iconFrame은 navRow 안에서 rowSeq로 그린다.
       navRow({ icon: ICONS.timezone, name: "시간대", value: timezoneValue(), onclick: () => announce("시간대: 시안이라 동작하지 않습니다") }),
       el("p", { class: "note st-tz-note", text: "바꿔도 이미 쓴 기록의 날짜는 바뀌지 않아요." }),
-
-      switchRow({ icon: ICONS.hourglass, name: "푸시 알림", locked: true }),
-      el("p", { class: "note st-lock-note" }, "휴대폰이 닫혀 있어도 알려 주는 알림은 지원을 확인한 뒤에 열어요."),
 
       el("p", { class: "caption st-foot-note" },
         "오늘 기록을 남기면 그날 알림은 멈춰요. 지난 날을 채우라고 알리지 않아요. 거절해도 같은 요청을 반복하지 않아요.")));
@@ -371,10 +369,49 @@ function renderLeaveConfirm(main, navigate, params, days) { // 결심하는 단�
 
 // ══════════════════════ 진입점 ══════════════════════
 // 하위 화면 이름 — main.js가 이 목록에 있는 경로만 전체 화면(하단 탐색 없음)으로 만든다.
-export const SETTINGS_PAGES = ["reminder", "day", "privacy", "export", "delete", "deleted", "profile", "name", "leave", "left"];
+// 앱 잠금(D-106, UX_SPEC §15): 켜고 끄는 스위치와 비밀번호 바꾸기. 끄거나 바꾸려면 지금 비밀번호를 먼저 누른다.
+function renderLockSettings(main, navigate) {
+  const on = hasPin();
+  main.replaceChildren(el("div", { class: "screen settings-sub st-lock" },
+    ...subHead(navigate, "앱 잠금"),
+    switchRow({ icon: ICONS.keypad, name: "비밀번호로 잠그기", checked: on, onclick: () => navigate(on ? "settings/pin?m=off" : "settings/pin") }),
+    navRow({ icon: ICONS.swap, name: "비밀번호 바꾸기", dim: !on, onclick: () => (on ? navigate("settings/pin?m=change") : announce("앱 잠금이 꺼져 있어요: 먼저 켜 주세요")) }),
+    el("p", { class: "note st-lock-note", text: "앱을 켤 때와 5분 넘게 떠났다 돌아올 때 비밀번호를 물어요." }),
+    el("p", { class: "note st-lock-note", text: "잊으면 다시 로그인해서 새로 정할 수 있어요. 기록은 그대로 있어요." })));
+}
+
+// 비밀번호 정하기(D-106, UX_SPEC §15): 잠금 화면과 같은 숲 장면에서 네 자리를 누르고 한 번 더 눌러 확인한다. 두 번이 다르면 처음으로 돌아간다.
+// 갈래(?m=): 없음 = 걸기(이미 걸려 있으면 바꾸기와 같다) · change = 바꾸기 · off = 끄기 · reset = 잊어서 다시 로그인한 뒤 새로.
+// **잠금이 걸려 있으면 어느 갈래든 지금 비밀번호를 먼저 누른다** — 주소의 갈래 값으로 확인을 건너뛸 수 없다. 다시 로그인한 경우는 auth.js가 옛 비밀번호를 이미 지웠다.
+// ?next=today 는 끝난 뒤 갈 곳(가입 끝·다시 로그인에서 온 경우), ?back= 은 뒤로 가기가 갈 곳이다.
+function renderPinSetup(main, navigate, params = new URLSearchParams()) {
+  const had = hasPin(), mode = params.get("m"), next = params.get("next") || "settings/lock", backTo = params.get("back") || "settings/lock";
+  if (mode === "off" && !had) { navigate("settings/lock"); return; }
+  const NOW = ["지금 비밀번호를 눌러 주세요", mode === "off" ? "맞으면 잠금을 꺼요." : "맞으면 새 비밀번호를 정해요."];
+  const ASK = [had || mode === "reset" ? "새 비밀번호 네 자리를 정해요" : "비밀번호 네 자리를 정해요", "앱을 켤 때와 잠시 떠났다 돌아올 때 물어요."], AGAIN = ["한 번 더 눌러 주세요", "같은 숫자를 눌러 확인해요."];
+  let verified = !had, first = null, scene;
+  const say = ([title, note]) => { scene.title.textContent = title; scene.note.textContent = note; };
+  const pad = pinPad({ tone: "dark", label: "비밀번호", onComplete: (value) => {
+    if (!verified) {
+      if (!checkPin(value)) { pad.reset("맞지 않아요. 다시 눌러 주세요.", { shake: true }); return; }
+      if (mode === "off") { clearPin(); navigate("settings/lock"); toast("잠금을 껐어요"); return; }
+      verified = true; say(ASK); pad.reset(""); announce(ASK[0]); return;
+    }
+    if (first == null) { first = value; say(AGAIN); pad.reset(""); announce(AGAIN[0]); return; }
+    if (value !== first) { first = null; say(ASK); pad.reset("두 번이 서로 달라요. 처음부터 다시 정해요.", { shake: true }); return; }
+    setPin(value); navigate(next); toast(had ? "비밀번호를 바꿨어요" : "잠금을 걸었어요");
+  } });
+  scene = lockScene({ inline: true, title: (verified ? ASK : NOW)[0], note: (verified ? ASK : NOW)[1], pad,
+    back: el("button", { type: "button", class: "lock-back", "aria-label": "돌아가기", onclick: () => navigate(backTo) }, backIcon()) });
+  main.replaceChildren(el("div", { class: "screen settings-sub st-pin" }, scene.node));
+}
+
+export const SETTINGS_PAGES = ["reminder", "day", "privacy", "export", "delete", "deleted", "profile", "name", "leave", "left", "pin", "lock"];
 export function renderSettings(main, navigate, params, rest = []) {
   const sub = rest[0];
   if (sub === "reminder") return renderReminder(main, navigate, params);
+  if (sub === "pin") return renderPinSetup(main, navigate, params);
+  if (sub === "lock") return renderLockSettings(main, navigate);
   if (sub === "day") return renderDayStart(main, navigate);
   if (sub === "privacy") return renderPrivacy(main, navigate);
   if (sub === "export") return renderExport(main, navigate, params);

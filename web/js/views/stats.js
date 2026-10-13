@@ -122,8 +122,7 @@ function renderStatsList(main, navigate, params, sample, todayIso, few, sParam) 
   main.replaceChildren(el("div", { class: "screen stats-screen" },
     el("h1", { tabindex: "-1", text: "통계" }),
     el("p", { class: "proto-note" }, el("span", { class: "proto-tag", text: "시안" }), " 아래 숫자는 모두 지어낸 예시입니다. 실제 기록을 세지 않습니다."),
-    seg, body,
-    el("p", { class: "caption sx-ai-note", text: "AI 분석은 지금은 제공되지 않아요. 제공되더라도 점수·병명·성격 유형은 보여 주지 않아요." })));
+    seg, body));
 }
 
 // ══════════════════════════════════════ 친구 상세(#/stats/<계열>?p=7|30, D-091 ②) ══════════════════════════════════════

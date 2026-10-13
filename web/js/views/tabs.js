@@ -285,7 +285,7 @@ function editAt(rec, navigate) {
 function recordMenu(iso, rec, real, navigate) {
   const menu = () => {
     const sh = openSheet({ title: `${shortDay(iso)}의 기록`, secondary: { text: "닫기" }, body: [
-      el("button", { type: "button", class: "menu-row", onclick: () => { sh.close(); editCompleted(rec); navigate("write"); } }, el("span", {}, "고치기", el("small", { text: "완료된 기록을 수정해요. 저장하면 분석이 최신이 아니게 될 수 있어요." }))),
+      el("button", { type: "button", class: "menu-row", onclick: () => { sh.close(); editCompleted(rec); navigate("write"); } }, el("span", {}, "고치기", el("small", { text: "완료된 기록을 수정해요." }))),
       el("button", { type: "button", class: "menu-row", onclick: () => { sh.close(); cancelDone(); } }, el("span", {}, "완료 취소", el("small", { text: "임시저장 상태로 돌려요. 통계와 분석에서 빠져요." }))),
       el("button", { type: "button", class: "menu-row danger", onclick: () => { sh.close(); del1(); } }, el("span", {}, "삭제", el("small", { text: "이 날의 기록을 지워요. 되돌릴 수 없어요." })))] });
   };

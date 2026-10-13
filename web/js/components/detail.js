@@ -49,6 +49,6 @@ export function renderDetail(cat, { index, total, onSkip } = {}) {
     total > 1 ? el("p", { class: "detail-label", text: `${c.label} · ${index + 1}/${total}` }) : null,
     el("h1", { tabindex: "-1", text: `${c.label} 중에서 어떤 마음이었나요?` }),
     el("p", { class: "lede", text: "가까운 말을 여러 개 골라도 돼요. 정답은 없어요." }),
-    onSkip ? el("button", { type: "button", class: "link detail-skip", text: "이 계열은 빼기", onclick: onSkip }) : null,
+    onSkip ? el("button", { type: "button", class: "link detail-skip", text: "이 마음은 빼기", onclick: onSkip }) : null,
     hint, cloud, error);
 }

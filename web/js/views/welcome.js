@@ -88,7 +88,7 @@ function buildNotice(navigate, { solo, onBack }) {
       el("h1", { id: "obNoticeTitle", tabindex: "-1" }, "이곳은 나를 알아가는", el("br"), "나만의 공간이에요"),
       el("ul", { class: "items" },
         el("li", {}, el("span", { class: "ob-face" }, icon(ICON.pen)), el("div", {}, el("b", { text: "정답을 정해 주지 않아요" }), el("p", { text: "감정을 진단하거나 판단하지 않아요. 어떤 마음이었는지는 내가 정해요." }))),
-        el("li", {}, el("span", { class: "ob-face" }, icon(ICON.lock)), el("div", {}, el("b", { text: "내 기록은 나만의 것이에요" }), el("p", { text: "직접 쓴 일기를 자동으로 분석하거나 지켜보지 않아요." }))))),
+        el("li", {}, el("span", { class: "ob-face" }, icon(ICON.lock)), el("div", {}, el("b", { text: "내 기록은 나만의 것이에요" }), el("p", { text: "직접 쓴 일기를 자동으로 분석하거나 지켜보지 않아요. 원하면 비밀번호로 잠글 수 있어요." }))))),
     ground, start);
   notice.addEventListener("click", (e) => e.stopPropagation());
   return { notice, ground, road, start };

@@ -14,6 +14,7 @@ import { renderHelp } from "./views/entry.js";
 import { renderWelcome } from "./views/welcome.js";
 import { renderAuth } from "./views/auth.js";
 import { finishSplash, dropSplash } from "./splash.js";
+import { showLock, watchAway, lock } from "./lock.js";
 
 const main = document.getElementById("main");
 const navRail = document.querySelector(".bottom-nav-rail");
@@ -36,6 +37,8 @@ function render() {
   const [path, query = ""] = location.hash.replace(/^#\//, "").split("?");
   const [name0, ...rest] = path.split("/");
   const name = ROUTES[name0] ? name0 : "today";
+  // 비밀번호를 잊어 다시 로그인하는 동안(D-106 ⑤)에는 로그인 화면만 연다(로그인이 끝나야 새 비밀번호를 정할 수 있다) — 뒤로 가기로 잠금을 돌아 들어오지 못한다.
+  if (lock.resetting && name !== "auth") { location.replace("#/auth?s=pin"); return; }
   const route = ROUTES[name];
   clearListeners();
   document.querySelector(".fly-stone")?.remove();
@@ -79,7 +82,11 @@ try {
   });
   render();
   const first = location.hash.replace(/^#\//, "").split(/[/?]/)[0];
-  finishSplash(ROUTES[first] ? first : "today"); // 로딩 화면을 첫 화면에 맞춰 걷는다(D-092 ④)
+  // 잠금이 걸려 있으면 로딩 → 잠금 → 첫 화면 순서다(D-106 ③). 잠금 화면이 로딩과 같은 숲 그림이라 로딩은 짧게 사라지기만 한다.
+  const lockOptions = { onForgot: (unlock) => { lock.resetting = true; navigate("auth?s=pin"); unlock({ quiet: true }); } };
+  const locked = showLock(lockOptions);
+  watchAway(lockOptions); // 떠나면 가리고 5분 넘게 있다 돌아오면 다시 묻는다(D-106 ③④)
+  finishSplash(locked ? "lock" : ROUTES[first] ? first : "today"); // 로딩 화면을 첫 화면에 맞춰 걷는다(D-092 ④)
 } catch (error) {
   dropSplash(); // 로딩 화면이 오류 문구를 덮지 않게
   document.documentElement.classList.add("ready");

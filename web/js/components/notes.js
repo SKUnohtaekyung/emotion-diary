@@ -56,7 +56,7 @@ export function renderEventScene({ eventField, day = "오늘" }) {
     hill("far", EVENT.far), tree(12, 6.5, EVENT.far), tree(19, 4.5, EVENT.far), tree(91, 5, EVENT.far),
     hill("mid", EVENT.mid),
     road(),
-    el("p", { class: "nt-story", text: `${day}의 첫 걸음이에요` }), // 장면을 설명하는 한 줄이다. 판단·평가·격려의 말이 아니다.
+    el("p", { class: "nt-story", text: `${day} 하루를 돌아보는 길이에요` }), // 장면을 설명하는 한 줄이다. 판단·평가·격려의 말이 아니다. 보이는 길과 지금 하는 일을 그대로 말한다(2026-10-13 QA R9)
     el("span", { class: "nt-stone", "aria-hidden": "true" }, stoneImg("rest")));
   return el("div", { class: "nt-scene nt-event" }, sheet, land, base(EVENT.near));
 }

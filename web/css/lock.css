@@ -1,0 +1,46 @@
+/* 앱 잠금 PIN(D-106, UX_SPEC §15). 숫자판은 두 곳이 같이 쓴다 — 숲 위의 잠금 화면(.pin-dark)과 흰 바탕의 PIN 정하기(.pin-light). */
+.pin-pad{--pin-fg:var(--service-ink);--pin-key:var(--surface-soft);--pin-key-on:color-mix(in srgb,var(--service-ink) 12%,var(--surface-soft));--pin-dot:color-mix(in srgb,var(--service-ink) 55%,transparent);--pin-on:var(--service-ink);display:flex;flex-direction:column;align-items:center;width:100%;color:var(--pin-fg)}
+.pin-pad.pin-dark{--pin-fg:var(--bg);--pin-key:color-mix(in srgb,var(--bg) 11%,transparent);--pin-key-on:color-mix(in srgb,var(--bg) 24%,transparent);--pin-dot:color-mix(in srgb,var(--bg) 60%,transparent);--pin-on:var(--service-mint)}
+.pin-dots{display:flex;gap:var(--sp-4);padding:var(--sp-2) 0}
+/* 점은 작은 조약돌이다 — 누를 때마다 돌 하나가 놓인다(모양이 조금씩 다르다). 빈 자리는 윤곽만, 놓인 돌은 숲 위에서 민트·흰 바탕에서 ink. */
+.pin-dots i{width:18px;height:16px;border-radius:58% 42% 54% 46% / 46% 54% 42% 58%;box-shadow:inset 0 0 0 2px var(--pin-dot);transition:background-color .12s,box-shadow .12s,scale .12s}
+.pin-dots i:nth-child(2){rotate:28deg}.pin-dots i:nth-child(3){rotate:-18deg}.pin-dots i:nth-child(4){rotate:44deg}
+.pin-dots i.on{background:var(--pin-on);box-shadow:none;scale:1.12}
+.pin-dots.shake{animation:pin-shake .36s var(--ease)}
+@keyframes pin-shake{20%{translate:-8px 0}40%{translate:7px 0}60%{translate:-5px 0}80%{translate:3px 0}}
+.pin-status{min-height:var(--lh-label);margin:var(--sp-2) 0 var(--sp-4);font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);text-align:center;color:var(--pin-fg)}
+.pin-keys{display:grid;grid-template-columns:repeat(3,64px);gap:var(--sp-3) var(--sp-6);justify-content:center}
+.pin-key{width:64px;height:64px;padding:0;border:0;border-radius:50%;background:var(--pin-key);color:var(--pin-fg);font:inherit;font-size:1.5rem;font-weight:var(--fw-body-strong);font-variant-numeric:tabular-nums;display:grid;place-items:center;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background-color .12s,scale .12s}
+.pin-key:active{background:var(--pin-key-on);scale:.94}
+@media (hover:hover){.pin-key:hover{background:var(--pin-key-on)}}
+.pin-key:focus-visible{outline:var(--emphasis) solid var(--pin-fg);outline-offset:3px}
+.pin-erase{background:none}
+.pin-erase svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pin-pad.resting .pin-key{opacity:.38;cursor:default}
+
+/* 잠금 화면: 로딩 화면(.splash)과 같은 자리·같은 그림이라 로딩이 걷히면 그대로 이 화면이 된다. 위에서 아래로 어두워지는 막이 숫자판의 대비를 지킨다. */
+.lock{position:fixed;top:0;bottom:0;left:50%;width:min(100%,480px);transform:translateX(-50%);z-index:140;overflow:hidden;container-type:size;background:var(--service-ink)}
+.lock-box{position:absolute;bottom:0;width:max(100cqw,calc(100cqh * 360 / 744));left:calc((100cqw - max(100cqw,calc(100cqh * 360 / 744))) / 2);aspect-ratio:360/744}
+.lock-art{position:absolute;inset:0;width:100%;height:100%;display:block}
+.lock-box::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent 0,color-mix(in srgb,var(--forest-sky) 30%,transparent) 30%,color-mix(in srgb,var(--forest-sky) 86%,transparent) 50%,color-mix(in srgb,var(--forest-sky) 92%,transparent) 100%)} /* 위쪽은 숲과 하늘이 그대로 보이고, 숫자판이 놓이는 아래 절반은 고르게 어둡다 — 숫자 뒤에 풀·길이 비치면 칸마다 밝기가 달라진다 */
+.lock-body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;padding:calc(var(--banner-h,0px) + 16cqh) var(--sp-5) calc(var(--sp-3) + env(safe-area-inset-bottom))}
+.lock-body .pin-pad{flex:1}
+.lock-body .pin-keys{margin-top:auto} /* 숫자판은 아래로 — 한 손 엄지가 닿는 자리 */
+.lock-title{margin:0 0 var(--sp-3);font-size:var(--fs-title);font-weight:var(--fw-title);letter-spacing:-.02em;color:var(--bg);text-align:center}
+.lock-title:focus{outline:none}
+.lock-note{min-height:var(--lh-caption);margin:calc(var(--sp-2) * -1) 0 var(--sp-3);font-size:var(--fs-caption);line-height:var(--lh-caption);color:color-mix(in srgb,var(--bg) 78%,transparent);text-align:center}
+.lock-note:empty{display:none}
+/* 설정 하위 화면으로 쓸 때(비밀번호 정하기): 덮는 층이 아니라 화면 자리에 놓인다. 시안 띠 아래부터 화면 끝까지. */
+.screen.st-pin{padding:0;max-width:none}
+.lock.lock-inline{position:relative;left:auto;transform:none;width:100%;height:calc(100dvh - var(--banner-h,2rem));z-index:auto}
+.lock-inline .lock-body{padding-top:16cqh}
+.lock-back{position:absolute;left:var(--sp-3);top:var(--sp-3);width:var(--touch);height:var(--touch);padding:0;border:0;border-radius:50%;background:none;color:var(--bg);display:grid;place-items:center;cursor:pointer}
+.lock-back svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.lock-back:focus-visible{outline:var(--emphasis) solid var(--service-mint);outline-offset:-2px}
+.lock-forgot{min-height:var(--touch);margin-top:var(--sp-2);padding:0 var(--sp-4);border:0;border-radius:var(--radius-chip);background:none;color:color-mix(in srgb,var(--bg) 78%,transparent);font:inherit;font-size:var(--fs-label);font-weight:var(--fw-body-strong);cursor:pointer}
+@media (hover:hover){.lock-forgot:hover{color:var(--bg)}}
+.lock-forgot:focus-visible{outline:var(--emphasis) solid var(--service-mint);outline-offset:0}
+body.is-locked .sheet-dim{z-index:160} /* 잠금이 연 시트(비밀번호를 잊었나요?)만 해당한다 — 잠그기 전에 열려 있던 시트는 showLock이 닫는다 */
+@media (max-height:660px){.pin-keys{grid-template-columns:repeat(3,56px);gap:var(--sp-2) var(--sp-6)}.pin-key{width:56px;height:56px}.lock-title{margin-bottom:0}.lock-body{padding-top:calc(var(--banner-h,0px) + 9cqh)}.lock-inline .lock-body{padding-top:11cqh}.lock-note{margin:0}.pin-status{margin-bottom:var(--sp-2)}}
+
+@media (prefers-reduced-motion:reduce){.pin-dots i,.pin-key{transition:none}.pin-dots.shake{animation:none}}

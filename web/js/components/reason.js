@@ -54,7 +54,7 @@ export function renderReasonScene({ cats = [], field }) {
     el("i", { class: "rs-hill h1", "aria-hidden": "true" }),
     TREES.map((t, i) => el("i", { class: "rs-tree", "aria-hidden": "true", style: { "--x": `${t.x}%`, "--r": String(t.r), "--dy": `${t.dy}px`, "--i": String(i) } })),
     el("i", { class: "rs-hill h2", "aria-hidden": "true" }),
-    order.length ? el("p", { class: "rs-story", text: "고른 마음이 곁에 있어요" }) : null, // 장면을 설명하는 한 줄이다. 친구가 하는 말이 아니고 감정을 판단하지 않는다.
+    order.length ? el("p", { class: "rs-story", text: "고른 마음을 보며 이유를 떠올려 봐요" }) : null, // 장면을 설명하는 한 줄이다. 친구가 하는 말이 아니고 감정을 판단하지 않는다.
     order.length ? el("ul", { class: "rs-friends", role: "list", "aria-label": "이번에 고른 마음" }, friends) : null); // 높이는 --rs-h(부모)를 css가 읽는다(격자 모드에서 auto로 덮어쓰기 쉽게 — inline이면 !important가 필요했다)
 
   if (order.length) watchFreeGrid(land.querySelector(".rs-friends"), { overlap: (r) => anyOverlap(r, ".rs-fr") });

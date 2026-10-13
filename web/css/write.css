@@ -251,3 +251,9 @@ html:has(.detail-stage){scroll-padding-top:calc(var(--banner-h,2rem) + 170px);sc
 .step-date .paper-guide,.step-praise .paper-guide,.step-thanks .paper-guide{animation-delay:.06s}
 @keyframes stepin{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){.step-date :is(h1,.paper-guide),.step-praise :is(h1,.paper-guide),.step-thanks :is(h1,.paper-guide){animation:none}}
+.step-intensity .lede{text-wrap:balance} /* 두 문장을 줄로 나눴다(2026-10-13 QA R13) — 좁은 화면에서 첫 문장 끝 낱말만 다음 줄에 떨어지지 않게 고르게 나눈다 */
+/* 있었던 일의 안내 자리(2026-10-13 QA R6): 막힘 안내는 안내 글과 같은 칸에 겹쳐 뜬다 — 자리를 새로 차지하지 않아 종이와 장면이 밀리지 않는다 */
+.guide-slot{display:grid}
+.guide-slot>*{grid-area:1/1}
+.guide-slot .blocked-hint{margin:0;align-self:start;font-size:var(--fs-heading);line-height:var(--lh-heading)}
+.guide-slot:has(.blocked-hint:not([hidden])) .paper-guide{visibility:hidden}

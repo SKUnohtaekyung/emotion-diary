@@ -10,6 +10,7 @@ import { el, svgEl, announce, toast, reducedMotion } from "../dom.js";
 import { openSheet } from "../components/sheet.js";
 import { hillGround } from "./welcome.js";
 import { account, PROVIDERS, NAME_MAX, cleanName, nameLength } from "../account.js";
+import { lock, clearPin } from "../lock.js";
 import { todayISO } from "../state.js";
 
 const chevron = (d, cls) => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: cls ?? null }, svgEl("path", { d }));
@@ -49,7 +50,7 @@ export function nameScene(name = "") {
 
 // ══════════════════════ ① 로그인 #/auth ══════════════════════
 function renderSignIn(main, navigate, params) {
-  const s = params.get("s"), expired = s === "expired", left = s === "left";
+  const s = params.get("s"), expired = s === "expired", left = s === "left", forgot = s === "pin" && lock.resetting; // forgot: 잠금 비밀번호를 잊어 다시 로그인(D-106 ⑤)
   const offline = s === "offline" || !navigator.onLine;
   const last = PROVIDERS[params.get("last")] ? params.get("last") : readLast();
   const { ground, road } = hillGround({ extra: 100 });
@@ -84,6 +85,7 @@ function renderSignIn(main, navigate, params) {
         toast(s === "cancel" ? "연결을 마치지 못했어요. 다시 눌러 주세요" : "지금은 연결이 어려워요. 잠시 뒤 다시 시도해 주세요"); return;
       }
       writeLast(code);
+      if (forgot) { account.via = code; clearPin(); lock.resetting = false; navigate("settings/pin?m=reset&next=today&back=today"); return; } // 본인 확인이 끝났다 — 옛 비밀번호를 지우고 새로 정하게 한다
       if (s === "returning" || expired) { account.via = code; navigate("today"); toast(expired ? "다시 들어왔어요. 쓰던 글은 그대로예요" : `돌아와서 반가워요, ${account.name} 님`); return; }
       navigate(`auth/join?via=${code}`);
     }, 900);
@@ -92,10 +94,11 @@ function renderSignIn(main, navigate, params) {
   const back = params.get("from") === "welcome"
     ? el("button", { type: "button", class: "ob-back", "aria-label": "시작하기 전에로 돌아가기", onclick: () => navigate("welcome?p=2") }, chevron(BACK_D))
     : null;
-  const copy = expired ? ["잠시 자리를 비운 사이", ["다시 들어와", "주세요"], "한동안 쓰지 않아 안전하게 로그아웃했어요. 쓰던 글은 그대로 있어요."]
+  const copy = forgot ? ["잠금 비밀번호", ["다시 들어와", "주세요"], "로그인하면 새 비밀번호를 정할 수 있어요. 기록은 그대로 있어요."]
+    : expired ? ["잠시 자리를 비운 사이", ["다시 들어와", "주세요"], "한동안 쓰지 않아 안전하게 로그아웃했어요. 쓰던 글은 그대로 있어요."]
     : left ? ["나의 기록 공간", ["이 계정은", "탈퇴했어요"], "다른 기기에서 탈퇴한 계정이에요. 새로 시작하려면 다시 가입해요."]
     : ["나의 기록 공간", ["매일의 마음이", "머무는 곳"], "쓰던 계정으로 들어오면 기록이 그대로 이어져요."];
-  const caption = offline ? "인터넷에 연결되면 들어올 수 있어요." : "처음이라면 연결한 뒤 부를 이름만 정하면 돼요.";
+  const caption = offline ? "인터넷에 연결되면 들어올 수 있어요." : forgot ? "가입할 때 쓴 계정으로 들어와 주세요." : "처음이라면 연결한 뒤 부를 이름만 정하면 돼요.";
 
   main.replaceChildren(el("div", { class: "screen au au-signin" },
     el("div", { class: "au-top" }, back),
@@ -238,20 +241,22 @@ function renderDone(main, navigate) {
   const stoneHit = el("span", { class: "au-stone-hit", "aria-hidden": "true", style: { "--stone-y": g.H - g.stoneCenter.y }, onclick: go });
   g.ground.append(tag, stoneHit);
   const start = el("button", { type: "button", class: "ob-start au-done-start", text: "오늘 시작하기", onclick: go });
+  // 잠금을 걸 수 있다는 것을 계정이 생긴 이 자리에서 고르게 한다(D-106 ② — 안내는 '시작하기 전에'가 먼저 했다). 주 버튼은 하나이고 이것은 조용한 글자 버튼이다.
+  const lockNow = el("button", { type: "button", class: "au-done-lock", text: "비밀번호로 잠그고 시작하기", onclick: () => navigate("settings/pin?next=today&back=auth/done") });
   const h1 = el("h1", { tabindex: "-1", text: `반가워요, ${account.name} 님` });
   const lede = el("p", { class: "au-lede", text: "길 끝의 이 돌이 나의 자리예요. 매일의 마음을 여기서부터 적어요." });
   const eyebrow = el("p", { class: "au-eyebrow", text: "나의 기록 공간" });
   const screen = el("div", { class: "screen au au-done" },
     el("div", { class: "au-top" }),
     el("div", { class: "au-body" }, eyebrow, h1, lede),
-    el("div", { class: "au-ground-wrap" }, g.ground, start));
+    el("div", { class: "au-ground-wrap" }, g.ground, lockNow, start));
   main.replaceChildren(screen);
   g.road();
   if (RM) return;
   // 들어올 때 한 번: 글이 차례로 오르고(시작하기 전에와 같은 결), 이름 칸이 돌 아래로 살며시 앉는다. 크림빛 숨은 CSS가 맡는다.
   [eyebrow, h1, lede].forEach((n, k) => n.animate([{ opacity: 0, transform: "translateY(12px)" }, { opacity: 1, transform: "none" }], { duration: 620, delay: 120 + k * 90, easing: OUT, fill: "both" }));
   tag.animate([{ opacity: 0, transform: "translate(-50%, 10px) scale(.96)" }, { opacity: 1, transform: "translate(-50%, 0)" }], { duration: 700, delay: 650, easing: OUT, fill: "both" });
-  start.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 1100, easing: "ease-out", fill: "both" });
+  [start, lockNow].forEach((n) => n.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, delay: 1100, easing: "ease-out", fill: "both" }));
 }
 
 export function renderAuth(main, navigate, params, rest = []) {

@@ -57,7 +57,7 @@ main:has(.nt-scene) .step-footer :focus-visible{outline:3px solid var(--service-
 .nt-paper .ruled::placeholder{color:var(--muted)}
 .nt-paper .field-error{margin:0;font-size:var(--fs-label);line-height:2rem}
 @supports selector(:has(*)){
-  .nt-paper:has(.ruled:focus-visible){outline:var(--emphasis) solid var(--focus);outline-offset:4px}
+  .nt-paper:has(.ruled:focus-visible){outline:var(--emphasis) solid var(--service-ink);outline-offset:4px}
   .nt-paper .ruled:focus-visible{outline:none}
 }
 /* 하늘은 옅은 초록 언덕 모양의 안개다. 해는 먼 언덕 마루에 반쯤 걸려 있다(막 뜨는 중). */

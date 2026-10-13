@@ -21,8 +21,8 @@ const SPOTS = [
 
 function road() { // 아래에서 위로 좁아지며 두 굽이 도는 길
   const left = [], right = [];
-  for (let y = H; y >= 130; y -= 6) { // 먼 언덕 마루(y≈118) 바로 아래에서 끝나 하늘로 튀어나오지 않는다
-    const t = (H - y) / (H - 130), cx = 198 + 46 * (1 - 0.45 * t) * Math.sin(t * Math.PI * 1.45 + 0.35), w = 178 * (1 - t) ** 1.3 + 2;
+  for (let y = H; y >= 114; y -= 6) { // 먼 언덕 마루의 나무 밑동(x≈165~173, y≈114)까지 닿는다 — 그 아래에서 끊기면 길이 중간에 끝난 것으로 읽힌다(2026-10-13 QA R11). 마루를 넘지 않아 하늘로 튀어나오지 않는다
+    const t = (H - y) / (H - 114), cx = 198 + 46 * (1 - 0.45 * t) * Math.sin(t * Math.PI * 1.45 + 0.35), w = 178 * (1 - t) ** 1.3 + 2;
     left.push(`${(cx - w / 2).toFixed(1)} ${y}`); right.push(`${(cx + w / 2).toFixed(1)} ${y}`);
   }
   return `M${left.join("L")}L${right.reverse().join("L")}Z`;

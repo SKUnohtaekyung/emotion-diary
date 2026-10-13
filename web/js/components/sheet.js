@@ -37,3 +37,6 @@ export function openSheet({ title, body = [], primary, secondary, danger = false
   current = { close, opener, sheet };
   return { close, sheet };
 }
+
+// 열려 있는 시트를 밖에서 닫는다(앱 잠금이 걸릴 때, D-106) — 초점은 되돌리지 않는다.
+export function closeSheet() { current?.close({ restoreFocus: false }); }
