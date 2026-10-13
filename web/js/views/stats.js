@@ -106,7 +106,8 @@ function renderStatsList(main, navigate, params, sample, todayIso, few, sParam) 
         el("div", { class: "sx-tile-v", "aria-hidden": "true", text: `${s.recorded}일` }),
         el("div", { class: "sx-tile-k", "aria-hidden": "true", text: "기록한 날" }),
         el("div", { class: "sx-tile-note", "aria-hidden": "true", text: `최근 ${periodLen}일 중` })),
-      el("div", { class: "sx-tile", "aria-label": `이어서 쓴 날 ${streak}일` },
+      // 이어서 쓴 날은 이틀 이상일 때만 보인다(D-107) — 끊긴 날의 '0일'·'1일'은 기록을 의무로 읽히게 한다(SERVICE_WHY 원칙 4·§19.12).
+      streak < 2 ? null : el("div", { class: "sx-tile", "aria-label": `이어서 쓴 날 ${streak}일` },
         el("div", { class: "sx-tile-v", "aria-hidden": "true", text: `${streak}일` }),
         el("div", { class: "sx-tile-k", "aria-hidden": "true", text: "이어서 쓴 날" })));
     const enough = s.recorded >= MIN_DAYS;

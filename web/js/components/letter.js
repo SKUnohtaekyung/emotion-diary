@@ -7,7 +7,7 @@
 // 긴 글: 카드 안의 글 영역(.lt-scroll)은 넘칠 때만 스크롤된다. 넘치는 영역만 키보드로 닿게 tabindex를 준다.
 import { el, svgEl, announce, reducedMotion } from "../dom.js";
 import { category, FRIENDS, pebbleImg } from "../data.js";
-import { formatDate } from "../state.js";
+import { formatDate, todayISO } from "../state.js";
 
 const pencil = () => svgEl("svg", { viewBox: "0 0 24 24", width: "15", height: "15", "aria-hidden": "true", class: "ico" }, svgEl("path", { d: "M4 20l4.2-1 10-10a2.1 2.1 0 0 0-3-3l-10 10L4 20zM13.5 7.5l3 3" }));
 const chevron = (dir) => svgEl("svg", { viewBox: "0 0 24 24", width: "18", height: "18", "aria-hidden": "true", class: "ico" }, svgEl("path", { d: dir < 0 ? "M14.5 5.5 8 12l6.5 6.5" : "M9.5 5.5 16 12l-6.5 6.5" }));
@@ -55,6 +55,7 @@ const sceneLayer = (cats) => el("div", { class: "lt-scene", "aria-hidden": "true
   arcPebbles(cats));
 
 export function renderLetter(record, { mode = "write", onEdit, onOpened } = {}) { // 달력 인라인 갈래(scene:false)는 D-100 ③(달력은 작은 편지 mini-letter.js)으로 쓰는 곳이 없어 2026-09-26 지웠다
+  const dayWord = record.date === todayISO() ? "오늘" : "그날"; // 지난 날의 편지를 읽을 때 '오늘'이라고 하지 않는다(2026-10-13 문구 점검 — 통계의 편지 미리보기와 같은 말)
   const cats = record.cats.filter((c) => record.emotions.some((e) => e.cat === c));
   const cards = [];
   const CARD_CHIPS = 8, MANY_FROM = 5; // 카드 한 장에 최대 8개(9개부터 이어지는 카드), 5개부터 32px/2열(열마다 최대 4개) — D-079, 2026-09-24 사용자 확정
@@ -95,7 +96,7 @@ export function renderLetter(record, { mode = "write", onEdit, onOpened } = {}) 
   cards.push({ key: "story", label: "있었던 일과 이유", node: el("article", { class: "card t2", role: "group" },
     el("i", { class: "tape big", "aria-hidden": "true" }), el("p", { class: "lab2", text: shortDate(record.date) }),
     el("div", { class: "lt-paper lt-scroll" },
-      line("오늘 있었던 일", "date", "있었던 일 고치기"), el("p", { class: "v ev", text: record.event }),
+      line(`${dayWord} 있었던 일`, "date", "있었던 일 고치기"), el("p", { class: "v ev", text: record.event }),
       line("이런 마음이 든 이유", "reason", "이유 고치기"), el("p", { class: "v", text: record.reason }))) });
   for (const [kind, title] of [["praise", "칭찬"], ["thanks", "감사"]]) {
     const items = nonblank(record[kind]);
@@ -104,10 +105,10 @@ export function renderLetter(record, { mode = "write", onEdit, onOpened } = {}) 
       el("p", { class: "lab3", text: title }), editTag(`${title} 고치기`, () => onEdit?.(kind)),
       el("div", { class: "lt-body lt-scroll" },
         items.length === 1 ? el("p", { class: "q", text: items[0] }) : el("ul", { class: "qs" }, items.map((t) => el("li", { text: t }))),
-        el("div", { class: "lt-sign" }, el("p", { class: "sig", text: "— 오늘의 나에게" }), el("i", { class: "seal2", "aria-hidden": "true" })))) });
+        el("div", { class: "lt-sign" }, el("p", { class: "sig", text: `— ${dayWord}의 나에게` }), el("i", { class: "seal2", "aria-hidden": "true" })))) });
   }
 
-  const pager = el("div", { class: "pager", tabindex: "0", role: "region", "aria-roledescription": "carousel", "aria-label": "오늘의 편지" }, cards.map((c, i) => { c.node.setAttribute("aria-label", `${i + 1} / ${cards.length}, ${c.label}`); return c.node; }));
+  const pager = el("div", { class: "pager", tabindex: "0", role: "region", "aria-roledescription": "carousel", "aria-label": `${dayWord}의 편지` }, cards.map((c, i) => { c.node.setAttribute("aria-label", `${i + 1} / ${cards.length}, ${c.label}`); return c.node; }));
   // 점은 10장까지만(D-101): 그 이상은 점을 셀 수 없어 위치를 알려 주지 못하고, 한 줄에 다 넣으려다 화살표가 44px 밑으로 찌그러졌다(2026-09-27 사용자 QA, 19장에서 30px).
   // 11장부터는 같은 자리에 '3 / 18' 숫자로 보인다. 둘 다 장식(aria-hidden)이고 위치는 카드 aria-label과 넘김 알림이 전한다.
   const MAX_DOTS = 10, useCount = cards.length > MAX_DOTS;

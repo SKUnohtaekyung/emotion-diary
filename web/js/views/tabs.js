@@ -216,7 +216,7 @@ export function renderCalendar(main, navigate, params) {
   }
   function confirmDiscard(iso) {
     openSheet({ title: "이 글을 지울까요?", body: [el("p", { text: "쓰던 글을 지우면 되돌릴 수 없어요." })], danger: true,
-      primary: { text: "지우기", onclick: () => confirmDiscard2(iso) }, secondary: { text: "그대로 두기" } });
+      primary: { text: "지우기", onclick: () => confirmDiscard2(iso) }, secondary: { text: "그만두기" } });
   }
   function confirmDiscard2(iso) {
     openSheet({ title: "정말 지울까요?", body: [el("p", { text: `${shortDay(iso)}에 쓰던 글이 사라져요.` })], danger: true,
@@ -284,19 +284,19 @@ function editAt(rec, navigate) {
 // 기록 하나의 ⋯ 메뉴(고치기·완료 취소·삭제). 기록 상세(#/record/…)와 달력의 날짜 줄(완료한 날, D-096)이 같은 메뉴를 쓴다 —
 function recordMenu(iso, rec, real, navigate) {
   const menu = () => {
-    const sh = openSheet({ title: `${shortDay(iso)}의 기록`, secondary: { text: "닫기" }, body: [
-      el("button", { type: "button", class: "menu-row", onclick: () => { sh.close(); editCompleted(rec); navigate("write"); } }, el("span", {}, "고치기", el("small", { text: "완료된 기록을 수정해요." }))),
+    const sh = openSheet({ title: `${shortDay(iso)}의 편지`, secondary: { text: "닫기" }, body: [
+      el("button", { type: "button", class: "menu-row", onclick: () => { sh.close(); editCompleted(rec); navigate("write"); } }, el("span", {}, "고치기", el("small", { text: "완료된 기록을 고쳐요." }))),
       el("button", { type: "button", class: "menu-row", onclick: () => { sh.close(); cancelDone(); } }, el("span", {}, "완료 취소", el("small", { text: "임시저장 상태로 돌려요. 통계와 분석에서 빠져요." }))),
-      el("button", { type: "button", class: "menu-row danger", onclick: () => { sh.close(); del1(); } }, el("span", {}, "삭제", el("small", { text: "이 날의 기록을 지워요. 되돌릴 수 없어요." })))] });
+      el("button", { type: "button", class: "menu-row danger", onclick: () => { sh.close(); del1(); } }, el("span", {}, "지우기", el("small", { text: "이 날의 기록을 지워요. 되돌릴 수 없어요." })))] });
   };
   // 완료 취소 뒤에는 그날이 고른 상태(임시저장 안내)로 달력을 연다(A2 §7). 삭제 뒤에는 달력으로 가고 위쪽 토스트로 알린다.
   const cancelDone = () => openSheet({ title: "완료를 취소할까요?", body: [el("p", { text: "이 기록은 임시저장 상태가 되어 통계·분석에서 빠져요. 쓴 내용은 지워지지 않아요." })],
-    primary: { text: "완료 취소", onclick: () => { if (real) { state.draft = structuredClone(state.completed); state.completed = null; state.editing = null; announce("완료를 취소했어요. 임시저장 상태예요."); navigate(`calendar?d=${iso}`); } else announce("예시 기록이라 바뀌지 않아요."); } }, secondary: { text: "그대로 두기" } });
-  const del1 = () => openSheet({ title: `${shortDay(iso)} 기록을 삭제할까요?`, body: [el("p", { text: "삭제하면 되돌릴 수 없어요. 삭제한 뒤에 되돌리는 버튼도 없어요." })], danger: true,
-    primary: { text: "삭제하기", onclick: del2 }, secondary: { text: "그만두기" } });
-  const del2 = () => openSheet({ title: "정말 삭제할까요?", body: [el("p", { text: "아래 기록이 영구히 지워져요. 통계와 분석에서도 사라져요." }),
+    primary: { text: "완료 취소", onclick: () => { if (real) { state.draft = structuredClone(state.completed); state.completed = null; state.editing = null; announce("완료를 취소했어요. 임시저장 상태예요."); navigate(`calendar?d=${iso}`); } else announce("예시 기록이라 바뀌지 않아요."); } }, secondary: { text: "그만두기" } });
+  const del1 = () => openSheet({ title: `${shortDay(iso)} 기록을 지울까요?`, body: [el("p", { text: "지우면 되돌릴 수 없어요." })], danger: true,
+    primary: { text: "지우기", onclick: del2 }, secondary: { text: "그만두기" } });
+  const del2 = () => openSheet({ title: "정말 지울까요?", body: [el("p", { text: "아래 기록이 영구히 지워져요. 통계와 분석에서도 사라져요." }),
     el("div", { class: "sum-row" }, friendsRow(rec.cats), el("p", { class: "note", text: `${formatDate(iso)} · ${rec.event}` }))], danger: true,
-    primary: { text: "삭제하기", onclick: () => { if (real) { state.completed = null; toast(`${shortDay(iso)} 기록을 지웠어요`); navigate("calendar"); } else announce("예시 기록이라 지워지지 않아요."); } }, secondary: { text: "그만두기" } });
+    primary: { text: "지우기", onclick: () => { if (real) { state.completed = null; toast(`${shortDay(iso)} 기록을 지웠어요`); navigate("calendar"); } else announce("예시 기록이라 지워지지 않아요."); } }, secondary: { text: "그만두기" } });
   return menu;
 }
 
@@ -308,7 +308,7 @@ export function renderRecord(main, navigate, params, rest) {
   if (!parsed || startOfDay(parsed) > startOfDay(today)) { // 없는 날짜(예: 2026-13-45)·미래 날짜 주소(완료 기준 8)
     main.replaceChildren(el("div", { class: "screen record" },
       el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": "달력으로", onclick: () => navigate("calendar") }, svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true" }, svgEl("path", { d: "M14.5 5.5 8 12l6.5 6.5" })))),
-      el("h1", { tabindex: "-1", text: "이 날의 편지가 없어요" }),
+      el("h1", { tabindex: "-1", text: "남긴 기록이 없어요" }),
       el("div", { class: "stack" }, el("button", { type: "button", class: "btn primary", text: "달력으로", onclick: () => navigate("calendar") }))));
     main.querySelector("h1").focus({ preventScroll: true });
     return;

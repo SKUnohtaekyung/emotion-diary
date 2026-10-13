@@ -25,7 +25,7 @@ const saveLocationNote = "iPhone에서는 다운로드가 '파일' 앱이나 공
 // 시안이라 실제로 내보내지 않는다 — 선택은 모듈 변수로만 들고 있는다(공통 지침 §2). 화면에 들어올 때마다 기본값(꺼짐)으로 되돌린다.
 const exportState = { analysis: false };
 // 삭제 확인 문구 — UX_SPEC §13(확인 문구를 직접 입력) — 정확히 같은 문구만 통과시킨다.
-const CONFIRM_PHRASE = "모든 기록 삭제";
+const CONFIRM_PHRASE = "모든 기록 지우기";
 
 function scopeRow(icon, label) {
   return el("li", { class: "sd-scope-row" }, icon, el("span", { text: label }));
@@ -78,7 +78,7 @@ function renderExportFail(main, navigate) {
     backBar(navigate),
     iconFace(warnIcon(), "neutral"),
     el("h1", { tabindex: "-1", text: "내려받지 못했어요" }),
-    el("p", { class: "lede", text: "기록은 그대로 안전해요. 잠시 뒤에 다시 시도해 주세요." }),
+    el("p", { class: "lede", text: "기록은 그대로 있어요. 잠시 뒤에 다시 시도해 주세요." }),
     el("p", { class: "note", text: "홈 화면 바로가기에서 안 된다면 브라우저에서 열어 다시 내보낼 수 있어요." }), // UX_SPEC §13 standalone 대안 안내
     el("div", { class: "sd-actions" },
       el("button", { type: "button", class: "btn primary big", text: "다시 시도", onclick: () => navigate("settings/export") }),
@@ -93,7 +93,7 @@ export function renderExport(main, navigate, params) {
 }
 
 export function renderDelete(main, navigate) {
-  const primaryBtn = el("button", { type: "button", class: "btn danger big", text: "영구 삭제", disabled: true,
+  const primaryBtn = el("button", { type: "button", class: "btn danger big", text: "모두 지우기", disabled: true,
     onclick: () => { if (input.value === CONFIRM_PHRASE) navigate("settings/deleted"); } });
   const input = el("input", { type: "text", class: "sd-confirm-input", id: "sdConfirm", "aria-describedby": "sdConfirmPhrase", autocomplete: "off", autocapitalize: "off", spellcheck: false });
   input.value = "";
@@ -101,7 +101,7 @@ export function renderDelete(main, navigate) {
 
   main.replaceChildren(el("div", { class: "screen sd-screen sd-delete" },
     backBar(navigate),
-    el("h1", { class: "sd-danger-title", tabindex: "-1", text: "모든 기록을 영구 삭제할까요?" }),
+    el("h1", { class: "sd-danger-title", tabindex: "-1", text: "모든 기록을 영구히 지울까요?" }),
 
     el("section", { class: "sd-scope" },
       el("p", { class: "field-label", text: "지우는 것" }),
@@ -109,7 +109,7 @@ export function renderDelete(main, navigate) {
         el("li", { text: "모든 완료·임시저장 기록" }), el("li", { text: "분석 결과" }), el("li", { text: "설정" })),
       el("p", { class: "note sd-cant-undo", text: "되돌릴 수 없어요." })),
 
-    el("p", { class: "note sd-export-hint", text: "삭제 전에 내 기록 내보내기로 사본을 받아 둘 수 있어요." }),
+    el("p", { class: "note sd-export-hint", text: "지우기 전에 내 기록 내보내기로 사본을 받아 둘 수 있어요." }),
     el("button", { type: "button", class: "sd-pill-btn", onclick: () => navigate("settings/export") },
       el("span", { class: "sd-pill-inner" }, el("span", { text: "내 기록 내보내기" }), pillChev())),
 
@@ -127,7 +127,7 @@ export function renderDeleted(main, navigate) {
   // ‹ 뒤로 가기를 뺀다 — 되돌릴 수 없는 일이 끝난 화면이라 뒤로 가면 삭제 확인으로 되돌아가는 모순이 생긴다. 출구는 '처음으로' 하나다.
   main.replaceChildren(el("div", { class: "screen sd-screen sd-deleted center" },
     iconFace(checkIcon(), "neutral"),
-    el("h1", { tabindex: "-1", text: "모두 삭제했어요" }),
+    el("h1", { tabindex: "-1", text: "모두 지웠어요" }),
     el("p", { class: "lede", text: "이 앱에서는 더 볼 수 없어요." }),
     // 기간 숫자를 적지 않는다(확인 전, DATA_MODEL §8·SAFETY_POLICY) — 백업·공급자 쪽 보존 지연만 정직하게 고지한다.
     el("p", { class: "note", text: "백업이나 서비스 제공사 쪽에는 정해진 기간 동안 남을 수 있어요." }),

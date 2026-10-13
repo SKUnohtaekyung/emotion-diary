@@ -86,12 +86,12 @@ function openLogoutSheet(navigate, params) {
   const out = () => navigate("auth?s=loggedout");
   if (params?.get("s") === "unsynced") {
     openSheet({ title: "아직 저장되지 않은 글이 있어요", danger: true,
-      body: [el("p", { text: "지금 로그아웃하면 그 글은 이 기기에서 사라져요. 인터넷에 연결돼 저장된 뒤에 로그아웃해 주세요." })],
-      primary: { text: "그래도 로그아웃", onclick: out }, secondary: { text: "취소" } });
+      body: [el("p", { text: "지금 로그아웃하면 그 글은 이 기기에서 사라져요. 인터넷에 연결되면 저장돼요. 그 뒤에 로그아웃하면 글이 남아요." })],
+      primary: { text: "그래도 로그아웃", onclick: out }, secondary: { text: "그만두기" } });
     return;
   }
   openSheet({ title: "로그아웃할까요?", body: [el("p", { text: "기록은 계정에 그대로 남아 있어요. 다시 로그인하면 이어서 볼 수 있어요." })],
-    primary: { text: "로그아웃", onclick: out }, secondary: { text: "취소" } });
+    primary: { text: "로그아웃", onclick: out }, secondary: { text: "그만두기" } });
 }
 
 // ══════════════════════ 1. 설정 목록 #/settings ══════════════════════
@@ -129,7 +129,7 @@ function renderList(main, navigate, params) {
         group("계정", [navRow({ icon: ICONS.logout, name: "로그아웃", onclick: () => openLogoutSheet(navigate, params) })]),
 
         el("button", { type: "button", class: "st-delete-row", onclick: () => navigate("settings/delete") },
-          el("span", { text: "모든 기록 영구 삭제" }), chevIcon()))));
+          el("span", { text: "모든 기록 지우기" }), chevIcon()))));
   }
   draw();
 }
@@ -191,7 +191,7 @@ function timezoneValue() {
 
 // ══════════════════════ 3. 하루 기준 시각 #/settings/day (D-081 ②) ══════════════════════
 function exampleLine(hour) {
-  if (hour === 0) return "자정을 기준으로 하면 날짜가 바뀌는 새벽 시간이 없어요 — 자정이 곧 하루의 시작이에요.";
+  if (hour === 0) return "자정을 기준으로 하면 날짜가 바뀌는 새벽 시간이 없어요. 자정이 하루의 시작이에요.";
   const yest = new Date(now()); yest.setDate(yest.getDate() - 1);
   return `지금 설정이면 ${hourLabel(hour - 1)}에 쓴 기록은 ${yest.getMonth() + 1}월 ${yest.getDate()}일 기록이 돼요.`;
 }
@@ -221,11 +221,11 @@ function renderPrivacy(main, navigate) {
     ...subHead(navigate, "개인정보 안내"),
     el("div", { class: "st-rows st-rows-info" },
       // ① SAFETY_POLICY §6 원문 뜻: 직접 작성 원문은 자동으로 스캔하지 않는다.
-      infoRow(0, ICONS.lock, "직접 쓴 일기는 그대로예요", "자동으로 분석하거나 감시하지 않아요. 위기 상황에서는 아래 '도움이 필요할 때 보기'에서 바로 연락해 주세요."),
+      infoRow(0, ICONS.lock, "직접 쓴 기록은 그대로예요", "자동으로 분석하거나 들여다보지 않아요. 위기 상황에서는 아래 '도움이 필요할 때 보기'에서 바로 연락해 주세요."),
       // ② AI_RAG_SPEC 53줄 "분석 기본 입력 = 기간·기록 수·감정 이름·크기 집계·상황의 최소 발췌, 전체 일기는 필요가 확인된 경우만"의 범위 그대로 쓴다 — '일기 전체를 보내지 않는다'고 단정하지 않는다(정본은 필요가 확인되면 제한적으로 포함할 수 있다). '켤 때만'은 D-018 후행·옵트인 전제.
       infoRow(1, ICONS.bubble, "AI 분석을 켜면", "AI 분석은 켤 때만 쓰여요. 기간·감정·크기 같은 요약과 꼭 필요한 짧은 발췌를 보내요. 일기 전체는 꼭 필요하다고 확인된 때에만 일부로 보내요."),
       // ③ DATA_MODEL §8 보존: 화면에서는 바로 사라지지만 백업 소거는 지연될 수 있다(D-081 ①의 설정 문구를 옮겼다).
-      infoRow(2, ICONS.trash, "보관과 삭제", "지운 기록은 화면에서 바로 사라지지만, 백업에서 완전히 지워지기까지 시간이 걸릴 수 있어요."),
+      infoRow(2, ICONS.trash, "보관과 지우기", "지운 기록은 화면에서 바로 사라지지만, 백업에서 완전히 지워지기까지 시간이 걸릴 수 있어요."),
       infoRow(3, ICONS.heart, "진단·치료 앱이 아니에요", "정신질환을 진단하거나 치료를 대신하지 않아요. 진료·상담 기록 같은 건강 정보는 여기에 적지 않는 게 좋아요. 힘든 순간에는 아래 도움을 참고해 주세요.")),
 
     // 위기 연락처는 위기 안내 화면(#/help, D-094)이 공식 출처로 확인한 번호로 보여 준다 — 여기에는 그리로 가는 알약만 둔다(같은 번호를 두 곳에 적지 않는다).

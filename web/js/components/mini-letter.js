@@ -63,14 +63,14 @@ export function renderMiniLetter(record, { onOpen, onEdit } = {}) {
   // 카드 전체를 덮는 투명 버튼이 '편지 전체 보기'를 맡고, 고치기 태그만 그 위에 따로 눌린다(버튼 안에 버튼을 넣지 않는다).
   const cards = specs.map((c, k) => el("article", { class: `ml-card ${c.cls}`, style: c.style, role: "group", "aria-roledescription": "카드", "aria-label": `${k + 1} / ${specs.length}, ${c.label}` },
     ...c.body,
-    el("button", { type: "button", class: "ml-open", "aria-label": `${c.label} — 편지 전체 보기`, onclick: () => onOpen?.() }),
+    el("button", { type: "button", class: "ml-open", "aria-label": `${c.label} — 편지 열기`, onclick: () => onOpen?.() }),
     el("button", { type: "button", class: "ml-edit", "aria-label": `${c.label} 고치기`, onclick: () => onEdit?.(c.target) }, pencil(), "고치기")));
 
   const pager = el("div", { class: "ml-pager", tabindex: "0", role: "region", "aria-roledescription": "carousel", "aria-label": "그날의 편지" }, cards);
   const dots = cards.map(() => el("i"));
   const prev = el("button", { type: "button", class: "ml-ar", "aria-label": "이전 장" }, chevron(-1));
   const next = el("button", { type: "button", class: "ml-ar", "aria-label": "다음 장" }, chevron(1));
-  const big = el("button", { type: "button", class: "ml-big", onclick: () => onOpen?.() }, "크게 보기", chevron(1));
+  const big = el("button", { type: "button", class: "ml-big", onclick: () => onOpen?.() }, "편지 열기", chevron(1));
   const nav = el("div", { class: "ml-nav" }, el("div", { class: "ml-steps" }, prev, el("span", { class: "ml-dots", "aria-hidden": "true" }, dots), next), big);
 
   // 넘김은 편지(letter.js)와 같다: 스크롤 스냅, 양 끝 화살표는 aria-disabled(D-099 icon-button K1), 장이 바뀌면 'N장 중 M장'을 읽는다(D-099 pager K1).

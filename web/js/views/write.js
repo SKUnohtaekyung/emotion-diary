@@ -450,5 +450,5 @@ export function renderDone(main, navigate) {
   document.title = `${day}의 마음을 남겼어요 — 감정일기 화면 시안`;
   window.scrollTo(0, 0);
   main.querySelector("h1").focus({ preventScroll: true });
-  announce("기록을 마쳤습니다. 시안이라 저장되지는 않았습니다.");
+  announce(`${day}의 마음을 남겼어요. 시안이라 저장되지는 않았어요.`);
 }
