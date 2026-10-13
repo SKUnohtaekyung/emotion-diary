@@ -1,19 +1,23 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-WEB-UI-02",
-  "phase": "user-qa-and-design-fixes",
+  "task_id": "TASK-HOOK-AUTO",
+  "phase": "awaiting-user-confirmation",
   "iteration": 1,
   "status": "in_progress",
-  "current_hypothesis": "The user, who judges by eye, can review the static screen prototype (web/) in the browser and report design problems in design language; each report is confirmed as 'which screen, what, how', fixed with the smallest change (values in design/tokens.json, shapes in web/css/app.css), shown as a before/after capture, and the settled shape is written back into DESIGN_SYSTEM.md and style-guide.html in the same change so the design system stays the single source.",
+  "current_hypothesis": "With TASK-WEB-UI-02 closed, no build task is active. The only open section in CURRENT_TASK is TASK-HOOK-AUTO (implemented and verified; waiting for the user to confirm in another auto-mode session that the guard hooks no longer raise confirmation prompts). The next real work is the remaining spike verdicts that gate Phase 1.",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "55f3f91",
-  "completed_nodes": ["bootstrap-audit", "taxonomy-v1", "taxonomy-v2-research"],
+  "last_verified_commit": "adad018",
+  "completed_nodes": [
+    "bootstrap-audit",
+    "taxonomy-v1",
+    "taxonomy-v2-research"
+  ],
   "next_node": "hosting-identity-spike",
   "blockers": [
     "hosting-identity-spike gate (B-02/B-03/B-08 partial): iPhone Safari proper, home-screen standalone, Android Chrome, bundle/log secret scan, Cloudflare Access applicability, free-tier numbers",
     "model-access-spike gate (B-06 partial): job expiry/failed handling, independent verifier double call, crisis-signal cases, subscription retention settings (RK-016)",
     "app-scaffold stays blocked until hosting-identity-spike and data-store-spike are done; TASK-MOBILE (single Worker + Static Assets proposal) is on hold until Phase 1 starts"
   ],
-  "last_checkpoint": "2026-09-21 TASK-WEB-UI-02 started on branch web-ui/qa. PR #30 (TASK-WEB-UI-01) was still open (CI green on both OS, mergeable), so with the user's decision the branch was cut from the end of web-ui/prototype (55f3f91) without merging; merging happens only when the user does it or says so. The finished TASK-WEB-UI-01 section moved to tasks/archive/TASK-WEB-UI-01.md (original 10,608 bytes, sha256 prefix 75976470981a; only one relative link target depth was adjusted). QA mode chosen by the user: the user first walks through the prototype alone and then reports everything at once; meanwhile the prototype is left unchanged. First user report (same day): one defect fixed at once (neighbour-cell fragments removed from the wish/sadness UI pose PNGs, verified, check-characters PASS); everything else depends on a brand direction, and the user asked to settle brand mood and concept before further QA. design/brand-concepts.html holds three directions (field guide / explorer notebook / forest clearing) and mascot options; waiting for the user's choice before writing a decision row (next number D-050; D-048 = provisional character adoption, D-049 = bottom navigation) or touching web/. The prototype is outside the work-graph nodes; next_node and blockers are unchanged. Acceptance conditions and the QA log are in tasks/CURRENT_TASK.md."
+  "last_checkpoint": "2026-10-13 TASK-WEB-UI-02 closed: the user walked through the whole prototype as a real user, requested changes (QA #60: 14 requests, UX writing principles D-105, app lock passcode D-106, terminology table D-107), and approved every screen including the calendar. The section moved to tasks/archive/TASK-WEB-UI-02.md (140917 bytes, sha256 prefix cfb328619682; three lines recording the closing and relative link depths were adjusted). Requests, plan and terminology are in tasks/qa/2026-10-13/. Remaining items (real devices, keyboard Enter, four release blockers, the deferred display font) are listed in docs/STATUS.md section 4. next_node and blockers are unchanged."
 }

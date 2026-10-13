@@ -13,6 +13,7 @@
 
 | 파일 | 상태 | 남은 일이 간 곳 |
 | --- | --- | --- |
+| [TASK-WEB-UI-02.md](TASK-WEB-UI-02.md) 사용자 QA와 디자인 수정 | done(2026-10-13, 사용자가 달력 포함 전체 화면 승인) — QA #1~#60, D-048~D-107 | 실기기·키보드·친구 인상 확인, 출시 전 차단 넷, 보류한 메인 글꼴 → `docs/STATUS.md` §4. 2026-10-13 옮김(원문 140,917B, SHA-256 앞 12자리 `cfb328619682`, 직전 커밋 `adad018`) |
 | [TASK-WEB-UI-01.md](TASK-WEB-UI-01.md) 브라우저 우선 UI 프로토타입 | 구현·PC 검수 완료(2026-09-20), PR #30 CI 두 OS success이나 2026-09-21 기준 병합 전 | 사용자 확인(T7)과 미검증 5항목 → `CURRENT_TASK`의 TASK-WEB-UI-02 "사용자 QA 점검표". 2026-09-21 TASK-WEB-UI-02 착수 때 옮김(원문 10,608B, SHA-256 앞 12자리 `75976470981a`, 직전 커밋 `55f3f91`, 상대 링크 1개의 경로 깊이만 고침) |
 | [TASK-INFRA-01.md](TASK-INFRA-01.md) 개발 인프라 정비 | done(2026-09-20), PR #28·#29 병합 | 개발 장치 쪽 후속 → `docs/STATUS.md` §4. 2026-09-20 TASK-WEB-UI-01 착수 때 옮김(원문 SHA-256 앞 12자리 `ea1586bf865b`, 직전 커밋 `9131f53`) |
 | [TASK-ISSUE-26.md](TASK-ISSUE-26.md) 캐릭터 9종 포즈·애니메이션 | complete(2026-09-19), 이슈 #26 closed | 실기기·OS reduced-motion·회색조 판독 → TASK-WEB-UI-01([archive](TASK-WEB-UI-01.md))을 거쳐 `CURRENT_TASK`의 TASK-WEB-UI-02 "사용자 QA 점검표" |
