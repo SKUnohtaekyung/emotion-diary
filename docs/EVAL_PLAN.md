@@ -44,6 +44,8 @@
 
 2026-09-02 스파이크(`work/spikes/g2a-cloudflare`, wrangler 4.128.0): 로컬 miniflare에 이어 **원격**(D1 `emotion-diary-spike` APAC, Workers `<spike-worker>.workers.dev`, secret 3개는 `wrangler secret put`)에서도 HTTP 22건 PASS, D1 trigger 2종·CHECK 2종·UNIQUE 거부와 부모 우선 cascade 확인. B-02/B-03/B-04/B-06 큐는 `partial`. 휴대폰 실기기·무료 한도 수치·rate limit·실제 PC worker 프로세스는 아직 `unknown`이다. 스파이크 자원에는 합성 데이터만 넣었고 검증 후 비운다.
 
+2026-10-13~14 잔여 판정(TASK-SPIKE-02, 근거 `tasks/spike/2026-10-13/PLAN.md`, **본인 1명 사용 전제** — D-108): B-02·B-03·B-04·B-05·B-08 `pass`, B-06 `보류`(거절 응답을 실제 호출로 재현하지 못했고 구독 한도에서 차지하는 비율을 계산하지 못함 — 나머지 항목은 확인), B-07 `unknown`(범위 밖). 통과 판정에 붙는 단서: B-02의 Cloudflare Access는 공식 문서로 '적용 가능·무료 50명·결제수단 입력 필요'까지만 확인했고 **켜 보지 않았다**. identity 헤더는 Access를 켤 때만 있어 D-025의 허용 목록 대조는 세션 주체로 구현해 원격에서 확인했다(목록에 없는 주체는 서명이 맞아도 401). B-04의 '미사용 정지 없음'은 요금 문서에 그런 조항이 없음으로 판정했다. B-05의 백업은 절차만 문서화했고 **구현하지 않았다**(Phase 1). B-08은 iPhone(iOS 26.5.2) Safari 본체와 홈 화면 앱으로 판정했고, Android Chrome은 기기가 없어 확인하지 않았으며 사용자 결정으로 `mobile-real-device`(출시 전 실기기 점검)로 넘겼다. 판정은 Worker 하나가 정적 파일과 `/api/*`를 함께 내는 구성에서 나왔다 — 위 표의 'Pages/Workers' 분리 구성은 검증한 적이 없다.
+
 `unknown`은 pass가 아니다. B-06/B-07은 RAG 트랙이며 제한 MVP(D-018)의 critical path에 있지 않다. 현재 제품 핵심과 양립하지 않는 후보 기술은 [DECISIONS.md](DECISIONS.md)에서 reject하고 그래프를 수정한다.
 
 ## 5. 기능·데이터 무결성 평가
