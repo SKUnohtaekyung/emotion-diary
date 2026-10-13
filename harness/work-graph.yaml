@@ -31,11 +31,14 @@ nodes:
     gate: bootstrap-facts
 
   - id: hosting-identity-spike
-    status: verifying
+    status: done
     depends_on: [bootstrap-audit]
-    # 2026-09-20: 스파이크는 2026-09-02에 실행됐다. gate security-foundation의 B-02·B-03·B-08이 모두
-    # partial이라 done이 아니다 — 남은 것: iPhone Safari 본체·홈 화면·Android Chrome, bundle/log secret
-    # scan, Cloudflare Access 적용 가능성, 무료 한도 수치(STATUS §3, runtime-profile hosting).
+    # 2026-10-14 TASK-SPIKE-02: gate security-foundation 통과 — B-02·B-03·B-08 pass(본인 1명 전제, D-108).
+    # B-08은 iPhone iOS 26.5.2 Safari 본체·홈 화면 앱으로 판정했고 Android는 출시 전 실기기 점검으로 넘겼다.
+    # Access는 문서 판정만(켜 보지 않음). D-025의 허용 목록 대조는 세션 주체로 스파이크에서 확인했다.
+    # 판정은 Worker 하나 + 정적 파일 구성에서 나왔다(Pages 분리 구성은 미검증).
+    # 근거: tasks/spike/2026-10-13/PLAN.md, docs/STATUS.md §3.
+    # (이력) 2026-09-20에는 B-02·B-03·B-08이 partial이라 verifying이었다.
     owns:
       - docs/ARCHITECTURE.md §5, §6, §10 hosting/identity rows
       - docs/DECISIONS.md hosting/identity decisions
@@ -46,12 +49,11 @@ nodes:
     gate: security-foundation
 
   - id: data-store-spike
-    status: blocked
+    status: done
     depends_on: [hosting-identity-spike]
-    # 2026-09-20: blocked로 둔 것은 의도다. G2a와 같은 스파이크에서 B-04·B-05 증거(원격 D1의 CHECK·
-    # UNIQUE·trigger 거부, 조건부 UPDATE, 부모 우선 cascade, Time Travel bookmark)를 이미 partial로
-    # 모았지만(STATUS §3), 선행 hosting-identity-spike의 gate가 아직 통과하지 않았다. harness/README의
-    # "선행 gate 통과 전에는 시작 상태로 바꾸지 않는다"를 지키고, 증거가 있다는 사실은 여기 적는다.
+    # 2026-10-14 TASK-SPIKE-02: gate data-contract 통과 — B-04·B-05 pass. 원격 batch 되돌림·동시 요청,
+    # Time Travel 복구 실습, 백업 절차와 삭제 지연 문서화(D-109). 백업·재수입 구현은 data-foundation 몫이다.
+    # (이력) 2026-09-20에는 선행 gate가 통과하지 않아 증거(partial)가 있어도 blocked로 두었다.
     owns:
       - docs/DATA_MODEL.md §3 SQL-level contracts
       - docs/DECISIONS.md storage decisions
@@ -63,9 +65,9 @@ nodes:
   - id: model-access-spike
     status: verifying
     depends_on: [bootstrap-audit]
-    # 2026-09-20: PC worker → 원격 ai_jobs → claude -p 왕복은 2026-09-02 PASS. gate model-access의 B-06이
-    # partial이라 done이 아니다 — 남은 것: job 만료·failed 전환, verifier 독립 2회 호출, 위기 케이스,
-    # 구독 경로의 보존 설정(STATUS §4-8, RK-016).
+    # 2026-10-14 TASK-SPIKE-02: B-06은 보류 2건 — 거절 응답을 실제 호출로 재현하지 못했고(모의 응답으로만), 구독 한도 비율을 계산하지 못했다.
+    # 실패·만료 전환, 독립 verifier, 위기 케이스, 기록 미저장, 지연·토큰은 확인했다. 운영 조건 D-110.
+    # (이력) 2026-09-20에는 만료·failed 전환, verifier, 위기 케이스, 보존 설정이 남아 verifying이었다.
     owns:
       - docs/AI_RAG_SPEC.md §1, §4 model access sections
       - docs/DECISIONS.md model access decisions
@@ -85,8 +87,10 @@ nodes:
     gate: retrieval-contract
 
   - id: app-scaffold
-    status: blocked
+    status: ready
     depends_on: [hosting-identity-spike, data-store-spike]
+    # 2026-10-14 TASK-SPIKE-02: 선행 두 노드가 done이라 열렸다. 같은 날 사용자가 TASK-MOBILE 제안을 받았다(D-111 —
+    # Worker 하나 + 정적 파일, 설치형 홈 화면 웹앱). 착수 전에 정본 동기화(TASK-MOBILE T2)와 모바일 명세(T3)가 남았다.
     owns:
       - package manifest and lockfile
       - application configuration

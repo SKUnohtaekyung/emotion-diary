@@ -2,7 +2,7 @@
   "schema_version": "1.1",
   "generated_at": "2026-09-02T11:30:00+09:00",
   "verified_by": "Claude Code (Fable 5.1), TASK-BOOTSTRAP G0/G1",
-  "last_synced": "2026-09-20 TASK-INFRA-01 — runtime, commands, evidence, unknowns re-checked against package.json, CI and docs/STATUS.md §3; hosting/storage/model_access blocks are the 2026-09-02 spike record and were not re-run",
+  "last_synced": "2026-10-14 TASK-SPIKE-02 — hosting/storage/model_access blocks re-measured 2026-10-13~14 (remote redeploy of the spike as a single Worker + Static Assets, iPhone iOS 26.5.2 Safari and home-screen app, queue e2e with the real PC worker); evidence in tasks/spike/2026-10-13/PLAN.md. Single-user premise (D-108)",
   "repository": {
     "root": "<local-project-root>",
     "git_repository": true,
@@ -27,37 +27,37 @@
     "language": "JavaScript/TypeScript candidate; not selected"
   },
   "hosting": {
-    "target": "own backend on free cloud: Cloudflare Pages (static UI) + Workers (API) + D1 (D-032); fallback limited to free options such as Netlify+Turso (D-021)",
-    "account_or_project_exists": "yes — user approved 2026-09-02; wrangler OAuth login by the user; spike Worker emotion-diary-spike (workers.dev) and D1 emotion-diary-spike (APAC) created, free plan, synthetic data only",
-    "access_token_cookie_confirmed": "partial — local and remote workers.dev 2026-09-02 (401 without/wrong token, HMAC cookie HttpOnly/Secure/SameSite=Lax); phone not yet",
+    "target": "one Cloudflare Worker serving Static Assets (the app shell) and /api/* on the same origin + D1; installable home-screen web app, no service worker or offline (D-032 as corrected by D-111, user decision 2026-10-14). Fallback limited to free options (D-021). Canonical docs still describing 'Pages + Workers' are rewritten in TASK-MOBILE T2",
+    "account_or_project_exists": "yes — spike Worker emotion-diary-spike (workers.dev) and D1 emotion-diary-spike (APAC), free plan, synthetic data only; redeployed 2026-10-13~14 as a single Worker + Static Assets (same origin for the page and /api/*). Cleaned 2026-10-14: long access token restored, synthetic rows 0; the Worker and D1 remain in the account",
+    "access_token_cookie_confirmed": "yes — local, remote, desktop Chrome (2026-09-02) and iPhone iOS 26.5.2 Safari proper + home-screen app (2026-10-14): 401 without/wrong token, HMAC cookie HttpOnly/Secure/SameSite=Lax, session survives a full app close. Safari's login is NOT carried into the home-screen app (separate storage)",
     "rate_limit_confirmed": "partial — Workers Rate Limiting binding deployed on free plan but never blocked (30 same-key calls across HKG/NRT; permissive per docs) → rejected; D1 global lockout adopted and verified remotely (10 fails → 429, correct token 429 while locked, Retry-After 300)",
-    "cloudflare_access_free_applicable": "unknown — Zero Trust free-plan user limit and workers.dev applicability not confirmed from fetched docs; JWT header Cf-Access-Jwt-Assertion + certs endpoint documented",
-    "identity_header_available": "unknown",
-    "custom_header_csrf_passthrough": "partial — local, remote (node fetch) and real desktop browser (Windows Chrome 152: with header 200, without header 403, session cookie round trip over HTTPS); phone browser not yet tested",
-    "secrets_confirmed": "partial — 3 secrets registered via wrangler secret put, none in wrangler.toml or source; bundle/log scan not yet done",
-    "phone_access_confirmed": "partial — iPhone iOS 18.7 KakaoTalk in-app WebView 2026-09-02: session 200, PUT with header reached DB (409 revision conflict vs desktop draft), PUT without header 403; Safari proper, home-screen standalone, Android Chrome not yet",
-    "free_tier_limits_confirmed": "unknown"
+    "cloudflare_access_free_applicable": "by docs only (2026-10-13~14, NOT activated): Access can protect a workers.dev URL (developers.cloudflare.com), the product page lists a $0 plan with a 50 user limit, creating the Zero Trust organization requires entering payment details even on the free plan. Not used in the first version (user decision 2026-10-14, D-108)",
+    "identity_header_available": "only with Access (Cf-Access-Jwt-Assertion); without it the signed session is the runtime identity. 2026-10-14 the spike signs a subject into the session and checks it against OWNER_ALLOWLIST on every request: a correctly signed session for a subject not on the list gets 401 (positive control 200), a swapped subject 401 (D-025). Real app implementation is Phase 1",
+    "custom_header_csrf_passthrough": "yes — desktop Chrome (2026-09-02) and iPhone Safari proper + home-screen app (2026-10-14): with header 200, without header 403; the phone sends Origin and Sec-Fetch-Site: same-origin",
+    "secrets_confirmed": "yes — 3 secrets only via wrangler secret put; 2026-10-13 scan: deploy bundle, static assets, config, logs, tracked files and full Git history 0 hits; wrangler tail 0 hits (cookie/authorization redacted, no bodies). One local-only test literal was moved out of a spike test file",
+    "phone_access_confirmed": "yes for iPhone — iOS 26.5.2 (UA string reports a frozen 'iOS 18.7'), Safari proper and home-screen app 2026-10-14: token entry, save, read, reject; standalone display; edge-swipe back works; export works via the share sheet only (blob download opens a preview, an attachment link replaces the app screen with no way back). Android Chrome not tested — moved to the pre-release real-device gate (D-108). Open: session after 12h, keyboard, 5-min background, icon delete/re-add",
+    "free_tier_limits_confirmed": "yes by official docs 2026-10-13 — Workers 100,000 requests/day, 10 ms CPU, 5 cron triggers; static asset requests free; D1 5M rows read/day, 100k rows written/day, 500 MB per DB, 10 DBs, 50 queries per invocation, Time Travel 7 days. No pause-on-inactivity clause was found in the D1 pricing docs (judged by absence, not by a positive statement)"
   },
   "storage": {
     "diary_database": "Cloudflare D1 (SQLite-compatible, D-032)",
-    "conditional_update_and_check_confirmed": "partial — local and remote D1: CHECK intensity/status, conditional completion UPDATE, revision conflict 409, UNIQUE(owner,date)/(diary,emotion)",
-    "trigger_support_confirmed": "partial — local and remote D1: keep-last-emotion and nonblank-text triggers RAISE(ABORT) (SQLITE_CONSTRAINT_TRIGGER code 7500)",
-    "batch_atomicity_confirmed": "partial — local and remote batch() ran; parent-first delete + FK cascade verified (orphans 0); meta.changes over-counts with cascade",
-    "backup_and_deletion_confirmed": "partial — `wrangler d1 time-travel info` returns a restorable bookmark on the free plan (restore not exercised); `d1 info`: region APAC, jurisdiction null, read_replication disabled; worker export backup and deletion-lag notice still to define (I-17)",
-    "ai_jobs_queue_round_trip_confirmed": "partial — remote queue + real PC worker (work/spikes/g2a-cloudflare/pc-worker.mjs) + claude -p Sonnet 5 round trip PASS 2026-09-02: lease → 7.4s → result 200 → owner reads done, payload cleared; Windows quoting fixed by running claude via Git Bash with env-passed prompt/schema; failed-job → failed status not yet implemented",
-    "spike_location": "work/spikes/g2a-cloudflare (not in Git), wrangler 4.128.0, 22/22 HTTP + 9 SQL checks PASS 2026-09-02",
+    "conditional_update_and_check_confirmed": "yes — local and remote D1: CHECK intensity/status, conditional completion UPDATE, revision conflict 409, UNIQUE(owner,date)/(diary,emotion); 2026-10-13 remote concurrency: of 8 simultaneous first saves / 8 updates / 6 completes exactly one succeeds each, replay returns 409",
+    "trigger_support_confirmed": "yes — local and remote D1: keep-last-emotion and nonblank-text triggers RAISE(ABORT) (SQLITE_CONSTRAINT_TRIGGER code 7500)",
+    "batch_atomicity_confirmed": "yes — 2026-10-13 remote: a failing statement in batch() rolls back the earlier statement (positive control commits both); parent-first delete + FK cascade (orphans 0); meta.changes over-counts with cascade",
+    "backup_and_deletion_confirmed": "yes (procedure documented, not implemented) — 2026-10-13 Time Travel restore drill on the free plan: a deleted row came back, and the restore was undone via the returned bookmark; region APAC, AES-256 at rest; backup: Time Travel 7 days + PC backup once a day kept 30 days (D-109); deletion-lag notice wording is a draft",
+    "ai_jobs_queue_round_trip_confirmed": "yes — 2026-10-13 remote queue + real PC worker: fail once -> pending, twice -> failed with payload cleared and reason code only, expiry -> expired, fallback direct_write in the owner response, 10/10 normal runs",
+    "spike_location": "work/spikes/g2a-cloudflare (not in Git), wrangler 4.128.0; 2026-10-14 latest: 22/22 + 36/36 HTTP checks local and remote (incl. session-subject allowlist), tt-drill, tail-check, e2e-queue; deployed versions 5d574b9a (single Worker + assets), 0a29376c (test page keeps its action log), 09a04532 (session subject allowlist)",
     "evidence_store": "not selected; paid Vector Store excluded by D-019"
   },
   "model_access": {
     "policy": "no paid API (D-019); single-user subscription path via local Claude Code CLI headless mode (D-029)",
-    "path": "claude -p --output-format json --json-schema (Claude Code 2.1.237, subscription login, no ANTHROPIC_API_KEY)",
-    "path_confirmed": "partial — 2026-09-02 minimal spike PASS with synthetic input",
+    "path": "claude -p --output-format json --json-schema --tools \"\" --max-turns 1 --no-session-persistence (Claude Code 2.1.237, subscription login, no ANTHROPIC_API_KEY)",
+    "path_confirmed": "partial — two items on hold: (1) a real refusal response was not reproduced (mock only), (2) the share of the subscription limit was not computed (only tokens per call and 'about 46 calls without hitting the limit'). Everything else measured 2026-10-13~14",
     "server_only": "yes by design (subprocess on the same PC); not yet exercised from an app server",
     "structured_outputs_confirmed": "yes — structured_output matched 6 required keys, no extra keys",
-    "latency_observed": "Sonnet 5 via PC worker, 10 runs 2026-09-02: worker-side min 7.7s / p50 8.4s / p95 12.1s; API-only p50 4.9s / p95 9.4s. Opus 5 single run: wall 15s / API 8.5s. Exceeds the 8s first-response target → UI must show thinking state with ~20s fallback",
-    "retention_control_confirmed": "unknown (subscription account data settings to verify)",
-    "independent_verifier_call_confirmed": "unknown",
-    "policy_status": "gray area for single-user personal tool; user acknowledged (RK-017)",
+    "latency_observed": "Sonnet 5 via PC worker, 10 sequential runs 2026-10-13: worker-side min 9.3s / p50 10.8s / p95 13.1s, API-only p50 5.5s / p95 8.0s, enqueue-to-visible p50 11.8s / p95 14.3s (2026-09-02: p50 8.4s / p95 12.1s). Crisis-type sentences took 17-38s. Opus 5 verifier 12.5-16.6s",
+    "retention_control_confirmed": "local: yes — --no-session-persistence leaves no transcript (17 calls, file count unchanged; default is plaintext for 30 days). Account: the 'use my data to improve models' setting was ON on 2026-10-14 (5-year retention) and the user reported turning it off the same day (30 days) — reported by the user, not observed by the agent. Condition D-110",
+    "independent_verifier_call_confirmed": "yes — 2026-10-13: generator call + 5 separate verifier calls (distinct sessions, no tools), verdicts 5/5 as expected, reason codes only",
+    "policy_status": "single-user personal tool only (D-108, RK-017). Official docs 2026-10-14: third-party products may not offer claude.ai login or rate limits without prior approval; docs also announce --bare (no subscription login) as the future default for -p (RK-035)",
     "vector_search_filter_confirmed": "unknown"
   },
   "commands": {
@@ -83,13 +83,15 @@
     "2026-09-20 unzip -p outputs/emotion-diary-agent-seed.zip .../journal-template.txt | sha256 => 221B b1d77d38991c… (CRLF x17), equal to manifest; repo blob was LF 204B 0eb5580714ef… until .gitattributes (references/source/** -text)",
     "2026-09-20 git cat-file -s :references/source/journal-template.txt => 221 after git add --renormalize",
     "2026-09-20 gh pr checks 28 => verify (ubuntu-latest) pass, verify (windows-latest) pass",
-    "2026-09-20 npm ci (npm 10.9.2) => git status shows package-lock.json modified, 48 deletions of libc fields; reverted"
+    "2026-09-20 npm ci (npm 10.9.2) => git status shows package-lock.json modified, 48 deletions of libc fields; reverted",
+    "2026-10-13~14 TASK-SPIKE-02: commands and results in tasks/spike/2026-10-13/PLAN.md (wrangler deploy versions 5d574b9a and 0a29376c, remote-test 22/22, test-extra remote 30/30, tt-drill, tail-check, e2e-queue, e-model-checks, iPhone captures A-E3)"
   ],
   "unknowns": [
-    "B-08: iPhone Safari proper, home-screen standalone, Android Chrome (only KakaoTalk in-app WebView and desktop Chrome were confirmed 2026-09-02)",
-    "B-02/B-03: Cloudflare Access free-plan applicability and identity header, bundle/log secret scan, free-tier limit numbers",
-    "B-05: Time Travel restore not exercised, worker export backup procedure and deletion-lag notice wording (I-17)",
-    "B-06: job expiry/failed transition, independent verifier double call, crisis-signal cases, subscription retention/training settings, subscription quota impact",
+    "B-06 on hold for two items: a real refusal response was not reproduced (mock only); the share of the subscription limit was not computed. Ambiguous crisis sentences await human judgement (Phase 3)",
+    "B-08 follow-ups for the TASK-MOBILE decision (5): session after 12 hours, keyboard vs bottom bar, 5-min background, icon delete/re-add, 'Open as Web App' turned off; Android Chrome not tested (moved to the pre-release real-device gate, D-108)",
+    "Which action makes the home-screen app reload its page (external link return, preview return) — observed twice 2026-10-14, cause not isolated (RK-034)",
+    "Pages + Workers split hosting was never verified and is not adopted (D-111); all spike evidence comes from a single Worker",
+    "Scope is single-user for now (D-108, reconfirmed 2026-10-14) — nothing in the spike covers accounts, per-user data separation or a paid model API",
     "B-07: retrieval layer on subscription or free path (G2d, not started)",
     "Web Push and PWA support (Post-MVP, issue #9)",
     "Whether Codex hooks and rules behave as documented on this machine — docs say Stop hook is portable but PreToolUse has no 'ask' decision; not runtime-verified (TASK-INFRA-01 follow-up)"
