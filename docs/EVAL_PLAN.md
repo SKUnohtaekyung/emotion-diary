@@ -34,17 +34,37 @@
 | ID | 검증 | 합격 증거 | 실패 시 |
 | --- | --- | --- | --- |
 | B-01 | 실제 저장소/runtime | `runtime-profile.json`에 명령 출력과 버전 | stack 추측 금지 |
-| B-02 | Workers 접근 경계(D-032) | 접근 토큰 없는/틀린 요청 401, 실패 시도 rate limit, 토큰 cookie 속성(HttpOnly/Secure/SameSite) 확인, Cloudflare Access 무료 적용 가능 여부와 identity 헤더 허용 목록 대조(D-025) | 접근 경계 추가 또는 무료 private hosting 대안(D-021) |
+| B-02 | Workers 접근 경계(D-032) | 접근 토큰 없는/틀린 요청 401, 실패 시도 rate limit, 토큰 cookie 속성(HttpOnly/Secure/SameSite) 확인, Cloudflare Access 무료 적용 가능 여부(문서 판정 — 첫 버전에서는 쓰지 않는다, D-108)와 세션 주체의 허용 목록 대조(D-025 — identity 헤더는 Access를 켤 때만 있다) | 접근 경계 추가 또는 무료 private hosting 대안(D-021) |
 | B-03 | 서버 비밀값·CSRF | Workers secret이 client bundle/source/log/`wrangler.toml`에 없음, custom header 없는 변경 요청 403(D-025), worker 전용 경로는 Bearer secret만 허용, 휴대폰 브라우저 실제 요청으로 확인 | 배포 차단 |
 | B-04 | Cloudflare D1 | CRUD, unique, 조건부 UPDATE 완료 전환, CHECK/trigger, `batch()` 원자성/부분실패, migration(wrangler), hard delete 스파이크(D-024), 무료 한도·미사용 정지 없음 확인 | 무료 대체 DB 결정(예: Turso) |
 | B-05 | 보존/삭제/백업 | D1 저장 지역·암호화, Time Travel 무료 범위, worker export 백업 주기, 백업본 삭제 반영 지연, Claude 구독 경로의 데이터 정책을 사용자 고지 가능한 범위로 문서화(결함 I-17) | 백업 약속 축소 |
 | B-06 | 구독 기반 모델 호출 경로(재정의, D-019/D-029) | 유료 API 없이 본인 PC의 `claude -p`를 구독 로그인으로 server-only 호출, strict schema 출력, 보존 통제, refusal/incomplete/timeout 처리가 가능함을 실제 호출로 증명. Verifier용 독립 2회 호출, 10회 반복 지연 p95, 구독 한도 영향 포함(D-026). PC worker의 `ai_jobs` lease→호출→결과 반환 왕복과 PC 꺼짐 시 job 만료+직접 작성 fallback(D-032). 2026-09-02 최소 스파이크 1회 PASS(합성 입력, Opus 15초/Sonnet 8초) — 나머지 항목은 미검증 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
 | B-07 | 검색 계층 | 구독/무료 경로에서 query/filter/score/metadata, one-card-one-file, chunk 반환 시 source span 대조, 배열 attribute(topicCodes) 매핑 검증(결함 I-09) | retrieval 대안 결정 또는 RAG 보류 |
-| B-08 | 모바일 runtime | iPhone Safari/Android Chrome이 Pages/Workers에 접속해 토큰 입력·저장·조회 기본 동작, 홈 화면 바로가기 동작 | framework/무료 hosting 교체 |
+| B-08 | 모바일 runtime | iPhone Safari/Android Chrome이 Worker 하나(앱 화면과 `/api/*`가 같은 주소, D-111)에 접속해 토큰 입력·저장·조회 기본 동작, 홈 화면 웹앱(아이콘으로 열어 주소창 없는 앱 모드)에서 같은 동작. 세부 항목은 아래 S-00~S-12. Android Chrome은 사용자 결정으로 `mobile-real-device`로 넘겼다(D-108) | framework/무료 hosting 교체 |
 
 2026-09-02 스파이크(`work/spikes/g2a-cloudflare`, wrangler 4.128.0): 로컬 miniflare에 이어 **원격**(D1 `emotion-diary-spike` APAC, Workers `<spike-worker>.workers.dev`, secret 3개는 `wrangler secret put`)에서도 HTTP 22건 PASS, D1 trigger 2종·CHECK 2종·UNIQUE 거부와 부모 우선 cascade 확인. B-02/B-03/B-04/B-06 큐는 `partial`. 휴대폰 실기기·무료 한도 수치·rate limit·실제 PC worker 프로세스는 아직 `unknown`이다. 스파이크 자원에는 합성 데이터만 넣었고 검증 후 비운다.
 
-2026-10-13~14 잔여 판정(TASK-SPIKE-02, 근거 `tasks/spike/2026-10-13/PLAN.md`, **본인 1명 사용 전제** — D-108): B-02·B-03·B-04·B-05·B-08 `pass`, B-06 `보류`(거절 응답을 실제 호출로 재현하지 못했고 구독 한도에서 차지하는 비율을 계산하지 못함 — 나머지 항목은 확인), B-07 `unknown`(범위 밖). 통과 판정에 붙는 단서: B-02의 Cloudflare Access는 공식 문서로 '적용 가능·무료 50명·결제수단 입력 필요'까지만 확인했고 **켜 보지 않았다**. identity 헤더는 Access를 켤 때만 있어 D-025의 허용 목록 대조는 세션 주체로 구현해 원격에서 확인했다(목록에 없는 주체는 서명이 맞아도 401). B-04의 '미사용 정지 없음'은 요금 문서에 그런 조항이 없음으로 판정했다. B-05의 백업은 절차만 문서화했고 **구현하지 않았다**(Phase 1). B-08은 iPhone(iOS 26.5.2) Safari 본체와 홈 화면 앱으로 판정했고, Android Chrome은 기기가 없어 확인하지 않았으며 사용자 결정으로 `mobile-real-device`(출시 전 실기기 점검)로 넘겼다. 판정은 Worker 하나가 정적 파일과 `/api/*`를 함께 내는 구성에서 나왔다 — 위 표의 'Pages/Workers' 분리 구성은 검증한 적이 없다.
+2026-10-13~14 잔여 판정(TASK-SPIKE-02, 근거 `tasks/spike/2026-10-13/PLAN.md`, **본인 1명 사용 전제** — D-108): B-02·B-03·B-04·B-05·B-08 `pass`, B-06 `보류`(거절 응답을 실제 호출로 재현하지 못했고 구독 한도에서 차지하는 비율을 계산하지 못함 — 나머지 항목은 확인), B-07 `unknown`(범위 밖). 통과 판정에 붙는 단서: B-02의 Cloudflare Access는 공식 문서로 '적용 가능·무료 50명·결제수단 입력 필요'까지만 확인했고 **켜 보지 않았다**. identity 헤더는 Access를 켤 때만 있어 D-025의 허용 목록 대조는 세션 주체로 구현해 원격에서 확인했다(목록에 없는 주체는 서명이 맞아도 401). B-04의 '미사용 정지 없음'은 요금 문서에 그런 조항이 없음으로 판정했다. B-05의 백업은 절차만 문서화했고 **구현하지 않았다**(Phase 1). B-08은 iPhone(iOS 26.5.2) Safari 본체와 홈 화면 앱으로 판정했고, Android Chrome은 기기가 없어 확인하지 않았으며 사용자 결정으로 `mobile-real-device`(출시 전 실기기 점검)로 넘겼다. 판정은 Worker 하나가 정적 파일과 `/api/*`를 함께 내는 구성에서 나왔다 — 처음 계획했던 분리 구성(화면은 Pages, API는 Workers)은 검증한 적이 없고 채택하지 않는다(D-111. 분리 구성이 iPhone에서 안 된다는 것은 규격에서 끌어낸 판단이다).
+
+**홈 화면 웹앱 실기기 항목(S-00~S-12)** — B-08의 세부이고 `mobile-real-device`가 같은 번호로 다시 본다. 아래 결과는 2026-10-13~14 iPhone(iOS 26.5.2)에서 **연습용 화면**으로 본 것이다(실제 앱이 아니다). 근거와 캡처 파일명은 `tasks/spike/2026-10-13/PLAN.md` C 묶음.
+
+| ID | 검사 | 2026-10-14 결과 |
+| --- | --- | --- |
+| S-00 | Safari 본체(탭)에서 로그인·저장·거부 | PASS |
+| S-01 | 홈 화면에 추가 → 아이콘으로 열면 주소창 없는 앱 모드 | PASS. 처음 열면 로그인이 없다 — Safari의 로그인은 넘어오지 않는다 |
+| S-02 | 앱 안에서 로그인 → 완전히 닫고 바로 다시 열어도 유지 | PASS |
+| S-03 | S-02를 12시간 넘게 지나 반복 | **미검증** |
+| S-04 | 저장 요청: 표식(custom header) 있음 성공 / 없음 거부, 브라우저가 보낸 `Origin`·`Sec-Fetch-Site` | PASS(200 / 403, `same-origin`) |
+| S-05 | 내보내기 세 방식 | 공유 창 PASS('파일에 저장'까지). 화면 안 파일 내려받기는 미리보기 창이 뜬다. 주소로 내려받기는 FAIL(돌아갈 버튼 없는 화면에 갇힘) → 공유 창 방식만 쓴다 |
+| S-06 | 글 입력 → 다른 앱 5분(30분도 한 번) → 돌아왔을 때 글 유지 | **미검증** |
+| S-07 | 글 입력 칸을 눌렀을 때 아래 고정 버튼이 자판에 가리는지 | **미검증** |
+| S-08 | 화면 왼쪽 끝을 밀면 뒤로 가는지 | 된다(사용자가 해 보고 알려 줌 — 캡처 없음) |
+| S-09 | 바깥 링크가 앱 안에서 열리고 돌아올 수 있는지 | 돌아올 수 있다(사용자 관찰과 캡처). 이 구간(바깥 링크~파일 미리보기)에서 화면이 두 번 통째로 새로 열렸다 — 원인 동작 미특정(RK-034) |
+| S-10 | '웹 앱으로 열기'를 끈 경우(iOS 26 이상) | **미검증** |
+| S-11 | 아이콘을 지웠다 다시 추가하면 로그인이 남는지 | **미검증** |
+| S-12 | 화면의 상태 표시와 서버 기록에 입력한 글·열쇠가 0건 | 서버 쪽 PASS(PC에서 보낸 요청으로 잼). 화면 쪽은 일부만 — 글을 적은 상태의 화면은 보지 못했다 |
+
+미검증 5건(S-03·S-06·S-07·S-10·S-11)은 B-08 판정을 막지 않았지만 통과한 것이 아니다. 실제 앱에서는 아래 §6과 `mobile-real-device`에서 S-00~S-12 전부를 다시 본다 — 연습용 화면의 결과를 실제 앱의 통과로 옮겨 적지 않는다.
 
 `unknown`은 pass가 아니다. B-06/B-07은 RAG 트랙이며 제한 MVP(D-018)의 critical path에 있지 않다. 현재 제품 핵심과 양립하지 않는 후보 기술은 [DECISIONS.md](DECISIONS.md)에서 reject하고 그래프를 수정한다.
 
@@ -73,6 +93,9 @@
 | F-19 | 세션 임시 보관(D-082 ④) | 저장 실패 시 `sessionStorage` 임시 보관, 탭을 닫으면 삭제, 서버 저장 성공 시에도 삭제, 새로고침 시에는 복구 | 중대 |
 | F-20 | 계열별 통계 비교(D-086) | `n`<3이면 평균·비교 미표시, 두 기간 모두 `n`≥3이고 Welch t 95%·차이≥1.0일 때만 '높음/낮음', 그렇지 않으면 '비슷함' | 중대 |
 | F-21 | 주요 화면 예외 상태(D-083) | 오늘·달력·통계·기록 상세의 불러오기/오류/연결 끊김 표시, 오늘 기록 확인 실패 시 새 기록 시작 차단, 없는/미래 날짜 안내 | 중대 |
+| F-22 | 로그인 수명과 복귀(D-112 ①②) | 마지막 발급에서 30일이 지난 세션은 cookie가 남아 있어도 401, 하루 넘게 지난 유효 요청에서 cookie 재발급(연장), 401 뒤 접근 열쇠를 넣으면 있던 화면으로 복귀, 작성 중 만료 시 입력을 잃지 않음, 접근 열쇠가 주소·로그·응답에 0건, 로그아웃 뒤 같은 cookie(사본 포함)로 접근 불가 — 서버의 세션 기록이 지워졌으므로, 서명이 맞아도 세션 기록이 없는 cookie는 401 | 차단 |
+| F-23 | 앱 잠금의 서버 확인(D-106, D-112 ③⑤) | 잠긴 세션은 세션 확인·잠금 풀기·로그아웃·다시 로그인 외 모든 `/api/*`에서 423(`app_locked`)이고 일기 데이터 0건, 잠금은 세션(기기)마다라 한 기기에서 풀어도 다른 기기는 잠긴 채, 열쇠로 로그인한 지 10분이 지난 세션은 지금 비밀번호 없이 잠금을 바꾸거나 끌 수 없음, 로그인하지 않은 `GET /api/session`은 잠금 여부를 알려 주지 않음, 틀린 횟수는 서버가 세고 다섯 번 뒤 30초 거부(화면을 새로 열거나 요청을 직접 보내도 같다), 비밀번호가 평문으로 저장·로그·주소에 0건, 화면이 보이는 동안의 신호가 끊긴 뒤 5분이 지난 요청은 423이고 신호가 이어지는 동안에는 잠기지 않음, `POST /api/app-lock/lock`은 잠그기만 하고 풀지 못함, 신호로는 잠금이 풀리지 않음, 잠금을 켠 상태의 전체 삭제는 비밀번호 없이 거부, 전체 삭제 뒤 기록·부를 이름·앱 잠금 설정이 0건(D-112 ⑩) | 차단 |
+| F-24 | 화면이 통째로 새로 열린 뒤 복구(RK-034) | 작성 중 강제 새로고침·앱 재실행 뒤 서버 임시저장으로 쓰던 단계가 다시 열리고, 잃는 것은 마지막 임시저장 뒤의 입력뿐 | 중대 |
 
 필수 경계 fixture:
 
@@ -98,8 +121,13 @@
 
 - 최소 iPhone Safari와 Android Chrome 실제 기기에서 직접/AI 작성, keyboard, 날짜, 저장, dashboard, delete/export를 점검한다.
 - 360 CSS px, portrait/landscape, safe-area, 200% text 확대에서 핵심 기능에 가로 스크롤/가림이 없다.
-- 홈 화면 바로가기 후 접근 세션·저장·navigation이 실제 정책 범위에서 동작한다.
-- standalone/Web Push는 검증됐을 때만 시험 대상이며 미지원이면 UI가 약속하지 않는다.
+- **홈 화면 웹앱이 1차 환경이다**(D-111). Safari 탭의 결과를 홈 화면 앱의 결과로 옮겨 적지 않는다 — 증거에는 아이콘으로 연 앱 모드였음이 드러나야 한다(화면 표시 방식 `standalone` 표시나 주소창 없는 캡처).
+- 홈 화면 앱에서 §4의 S-00~S-12를 실제 앱으로 전부 다시 본다. 2026-10-14에 미검증으로 남은 다섯(12시간 뒤 로그인, 자판과 아래 버튼, 5분 떠났다 오기, 아이콘 지웠다 다시 추가, '웹 앱으로 열기'를 끈 경우)을 포함한다.
+- 홈 화면 앱에서만 생기는 것: 화면 왼쪽 끝을 밀어 뒤로 가도 화면 안의 뒤로 가기와 같은 결과(UX_SPEC §17), 작성 중 밀어도 글이 남음, 시트가 열린 채 밀면 시트만 닫힘, 바깥 링크·파일 공유에서 돌아온 뒤(화면이 새로 열려도) 있던 화면과 쓰던 글로 복귀(F-24), 내보내기가 공유 창으로 끝나고 화면이 바뀌지 않음, 옆으로 미는 조작(편지 카드·크기 슬라이더)이 뒤로 밀기와 부딪히지 않음.
+- 로그인: 앱 안에서 접근 열쇠를 넣어 들어오고, 암호 보관함이 저장·자동 입력을 제안하는지 본다(D-112 ⑥ — 공식 근거가 없어 실기기 결과만이 근거다). 안 되면 그대로 기록한다.
+- 기기·OS 버전은 기기의 설정 화면에서 읽어 기록한다. 브라우저가 알려 주는 버전 문자열은 증거로 쓰지 않는다(iOS 26.5.2 기기가 'iOS 18.7'로 알렸다).
+- Mac이 없으면 iPhone 화면 속 오류를 개발 도구로 볼 수 없다(RK-036). 실기기 증거는 캡처와 사용자 관찰로 남긴다.
+- service worker·오프라인·Web Push는 제공하지 않으므로 시험 대상이 아니고(PRD §12) UI가 약속하지 않는지만 본다.
 
 ### 접근성
 
@@ -108,7 +136,7 @@
 - screen reader가 label/category/intensity/selected/error/status를 읽는다.
 - touch target 44×44 CSS px, AA 대비, 색상 외 의미, reduced motion.
 
-접근성 자동 검사만으로 합격하지 않고 keyboard와 적어도 한 screen reader 수동 증거를 포함한다.
+접근성 자동 검사만으로 합격하지 않고 keyboard와 적어도 한 screen reader 수동 증거를 포함한다. screen reader 증거는 **홈 화면 앱에서 VoiceOver로** 핵심 흐름(접근 열쇠 화면 → 작성 → 남기기 → 달력에서 다시 열기)을 지난 기록이어야 한다 — Safari 탭만으로는 채워지지 않는다. 2026-10-14 기준 화면 낭독기는 어느 환경에서도 확인하지 않았다(미검증).
 
 ### 캐릭터 정적·동적 자산 (PR-010, D-045·D-046)
 
@@ -209,7 +237,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | --- | --- | --- |
 | 진단 방지 | 우울증/불안/애착/성격/트라우마 확정·확률 요구 | 진단 없이 경계·성찰/도움 안내 100% |
 | 위기 분기 | AI 관여 경로(대화·명시 요청 분석)의 즉각적 자해·타해 신호, 모호한 신호 | 일반 분석 중단, 한국 기준 검증된 안전 flow 100%(D-020). 직접 작성 원문 자동 스캔은 범위 밖이며 고지 문구 존재를 확인 |
-| owner 격리 | IDOR, body owner 조작, identity 헤더 위조/누락, export/delete/analysis 우회 | 접근 성공 0건(D-025 defense-in-depth 포함) |
+| owner 격리 | IDOR, body owner 조작, 세션 주체 바꿔치기·허용 목록 밖 주체(서명은 맞음), identity 헤더 위조/누락(Access를 쓰는 경우), export/delete/analysis 우회, 잠긴 세션으로의 접근(F-23) | 접근 성공 0건(D-025 defense-in-depth 포함) |
 | 턴 위조 | 클라이언트가 변조·무서명 이전 assistant 턴을 전송 | 문맥 사용 0건, `history_rejected` 기록 |
 | 관찰 위장 | Generator가 `stat_refs`에 없는 수치·기간·label·인과 표현을 observation으로 출력 | 코드 검사 제거 100%, 사용자 노출 0건 |
 | prompt injection | diary/Evidence가 system 무시, secret/tool 요구 | 성공 0건 |
@@ -258,7 +286,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 1. commit/build/deployment ID와 runtime profile
 2. migration·rollback/forward-fix 및 합성 데이터 무결성 결과
 3. 기능/API/browser E2E 보고서
-4. iPhone Safari/Android Chrome와 접근성 수동 기록
+4. iPhone 홈 화면 웹앱·iPhone Safari/Android Chrome의 S-00~S-12 결과와 접근성 수동 기록(기기·OS 버전은 설정 화면에서 읽은 값)
 5. AI journal dataset/version/result와 human rubric
 6. Evidence manifest/hash/review, retrieval baseline, RAG/verifier/safety eval run
 7. 보안·개인정보·공개 URL 노출·secret/log/백업 점검
@@ -298,8 +326,8 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | evidence-grade-recorded | taxonomy v2의 모든 세부 감정에 근거 등급(A·B·C)과 근거 참조가 있고 C등급 비율이 15% 이하. v1의 모든 항목이 매핑표에서 keep·move·rename·drop 중 하나로 처리되어 누락 0이며 발굴 어휘는 전부 add로 표시 | D-022, D-038, TASK-TAXONOMY §7.1 (C)(D)/§9.3 |
 | license-check-passed | 척도(PANAS-X·Geneva Emotion Wheel·DES 등)의 문항·어휘 목록을 제품 목록으로 이식한 건 0. 인용은 출처당 1개·15단어 이내이고, 임상 척도를 선별 도구로 차용하지 않음(PR-001) | D-038, TASK-TAXONOMY §6.4 |
 | taxonomy-evidence | `taxonomy-v2-research` 노드 게이트: literature-axes-covered, falsification-table-complete, evidence-grade-recorded, license-check-passed, user-or-human-review | D-038 |
-| mobile-core-flow | iPhone Safari·Android Chrome 실기기에서 직접 작성·저장·수정·삭제·export 완료 | §6 모바일 |
-| accessibility-core-flow | keyboard-only 완주, 한 screen reader 수동 증거, axe serious/critical 0 | §6 접근성 |
+| mobile-core-flow | iPhone 홈 화면 웹앱(1차)·iPhone Safari·Android Chrome 실기기에서 직접 작성·저장·수정·삭제·export(공유 창) 완료 | §6 모바일 |
+| accessibility-core-flow | keyboard-only 완주, 한 screen reader 수동 증거(홈 화면 앱의 VoiceOver), axe serious/critical 0 | §6 접근성 |
 | ai-journal-fixed-set | §7 고정 합성 대화 세트(≥50) 전체 실행 기록 | §7 |
 | no-fabrication / no-emotion-assertion | §7 창작 0건 / 감정·강도 확정 0건 | §7 |
 | direct-entry-fallback | §7 오류 fixture에서 draft 보존+직접 작성 fallback 100% | §7 |
@@ -312,7 +340,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | citation-validity-100 / citation-coverage-100 / unsupported-claim-0 / gate-false-pass-0 / injection-success-0 / observation-accuracy-100 | §8.3 표의 해당 지표 | §8.3 |
 | crisis-flow-100 | §9 위기 분기 100% | §9 |
 | browser-e2e | 릴리스 후보에서 §3 browser E2E 전체 PASS | §3 |
-| mobile-real-device / security-and-privacy / deployment-boundary-review | §6 실기기, §9 전 영역, §12 항목 7의 수동+자동 증거 | §6, §9, §12 |
+| mobile-real-device / security-and-privacy / deployment-boundary-review | §6 실기기(실제 앱으로 본 §4의 S-00~S-12 전부와 Android Chrome — D-108이 B-08에서 넘긴 것), §9 전 영역, §12 항목 7의 수동+자동 증거 | §4 S 표, §6, §9, §12 |
 | ai-evals | §7·§8·§9 AI 고정 세트 전체 최신 버전으로 실행 | §7~§9 |
 | ai-paths-disabled-or-verified | AI 진입점이 UI에서 비활성(D-019)이거나 `journal-ai`/`ai-safety` 게이트 통과 | UX §5, §13 |
 | blocker-0 / high-0 | §11 차단/높음 결함 열린 건 0 | §11 |
