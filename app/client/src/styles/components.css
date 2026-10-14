@@ -1,0 +1,277 @@
+/* 버튼·입력·스위치·시트·알림. 터치 자리는 44px 이상, 초점 링은 neutral.focus, 비활성은 투명도가 아니라 색을 섞어 표현한다(state.disabled). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--size-touch-target-min);
+  padding: 0 var(--space-5);
+  border: 1px solid var(--neutral-border-strong);
+  border-radius: var(--radius-control);
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn-block {
+  display: flex;
+  width: 100%;
+}
+
+.btn-primary {
+  border-color: var(--service-ink);
+  background: var(--service-ink);
+  color: var(--neutral-bg);
+}
+
+.btn-quiet {
+  border-color: var(--neutral-border);
+  background: var(--neutral-bg);
+}
+
+.btn-small {
+  padding: 0 var(--space-4);
+  font-size: var(--text-label-size);
+}
+
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  border-color: color-mix(in srgb, var(--neutral-bg), var(--service-ink) 12%);
+  background: color-mix(in srgb, var(--neutral-bg), var(--service-ink) 12%);
+  color: color-mix(in srgb, var(--neutral-bg), var(--service-ink) 50%);
+  cursor: default;
+}
+
+.back-button {
+  min-height: var(--size-touch-target-min);
+  padding: 0 var(--space-3) 0 0;
+  border: 0;
+  background: none;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* 입력 칸: 글자 16px 이상(iOS가 확대하지 않게) */
+.input {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--neutral-border-strong);
+  border-radius: var(--radius-control);
+  background: var(--neutral-bg);
+  font-size: var(--text-body-size);
+}
+
+.textarea {
+  min-height: 120px;
+  padding: var(--space-3);
+  resize: vertical;
+  line-height: var(--text-body-line);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.field label {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: 600;
+}
+
+.field-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.field-row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.field-toggle {
+  flex: none;
+}
+
+.field-error {
+  color: var(--semantic-danger);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.field-error:empty {
+  display: none;
+}
+
+.field-error p + p {
+  margin-top: var(--space-1);
+}
+
+.auth-form,
+.name-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.name-count {
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+}
+
+.name-count.is-over {
+  color: var(--semantic-danger);
+}
+
+/* 설치 안내 줄 */
+.install-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.hint-open {
+  flex: 1;
+  min-height: var(--size-touch-target-min);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  text-align: left;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.hint-close {
+  flex: none;
+  width: var(--size-touch-target-min);
+  height: var(--size-touch-target-min);
+  border: 0;
+  background: none;
+  color: var(--neutral-text-muted);
+  font-size: var(--text-heading-size);
+  cursor: pointer;
+}
+
+/* 스위치 */
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--size-touch-target-min);
+}
+
+.switch {
+  position: relative;
+  flex: none;
+  width: 60px;
+  height: var(--size-touch-target-min);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.switch::before {
+  content: "";
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  top: 50%;
+  height: 28px;
+  margin-top: -14px;
+  border-radius: var(--radius-chip);
+  background: var(--neutral-border-strong);
+}
+
+.switch[aria-checked="true"]::before {
+  background: var(--service-ink);
+}
+
+.switch-knob {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: var(--neutral-bg);
+}
+
+.switch[aria-checked="true"] .switch-knob {
+  transform: translateX(24px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .switch-knob {
+    transition: transform 120ms cubic-bezier(0.2, 0, 0, 1);
+  }
+}
+
+/* 시트 */
+.sheet-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: color-mix(in srgb, var(--service-ink) 50%, transparent);
+}
+
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  max-width: var(--size-content-max-width);
+  padding: var(--space-6) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+  border-radius: var(--radius-sheet) var(--radius-sheet) 0 0;
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+}
+
+.sheet-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.sheet-actions .btn {
+  width: 100%;
+}
+
+/* 알림 */
+.toast {
+  position: fixed;
+  z-index: 80;
+  left: 50%;
+  top: calc(env(safe-area-inset-top) + var(--space-4));
+  max-width: calc(100% - var(--space-8));
+  padding: var(--space-3) var(--space-5);
+  transform: translateX(-50%);
+  border-radius: var(--radius-control);
+  background: var(--service-ink);
+  color: var(--neutral-bg);
+  text-align: center;
+  pointer-events: none;
+}
+
+/* 덮개(D-113 ①): 앱을 떠나는 순간 숲 색으로 덮는다. 모든 것 위에 있다. */
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: var(--forest-sky);
+}

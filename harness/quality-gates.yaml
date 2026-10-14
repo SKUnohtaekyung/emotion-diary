@@ -31,20 +31,23 @@ gates:
       - name: repository-full-check
         command: node scripts/verify.mjs --mode full
         status: ready
+      # 2026-10-14 app-scaffold(TASK-MOBILE T3, D-115 ⑥): 아래 넷은 verify full이 package.json의 같은 이름 script로 돈다.
       - name: lint
-        command: null
-        status: configure_after_bootstrap
+        command: npm run lint
+        # Biome — 경고도 실패(--error-on-warnings). 일부러 넣은 미사용 변수를 잡는 것을 확인했다(tasks/mobile/2026-10-14-t3/PLAN.md 4-6).
+        status: ready
       - name: typecheck
-        command: null
-        status: configure_after_bootstrap
+        command: npm run typecheck
+        status: ready
       - name: unit-and-integration
         command: npm test
-        # 지금은 검사기 자체 테스트뿐이다(check-taxonomy, scope-guard, check-characters, check-harness,
-        # git-guard). 앱의 unit/integration 테스트는 app-scaffold에서 같은 script에 이어 붙인다.
-        status: ready_harness_tests_only
+        # 검사기 자체 테스트(check-taxonomy, scope-guard, git-guard, check-characters, check-harness) 뒤에 vitest run —
+        # 서버 시험(로컬 D1, EVAL F-22·F-23 등)과 화면 시험(happy-dom).
+        status: ready
       - name: production-build
-        command: null
-        status: configure_after_bootstrap
+        command: npm run build
+        # 개발용·운영용 두 벌을 묶고 운영 묶음에 개발용 전용 코드 표식이 0건인지 검사한다(D-115 ②).
+        status: ready
 
   release:
     blocking: true
@@ -57,6 +60,8 @@ gates:
         # docs/EVAL_PLAN.md §4의 S-00~S-12 전부를 다시 본다 — S-00, S-01, S-02, S-03, S-04, S-05,
         # S-06, S-07, S-08, S-09, S-10, S-11, S-12. 연습용 화면(스파이크)의 결과는 옮겨 적지 않는다.
         # 스파이크에서 미검증으로 남은 것: S-03, S-06, S-07, S-10, S-11. Android Chrome도 여기서 본다(D-108).
+        # 2026-10-14 앱 뼈대(개발용 건물) 1회차: S-01·S-02 PASS, S-12 화면 쪽 PASS, S-07은 '자판이 아래 고정 버튼을 가린다'.
+        # 실기기 실험 T-01~T-07(EVAL §6)과 나머지 S는 사용자 결정으로 미뤘다 — 이 게이트에서 본다(안내서 tasks/mobile/2026-10-14-t3/PHONE-GUIDE.md).
         command: manual evidence required
         status: pending
       - name: security-and-privacy

@@ -13,6 +13,7 @@
 
 | 파일 | 상태 | 남은 일이 간 곳 |
 | --- | --- | --- |
+| [TASK-MOBILE-T2.md](TASK-MOBILE-T2.md) 정본을 Worker 하나·설치형 홈 화면 웹앱 구성으로 고쳐 쓰기 | done(2026-10-14, PR #36 병합 `7b99e2c`) — 독립 검토 2회, full PASS, 결정 D-112 | T3 → `tasks/mobile/2026-10-14-t3/PLAN.md`, `mobile-core-flow`의 Android → `docs/STATUS.md` §4. 2026-10-14 옮김(원문 3,635B, SHA-256 앞 12자리 `268d14d1fdf8`, 직전 커밋 `7b99e2c`, 상대 링크 3개의 경로 깊이만 고침). 요청·계획·검토 지적 처리는 `tasks/mobile/2026-10-14/` |
 | [TASK-SPIKE-02.md](TASK-SPIKE-02.md) 스파이크 잔여 판정 | done(2026-10-14, PR #35 병합 `535e714`) — B-02·B-03·B-04·B-05·B-08 pass, B-06 보류 2건 | 정본을 Worker 하나 구성으로 고쳐 쓰기 → TASK-MOBILE T2(`tasks/mobile/2026-10-14/`), B-06 보류 2건·실기기 미검증 5건 → `docs/STATUS.md` §3·§4. 2026-10-14 옮김(원문 9,538B, SHA-256 앞 12자리 `4ba3123ab947`, 직전 커밋 `42a6426`, 상대 링크 3개의 경로 깊이만 고침) |
 | [TASK-WEB-UI-02.md](TASK-WEB-UI-02.md) 사용자 QA와 디자인 수정 | done(2026-10-13, 사용자가 달력 포함 전체 화면 승인) — QA #1~#60, D-048~D-107 | 실기기·키보드·친구 인상 확인, 출시 전 차단 넷, 보류한 메인 글꼴 → `docs/STATUS.md` §4. 2026-10-13 옮김(원문 140,917B, SHA-256 앞 12자리 `cfb328619682`, 직전 커밋 `adad018`) |
 | [TASK-WEB-UI-01.md](TASK-WEB-UI-01.md) 브라우저 우선 UI 프로토타입 | 구현·PC 검수 완료(2026-09-20), PR #30 CI 두 OS success이나 2026-09-21 기준 병합 전 | 사용자 확인(T7)과 미검증 5항목 → `CURRENT_TASK`의 TASK-WEB-UI-02 "사용자 QA 점검표". 2026-09-21 TASK-WEB-UI-02 착수 때 옮김(원문 10,608B, SHA-256 앞 12자리 `75976470981a`, 직전 커밋 `55f3f91`, 상대 링크 1개의 경로 깊이만 고침) |

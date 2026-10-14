@@ -77,7 +77,8 @@ DB 불변조건:
 - `owner_key`가 PK인 owner당 1행: `enabled`, `local_time`, `timezone`, `channel`, `permission_state`, `day_start_hour`, `updated_at`. 갱신은 upsert(`INSERT ... ON CONFLICT(owner_key) DO UPDATE`)로 재시도에 안전해야 한다.
 - `day_start_hour`는 정수 0~6, 기본 4다. 이름은 reminder 전용처럼 보이지만 실제로는 owner의 하루 경계를 정하는 공용 설정이며, `entry_date` 계산(§2)·streak·대시보드 기간에도 같은 값을 쓴다. 값은 내보내기(§8)에 포함한다.
 - MVP `channel`은 `in_app`; 플랫폼 검증 후에만 `web_push`를 허용한다.
-- **owner 설정에 더해지는 두 가지**(D-112, 2026-10-14 — 논리 계약만 적는다. 표 이름·컬럼·migration은 Phase 1 `data-foundation`에서 정한다): ① **부를 이름** — owner당 하나, 12자 이하, 앞뒤 빈칸을 뺀 뒤 비어 있지 않아야 한다. 없으면 '처음 들어온 사람'으로 보고 이름을 묻는다(UX_SPEC §16). 내보내기에 넣을지는 정하지 않았다(넣으려면 `schemas/export.schema.json`을 같은 변경에서 고친다). ② **앱 잠금**(D-106) — 켜짐 여부, 서버 비밀값을 섞은 비밀번호 해시(HMAC — 평문·되돌릴 수 있는 형태로 저장하지 않는다. 네 자리라 느린 해시는 쓰지 않는다, ARCHITECTURE §6), 연속으로 틀린 횟수와 다시 받을 수 있는 시각(다섯 번 → 30초, 서버가 센다). 비밀번호 해시는 비밀값으로 다루어 내보내기·로그·API 응답에 넣지 않는다. 지금 잠겼는지는 여기가 아니라 세션마다 둔다(§3.10). 접근 열쇠로 로그인한 지 10분 안인 세션은 지금 비밀번호 없이 이 항목을 새로 정하거나 끌 수 있다('잊었어요' 길, D-112 ⑧ — 기록은 그대로). **모든 기록 지우기는 이 두 가지와 위의 owner 설정 행까지 지운다**(D-112 ⑩, §8).
+- **owner 설정에 더해지는 두 가지**(D-112, 2026-10-14. 표는 아래 'owner_settings' 줄 — app-scaffold가 만들었다): ① **부를 이름** — owner당 하나, 12자 이하, 앞뒤 빈칸을 뺀 뒤 비어 있지 않아야 한다. 없으면 '처음 들어온 사람'으로 보고 이름을 묻는다(UX_SPEC §16). 내보내기에 넣을지는 정하지 않았다(넣으려면 `schemas/export.schema.json`을 같은 변경에서 고친다). ② **앱 잠금**(D-106) — 켜짐 여부, 서버 비밀값을 섞은 비밀번호 해시(HMAC — 평문·되돌릴 수 있는 형태로 저장하지 않는다. 네 자리라 느린 해시는 쓰지 않는다, ARCHITECTURE §6), 연속으로 틀린 횟수와 다시 받을 수 있는 시각(다섯 번 → 30초, 서버가 센다). 비밀번호 해시는 비밀값으로 다루어 내보내기·로그·API 응답에 넣지 않는다. 지금 잠겼는지는 여기가 아니라 세션마다 둔다(§3.10). 접근 열쇠로 로그인한 지 10분 안인 세션은 지금 비밀번호 없이 이 항목을 새로 정하거나 끌 수 있다('잊었어요' 길, D-112 ⑧ — 기록은 그대로). **모든 기록 지우기는 이 두 가지와 위의 owner 설정 행까지 지운다**(D-112 ⑩, §8).
+- **`owner_settings`**(app-scaffold, 2026-10-14 — `app/migrations/0003_owner_settings.sql`, T3 A-10): `owner_key` PK(1~64자), `display_name`(NULL = 아직 없음, 1~12자 CHECK — 서버는 앞뒤 빈칸을 빼고 제어 문자를 거부한 뒤 코드 포인트로 센다), `app_lock_hash`(NULL = 잠금 꺼짐, 있으면 HMAC-SHA256 16진수 64자 CHECK — **켜짐 여부는 해시가 있는지로만 가른다**, 따로 둔 켜짐 칸과 어긋날 수 없게), `app_lock_fail_count`(0~5 CHECK), `app_lock_retry_at`(다시 받는 시각, UTC), `created_at`, `updated_at`. 위 `reminder_settings`와 따로 둔 것은 `reminder_settings`가 `data-foundation`의 표이기 때문이다 — 전체 삭제는 두 표를 함께 지운다. 틀린 횟수는 대조하기 전에 시도 한 번을 먼저 예약한다(조건부 `UPDATE … RETURNING` — 한꺼번에 보낸 요청으로 다섯 번을 넘겨 맞혀 볼 수 없다, ARCHITECTURE §11.7).
 - 인앱 reminder 문구는 `enabled`가 true이고 현재 시각이 `local_time`을 지났으며, 오늘 `entry_date`에 completed diary도 진행 중인 draft(과거에 시작해 아직 끝나지 않은 것 포함)도 없을 때만 표시 대상이다. 진행 중인 draft가 있으면 reminder 대신 이어서 쓰기 표시를 UI가 보여준다(D-077, D-081).
 
 ### 3.5 `analysis_runs`
@@ -133,10 +134,11 @@ read-time guard(결함 I-16): 저장된 `status`만 믿지 않는다. 분석을 
 - 토큰 검증 실패 시 창(60초) 안이면 `fail_count+1`, 아니면 1로 초기화. 임계(10회) 도달 시 `locked_until`을 5분 뒤로 설정. 성공 시 0으로 초기화.
 - `locked_until`이 미래이면 토큰이 맞아도 429와 `Retry-After`를 반환한다. 원문·토큰 값은 저장하지 않는다.
 - 2026-09-02 원격 스파이크: 실패 10회 뒤 429, 잠금 중 올바른 토큰 429(`Retry-After: 300`), 카운터 초기화 후 200 확인. 배포 직후 첫 요청 1건이 이전 버전에서 처리된 것으로 보이는 off-by-one 관찰(전파 지연).
+- 앱 뼈대(2026-10-14, `app/migrations/0001_auth_failures.sql`): 위 계약 그대로이고, 대조하기 **전에** 시도 한 번을 예약한다 — 창 안에서 이미 10번이면 대조하지 않고 429. 한꺼번에 보낸 요청으로 창의 한도를 넘겨 맞혀 보지 못한다(ARCHITECTURE §11.7, 서버 시험 `app/test/worker/session.test.ts`).
 
 ### 3.10 세션 기록 (D-112, ARCHITECTURE §6)
 
-2026-10-14 TASK-MOBILE T2에서 더한 논리 계약이다. 스파이크의 세션은 서버 기록 없이 서명만으로 검증했고 이 표는 스파이크로 확인하지 않았다. 표 이름·컬럼·migration은 Phase 1 `data-foundation`에서 정한다.
+2026-10-14 TASK-MOBILE T2에서 더한 논리 계약이다. 스파이크의 세션은 서버 기록 없이 서명만으로 검증했고 이 표는 스파이크로 확인하지 않았다. **표는 `sessions`**(app-scaffold, 2026-10-14 — `app/migrations/0002_sessions.sql`, T3 A-10): `id`(세션 번호 — 16바이트 무작위 base64url, PK), `subject`(주체 = owner_key), `key_login_at`(열쇠로 로그인한 시각), `issued_at`(마지막 발급), `last_active_at`(마지막 활동), `locked`(0/1 CHECK), 색인 `subject`·`issued_at`. 계약은 서버 시험(로컬 D1)으로 확인했다(EVAL_PLAN F-22·F-23 — `app/test/worker/`). 개발용 건물의 원격 확인은 TASK-MOBILE T3 5단계다.
 
 - 로그인(접근 열쇠 대조 성공)마다 한 행: 세션 번호(무작위 — cookie에 서명과 함께 실린다), 주체, 열쇠로 로그인한 시각, 마지막 발급 시각, 마지막 활동 시각, 잠김 여부.
 - 요청마다 서명이 맞아도 이 행이 없으면 401이다. 로그아웃은 이 행을 지운다(지운 cookie의 사본으로 다시 들어올 수 없다). 모든 기기의 로그인을 끊을 때는 행을 전부 지운다.
@@ -145,6 +147,12 @@ read-time guard(결함 I-16): 저장된 `status`만 믿지 않는다. 분석을 
 - 잠김 여부는 세션마다다(D-112 ③). 앱 잠금이 켜져 있고 마지막 활동(화면이 보이는 동안 1분마다 보내는 신호 포함, ARCHITECTURE §6) 뒤 5분이 넘었으면 잠긴 것으로 본다. 화면의 잠금 요청은 이 값을 '잠김'으로만 바꾼다. 풀기는 비밀번호 대조로만 한다.
 - 행에는 접근 열쇠·비밀번호·일기 내용을 두지 않는다. 마지막 활동 시각은 잠금 판정에만 쓰고 사용 기록으로 분석하지 않는다.
 - 매 요청이 이 행을 읽는다(D1 읽기 — 하루 500만 행 한도 안이다). 마지막 활동 시각은 1분 단위로 묶어 쓴다(같은 분 안의 요청은 다시 쓰지 않는다 — 판정 오차 1분. 화면을 켜 둔 한 시간에 약 60행 쓰기로 하루 10만 행 한도 안이다).
+
+### 3.11 `client_errors` (개발용 건물에서만 채워진다 — D-113 ②, D-115 ⑤)
+
+- 화면 오류 보고(ARCHITECTURE §11.5). `app/migrations/0004_client_errors.sql`. 칸은 `id`, `created_at`, `kind`(`error`·`unhandledrejection`·`api` CHECK), `name`(오류 이름 1~40자), `source`(파일 경로 — query·`#` 없음, 1~120자), `line`, `col`, `build`(빌드 번호), `route`(화면 이름 — query 없음). **메시지·stack·입력값을 담는 칸은 없다.** 받는 모양은 서버와 화면이 같은 검사(`app/shared/dev.ts`)로 확인하고 칸이 더 있으면 400이다.
+- 최근 200행만 남긴다(넣을 때마다 오래된 행을 지운다). 개인 데이터가 아니므로 내보내기·전체 삭제 대상이 아니다.
+- 운영에도 빈 표로 생긴다 — 두 환경의 스키마를 같게 두려고. 운영 묶음에는 이 표에 쓰는 경로가 코드째 없다(빌드 검사, ARCHITECTURE §11.2).
 
 ## 4. 감정 taxonomy
 
@@ -289,3 +297,4 @@ completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편
 - 새 non-null 컬럼은 expand → backfill → validate → contract 순서로 적용한다.
 - taxonomy와 analysis schema는 DB schema와 별도 version을 가진다.
 - 실제 사용자 데이터로 migration을 시험하지 않고 합성 fixture와 복사본을 사용한다.
+- 파일은 `app/migrations/NNNN_이름.sql`(번호 순서로 적용)이고 `wrangler d1 migrations apply`가 적용 기록(`d1_migrations` 표)을 남긴다. 원격 적용은 [DEPLOY.md](DEPLOY.md) §3·§4, 서버 시험은 같은 파일을 로컬 D1에 적용해 돈다(`app/test/worker/harness.ts`). 2026-10-14 app-scaffold: `0001_auth_failures`·`0002_sessions`·`0003_owner_settings`·`0004_client_errors`. diary 표는 `data-foundation`이 `0005`부터 더한다.

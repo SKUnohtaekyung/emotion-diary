@@ -20,7 +20,7 @@ const required = [
   // AGENTS §1·CLAUDE.md가 세션 시작 때 읽게 하는 서비스 WHY(2026-09-24). 없으면 그 규칙이 조용히 깨진다.
   "docs/SERVICE_WHY.md",
   "docs/ARCHITECTURE.md", "docs/DATA_MODEL.md", "docs/UX_SPEC.md",
-  "docs/AI_RAG_SPEC.md", "docs/SAFETY_POLICY.md", "docs/EVAL_PLAN.md",
+  "docs/AI_RAG_SPEC.md", "docs/SAFETY_POLICY.md", "docs/EVAL_PLAN.md", "docs/DEPLOY.md",
   "docs/AGENT_WORKFLOW.md", "docs/DECISIONS.md", "docs/ROADMAP.md",
   "docs/RISK_REGISTER.md", "docs/TRACEABILITY.md", "docs/STATUS.md", "docs/DESIGN_SYSTEM.md", "design/tokens.json", "design/characters/prompts.json", "design/characters/README.md", "scripts/check-contrast.mjs", "scripts/check-characters.mjs", "scripts/test-check-characters.mjs", "scripts/build-character-animations.mjs", "tasks/CURRENT_TASK.md", "tasks/TASK_TEMPLATE.md",
   "references/README.md", "references/manifest.json", "harness/README.md", "harness/work-graph.yaml", "harness/quality-gates.yaml",
@@ -37,8 +37,10 @@ for (const relative of required) {
   if (!fs.existsSync(path.join(root, relative))) failures.push(`필수 파일 누락: ${relative}`);
 }
 
-const ignored = new Set([".git", "node_modules", "dist", "coverage", ".next", "outputs", "work"]);
-const textExtensions = new Set([".md", ".json", ".mjs", ".js", ".jsx", ".ts", ".tsx", ".css", ".sql", ".yml", ".yaml", ".ps1"]);
+const ignored = new Set([".git", "node_modules", "dist", "coverage", ".next", "outputs", "work", ".wrangler",
+  // Git 제외 파일 — 계정 값(D1 id)이 들어 있는 것이 정상이다(app/scripts/cf.mjs가 만든다, D-115 ①)
+  "wrangler.local.jsonc"]);
+const textExtensions = new Set([".md", ".json", ".jsonc", ".mjs", ".js", ".jsx", ".ts", ".tsx", ".css", ".sql", ".yml", ".yaml", ".ps1", ".html", ".webmanifest", ".toml"]);
 const files = [];
 function walk(directory) {
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
@@ -55,11 +57,19 @@ const secretPatterns = [
   /sk-[A-Za-z0-9_-]{20,}/,
   /(OPENAI_API_KEY|ANTHROPIC_API_KEY)\s*=\s*[^\s<]{8,}/
 ];
+// 공개 저장소에 Cloudflare 계정 단서를 두지 않는다(D-115 ①, 2026-10-14 검토 지적): 계정 하위 도메인이 든 workers.dev 주소
+// (`<Worker>.<하위 도메인>.workers.dev`, 하위 도메인만 있는 `<하위 도메인>.workers.dev`도)와 wrangler 설정의 계정·D1 id 키.
+// 값이 아니라 모양을 본다. 문서에서 주소를 가리킬 때는 `workers.dev`만 쓰거나 `<…>` 자리표시를 쓴다.
+// 한계: UUID 모양 D1 id와 32자 16진수 계정 id는 정상 파일(생성 타입의 해시, 문서 링크)에도 있어 wrangler 설정 밖에서는 보지 않는다.
+const accountUrlPattern = /\b[a-z0-9-]+\.workers\.dev\b/i;
+const accountKeyPattern = /["']?(database_id|account_id)["']?\s*[:=]/;
 for (const absolute of files) {
   const relative = path.relative(root, absolute);
   const content = fs.readFileSync(absolute, "utf8");
   if (/^(<<<<<<<|=======|>>>>>>>)/m.test(content)) failures.push(`병합 충돌 표식: ${relative}`);
   if (secretPatterns.some((pattern) => pattern.test(content))) failures.push(`명백한 비밀값 후보: ${relative}`);
+  if (accountUrlPattern.test(content)) failures.push(`계정 하위 도메인이 든 workers.dev 주소: ${relative}`);
+  if (/^wrangler\b/.test(path.basename(absolute)) && accountKeyPattern.test(content)) failures.push(`wrangler 설정에 계정·D1 id 키: ${relative}`);
   if (path.extname(absolute) !== ".md") continue;
   for (const match of content.matchAll(linkPattern)) {
     let target = match[1].trim().replace(/^<|>$/g, "");

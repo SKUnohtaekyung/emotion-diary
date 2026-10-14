@@ -1,0 +1,192 @@
+/* 숲 장면: 잠금 층·지금 비밀번호·비밀번호 정하기. 숲 색 단색 바탕에 흰 글자(T3 A-11, 장면 그림 없음). */
+/* 화면 안의 장면(비밀번호 정하기)은 #app을 채운다 — 위의 새 버전 띠가 가려지지 않는다. */
+.scene {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  background: var(--forest-sky);
+  color: var(--neutral-bg);
+}
+
+/* 화면 위에 덮는 층(주소가 아니다). 시트(60)보다는 아래 — '잊었어요' 시트가 이 위에 열린다. */
+.scene-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow-y: auto;
+}
+
+.scene :focus-visible {
+  outline-color: var(--neutral-bg);
+}
+
+.scene-inner {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: var(--size-content-max-width);
+  margin: 0 auto;
+  padding: calc(var(--space-4) + env(safe-area-inset-top)) var(--space-4) calc(var(--space-6) + env(safe-area-inset-bottom));
+}
+
+.scene-top {
+  align-self: stretch;
+  min-height: var(--size-touch-target-min);
+}
+
+.scene-back {
+  min-height: var(--size-touch-target-min);
+  padding: 0 var(--space-3) 0 0;
+  border: 0;
+  background: none;
+  color: var(--neutral-bg);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.scene-head {
+  margin-top: var(--space-6);
+  text-align: center;
+}
+
+.scene-title {
+  margin: 0;
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+}
+
+.scene-note {
+  min-height: var(--text-body-line);
+  margin-top: var(--space-2);
+  color: color-mix(in srgb, var(--neutral-bg) 80%, var(--forest-sky));
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.scene-foot {
+  margin-top: var(--space-2);
+}
+
+.scene-link {
+  min-height: var(--size-touch-target-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  background: none;
+  color: var(--neutral-bg);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* 숫자판은 엄지가 닿는 아래쪽에 둔다 */
+.pin-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: auto;
+  padding-top: var(--space-8);
+}
+
+.pin-dots {
+  display: flex;
+  gap: var(--space-4);
+}
+
+.pin-dots i {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--neutral-bg);
+  border-radius: 50%;
+}
+
+.pin-dots i.on {
+  border-color: var(--service-mint);
+  background: var(--service-mint);
+}
+
+.pin-status {
+  min-height: var(--text-body-line);
+  text-align: center;
+}
+
+.pin-keys {
+  display: grid;
+  grid-template-columns: repeat(3, 64px);
+  gap: var(--space-3) var(--space-6);
+  justify-content: center;
+}
+
+.pin-key {
+  width: 64px;
+  height: 64px;
+  padding: 0;
+  border: 1px solid color-mix(in srgb, var(--neutral-bg) 40%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--neutral-bg) 10%, transparent);
+  color: var(--neutral-bg);
+  font-size: 24px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pin-erase {
+  font-size: var(--text-label-size);
+}
+
+.pin-key:disabled {
+  color: color-mix(in srgb, var(--neutral-bg) 50%, var(--forest-sky));
+  cursor: default;
+}
+
+/* 낮은 화면에서는 숫자판을 줄여 제목이 밀려나지 않게 한다 */
+@media (max-height: 640px) {
+  .pin-pad {
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+  }
+
+  .pin-keys {
+    grid-template-columns: repeat(3, 56px);
+    gap: var(--space-2) var(--space-5);
+  }
+
+  .pin-key {
+    width: 56px;
+    height: 56px;
+    font-size: 22px;
+  }
+}
+
+/* 틀렸을 때 점이 한 번 흔들린다. 움직임 줄이기에서는 흔들지 않는다. */
+@media (prefers-reduced-motion: no-preference) {
+  .pin-dots.shake {
+    animation: pin-shake 360ms cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+  }
+}
+
+@keyframes pin-shake {
+  10%,
+  90% {
+    transform: translateX(-2px);
+  }
+
+  20%,
+  80% {
+    transform: translateX(4px);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translateX(-6px);
+  }
+
+  40%,
+  60% {
+    transform: translateX(6px);
+  }
+}

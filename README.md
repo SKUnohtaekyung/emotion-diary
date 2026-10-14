@@ -115,7 +115,7 @@ flowchart LR
 | --- | --- |
 | Phase 0 부트스트랩 — 정본 명세·검증 하네스·기술 스파이크 | 끝남(2026-10-14, 스파이크 잔여 판정까지 — `docs/STATUS.md` §3) |
 | **브라우저 화면 시안(`web/`)** — 사용자 QA로 무드·흐름 재구성(결정 D-050~D-107) | 사용자 QA 마감(2026-10-13) · 저장·인증·AI 없음 |
-| Phase 1 기반·데이터 무결성 → Phase 2 직접 작성 → Phase 4 돌아보기·알림 | Phase 1 착수 가능 — 구성은 Worker 하나 + 설치형 홈 화면 웹앱(D-111) |
+| Phase 1 기반·데이터 무결성 → Phase 2 직접 작성 → Phase 4 돌아보기·알림 | Phase 1 진행 중 — 앱 뼈대(`app/`, Worker 하나 + 설치형 홈 화면 웹앱 D-111, 화면은 도구 없이 D-114) 끝남(2026-10-14), 다음 `data-foundation` |
 | 제한 MVP 릴리스 | 대기 — 위기 연락처 임상·안전 검토, 건강 민감정보 별도 동의가 출시 조건 |
 | Phase 3·5 AI 대화 작성·근거 있는 돌아보기 | 후행 |
 
@@ -173,6 +173,7 @@ npm run verify:full
 | 서비스를 만드는 이유(모든 판단의 기준) | [docs/SERVICE_WHY.md](docs/SERVICE_WHY.md) |
 | 제품 범위·완료 조건 | [PRD.md](PRD.md) |
 | 시스템 경계·배포·신뢰 경계 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| 만들기·올리기·비밀값·되돌리기 절차 | [docs/DEPLOY.md](docs/DEPLOY.md) |
 | 저장 구조·무결성·삭제·내보내기 | [docs/DATA_MODEL.md](docs/DATA_MODEL.md) |
 | 화면·직접 작성·AI 작성 흐름 | [docs/UX_SPEC.md](docs/UX_SPEC.md) |
 | 색·글자·구성요소·접근성 | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md), [design/tokens.json](design/tokens.json), [design/style-guide.html](design/style-guide.html) |

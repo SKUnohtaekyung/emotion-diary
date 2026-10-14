@@ -1,0 +1,199 @@
+/* 바탕·글자·배치. 값은 모두 tokens.ts가 시작할 때 심는 CSS 변수(--neutral-*, --space-*, --text-* …)에서 온다.
+   기능 확인용 최소 모양이다(T3 A-11) — 흰 바탕, 장면 그림 없음. CSP 때문에 style 속성은 쓰지 않고 모양은 이 파일의 클래스로만 준다. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+  font-family: var(--font-sans);
+  font-size: var(--text-body-size);
+  line-height: var(--text-body-line);
+  font-weight: var(--text-body-weight);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  /* 위에 새 버전 띠가 붙어도 화면이 한 장 높이를 넘지 않게: 띠는 제 높이만, 나머지를 #app이 채운다 */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+@supports (min-height: 100dvh) {
+  body {
+    min-height: 100dvh;
+  }
+}
+
+#app {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: var(--text-title-size);
+  line-height: var(--text-title-line);
+  font-weight: var(--text-title-weight);
+}
+
+h2 {
+  font-size: var(--text-heading-size);
+  line-height: var(--text-heading-line);
+  font-weight: var(--text-heading-weight);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* 화면이 바뀔 때 h1에 초점을 주므로(스크린리더가 새 화면을 알도록) h1 자신의 테두리는 그리지 않는다 */
+[tabindex="-1"]:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--neutral-focus);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* 화면 밖으로 뺀다. display:none·hidden은 쓰지 않는다 — 암호 보관함이 username 칸을 알아봐야 한다(T3 A-14) */
+.offscreen {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+#app.is-covered {
+  visibility: hidden;
+}
+
+.boot-note {
+  padding: var(--space-6) var(--space-4);
+  color: var(--neutral-text-muted);
+}
+
+/* 화면 한 장. 내용 최대 폭은 토큰, 아래쪽 버튼은 안전 영역 위에 놓인다. */
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+  max-width: var(--size-content-max-width);
+  flex: 1;
+  margin: 0 auto;
+  padding: calc(var(--space-6) + env(safe-area-inset-top)) max(var(--space-4), env(safe-area-inset-right))
+    calc(var(--space-6) + env(safe-area-inset-bottom)) max(var(--space-4), env(safe-area-inset-left));
+}
+
+.screen-top {
+  display: flex;
+  align-items: center;
+  min-height: var(--size-touch-target-min);
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.screen-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: auto;
+}
+
+.lede {
+  font-size: var(--text-body-size);
+}
+
+.note,
+.help {
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.button-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* 오늘 화면: 아래 고정 버튼 줄에 내용이 가려지지 않게 그만큼 비운다 */
+.today {
+  padding-bottom: calc(
+    var(--size-touch-target-min) + var(--space-3) * 2 + var(--space-6) + env(safe-area-inset-bottom)
+  );
+}
+
+.bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  padding: var(--space-3) max(var(--space-4), env(safe-area-inset-right)) calc(var(--space-3) + env(safe-area-inset-bottom))
+    max(var(--space-4), env(safe-area-inset-left));
+  background: var(--neutral-bg);
+  border-top: 1px solid var(--neutral-border);
+}
+
+.bottom-bar-inner {
+  max-width: var(--size-content-max-width);
+  margin: 0 auto;
+}
+
+/* 새 버전 띠: 맨 위에 붙는다 */
+#banner {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.banner-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) max(var(--space-4), env(safe-area-inset-right)) var(--space-2)
+    max(var(--space-4), env(safe-area-inset-left));
+  padding-top: calc(var(--space-2) + env(safe-area-inset-top));
+  background: var(--neutral-surface-soft);
+  border-bottom: 1px solid var(--neutral-border);
+}
+
+.banner-text {
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: 600;
+}

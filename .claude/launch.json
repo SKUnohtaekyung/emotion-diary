@@ -12,6 +12,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["scripts/web-preview.mjs", "4174"],
       "port": 4174
+    },
+    {
+      "name": "app-local",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["app/scripts/dev.mjs"],
+      "port": 8787
     }
   ]
 }

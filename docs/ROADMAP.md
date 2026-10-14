@@ -32,6 +32,8 @@ Exit: 개인정보·권한·저장 경계가 설명되고, 구현 stack과 테�
 
 Exit: 다른 owner 접근, 중복 날짜, stale overwrite, 부분 삭제가 자동 테스트에서 차단됨.
 
+진행(2026-10-14): 앞의 셋(앱 scaffold·session/access guard·migration 방식)은 work-graph `app-scaffold`(TASK-MOBILE T3)로 끝났다 — 구성은 [ARCHITECTURE.md](ARCHITECTURE.md) §11, 절차는 [DEPLOY.md](DEPLOY.md). CI는 커밋 때 처음 돈다. 나머지(draft CRUD부터)는 `data-foundation`이다.
+
 ## Phase 2 — 직접 작성 모바일 MVP
 
 - 원형 6영역 직접 작성

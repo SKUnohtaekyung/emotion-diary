@@ -20,15 +20,15 @@
     "npm_version": "10.9.2",
     "git_version": "2.49.0.windows.1",
     "package_manager": "npm",
-    "dev_dependencies": "sharp ^0.35.4 — scripts/check-characters.mjs (runs inside verify quick), scripts/build-character-animations.mjs, scripts/extract-ui-static-poses.mjs. Without node_modules, quick fails; run npm ci first",
-    "lockfile_policy": "package-lock.json was written by a newer npm (libc fields on the Linux sharp binaries). npm 10.9.x — this PC and the npm bundled with Node 22 on CI — drops those 48 lines on both npm install and npm ci (verified 2026-09-20). Install works either way; do not commit that diff (git checkout -- package-lock.json). User decision 2026-09-20",
+    "dev_dependencies": "sharp ^0.35.4 — scripts/check-characters.mjs (runs inside verify quick), scripts/build-character-animations.mjs, scripts/extract-ui-static-poses.mjs, app/scripts/make-icons.mjs. App scaffold (2026-10-14, exact versions published at least 7 days earlier except the happy-dom security release — D-115 ⑥): wrangler 4.148.0, vite 8.3.3, vitest 5.0.3, typescript 6.0.3, @biomejs/biome 2.5.15, happy-dom 20.14.6, @types/node 22.20.5. Without node_modules, quick fails; run npm ci first",
+    "lockfile_policy": "package-lock.json is written with npm 11 (npx -y npm@11 install …) so every platform's prebuilt binary entry stays in it (sharp, workerd, esbuild, rolldown, lightningcss, biome — linux-x64 and win32-x64 entries checked 2026-10-14). npm 10.9.x — this PC and the npm bundled with Node 22 on CI — dropped the libc lines (48 lines then) on both npm install and npm ci (verified 2026-09-20). On 2026-10-14 two clean `npm ci` runs with npm 10.9.2 left all 30 libc fields in place and produced the same tree (81 packages, identical inventory hash — app-scaffold reproducible-install evidence); npm install was not re-tested. If the lines do disappear, install still works; do not commit that diff (git checkout -- package-lock.json). User decision 2026-09-20. npm 11.21 does not run install scripts it has not approved (esbuild, workerd postinstall); both work without them (wrangler dry-run and local D1 verified 2026-10-14)",
     "ci": "GitHub Actions .github/workflows/harness.yml: npm ci → verify quick → verify full on ubuntu-latest and windows-latest, Node 22. First green run 2026-09-20 (PR #28); all 15 earlier runs failed",
-    "framework": null,
-    "language": "JavaScript/TypeScript candidate; not selected"
+    "framework": "none for the screens — TypeScript + DOM bundled by Vite 8.3.3 (user decision D-114, 2026-10-14); worker built by wrangler 4.148.0; layout and tools in D-115",
+    "language": "TypeScript 6.0.3 (app/), JavaScript ESM (scripts/ and app/scripts/)"
   },
   "hosting": {
     "target": "one Cloudflare Worker serving Static Assets (the app shell) and /api/* on the same origin + D1; installable home-screen web app, no service worker or offline (D-032 as corrected by D-111, user decision 2026-10-14). Fallback limited to free options (D-021). Canonical docs were rewritten to this layout on 2026-10-14 (TASK-MOBILE T2); login lifetime is 30 days from last use and the app lock is verified by the server (D-112). The split layout (static UI on Cloudflare Pages) was never measured and is not adopted — that it fails on iPhone is a judgement from the specs",
-    "account_or_project_exists": "yes — spike Worker emotion-diary-spike (workers.dev) and D1 emotion-diary-spike (APAC), free plan, synthetic data only; redeployed 2026-10-13~14 as a single Worker + Static Assets (same origin for the page and /api/*). Cleaned 2026-10-14: long access token restored, synthetic rows 0; the Worker and D1 remain in the account",
+    "account_or_project_exists": "yes — app dev building (TASK-MOBILE T3, created 2026-10-14 after user confirmation U-2): Worker emotion-diary-dev (workers.dev, address kept only in the Git-excluded work/deploy/dev.url) and D1 emotion-diary-dev (APAC), synthetic data only, 4 secrets uploaded with --secrets-file, migrations 0001-0004 applied, remote check 34/34; after the T3 checks the dev key was rotated to 43 chars and owner_settings/sessions/client_errors were emptied. Production (emotion-diary-prod) is named in wrangler.jsonc but NOT created. The spike Worker and D1 emotion-diary-spike were DELETED on 2026-10-14 (user decision, T3 PLAN 6-5; wrangler confirmed 'This Worker does not exist' and d1 list shows only emotion-diary-dev). History of the spike resources: free plan, synthetic data only; redeployed 2026-10-13~14 as a single Worker + Static Assets (same origin for the page and /api/*). Cleaned 2026-10-14: long access token restored, synthetic rows 0; the Worker and D1 remain in the account",
     "access_token_cookie_confirmed": "yes — local, remote, desktop Chrome (2026-09-02) and iPhone iOS 26.5.2 Safari proper + home-screen app (2026-10-14): 401 without/wrong token, HMAC cookie HttpOnly/Secure/SameSite=Lax, session survives a full app close. Safari's login is NOT carried into the home-screen app (separate storage)",
     "rate_limit_confirmed": "partial — Workers Rate Limiting binding deployed on free plan but never blocked (30 same-key calls across HKG/NRT; permissive per docs) → rejected; D1 global lockout adopted and verified remotely (10 fails → 429, correct token 429 while locked, Retry-After 300)",
     "cloudflare_access_free_applicable": "by docs only (2026-10-13~14, NOT activated): Access can protect a workers.dev URL (developers.cloudflare.com), the product page lists a $0 plan with a 50 user limit, creating the Zero Trust organization requires entering payment details even on the free plan. Not used in the first version (user decision 2026-10-14, D-108)",
@@ -62,11 +62,11 @@
   },
   "commands": {
     "install": "npm ci",
-    "dev": null,
-    "lint": null,
-    "typecheck": null,
-    "test": "npm test (harness script self-tests only: check-taxonomy, scope-guard, check-characters, check-harness, git-guard; no app tests exist yet)",
-    "build": null,
+    "dev": "npm run dev (app/scripts/dev.mjs: builds the dev bundle, applies migrations to the local D1, runs wrangler dev; needs .dev.vars from app/scripts/make-secrets.mjs local all)",
+    "lint": "npm run lint (Biome 2.5.15, warnings fail via --error-on-warnings)",
+    "typecheck": "npm run typecheck (wrangler types --check, then tsc for worker, client and tests)",
+    "test": "npm test (harness script self-tests: check-taxonomy, scope-guard, git-guard, check-characters, check-harness; then vitest run: worker tests against a local D1 via wrangler getPlatformProxy, client tests in happy-dom)",
+    "build": "npm run build (app/scripts/build.mjs: Vite client + wrangler deploy --dry-run worker for dev and prod, then bundle checks)",
     "e2e": null,
     "verify_quick": "npm run verify:quick",
     "verify_full": "npm run verify:full"

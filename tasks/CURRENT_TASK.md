@@ -8,43 +8,82 @@
 | [TASK-WEB-UI-02](archive/TASK-WEB-UI-02.md) 사용자 QA와 디자인 수정 | **완료(2026-10-13)** — 사용자가 시안을 처음부터 써 보고 달력 포함 전체 화면을 승인했다. QA #1~#60, D-048~D-107. 마지막 묶음(#60: 요청 14건·UX 라이팅 원칙·앱 잠금 비밀번호·용어표)은 main `25e0226`·`adad018`. 남은 일은 `docs/STATUS.md` §4 | [archive/](archive/README.md), 2026-10-13 요청·계획은 [qa/2026-10-13/](qa/2026-10-13/PLAN.md) |
 | [TASK-SPIKE-02](archive/TASK-SPIKE-02.md) 스파이크 잔여 판정(Phase 1 선행) | **완료(2026-10-14)** — B-02·B-03·B-04·B-05·B-08 pass, B-06 보류 2건, B-07 범위 밖. main `535e714`(PR #35). 남은 일은 `docs/STATUS.md` §3·§4 | [archive/](archive/README.md), 요청·계획·근거는 [spike/2026-10-13/](spike/2026-10-13/PLAN.md) |
 | TASK-HOOK-AUTO auto 모드에서 가드 훅 확인창 없애기 | 구현·검증 완료(2026-09-21, D-060 accepted) — 다른 세션에서의 사용자 확인 대기 | 이 파일 아래 |
-| [TASK-MOBILE](TASK-MOBILE.md) 설치형 홈 화면 웹앱 | **T2 정본 동기화 끝(2026-10-14), 커밋은 사용자 지시 대기** — 제안 승인 D-111, 함께 정한 것 D-112, T1은 TASK-SPIKE-02에서 일부 실행. T3(뼈대의 모바일 명세)는 이번 범위 밖, 이슈 #1~#9 | 이 파일 아래(소유 파일), 요청·계획은 [mobile/2026-10-14/](mobile/2026-10-14/PLAN.md), 배경은 별도 파일 |
+| [TASK-MOBILE](TASK-MOBILE.md) 설치형 홈 화면 웹앱 | **T2 끝(2026-10-14, PR #36 병합 `7b99e2c`) / T3 끝(2026-10-14, 브랜치 `app/scaffold`, 커밋 전 — 사용자 지시 대기)** — 결정 D-111~D-115, T1은 TASK-SPIKE-02에서 일부 실행, 이슈 #1~#9 | 이 파일 아래(T3 소유 파일), T3 요청·계획은 [mobile/2026-10-14-t3/](mobile/2026-10-14-t3/PLAN.md), T2 기록은 [archive/TASK-MOBILE-T2.md](archive/TASK-MOBILE-T2.md)와 [mobile/2026-10-14/](mobile/2026-10-14/PLAN.md), 배경은 별도 파일 |
+| TASK-REVIEW-01 종합 점검(현황·남은 작업·작업 방식·기술 스택) | **끝(2026-10-15, 커밋 전 — 커밋은 사용자 지시 때)**. 보고서 [review/2026-10-14/REPORT.md](review/2026-10-14/REPORT.md), 사용자 답 Max·순서 바꿈·관문 둘로·문서 가볍게(REQUESTS '마감 질문') — 결정 기록·공정표 반영은 다음 작업 | 이 파일 아래, 요청·계획은 [review/2026-10-14/](review/2026-10-14/PLAN.md) |
 | [TASK-DS-REF](TASK-DS-REF.md) 기본 부품 명세를 빠짐없이(D-039·D-097~D-100) | 완료(2026-09-26) — PR #31 병합(`838a0ef`), 이슈 #10~#14 닫음. 남은 일은 `docs/STATUS.md` §4-2로 옮겼다 | 별도 파일(여러 문서가 경로로 인용해 옮기지 않았다). 이 파일의 절(소유 파일 선언)은 뺐다 |
 | [TASK-TAXONOMY](TASK-TAXONOMY.md) · [V1](TASK-TAXONOMY-V1.md) · [PLAN-V2](TASK-TAXONOMY-PLAN-V2.md) | 완료(2026-09-05, D-038·D-040 accepted) | 별도 파일(다른 문서가 경로로 인용해 옮기지 않았다) |
 | TASK-INFRA-01 · ISSUE-26 · ISSUE-27 · CBM · DESIGN · BOOTSTRAP | 완료·보류 기록 | [archive/](archive/README.md) |
 
-# TASK-MOBILE — T2 정본 동기화 (Phase 1 착공 전 마지막 문서 작업)
+# TASK-MOBILE — T3 Phase 1 뼈대의 모바일 명세와 착수
 
 ## 상태
 
-`in_progress`(T2 끝, 커밋 대기 — T3는 이 작업 밖) — 2026-10-14 사용자 지시. 요청 원문과 답은 [mobile/2026-10-14/REQUESTS.md](mobile/2026-10-14/REQUESTS.md), 변경 지도·사실표·체크리스트·근거는 [mobile/2026-10-14/PLAN.md](mobile/2026-10-14/PLAN.md)에 둔다 — **PLAN이 이 작업의 유일한 진행 기록이다.** 배경(조사·누락 목록 G-01~G-19·작업 분할)은 [TASK-MOBILE.md](TASK-MOBILE.md). 이 절에는 요약만 적는다.
+`done`(커밋 전 — 커밋·PR은 사용자 지시 때) — 2026-10-14 사용자 지시("T3 작업 진행을 위한 계획을 세우고 새 세션에서 작업할 수 있게 세팅해놔" → 새 세션에서 "PLAN §0부터"). 같은 날 실행 세션이 0~7단계를 했다. 연습용 서버는 사용자 결정으로 지웠고(PLAN 6-5) 남은 것은 커밋(사용자 답 '아직 하지 않는다')뿐이다. 요청 원문과 답은 [mobile/2026-10-14-t3/REQUESTS.md](mobile/2026-10-14-t3/REQUESTS.md), 단계·체크리스트·함정·근거는 [mobile/2026-10-14-t3/PLAN.md](mobile/2026-10-14-t3/PLAN.md) — **PLAN이 이 작업의 유일한 진행 기록이다.** 새 세션은 PLAN §0부터 읽는다. 배경은 [TASK-MOBILE.md](TASK-MOBILE.md) §8 T3(2026-09-04 초안 — 낡은 전제는 PLAN §3이 바로잡는다).
 
 ## 목표
 
-정본 문서를 D-111의 구성(Worker 하나가 화면과 `/api/*`를 같은 주소에서 냄, 설치형 홈 화면 웹앱)으로 고쳐 써서, 다음 작업자가 `PRD.md` §4와 `docs/ARCHITECTURE.md` §2·§6만 읽어도 앱 뼈대의 호스팅·로그인·화면 이동을 틀리지 않게 지을 수 있게 한다.
+설계도(PRD §4, ARCHITECTURE §2·§6, UX_SPEC §15~§17, DATA_MODEL §3.10)대로 앱 뼈대(`app-scaffold`)를 세워 새로 만든 개발용 서버에 올리고 iPhone 홈 화면 앱으로 확인해서, Phase 2(직접 작성)를 시작할 때 호스팅·로그인·잠금·화면 이동·배포에 관한 결정을 새로 내리지 않아도 되게 한다.
 
 ## 범위
 
-- 포함: TASK-MOBILE §8 T2의 정본 동기화, 2026-10-13~14 실기기 결과의 문서 반영, TASK-SPIKE-02 절 아카이브와 loop-state 정리, 이번에 사용자가 정한 것의 결정 기록(D-112).
-- 제외: 앱 코드, `web/` 화면 시안, T3(Phase 1 뼈대의 모바일 명세), 푸시 알림·오프라인·프레임워크 선택(논의가 나오면 기록만), Cloudflare에 올리는 일, 커밋·푸시(사용자 지시 때만).
+- 포함(사용자 결정 Q1 — 설계도 + 뼈대 + 개발용 서버에서 iPhone 확인): T2가 넘긴 설계 마저 정하기, 화면 도구 결정(조사 뒤 사용자에게), 뼈대 코드(서버·최소 모양의 화면·로그인·세션 기록·잠금·마이그레이션·검사), 개발용 서버 새로 만들기(Q2, 만들기 직전 재확인), iPhone 확인(사용자 조작), 정본·하네스 동기화.
+- 제외: 일기 저장(`data-foundation`), 시안 디자인 이식(Phase 2), AI·RAG, 푸시·오프라인·service worker, 운영 서버, Android, 여러 사용자, `web/` 수정.
 
 ## 소유권
 
-- Main/Writer: 이 세션. 하위 에이전트는 `researcher`(공식 문서 확인)와 마감 검토자(읽기 전용)만 쓴다.
-- 소유 파일: `tasks/mobile/**`, `tasks/CURRENT_TASK.md`, `tasks/TASK-MOBILE.md`, `tasks/archive/**`, `PRD.md`, `README.md`, `docs/ARCHITECTURE.md`, `docs/UX_SPEC.md`, `docs/EVAL_PLAN.md`, `docs/RISK_REGISTER.md`, `docs/TRACEABILITY.md`, `docs/STATUS.md`, `docs/DECISIONS.md`, `docs/ROADMAP.md`, `docs/DATA_MODEL.md`, `harness/quality-gates.yaml`, `harness/work-graph.yaml`, `harness/runtime-profile.json`, `harness/loop-state.json`
+- Main/Writer: 새 세션. 하위 에이전트는 조사(`researcher`, Sonnet)·병렬 작업자(소유 파일을 나눠서, AGENT_WORKFLOW §10)·마감 검토자(읽기 전용)만 쓰고, 어떤 하위 에이전트도 커밋하지 않는다.
+- 소유 파일: `tasks/mobile/2026-10-14-t3/**`, `tasks/CURRENT_TASK.md`, `tasks/TASK-MOBILE.md`, `tasks/archive/**`, `app/**`, `package.json`, `package-lock.json`, `tsconfig*.json`, `eslint.config.*`, `biome.json`, `vite.config.*`, `vitest.config.*`, `wrangler.*`, `.gitignore`, `.github/workflows/harness.yml`, `scripts/verify.mjs`, `PRD.md`, `README.md`, `docs/ARCHITECTURE.md`, `docs/DEPLOY.md`, `docs/DATA_MODEL.md`, `docs/UX_SPEC.md`, `docs/EVAL_PLAN.md`, `docs/RISK_REGISTER.md`, `docs/TRACEABILITY.md`, `docs/STATUS.md`, `docs/DECISIONS.md`, `docs/ROADMAP.md`, `harness/quality-gates.yaml`, `harness/work-graph.yaml`, `harness/runtime-profile.json`, `harness/loop-state.json`, `work/**`, `.claude/launch.json`(로컬 미리보기 설정 `app-local` 한 줄 — 2026-10-14 실행 중에 더했고 사후에 선언했다)
+
+(루트의 도구 설정 파일은 화면 도구·검사 도구를 정한 뒤 실제로 쓰는 것만 만든다. `work/`는 Git 제외다.)
 
 ## 인수 조건
 
-- [x] `PRD.md` §4와 `docs/ARCHITECTURE.md` §2·§6만 읽어도 호스팅·로그인·화면 이동을 만들 수 있다 — 새 맥락 읽기 전용 검토자: 1차 '미충족'(높음 3) → 반영 → 재검토 '충족'(남은 중간 4·낮음 10도 반영). T3로 넘긴 것은 뼈대를 막지 않는다는 판정. 근거 PLAN '검토 지적 처리'·A-13·A-14
-- [x] `PRD.md`·`docs/`·`README.md`에서 "Pages"가 전부 '예전 후보·교정됨' 문맥으로만 남는다 — 10줄, 검토자가 한 줄씩 판정(README 0줄).
-- [x] TASK-MOBILE §5의 G-01~G-19 각각에 반영한 곳(파일·절) 또는 미룬 이유가 PLAN의 표에 있다 — 검토자가 행마다 원문 확인.
-- [x] PLAN 사실표의 값이 모든 문서에서 같다 — 숫자별 grep 대조(검토자 1·2차, 에이전트).
-- [x] `node scripts/verify.mjs --mode full` PASS(2026-10-14 `37/37 PASS, 0 FAIL`, 마지막 반영 뒤), PLAN에 열린 항목 없음 — 미룬 것 M-2~M-7은 이유와 갈 곳이 적혀 있다.
+- [x] 명세: T2가 T3로 넘긴 것(PLAN §3의 표)이 정본에 결정과 근거와 함께 있다(파일·절). — ARCHITECTURE §11(새 버전 §11.4·환경 분리 §11.2·오류 보기 §11.5·주소 §11.3·설정 값 §11.2·헤더 §11.6·확장 규칙 §11.9), DEPLOY.md, DATA_MODEL §3.4·§3.9·§3.10·§3.11·§9, D-114·D-115. 실기기가 답할 셋(잠금 시점·덮개 스냅샷·암호 보관함)은 사용자 결정으로 미뤘고 그 사실과 잠정 규칙이 §6·§4.1·UX_SPEC §15에 있다.
+- [x] 뼈대: `app-scaffold`의 게이트 `code-quality` 통과(npm 10.9.2 `npm ci` 두 번 같은 결과, full 안에서 lint·typecheck·test·build PASS, 미사용 변수 함정 → lint 종료 코드 1 — PLAN 4-1·4-6·4-7) — 잠금 파일로 두 번 깨끗이 설치해 같은 결과, lint·typecheck·test·build가 `package.json`에 있고 full에서 PASS, lint가 일부러 넣은 오류 1건을 실제로 잡는다.
+- [x] 계약 검사: EVAL F-22·F-23과 새로 더한 뼈대 검사가 자동 테스트로 PASS, 개발용 서버의 원격 검사 PASS. — 앱 시험 238건(F-22·F-23·F-25~F-28, 단 F-22·F-23의 작성·전체 삭제 두 줄은 data-foundation — T3 A-18), 결함 주입 7종 모두 잡음, 원격 검사 34/34(최종 빌드 `20261014105614-7b99e2c`).
+- [x] iPhone: PLAN §7 6단계의 항목마다 PASS/FAIL/미검증과 근거. — 1회차 S-01·S-02 PASS, S-12 화면 쪽 PASS, S-07 '가린다', 나머지는 사용자 결정 '전부 미룬다'로 미검증(대신한 근거 함께).
+- [x] 지킨 것: 운영 서버 0, 실제 일기 0, 커밋될 내용에 계정 식별값·비밀값 0(스캔 근거). — 운영은 이름만(만들지 않음), 실제 일기 0(1회차에 사용자가 넣은 실제 이름은 끝 정리에서 지움 — 0행 확인), 실제 값 17종 스캔 0건 + `verify` quick의 상시 모양 검사.
+- [x] 마감: 새 맥락 읽기 전용 검토자의 '짓는 사람 시험' 통과, `node scripts/verify.mjs --mode full` PASS, PLAN에 열린 항목 0(미룬 것은 이유와 함께). — 첫 검토 '조건부 통과'(남은 셋: 잠금 시점·날짜 경로·본문 한도) → 반영(§11.9·§6 잠정 규칙) 뒤 같은 검토자의 재검토는 PLAN 7-2, full은 7-4.
 
 ## 체크포인트
 
-- 착수(2026-10-14): 읽기 단계에서 변경 지도와 사실표를 보였고, 질문 여덟 개의 답을 받았다(REQUESTS). TASK-SPIKE-02 절을 `tasks/archive/TASK-SPIKE-02.md`로 옮겼다. 이후 진행은 PLAN의 체크리스트에만 적는다.
-- 마감(2026-10-14): 정본 동기화 → 독립 검토(높음 3) → 사용자에게 네 가지를 다시 물음(Q9~Q12) → 반영 → 재검토(충족) → 남은 지적 반영 → full PASS. 커밋 지시는 아직 없다. 커밋 뒤 이 절을 `tasks/archive/`로 옮긴다. 다음은 T3(사용자 착수 승인 필요).
+- 계획(2026-10-14, T2를 마친 세션): 사용자 질문 네 개의 답을 받았다 — T3 범위는 설계도 + 뼈대 + 개발용 서버에서 iPhone 확인 / 개발용 서버는 새로 만든다 / 화면 오류는 개발용에서만 모은다 / 앱 전환 화면은 잠금과 상관없이 모두 가린다. 뒤의 둘은 D-113. T2 절은 `tasks/archive/TASK-MOBILE-T2.md`로 옮겼다. 아직 코드·서버는 없다. 다음: 새 세션이 PLAN §0.2부터.
+- 실행(2026-10-14 저녁, 브랜치 `app/scaffold`, 커밋 전): 0~5단계 끝 — 공법 D-114(사용자: 도구 없이), 구성 D-115(에이전트), 뼈대 코드 `app/**`·설정 파일, 앱 시험 218건, full PASS, 개발용 건물(Worker·D1 `emotion-diary-dev`) 만들어 원격 검사 34/34. 6단계 iPhone 1회차를 사용자에게 보냈다(PLAN 6-3 표, 안내 `mobile/2026-10-14-t3/PHONE-GUIDE.md`). 새 맥락 검토자(7-1)는 병렬로 진행 중. 다음: iPhone 결과 → 6-3·6-4 → 검토 반영 → 7-3 동기화 → full. 상세는 PLAN '진행 기록'.
+- 마감(2026-10-14 밤): 7단계까지 끝 — iPhone은 1회차 뒤 사용자 결정 '전부 미룬다', 독립 검토 2회 반영, 개발용 열쇠 43자로 교체·개발용 데이터 비움, 마지막 판 원격 검사 34/34, full PASS(앱 시험 241건). 그 뒤 사용자 답: 커밋은 아직 하지 않는다, 연습용 서버는 지운다(지웠다 — PLAN 6-5). 남은 사용자 결정: 커밋·PR(지시 때), 작성 화면 버튼 배치(Phase 2 전), 미룬 실기기 확인. 사용자 확인 뒤 이 절을 `tasks/archive/`로 옮긴다.
+
+# TASK-REVIEW-01 — 종합 점검: 현황·남은 작업·작업 방식·기술 스택
+
+## 상태
+
+`done`(2026-10-15, 커밋 전 — 커밋은 사용자 지시 때. PLAN 1~6단계 전부 체크, 보고서 REPORT.md 확정, 마감 질문 네 개의 답을 REQUESTS에 기록. 사용자 확인 뒤 이 절을 `tasks/archive/`로 옮긴다) — 2026-10-14 사용자 지시("새 세션에서 지금까지의 작업 현황을 싹 다 분석하고, 나머지 해야 할 작업들도 싹 분석 한 후 … 판단하려고 하는 작업을 시킬거야", "남은 작업 자체를 좀 비판적이고, 독립적으로 분석해서 더 좋은 작업 방법과 방식이 있는지를 생각하라는 거야"). 계획은 TASK-MOBILE T3를 마친 세션이 세웠고 **실행은 새 세션이 한다.** 요청 원문과 답은 [review/2026-10-14/REQUESTS.md](review/2026-10-14/REQUESTS.md), 단계·검토자·잣대·함정은 [review/2026-10-14/PLAN.md](review/2026-10-14/PLAN.md) — **PLAN이 이 작업의 유일한 진행 기록이다.** 새 세션은 PLAN §0부터 읽는다.
+
+## 목표
+
+지금까지의 현황과 남은 작업을 독립적·비판적으로 감정해 작업 방식·이슈·계획과 DB·백엔드·프론트엔드 기술 스택이 서비스의 방향과 향후 계획에 비춰 최선인지 판정하고, 더 나은 길이 있으면 대안 계획으로 낸다(고르는 것은 사용자).
+
+## 범위
+
+- 포함: 정본·결정·위험·이슈·하네스·작업 기록·`app/`·`web/` 구조 읽기, 공식 문서로 기술 대안 재확인, 영역별 독립 검토자 다섯 + 백지 설계 하나 + 반대 입장 하나(사용자 답 Q3), 보고서.
+- 제외: 코드·정본·하네스·서버 변경, 커밋·푸시·PR, 사용자 휴대폰 조작 요청. 사용자 결정도 다시 열어 권고할 수 있으나(Q1) 뒤집지 않는다.
+
+## 소유권
+
+- Main/Writer: 새 세션. 하위 에이전트는 읽기 전용 검토자(Sonnet)뿐이고 어떤 하위 에이전트도 커밋하지 않는다.
+- 소유 파일: `tasks/review/2026-10-14/**`, `tasks/CURRENT_TASK.md`
+
+## 인수 조건
+
+- [x] `tasks/review/2026-10-14/REPORT.md`가 PLAN §7 목차를 채웠고 판정마다 근거와 사실/추론/미확인 구분이 있다. — REPORT §1~§8, 머리말의 표기 규칙(사실·추론·미확인, 사용자 결정 표시).
+- [x] 기술 스택마다 '기준 → 기준이 맞나 → 대안(바꾸는 비용) → 판정'이 본인 전용·공개 서비스 따로 있다(Q2). — REPORT §5.1~§5.5, 갈림길 §5.6.
+- [x] 남은 작업은 백지 설계안과 기존 계획을 견준 대안 계획이 있다. — REPORT §3.1(견줌)·§3.2(일마다 판정)·§3.3(대안 계획과 득실).
+- [x] 검토자 보고(영역별 다섯·백지·반대)와 충돌 판정이 있다(Q3). — `review/2026-10-14/reviews/` 일곱 원문, REPORT §7.2 재측정·§7.3 충돌 C-1~C-11·§7.4 반대 검토 17건 반영.
+- [x] '사용자가 정할 것' 목록(추천)이 있다. 이 폴더와 이 파일 밖 변경 0, `node scripts/verify.mjs --mode quick` PASS. — REPORT §1.2 Q-A~Q-G(넷은 질문 창으로 답 받음), 지문 시작 값과 같음·quick PASS(PLAN 6-2).
+
+## 체크포인트
+
+- 계획(2026-10-14, TASK-MOBILE T3를 마친 세션): 사용자 질문 네 개의 답(사용자 결정도 다시 열어도 됨 / 본인 전용·공개 따로 판정 / 영역별 독립 검토자 여럿 / 저장소 안 분석 문서). 다음: 새 세션이 PLAN §0.2부터.
+- 실행(2026-10-14~15, 새 세션): 1~4단계 끝 — FACTS.md, 검토자 여섯 보고(`review/2026-10-14/reviews/`), 메인 재측정, REPORT.md 초안. 5단계 R-RED 진행 중. 다음: R-RED 반영 → 6단계(quick·지문·질문 창). 상세는 PLAN 체크리스트와 '진행 기록'.
+- 마감(2026-10-15): R-RED 17건 반영(16 반영·1 일부), REPORT 확정, quick PASS·지문 시작 값과 같음, 질문 창 답(Max / 순서 바꿈 / 관문 둘로 / 문서 가볍게). 다음 작업(사용자 지시 때): 이 답을 `docs/DECISIONS.md`·공정표·관문에 옮기는 정리 작업(REPORT §3.3 0단계)과 Q-E~Q-G 확인, 커밋.
 
 # TASK-HOOK-AUTO — auto 모드에서 가드 훅이 확인창을 띄우지 않게
 

@@ -1,0 +1,8 @@
+/* Pretendard 가변 글꼴(D-057). 굵기 한 벌만 선언하면 본문 400까지 그 굵기로 그려지므로 반드시 가변 범위 하나로 선언한다.
+   글꼴 파일은 정본 design/fonts/ 의 것을 Vite가 묶음에 파일로 넣는다(data: 주소로 끼우지 않는다 — CSP font-src 'self'). */
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("../../../../design/fonts/PretendardVariable.woff2") format("woff2-variations");
+  font-weight: 45 920;
+  font-display: swap;
+}

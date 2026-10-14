@@ -1,0 +1,9 @@
+{
+  // 서버(Worker). 런타임 타입은 wrangler types가 만든 app/worker/worker-configuration.d.ts다.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"]
+  },
+  "files": [],
+  "include": ["app/worker/**/*.ts", "app/shared/**/*.ts"]
+}

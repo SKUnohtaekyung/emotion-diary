@@ -2,9 +2,14 @@
 .env
 .env.*
 !.env.example
+# Cloudflare 로컬 비밀값·계정 값이 든 생성 설정(D-115 ①) — app/scripts/make-secrets.mjs·cf.mjs가 만든다
+.dev.vars
+.dev.vars.*
+wrangler.local.jsonc
 
 # Dependencies and generated output
 node_modules/
+.wrangler/
 dist/
 coverage/
 .next/

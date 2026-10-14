@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": { "enabled": false },
+  "files": {
+    "includes": ["app/**", "vite.config.ts", "vitest.config.ts", "!app/worker/worker-configuration.d.ts"]
+  },
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  "javascript": { "globals": ["__APP_ENV__", "__APP_BUILD__"] },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "correctness": {
+        "noUnusedVariables": "error",
+        "noUnusedImports": "error",
+        "noUnusedFunctionParameters": "error",
+        "noUndeclaredVariables": "error"
+      },
+      "suspicious": {
+        "noConsole": { "level": "error", "options": { "allow": ["error", "warn", "info"] } }
+      },
+      "style": {
+        "useConst": "error"
+      }
+    }
+  }
+}
