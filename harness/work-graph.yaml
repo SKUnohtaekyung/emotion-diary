@@ -43,7 +43,7 @@ nodes:
       - docs/ARCHITECTURE.md §5, §6, §10 hosting/identity rows
       - docs/DECISIONS.md hosting/identity decisions
     outputs:
-      - Cloudflare Pages/Workers minimal deployment with access-token cookie boundary (D-032, D-021)
+      - single Cloudflare Worker (static assets and /api/* on one origin) minimal deployment with access-token cookie boundary (D-032 as corrected by D-111, D-021)
       - Workers secret isolation, custom-header CSRF and worker-only Bearer route proof (D-025)
       - mobile runtime baseline
     gate: security-foundation
@@ -90,7 +90,9 @@ nodes:
     status: ready
     depends_on: [hosting-identity-spike, data-store-spike]
     # 2026-10-14 TASK-SPIKE-02: 선행 두 노드가 done이라 열렸다. 같은 날 사용자가 TASK-MOBILE 제안을 받았다(D-111 —
-    # Worker 하나 + 정적 파일, 설치형 홈 화면 웹앱). 착수 전에 정본 동기화(TASK-MOBILE T2)와 모바일 명세(T3)가 남았다.
+    # Worker 하나 + 정적 파일, 설치형 홈 화면 웹앱). 정본 동기화(TASK-MOBILE T2)는 2026-10-14에 했다 — 호스팅·로그인·
+    # 화면 이동은 PRD §4, docs/ARCHITECTURE.md §2·§6, docs/UX_SPEC.md §16·§17(로그인·잠금의 사용자 결정은 D-112).
+    # 착수 전에 남은 것은 모바일 명세(T3: 갱신 감지, 개발·운영 분리, 화면 속 오류 확인 수단, 화면 주소 형식, 앱 잠금이 언제 잠기는지의 실기기 판정)다.
     owns:
       - package manifest and lockfile
       - application configuration

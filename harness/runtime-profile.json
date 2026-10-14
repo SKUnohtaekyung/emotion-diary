@@ -2,7 +2,7 @@
   "schema_version": "1.1",
   "generated_at": "2026-09-02T11:30:00+09:00",
   "verified_by": "Claude Code (Fable 5.1), TASK-BOOTSTRAP G0/G1",
-  "last_synced": "2026-10-14 TASK-SPIKE-02 — hosting/storage/model_access blocks re-measured 2026-10-13~14 (remote redeploy of the spike as a single Worker + Static Assets, iPhone iOS 26.5.2 Safari and home-screen app, queue e2e with the real PC worker); evidence in tasks/spike/2026-10-13/PLAN.md. Single-user premise (D-108)",
+  "last_synced": "2026-10-14 TASK-MOBILE T2 — hosting.target wording and the not-verified list aligned with the rewritten canonical docs (no new measurements). Before that, 2026-10-14 TASK-SPIKE-02 — hosting/storage/model_access blocks re-measured 2026-10-13~14 (remote redeploy of the spike as a single Worker + Static Assets, iPhone iOS 26.5.2 Safari and home-screen app, queue e2e with the real PC worker); evidence in tasks/spike/2026-10-13/PLAN.md. Single-user premise (D-108)",
   "repository": {
     "root": "<local-project-root>",
     "git_repository": true,
@@ -27,7 +27,7 @@
     "language": "JavaScript/TypeScript candidate; not selected"
   },
   "hosting": {
-    "target": "one Cloudflare Worker serving Static Assets (the app shell) and /api/* on the same origin + D1; installable home-screen web app, no service worker or offline (D-032 as corrected by D-111, user decision 2026-10-14). Fallback limited to free options (D-021). Canonical docs still describing 'Pages + Workers' are rewritten in TASK-MOBILE T2",
+    "target": "one Cloudflare Worker serving Static Assets (the app shell) and /api/* on the same origin + D1; installable home-screen web app, no service worker or offline (D-032 as corrected by D-111, user decision 2026-10-14). Fallback limited to free options (D-021). Canonical docs were rewritten to this layout on 2026-10-14 (TASK-MOBILE T2); login lifetime is 30 days from last use and the app lock is verified by the server (D-112). The split layout (static UI on Cloudflare Pages) was never measured and is not adopted — that it fails on iPhone is a judgement from the specs",
     "account_or_project_exists": "yes — spike Worker emotion-diary-spike (workers.dev) and D1 emotion-diary-spike (APAC), free plan, synthetic data only; redeployed 2026-10-13~14 as a single Worker + Static Assets (same origin for the page and /api/*). Cleaned 2026-10-14: long access token restored, synthetic rows 0; the Worker and D1 remain in the account",
     "access_token_cookie_confirmed": "yes — local, remote, desktop Chrome (2026-09-02) and iPhone iOS 26.5.2 Safari proper + home-screen app (2026-10-14): 401 without/wrong token, HMAC cookie HttpOnly/Secure/SameSite=Lax, session survives a full app close. Safari's login is NOT carried into the home-screen app (separate storage)",
     "rate_limit_confirmed": "partial — Workers Rate Limiting binding deployed on free plan but never blocked (30 same-key calls across HKG/NRT; permissive per docs) → rejected; D1 global lockout adopted and verified remotely (10 fails → 429, correct token 429 while locked, Retry-After 300)",
@@ -35,7 +35,7 @@
     "identity_header_available": "only with Access (Cf-Access-Jwt-Assertion); without it the signed session is the runtime identity. 2026-10-14 the spike signs a subject into the session and checks it against OWNER_ALLOWLIST on every request: a correctly signed session for a subject not on the list gets 401 (positive control 200), a swapped subject 401 (D-025). Real app implementation is Phase 1",
     "custom_header_csrf_passthrough": "yes — desktop Chrome (2026-09-02) and iPhone Safari proper + home-screen app (2026-10-14): with header 200, without header 403; the phone sends Origin and Sec-Fetch-Site: same-origin",
     "secrets_confirmed": "yes — 3 secrets only via wrangler secret put; 2026-10-13 scan: deploy bundle, static assets, config, logs, tracked files and full Git history 0 hits; wrangler tail 0 hits (cookie/authorization redacted, no bodies). One local-only test literal was moved out of a spike test file",
-    "phone_access_confirmed": "yes for iPhone — iOS 26.5.2 (UA string reports a frozen 'iOS 18.7'), Safari proper and home-screen app 2026-10-14: token entry, save, read, reject; standalone display; edge-swipe back works; export works via the share sheet only (blob download opens a preview, an attachment link replaces the app screen with no way back). Android Chrome not tested — moved to the pre-release real-device gate (D-108). Open: session after 12h, keyboard, 5-min background, icon delete/re-add",
+    "phone_access_confirmed": "yes for iPhone — iOS 26.5.2 (UA string reports a frozen 'iOS 18.7'), Safari proper and home-screen app 2026-10-14: token entry, save, read, reject; standalone display; edge-swipe back works; export works via the share sheet only (blob download opens a preview, an attachment link replaces the app screen with no way back). Android Chrome not tested — moved to the pre-release real-device gate (D-108). Not verified (5): session after 12h, keyboard vs bottom bar, 5-min background, icon delete/re-add, 'Open as Web App' turned off",
     "free_tier_limits_confirmed": "yes by official docs 2026-10-13 — Workers 100,000 requests/day, 10 ms CPU, 5 cron triggers; static asset requests free; D1 5M rows read/day, 100k rows written/day, 500 MB per DB, 10 DBs, 50 queries per invocation, Time Travel 7 days. No pause-on-inactivity clause was found in the D1 pricing docs (judged by absence, not by a positive statement)"
   },
   "storage": {
@@ -88,7 +88,7 @@
   ],
   "unknowns": [
     "B-06 on hold for two items: a real refusal response was not reproduced (mock only); the share of the subscription limit was not computed. Ambiguous crisis sentences await human judgement (Phase 3)",
-    "B-08 follow-ups for the TASK-MOBILE decision (5): session after 12 hours, keyboard vs bottom bar, 5-min background, icon delete/re-add, 'Open as Web App' turned off; Android Chrome not tested (moved to the pre-release real-device gate, D-108)",
+    "Home-screen web app items not verified on the device (5): session after 12 hours, keyboard vs bottom bar, 5-min background, icon delete/re-add, 'Open as Web App' turned off; also not checked: Android Chrome (moved to the pre-release real-device gate, D-108), VoiceOver, password-manager autofill of the access token inside the home-screen app (no official statement found 2026-10-14, D-112)",
     "Which action makes the home-screen app reload its page (external link return, preview return) — observed twice 2026-10-14, cause not isolated (RK-034)",
     "Pages + Workers split hosting was never verified and is not adopted (D-111); all spike evidence comes from a single Worker",
     "Scope is single-user for now (D-108, reconfirmed 2026-10-14) — nothing in the spike covers accounts, per-user data separation or a paid model API",

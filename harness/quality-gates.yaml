@@ -53,6 +53,10 @@ gates:
         command: null
         status: configure_after_bootstrap
       - name: mobile-real-device
+        # 2026-10-14 TASK-MOBILE T2(D-111): 1차 환경은 iPhone 홈 화면 웹앱이다. 실제 앱으로
+        # docs/EVAL_PLAN.md §4의 S-00~S-12 전부를 다시 본다 — S-00, S-01, S-02, S-03, S-04, S-05,
+        # S-06, S-07, S-08, S-09, S-10, S-11, S-12. 연습용 화면(스파이크)의 결과는 옮겨 적지 않는다.
+        # 스파이크에서 미검증으로 남은 것: S-03, S-06, S-07, S-10, S-11. Android Chrome도 여기서 본다(D-108).
         command: manual evidence required
         status: pending
       - name: security-and-privacy

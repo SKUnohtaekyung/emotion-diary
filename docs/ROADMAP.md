@@ -10,7 +10,7 @@
 
 - 실제 stack/git/hosting/Node/package manager/runtime profile 확인 — G0 Git baseline(D-017)과 G1 계획 교정(D-018~D-027) 완료
 - 원자료 보존과 taxonomy 전사 계획 확정
-- G2a `hosting-identity-spike`(D-032): Cloudflare Pages/Workers 최소 배포, 접근 토큰 cookie+rate limit, Workers secret 격리, custom header CSRF, worker 전용 Bearer 경로, 휴대폰 접속(B-02/B-03/B-08). Cloudflare 계정·프로젝트 생성은 무료지만 외부 자원이므로 실행 직전 사용자 재확인
+- G2a `hosting-identity-spike`(D-032, 호스팅은 D-111이 교정 — 처음에는 화면을 Pages에 따로 두는 구성으로 적혀 있었으나 스파이크는 처음부터 Worker 하나로 했고 그 구성을 채택했다): Worker 하나(앱 화면과 `/api/*`가 같은 주소) 최소 배포, 접근 토큰 cookie+rate limit, Workers secret 격리, custom header CSRF, worker 전용 Bearer 경로, 휴대폰 접속(B-02/B-03/B-08). Cloudflare 계정·프로젝트 생성은 무료지만 외부 자원이므로 실행 직전 사용자 재확인
 - G2b `data-store-spike`: D1 CRUD, unique, 조건부 UPDATE, CHECK/trigger, `batch()` 원자성, wrangler migration, hard delete, Time Travel/export 백업, 무료 한도(B-04/B-05)
 - G2c `model-access-spike`(RAG 트랙, critical path 밖): 본인 PC `claude -p` 구독 경로(D-029). 최소 스파이크 PASS(2026-09-02). 남은 검증: PC worker의 `ai_jobs` 큐 왕복(D-032), 보존/학습 설정, 독립 verifier 2회 호출, 10회 지연 p95, 구독 한도, 위기 신호 케이스
 - G2d `vector-search-spike`(RAG 트랙): 구독/무료 경로의 검색 계층 검증(B-07)
