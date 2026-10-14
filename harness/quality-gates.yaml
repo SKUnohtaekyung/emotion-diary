@@ -3,6 +3,8 @@ source_of_truth: docs/EVAL_PLAN.md
 label_definitions: docs/EVAL_PLAN.md §14
 # 2026-09-02 G1(결함 I-10): node_gates 라벨을 EVAL §14 정의와 1:1로 재매핑하고
 # severity medium을 EVAL §2/§11(차단·높음만 출시 차단)과 일치시켰다.
+# 2026-10-15 TASK-CLEANUP-01(D-116·D-117): 관문을 '본인 사용 시작'(personal-start)과 '공개'(limited-release + public-only)로
+# 나누고 새 순서의 관문 first-slice·data-control·personal-start를 더했다. 라벨 정의는 EVAL §14가 정본이다.
 
 policies:
   no_skipped_required_gate: true
@@ -11,6 +13,8 @@ policies:
   same_hypothesis_failure_limit: 2
   block_on_unknown_privacy_boundary: true
   one_writer_per_file: true
+  # D-019. D-120 뒤에도 그대로다 — Max 요금제에 포함된 월 API 크레딧 안의 호출은 추가 지출 0이라 이 정책 안이고,
+  # 따로 산 크레딧·자동 충전은 쓰지 않는다.
   no_paid_api_calls: true
 
 gates:
@@ -53,15 +57,14 @@ gates:
     blocking: true
     commands:
       - name: browser-e2e
+        # 2026-10-15(D-116): 도구는 first-slice에서 고른다(후보 Playwright WebKit — 홈 화면 앱을 어디까지 대신하는지는 미확인).
+        # 첫 쓰임은 first-slice 관문의 e2e-reload-restore다.
         command: null
         status: configure_after_bootstrap
       - name: mobile-real-device
-        # 2026-10-14 TASK-MOBILE T2(D-111): 1차 환경은 iPhone 홈 화면 웹앱이다. 실제 앱으로
-        # docs/EVAL_PLAN.md §4의 S-00~S-12 전부를 다시 본다 — S-00, S-01, S-02, S-03, S-04, S-05,
-        # S-06, S-07, S-08, S-09, S-10, S-11, S-12. 연습용 화면(스파이크)의 결과는 옮겨 적지 않는다.
-        # 스파이크에서 미검증으로 남은 것: S-03, S-06, S-07, S-10, S-11. Android Chrome도 여기서 본다(D-108).
-        # 2026-10-14 앱 뼈대(개발용 건물) 1회차: S-01·S-02 PASS, S-12 화면 쪽 PASS, S-07은 '자판이 아래 고정 버튼을 가린다'.
-        # 실기기 실험 T-01~T-07(EVAL §6)과 나머지 S는 사용자 결정으로 미뤘다 — 이 게이트에서 본다(안내서 tasks/mobile/2026-10-14-t3/PHONE-GUIDE.md).
+        # 공개 관문(D-117)의 실기기: 실제 앱으로 docs/EVAL_PLAN.md §4의 S-00~S-12 전부와 §6의 T-01~T-07을 iPhone 홈 화면 웹앱에서
+        # 다시 본다(D-111). Android Chrome은 public-only에 있다. 본인 사용 시작 전에는 조각마다 해당 항목만 본다 —
+        # first-slice의 mobile-slice, personal-start의 mobile-personal. 결과의 정본은 EVAL §4·§6 표다(D-118).
         command: manual evidence required
         status: pending
       - name: security-and-privacy
@@ -99,23 +102,33 @@ node_gates:
     requires: [B-07]
   code-quality:
     requires: [reproducible-install, lint-configured, typecheck-configured, test-configured, build-configured, full]
+  # 2026-10-15(D-116): 저장 핵심만. F-14·F-15는 data-control로 옮겼다. ci-green은 앱 코드가 CI에서 처음 도는 것을 확인한다.
+  # F-17(하루 기준 시각 경계)은 2026-10-15 마감 검토 지적으로 더했다 — 저장된 entry_date는 나중에 고칠 수 없다.
   data-integrity:
-    requires: [F-01, F-02, F-06, F-07, F-09, F-10, F-14, F-15]
+    requires: [F-01, F-02, F-06, F-07, F-09, F-10, F-17, ci-green]
+  first-slice:
+    requires: [F-03, F-04, F-05, F-08, F-24, e2e-reload-restore, mobile-slice]
+  data-control:
+    requires: [F-14, F-15, restore-drill, export-cpu-measured]
+  personal-start:
+    requires: [full, F-01, F-02, F-06, F-07, F-09, F-10, F-14, F-15, F-17, F-24, deployment-boundary-review, backup-and-restore-drill, mobile-personal, crisis-help-unreviewed-label]
   source-fidelity:
     requires: [source-hashes-recorded, taxonomy-one-to-one-review, user-or-human-review]
   taxonomy-evidence:
     requires: [literature-axes-covered, falsification-table-complete, evidence-grade-recorded, license-check-passed, user-or-human-review]
+  # 2026-10-15(D-117): 실기기는 iPhone만(mobile-core-flow-personal). Android와 화면 낭독기는 public-only로 옮겼다.
   core-product:
-    requires: [F-03, F-04, F-05, F-07, F-08, mobile-core-flow, accessibility-core-flow]
+    requires: [F-03, F-04, F-05, F-07, F-08, F-17, F-18, F-19, F-21, mobile-core-flow-personal, accessibility-core-flow]
   journal-ai:
     requires: [ai-journal-fixed-set, no-fabrication, no-emotion-assertion, direct-entry-fallback, crisis-signal-100, history-forgery-0]
   reflection-core:
-    requires: [F-11, F-12, F-13, deterministic-statistics, timezone-boundaries]
+    requires: [F-11, F-12, F-13, F-20, deterministic-statistics, timezone-boundaries]
   evidence-quality:
     requires: [active-card-schema-valid, source-and-hash-valid, reviewer-approved, retrieval-baseline-frozen]
   ai-safety:
     requires: [citation-validity-100, citation-coverage-100, unsupported-claim-0, gate-false-pass-0, injection-success-0, observation-accuracy-100, crisis-flow-100]
+  # 2026-10-15(D-117): 공개 관문 — 다른 사람에게 열기로 정할 때만 본다. public-only가 공개에만 필요한 것을 묶는다.
   limited-release:
-    requires: [full, browser-e2e, mobile-real-device, security-and-privacy, deployment-boundary-review, blocker-0, high-0, ai-paths-disabled-or-verified]
+    requires: [full, browser-e2e, mobile-real-device, security-and-privacy, deployment-boundary-review, blocker-0, high-0, ai-paths-disabled-or-verified, public-only]
   release:
     requires: [full, browser-e2e, mobile-real-device, security-and-privacy, ai-evals, deployment-boundary-review, blocker-0, high-0]

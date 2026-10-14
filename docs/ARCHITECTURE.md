@@ -8,6 +8,8 @@
 
 사용자 결정(2026-09-02 D-018, D-019, D-021, D-029, D-031, D-032 / 2026-10-14 D-108, D-111, D-112): 배포는 직접 작성한 백엔드를 무료 클라우드에 올리는 구성이다 — **Cloudflare Worker 하나가 앱 화면(정적 파일)과 `/api/*`를 같은 주소에서 내고**(유일한 진입점), DB는 D1(SQLite 호환)이다. 모바일은 설치형 홈 화면 웹앱이다. 로그인은 접근 열쇠(서버 접근 토큰)로 받는 cookie 하나다. 제한 MVP(직접 작성+결정론적 대시보드)를 먼저 배포하고 AI 대화·RAG는 후행 단계다. 유료 API는 사용하지 않으며 AI는 본인 PC의 worker가 백엔드 작업 큐를 outbound로 가져가 Claude 구독 로그인으로 `claude -p`를 호출하는 경로만 쓴다. 본인 1명 전용이다. 이전 후보 ChatGPT Sites(D-006), PC 자체 호스팅(D-030), 화면을 Cloudflare Pages에 따로 두는 분리 구성(D-032의 그 부분 — D-111이 교정)은 superseded다.
 
+**2026-10-15 교정(D-116·D-117·D-120·D-121)**: 짓는 순서는 '오늘 한 편'을 휴대폰까지 먼저이고, 첫 사용은 본인 사용 시작과 공개 출시로 나뉜다. AI 대화 작성은 직접 쓰기를 30일 써 본 뒤 지을지 정하고, 짓게 되면 **서버(Worker)가 Claude API를 직접 부르는 경로**(사용자 요금제 Max에 포함된 월 API 크레딧 — 추가 지출 0이라 D-019 안)가 기본이다. 위의 본인 PC worker + `claude -p` 경로는 크레딧이 없어질 때 돌아갈 **대체 경로**로 남는다(§4.4·§4.6). 근거 분석은 60일 뒤 지을지 정한다.
+
 ## 2. 기준 아키텍처 (D-111)
 
 ```text
@@ -24,16 +26,19 @@ iPhone 홈 화면 웹앱(1차) / Safari·PC 브라우저
         |                |            |
         v                v            v
      D1 DB          ai_jobs 큐     알림 어댑터
-   (개인 일기)      (후행 단계)     (인앱 우선)
-                        ^
-                        | outbound 폴링/결과 반환 (worker secret)
+   (개인 일기)      (후행 단계 —    (인앱 우선)
+                    지을지는 D-120)
                         |
-              본인 PC: AI worker → claude -p
-              (구독 로그인, Sonnet 5 / Opus 5)
+              처리기(바꿔 끼움 — D-120)
+              +- 기본: Worker → Claude API
+              |   (Max 포함 월 크레딧, 추가 지출 0)
+              `- 대체: 본인 PC AI worker → claude -p
+                  (outbound 폴링/결과 반환, worker secret,
+                   구독 로그인 — D-029·D-110)
                     |
                     v
           Psychology Evidence Store
-          (후행 단계, D-018)
+          (후행 단계, D-018 — 하게 되면 카드 30~50장 파일, D-121)
 
 관리 경로: 승인된 Evidence 수집 -> 카드 검수 -> 비활성 업로드
                                       -> 평가 -> 활성화
@@ -61,7 +66,7 @@ iPhone 홈 화면 웹앱(1차) / Safari·PC 브라우저
 
 ### 2.3 그 밖의 구성
 
-MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받은 로그인 cookie로 접근을 제한하며, D1에 저장한다(D-032, D-111). 모델 호출은 Workers가 직접 하지 않는다. `ai_jobs` 큐에 작업을 넣으면 본인 PC의 worker가 가져가 `claude -p`로 처리한다(D-019, D-029). 유료 API 경로는 없다. 별도 Supabase나 agent framework는 기본 의존성이 아니다. 이 구성은 부트스트랩 스파이크를 통과했다(§10). 실제 앱에서 계약을 지키지 못하는 것으로 드러나면 동일한 계약을 만족하는 **무료** 비공개 호스팅/DB로 교체한다(D-021). 제한 MVP는 모델 접근 어댑터와 Evidence Store 없이 배포 가능해야 한다(D-018).
+MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받은 로그인 cookie로 접근을 제한하며, D1에 저장한다(D-032, D-111). 지금은 모델 호출 경로가 없다(AI는 후행 — 지을지는 실사용 30일 뒤, D-120). 짓게 되면 Worker가 Claude API를 직접 부르는 것이 기본이다 — API 키는 Workers secret에만 두고, 보내는 것은 §4.4·`AI_RAG_SPEC` §4의 최소 입력뿐이며, Max에 포함된 월 크레딧 안에서만 쓴다(추가 지출 0, D-019). 크레딧이 없어지면 `ai_jobs` 큐에 작업을 넣고 본인 PC의 worker가 가져가 `claude -p`로 처리하는 대체 경로(D-029)로 바꿔 끼운다. 추가 지출이 생기는 API 경로는 없다. 별도 Supabase나 agent framework는 기본 의존성이 아니다. 이 구성은 부트스트랩 스파이크를 통과했다(§10). 실제 앱에서 계약을 지키지 못하는 것으로 드러나면 동일한 계약을 만족하는 **무료** 비공개 호스팅/DB로 교체한다(D-021). 제한 MVP는 모델 접근 어댑터와 Evidence Store 없이 배포 가능해야 한다(D-018).
 
 ## 3. 신뢰 경계
 
@@ -101,8 +106,8 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 - 인증된 요청에서 서버가 `owner_key`를 도출한다.
 - 모든 diary CRUD, dashboard 집계, export, delete, AI orchestration의 유일한 진입점이다.
 - 입력과 모델 출력에 런타임 schema validation을 적용한다.
-- 모델 호출은 서버에서만 수행한다. 유료 OpenAI API는 사용하지 않으며(D-019) 구독 기반 경로가 B-06에서 확인되기 전까지 AI 경로는 비활성이다. 경로가 확인되면 그 경로의 데이터 보존·학습 사용 설정(`store: false`에 상당하는 통제)을 확인하고 기록한다.
-- D-029/D-032 경로: 서버는 모델을 직접 호출하지 않고 `ai_jobs` 행을 만든 뒤 클라이언트에 job ID를 준다. 클라이언트는 결과를 폴링하고, 정해진 timeout(예: 20초) 안에 결과가 없으면 "AI 응답 불가, 직접 작성으로 계속"을 보여 준다. 실제 호출은 §4.6의 PC worker가 수행한다. 서버는 worker가 되돌린 `structured_output`을 다시 schema 검증하고 `result` 문자열은 신뢰하지 않는다.
+- 모델 호출은 서버에서만 수행한다(대체 경로에서는 본인 PC worker). 추가 지출이 생기는 API는 사용하지 않으며(D-019·D-120) 모델 경로가 B-06에서 확인되기 전까지 AI 경로는 비활성이다 — 2026-10-15 D-120: AI 쓰기는 실사용 30일 뒤 지을지 정하고, 짓게 되면 기본은 서버 → Claude API(§4.4), `ai_jobs` 큐 + PC worker는 대체 경로(§4.6)다. 경로가 확인되면 그 경로의 데이터 보존·학습 사용 설정(`store: false`에 상당하는 통제)을 확인하고 기록한다.
+- D-029/D-032 경로(D-120 뒤로는 대체 경로 — 기본인 서버 직통에서는 Worker가 Claude API를 부르고 같은 schema 검증을 거친다): 서버는 모델을 직접 호출하지 않고 `ai_jobs` 행을 만든 뒤 클라이언트에 job ID를 준다. 클라이언트는 결과를 폴링하고, 정해진 timeout(예: 20초) 안에 결과가 없으면 "AI 응답 불가, 직접 작성으로 계속"을 보여 준다. 실제 호출은 §4.6의 PC worker가 수행한다. 서버는 worker가 되돌린 `structured_output`을 다시 schema 검증하고 `result` 문자열은 신뢰하지 않는다.
 - timeout, rate limit, bounded retry, idempotency, correlation ID, 사용자 안전 오류를 표준화한다.
 
 ### 4.3 Diary Database
@@ -118,7 +123,8 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 - 분석은 `plan → deterministic stats → search → gate → generate → verify → safety` 순서다.
 - 단계별 입력/출력 schema와 상태를 저장하되, 불필요한 원문 대화는 저장하지 않는다.
 - 자동 도구 루프는 허용된 도구, 최대 호출 수, 시간/비용 한도, 중단 조건을 갖는다.
-- 이 구성요소는 후행 단계다(D-018). 구독 기반 모델 접근 경로가 확인되지 않으면(B-06 fail/unknown) orchestrator 전체를 비활성화하고 제한 MVP는 이 구성요소 없이 동작·배포한다(D-019).
+- 이 구성요소는 후행 단계다(D-018). 지을지는 직접 쓰기 실사용 30일 뒤 정한다(D-120). 모델 접근 경로가 확인되지 않으면(B-06 fail/unknown) orchestrator 전체를 비활성화하고 직접 작성·대시보드는 이 구성요소 없이 동작·배포한다(D-019).
+- **모델 접근(D-120)**: 짓게 되면 기본은 Worker가 Claude API를 직접 부르는 처리기다 — API 키는 Workers secret에만 두고, 사용자 요금제 Max에 포함된 월 API 크레딧 안에서만 쓴다(따로 산 크레딧·자동 충전은 쓰지 않는다 — 크레딧이 떨어지면 그 달은 AI만 멈춘다). 크레딧이 없어지면 §4.6의 PC worker 처리기로 바꿔 끼울 수 있게 `ai_jobs` 큐 + 처리기 모양으로 감싼다. 서버 직통 경로의 확인(B-06 재정의)은 짓기로 정한 뒤 한다.
 
 ### 4.5 Evidence Administration
 
@@ -126,8 +132,9 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 - 한 Evidence Card를 MVP의 한 검색 파일로 만들어 file-level metadata filter의 한계를 피한다.
 - `draft → reviewed → active → retired` 상태를 사용하며 `active`만 검색 대상이다.
 
-### 4.6 PC AI Worker (후행 단계)
+### 4.6 PC AI Worker (후행 단계 — D-120 뒤로는 대체 경로)
 
+- 2026-10-15 D-120: AI 쓰기를 짓게 되면 기본 처리기는 서버 직통(§4.4)이고, 이 PC worker는 크레딧이 없어질 때 돌아갈 대체 경로다. 아래 계약과 D-110의 운영 조건은 이 경로의 것이다.
 - 본인 PC에서 도는 작은 Node 프로세스다. 주기적으로 `GET /api/ai-jobs/next`를 `Authorization: Bearer <worker secret>`으로 호출해 pending 작업을 lease하고, `claude -p --output-format json --json-schema <schema> --tools "" --max-turns 1 --model <D-031 모델>`을 subprocess로 실행한 뒤 `POST /api/ai-jobs/:id/result`로 되돌린다.
 - inbound 포트를 열지 않는다. 사설망·터널·포트 포워딩이 필요 없다.
 - 프로젝트 hooks/MCP가 섞이지 않도록 전용 작업 디렉터리에서 실행하고, `--bare`는 구독 인증을 지원하지 않으므로 쓰지 않는다. 동시 실행 1개, 호출 timeout, 실패 시 job `failed` 처리와 재시도 상한을 둔다.
@@ -274,12 +281,12 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 
 | 가설 | 게이트 | 판정 | 실패 시 대안 |
 | --- | --- | --- | --- |
-| 휴대폰 브라우저와 홈 화면 웹앱이 Worker 하나(화면과 `/api/*`가 같은 주소)에 접속해 핵심 흐름을 수행 | B-08 | confirmed(iPhone, Worker 하나 구성) — 2026-10-14 iPhone iOS 26.5.2: Safari 본체와 홈 화면 앱에서 토큰 입력·저장·조회·거부, 주소창 없는 앱 모드, 완전 종료 뒤 세션 유지, 밀어서 뒤로, 공유 창으로 파일 저장(EVAL_PLAN §4의 S-00~S-12). 미검증 5건: 12시간 뒤 로그인, 자판과 아래 버튼, 5분 떠났다 오기, 아이콘 지웠다 다시 추가, '웹 앱으로 열기'를 끈 경우. Android는 확인하지 않았고 출시 전 실기기 점검으로 넘겼다(D-108). **화면을 Pages에 따로 두는 분리 구성은 검증한 적이 없고 채택하지 않는다(D-111 — 안 된다는 것은 규격 판단).** 근거 `tasks/spike/2026-10-13/PLAN.md` | 무료 별도 hosting(D-021, 예: Netlify+Turso) |
+| 휴대폰 브라우저와 홈 화면 웹앱이 Worker 하나(화면과 `/api/*`가 같은 주소)에 접속해 핵심 흐름을 수행 | B-08 | confirmed(iPhone, Worker 하나 구성) — 2026-10-14 iPhone iOS 26.5.2: Safari 본체와 홈 화면 앱에서 토큰 입력·저장·조회·거부, 주소창 없는 앱 모드, 완전 종료 뒤 세션 유지, 밀어서 뒤로, 공유 창으로 파일 저장(EVAL_PLAN §4의 S-00~S-12). 미검증 5건: 12시간 뒤 로그인, 자판과 아래 버튼, 5분 떠났다 오기, 아이콘 지웠다 다시 추가, '웹 앱으로 열기'를 끈 경우. Android는 확인하지 않았고 출시 전 실기기 점검으로 넘겼다(D-108 — 2026-10-15부터 공개 관문의 `public-only`, D-117). **화면을 Pages에 따로 두는 분리 구성은 검증한 적이 없고 채택하지 않는다(D-111 — 안 된다는 것은 규격 판단).** 근거 `tasks/spike/2026-10-13/PLAN.md` | 무료 별도 hosting(D-021, 예: Netlify+Turso) |
 | D1의 조건부 UPDATE/CHECK/trigger/batch가 데이터 계약(D-024) 충족, 무료 한도·미사용 정지 없음 | B-04 | confirmed — 2026-09-02 근거(로컬·원격 D1: migration, CHECK, UNIQUE 2종, completed 보호 trigger 2종, 조건부 완료 UPDATE, revision 충돌, 부모 우선 FK cascade)에 더해 2026-10-13 원격: batch 중간 실패 시 앞 statement까지 되돌림, 동시 첫 저장 8·갱신 8·완료 6건에서 각각 1건만 성공, 재전송 409. 무료 한도(읽기 500만 행/일, 쓰기 10만 행/일, DB 500MB, 호출당 질의 50건) 확인. '미사용 정지'는 요금 문서에 조항이 없음으로 판정. 미검증: 지속 부하(1인 사용 범위 밖) | 무료 범위의 대체 DB 재평가 |
 | 서버 접근 토큰 cookie가 요구 인증 경계 충족(토큰 없는 접속 거부, rate limit) | B-02 | confirmed(본인 1명 전제) — 2026-09-02 근거(토큰 없음/오류 401, HMAC 세션 cookie HttpOnly/Secure/SameSite=Lax, D1 전역 잠금)에 더해 2026-10-14 iPhone Safari 본체·홈 화면 앱에서 세션 cookie 왕복. Rate Limiting binding은 미차단으로 기각. Cloudflare Access는 공식 문서 판정만(workers.dev 적용 가능, 무료 50명, 조직 생성에 결제수단 입력 필요) — 활성화하지 않았고 MVP에서 쓰지 않는다(D-108). identity 헤더는 Access를 켤 때만 있으므로 D-025의 허용 목록 대조는 세션 주체로 한다 — 2026-10-14 스파이크에 넣어 원격 확인: 세션이 주체를 서명과 함께 들고, 서명이 맞아도 목록에 없는 주체는 401(같은 방법으로 만든 목록 안 주체는 200), 주체만 바꿔치기한 세션 401. 실제 앱 구현은 Phase 1 | Cloudflare Access 추가 또는 무료 private hosting |
 | Workers secret이 client bundle/로그/`wrangler.toml`에 없고 custom header CSRF 통과, worker secret 경로 분리 | B-03 | confirmed — 2026-09-02 근거(secret 3개는 `wrangler secret put`으로만, custom header 없음·교차 Origin·cross-site 403, worker 경로 Bearer 없음 401)에 더해 2026-10-13 배포 묶음·정적 파일·설정·로그·Git 추적 파일·Git 이력에서 비밀값 0건, `wrangler tail` 기록 0건(cookie·authorization은 REDACTED, 본문 없음), 2026-10-14 iPhone Safari·홈 화면 앱의 실제 요청: custom header 있음 200 / 없음 403, Origin 있음·`Sec-Fetch-Site: same-origin` | 배포 중단 |
-| PC worker가 `ai_jobs` lease→`claude -p`→결과 반환 왕복을 완료하고, PC 꺼짐 시 job 만료+직접 작성 fallback | B-06 | partial(보류 2건) — 2026-09-02 왕복 PASS에 더해 2026-10-13 실제 PC worker: 실패 1회 → `pending`, 2회 → `failed`·payload NULL·사유 코드만, 기한 경과 → `expired`·payload NULL, 조회 응답의 `fallback: direct_write`, 정상 10/10. 미검증: 그 신호를 받은 화면의 실제 전환(앱 없음) | AI 대화·RAG 보류 |
-| 구독 기반 모델 호출 경로가 존재하고 server-only·strict schema·보존 통제 가능(B-06 재정의, D-019, D-029: 본인 PC `claude -p`) | B-06 | partial(보류 2건) — 2026-10-13~14: 생성과 분리된 독립 verifier 호출 5/5(세션 분리, 도구 없음), 명시 위기 3문장 가운데 2문장은 첫 호출에서 `possible_crisis`, 1문장은 첫 호출이 턴 제한으로 실패한 뒤 다시 부른 6회 모두 `possible_crisis`, `--no-session-persistence`로 PC에 대화 기록 미저장, 지연 worker p50 10.8초/p95 13.1초, 호출당 입력 약 2.6만 토큰(대부분 캐시)·출력 0.4~0.8천 토큰, 시간 초과·끊긴 출력·로그인 만료의 실패 분류. **미검증 2건: 거절 응답의 실제 재현(모의 응답으로만 확인), 구독 한도에서 차지하는 비율(계산하지 못함).** 운영 조건 D-110, 위험 RK-016·RK-017·RK-035 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
+| PC worker가 `ai_jobs` lease→`claude -p`→결과 반환 왕복을 완료하고, PC 꺼짐 시 job 만료+직접 작성 fallback | B-06 | partial(보류 2건) — 2026-09-02 왕복 PASS에 더해 2026-10-13 실제 PC worker: 실패 1회 → `pending`, 2회 → `failed`·payload NULL·사유 코드만, 기한 경과 → `expired`·payload NULL, 조회 응답의 `fallback: direct_write`, 정상 10/10. 미검증: 그 신호를 받은 화면의 실제 전환(앱 없음). 2026-10-15 D-120 뒤로는 대체 경로의 판정이다 | AI 대화·RAG 보류 |
+| 구독 기반 모델 호출 경로가 존재하고 server-only·strict schema·보존 통제 가능(B-06 재정의, D-019, D-029: 본인 PC `claude -p`) | B-06 | partial(보류 2건) — 2026-10-13~14: 생성과 분리된 독립 verifier 호출 5/5(세션 분리, 도구 없음), 명시 위기 3문장 가운데 2문장은 첫 호출에서 `possible_crisis`, 1문장은 첫 호출이 턴 제한으로 실패한 뒤 다시 부른 6회 모두 `possible_crisis`, `--no-session-persistence`로 PC에 대화 기록 미저장, 지연 worker p50 10.8초/p95 13.1초, 호출당 입력 약 2.6만 토큰(대부분 캐시)·출력 0.4~0.8천 토큰, 시간 초과·끊긴 출력·로그인 만료의 실패 분류. **미검증 2건: 거절 응답의 실제 재현(모의 응답으로만 확인), 구독 한도에서 차지하는 비율(계산하지 못함).** 운영 조건 D-110, 위험 RK-016·RK-017·RK-035. **2026-10-15 D-120**: 짓게 되면 서버 → Claude API 경로로 이 가설을 다시 세우고(보류 2건은 그 길에선 묻지 않는다), 이 판정은 대체 경로의 것으로 남는다 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
 | Web Push/background 동작 | 게이트 없음(MVP 밖 — 이슈 #9, RK-004). 전에는 이 행에도 B-08이 붙어 있어 휴대폰 접속 판정과 헷갈렸다 | unknown — 확인하지 않았다 | 인앱 reminder만 MVP |
 | Vector search filter/score 응답이 Gate 입력 충족(유료 Vector Store 불가 시 구독 경로/로컬 대안) | B-07 | unknown | custom DB/hybrid retrieval 또는 RAG 보류 |
 | D1 데이터 위치·암호화·보존·hard delete 반영·백업(Time Travel/export) 절차가 고지 가능한 수준으로 정의됨 | B-05 | confirmed — 2026-10-13 Time Travel 복구 실습(지운 행 복구 → 그 복구를 되돌림), 저장 지역 APAC·AES-256·무료 7일(공식 문서), 백업 절차와 삭제 지연 문서화(D-109, `DATA_MODEL` §8). 고지 문구는 초안. 백업·다시 넣는 도구의 구현은 Phase 1 | 백업 약속 축소 또는 제품 범위 축소 |
@@ -306,7 +313,7 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 
 - **`wrangler.jsonc`**(커밋된다): `main` = `app/worker/src/index.ts`, `compatibility_date` 2026-06-01, `minify` 켬, `send_metrics` 끔, `assets` = `{ binding: "ASSETS", not_found_handling: "single-page-application", run_worker_first: ["/api/*"] }`, D1 바인딩 `DB`(`migrations_dir` = `app/migrations`), 변수 `OWNER_SUBJECT`·`OWNER_ALLOWLIST`(주체 `owner`). `run_worker_first`를 배열로 주면 navigate 요청 자동 감지는 꺼지고 배열에 맞는 경로만 Worker로 간다(공식 문서 2026-10-14).
 - **계정 값은 저장소에 없다**(D-115 ①): account id, D1 id, 앱 주소(계정 하위 도메인)를 커밋되는 파일에 두지 않는다. 원격 명령은 `app/scripts/cf.mjs`가 `wrangler d1 list`로 이름에서 D1 id를 찾아 Git 제외 파일 `wrangler.local.jsonc`를 만든 뒤 `--config`로 부른다. id 없이 올려 자동으로 만드는 기능은 쓰지 않는다(설정 파일에 id를 되쓴다). CSRF의 허용 출처는 설정에 적지 않고 요청 자신의 주소로 계산한다(§5).
-- **환경 셋**: 최상위(로컬 개발·시험, `local`) / `env.dev` — 개발용 건물(Worker `emotion-diary-dev`, D1 `emotion-diary-dev`, 가짜 데이터만) / `env.prod` — 운영(Worker `emotion-diary-prod`, D1 `emotion-diary-prod`). **운영은 이름만 정했고 제한 MVP 출시 전에 만든다.** 환경마다 Worker·D1·비밀값이 따로다(바인딩·변수·비밀값은 상속되지 않는다). `cf.mjs`는 `--env` 없는 원격 명령과 운영 명령(따로 허락하지 않으면)을 거부한다.
+- **환경 셋**: 최상위(로컬 개발·시험, `local`) / `env.dev` — 개발용 건물(Worker `emotion-diary-dev`, D1 `emotion-diary-dev`, 가짜 데이터만) / `env.prod` — 운영(Worker `emotion-diary-prod`, D1 `emotion-diary-prod`). **운영은 이름만 정했고 본인 사용 시작(`personal-start`) 전에 만든다(D-116·D-117 — 만들기 직전 사용자 확인).** 환경마다 Worker·D1·비밀값이 따로다(바인딩·변수·비밀값은 상속되지 않는다). `cf.mjs`는 `--env` 없는 원격 명령과 운영 명령(따로 허락하지 않으면)을 거부한다.
 - **비밀값 넷**(환경마다 따로, `secrets.required`로 선언 — 빠지면 올리기가 실패하고, 실행 중 빠지거나 짧으면 모든 `/api/*`가 500): `ACCESS_KEY_HASH`(열쇠의 HMAC-SHA256, 16진수 64자), `ACCESS_KEY_SALT`, `SESSION_SECRET`(세션 서명), `APP_LOCK_SECRET`(앱 잠금 해시). 만드는 것은 `app/scripts/make-secrets.mjs`, 값은 Git 제외 파일(`work/deploy/`, 로컬은 `.dev.vars`)과 `wrangler secret`에만 있다(§3).
 - **개발용 전용 코드는 운영 묶음에서 코드째 빠진다**(D-115 ②): 빌드 상수 `__APP_ENV__`(`local`·`dev`·`prod`)로 가르고, 운영 빌드에서 그 조건이 거짓으로 접혀 오류 보고 경로와 상태 칸이 묶음에 들어가지 않는다. `npm run build`가 운영 묶음에서 표식(`client-errors`·`client_errors`·`dev-panel`)을 찾으면 실패하고, 개발용 묶음에 표식이 없어도 실패한다(검사가 헛돌지 않게).
 
@@ -363,7 +370,7 @@ Mac이 없어 iPhone 화면의 개발 도구를 쓸 수 없으므로(RK-036) 개
 
 ### 11.9 경로·화면 주소·본문 한도를 넓히는 규칙
 
-Phase 2(`data-foundation`과 직접 작성 흐름)가 새로 정하지 않고 경로만 더하면 되게 정해 둔다(2026-10-14 독립 검토의 '짓는 사람 시험' 지적 — 에이전트 결정, D-115의 세부).
+Phase 1a~Phase 2(`data-foundation`·`first-slice`와 직접 작성 흐름 — 2026-10-15 순서, D-116)가 새로 정하지 않고 경로만 더하면 되게 정해 둔다(2026-10-14 독립 검토의 '짓는 사람 시험' 지적 — 에이전트 결정, D-115의 세부).
 
 - **서버 경로**: 경로 표(`app/worker/src/router.ts`)의 열쇠는 `"방식 /api/경로"`이고 경로 조각 하나를 `:이름`으로 받는다(예: `PUT /api/diaries/:date`, `POST /api/diaries/:date/complete`). 조각은 주소의 `/` 사이 한 칸이지만 URL 디코딩 뒤 값에는 어떤 글자든 올 수 있다(`%2F`면 `/`) — 그 값이 `ctx.params`로 처리기에 가고, **모양 검사(날짜 형식 `YYYY-MM-DD` 등)와 권한 검사는 반드시 처리기가 한다**(§3). 정확한 경로가 매개변수 경로보다 먼저 맞는다. 같은 경로에 그 방식이 없으면 405, 경로가 없으면 404다. 이 판정은 로그인(401)·CSRF(403)·잠김(423) **뒤**에 한다 — 로그인 전이나 잠긴 세션에는 어떤 경로가 있는지 알려 주지 않는다. 새 경로를 더해도 `app.ts`의 순서는 바꾸지 않는다.
 - **화면 주소**: `#/이름` 뒤에 값이 필요하면 경로 조각으로 둔다(예: `#/record/2026-10-14`) — query(`?…`)는 한 화면 안의 상태(`?s=again`, `?step=` 같은 것)에만 쓴다. 화면 표(`app/client/src/lib/routes.ts`)는 지금 정확한 이름만 알고, 값이 든 화면이 처음 생길 때 `이름/:값` 모양을 더한다. 로그인이 풀려 돌아갈 자리(`returnTo`)에는 **값까지 든 화면 주소**를 두되 query는 버린다(열쇠는 원래 주소에 실리지 않는다 — §6). 값이 든 화면도 기록 규칙(UX_SPEC §17)은 같다. 개발용 오류 보고의 화면 칸(`route`)과 상태 칸에는 **값 조각을 빼고 화면 이름만** 싣는다(`record/2026-10-14` → `record`) — 기록 날짜 같은 값이 서버 기록에 남지 않게(§11.3·§11.5).

@@ -8,6 +8,10 @@ source_of_truth: docs/AGENT_WORKFLOW.md
 # 2026-09-20 TASK-INFRA-01: status가 9/5부터 멈춰 STATUS §3(스파이크 pass/partial)과 어긋나 있었다.
 # 실제 증거에 맞춰 고쳤고, 앞으로는 scripts/check-harness.mjs가 "선행이 done이 아닌데 후행이
 # in_progress·verifying·done"인 모순과 loop-state와의 불일치를 quick에서 잡는다.
+# 2026-10-15 TASK-CLEANUP-01(D-116~D-121): 순서를 '오늘 한 편'을 휴대폰까지 먼저로 바꿨다 — data-foundation(저장 핵심) →
+# first-slice·data-control → personal-start(본인 사용 시작 관문) → direct-journal → dashboard-reminder. limited-mvp-release는
+# id를 그대로 두고 뜻을 '공개 출시(공개를 정할 때만)'로 바꿨다(D-117). AI 쓰기는 실사용 30일 뒤, 근거 분석은 60일 뒤 결정(D-120·D-121).
+# 이 파일이 노드 상태의 유일한 기록이다(D-118) — 다른 문서는 상태를 옮겨 적지 않고 여기를 가리킨다.
 
 statuses:
   allowed: [blocked, ready, in_progress, verifying, done]
@@ -52,7 +56,8 @@ nodes:
     status: done
     depends_on: [hosting-identity-spike]
     # 2026-10-14 TASK-SPIKE-02: gate data-contract 통과 — B-04·B-05 pass. 원격 batch 되돌림·동시 요청,
-    # Time Travel 복구 실습, 백업 절차와 삭제 지연 문서화(D-109). 백업·재수입 구현은 data-foundation 몫이다.
+    # Time Travel 복구 실습, 백업 절차와 삭제 지연 문서화(D-109). 백업·재수입 구현은 data-control 몫이다(2026-10-15 D-116 —
+    # 전에는 data-foundation. docs/DATA_MODEL.md §8·docs/DEPLOY.md §8의 같은 문장은 TASK-CLEANUP-01 소유 밖이라 남았다).
     # (이력) 2026-09-20에는 선행 gate가 통과하지 않아 증거(partial)가 있어도 blocked로 두었다.
     owns:
       - docs/DATA_MODEL.md §3 SQL-level contracts
@@ -68,11 +73,14 @@ nodes:
     # 2026-10-14 TASK-SPIKE-02: B-06은 보류 2건 — 거절 응답을 실제 호출로 재현하지 못했고(모의 응답으로만), 구독 한도 비율을 계산하지 못했다.
     # 실패·만료 전환, 독립 verifier, 위기 케이스, 기록 미저장, 지연·토큰은 확인했다. 운영 조건 D-110.
     # (이력) 2026-09-20에는 만료·failed 전환, verifier, 위기 케이스, 보존 설정이 남아 verifying이었다.
+    # 2026-10-15(D-120): 사용자 요금제가 Max라 AI 쓰기를 짓게 되면 서버 → Claude API(포함 월 크레딧)로 짓는다. 그때 이 노드를
+    # '서버 직통 경로 확인'으로 다시 정의하고(gate model-access의 B-06 정의도 그때 고친다), 위 보류 2건은 그 길에선 묻지 않는다.
+    # 아래 PC 경로의 증거는 크레딧이 없어질 때 돌아갈 대체 경로의 증거로 남는다. 지을지는 실사용 30일 뒤 결정.
     owns:
       - docs/AI_RAG_SPEC.md §1, §4 model access sections
       - docs/DECISIONS.md model access decisions
     outputs:
-      - subscription-based (non-paid) claude -p path proof: minimal spike PASS 2026-09-02 (D-029, D-031)
+      - subscription-based (non-paid) claude -p path proof: minimal spike PASS 2026-09-02 (D-029, D-031) — fallback path after D-120
       - PC worker ai_jobs lease/result round trip and offline fallback (D-032)
       - independent verifier call feasibility (D-026)
     gate: model-access
@@ -80,6 +88,8 @@ nodes:
   - id: vector-search-spike
     status: blocked
     depends_on: [model-access-spike]
+    # 2026-10-15(D-121): 근거 분석은 실사용 60일 뒤 결정. 하게 되면 카드 30~50장을 태그로 찾는 방식이라 이 스파이크는 필요 없을 공산 —
+    # 그 결정 때 노드를 남길지 뺄지 정한다.
     owns:
       - docs/AI_RAG_SPEC.md §7 retrieval sections
     outputs:
@@ -89,11 +99,12 @@ nodes:
   - id: app-scaffold
     status: done
     depends_on: [hosting-identity-spike, data-store-spike]
-    # 2026-10-14 TASK-MOBILE T3(브랜치 app/scaffold, 커밋 전)에서 끝났다. 화면은 도구 없이(D-114), 구성은 D-115,
+    # 2026-10-14 TASK-MOBILE T3(브랜치 app/scaffold, 로컬 커밋 323329b — 푸시 전)에서 끝났다. 화면은 도구 없이(D-114), 구성은 D-115,
     # 정본은 docs/ARCHITECTURE.md §11·docs/DEPLOY.md. 게이트 code-quality 근거: 잠금 파일로 두 번 깨끗이 설치해 같은
-    # 결과(npm 10.9.2 npm ci, 81패키지), package.json의 lint·typecheck·test·build가 verify full 안에서 PASS(앱 시험 238건),
-    # lint가 일부러 넣은 미사용 변수를 잡음(종료 코드 1). 개발용 건물 emotion-diary-dev 원격 검사 34/34. iPhone은 1회차
-    # (설치·로그인·S-01·S-02·S-07·S-12)만 보고 나머지는 사용자 결정으로 미뤘다 — 근거 tasks/mobile/2026-10-14-t3/PLAN.md.
+    # 결과(npm 10.9.2 npm ci), package.json의 lint·typecheck·test·build가 verify full 안에서 PASS, lint가 일부러 넣은
+    # 미사용 변수를 잡음(종료 코드 1), 개발용 건물 emotion-diary-dev 원격 검사 — 시험·검사 수는 docs/STATUS.md §1(D-118).
+    # CI(Ubuntu·Windows)는 앱 코드를 아직 돌리지 않았다(푸시 전) — 첫 초록은 data-foundation 관문의 ci-green이 확인한다.
+    # iPhone은 1회차만 보고 나머지는 사용자 결정으로 미뤘다 — 결과는 docs/EVAL_PLAN.md §4, 근거 tasks/mobile/2026-10-14-t3/PLAN.md.
     # 경계: 이 노드는 로그인·세션 기록·앱 잠금·부를 이름·화면 오류 표(app/migrations 0001~0004)와 경로·화면 뼈대를 만들었다.
     # diary 표와 owner별 저장소·권한 검사는 data-foundation이다.
     owns:
@@ -108,19 +119,75 @@ nodes:
   - id: data-foundation
     status: ready
     depends_on: [app-scaffold]
-    # 2026-10-14 app-scaffold가 끝나 열렸다. 이 노드가 만드는 것: diary 표(마이그레이션 0005부터), owner별 저장소와
-    # 서버 권한 검사, 하루 1개·revision·idempotency, 삭제(전체 삭제는 owner_settings까지 — D-112 ⑩)·내보내기, 일기 칸의
-    # 최대 길이와 경로별 본문 한도(ARCHITECTURE §11.9). 경로는 app/worker/src/router.ts의 `:이름` 조각으로 더하고
-    # app.ts의 확인 순서(401→403→423→404)는 바꾸지 않는다. 시작 전 사용자 결정 남음: mobile-core-flow의 Android(STATUS §4).
+    # 2026-10-14 app-scaffold가 끝나 열렸다. 2026-10-15(D-116) 범위를 '저장 핵심'으로 좁혔다 — 내보내기·전체 삭제·백업은
+    # data-control로 옮겼다. 만드는 것: 일기·감정 표(마이그레이션 0005부터), owner별 저장소와 서버 권한 검사, 오늘 임시저장·완료·
+    # 조회·수정, 하루 1개·revision·idempotency, 일기 칸의 최대 길이와 경로별 본문 한도(ARCHITECTURE §11.9). 경로는
+    # app/worker/src/router.ts의 `:이름` 조각으로 더하고 app.ts의 확인 순서(401→403→423→404)는 바꾸지 않는다.
+    # 여기서 정한다(감리 REPORT §3.3 1단계): '쓰던 단계'를 서버에 둘지(RK-043), 틀린 열쇠 잠금 고침 — 맞는 열쇠는 잠금과 상관없이
+    # 통과하고 틀린 시도만 막는다(감리 REPORT §5.2, RK-041). 하루 기준 시각 — 서버가 오늘의 entry_date를 owner의 day_start_hour
+    # (기본 4시, DATA_MODEL §2·§3.4)로 계산한다. 그 값을 담는 설정 표를 이 노드에서 만들지, 기본 4시로 계산하고 바꾸는 화면은
+    # direct-journal로 미룰지 정한다 — 저장된 entry_date는 나중에 고칠 수 없으므로 실사용(personal-start) 전에 F-17을 통과한다.
+    # 바꾸는 길을 미루면 F-17의 '바꿔도 저장된 날짜는 그대로' 절은 데이터베이스 수준 시험(값을 직접 바꿔 보기)으로 본다.
+    # 부를 이름을 내보내기에 넣을지는 data-control에서 정한다.
     owns:
       - migrations
       - diary repository and server authorization
       - data contract tests
     outputs:
+      - today's draft save, completion, read and edit on the server
       - daily uniqueness
       - revision and idempotency
-      - delete and export
+      - access-key lockout that never blocks the correct key
     gate: data-integrity
+
+  - id: first-slice
+    status: blocked
+    depends_on: [data-foundation, taxonomy-v1, taxonomy-v2-research]
+    # 2026-10-15 새 노드(D-116): 첫 조각 '오늘 한 편' — 연출 없는 평면 화면으로 사건 → 계열·세부·강도 → 이유 → 칭찬·감사(비워도 됨)
+    # → 완료, 서버 임시저장, 화면이 통째로 새로 열린 뒤 쓰던 단계로 복구(F-24, RK-034). 여기서 정한다: 작성 흐름 상태 설계 한 장,
+    # 자판 아래 버튼 배치(S-07 — 버튼을 본문 흐름에 두는 안 추천, RK-042), 기기 안 짧은 사본을 둘지(DATA_MODEL §6과 맞바꿈, RK-043),
+    # 실제 브라우저 E2E 도구(quality-gates release.browser-e2e). 근거: 감리 tasks/review/2026-10-14/REPORT.md §3.3 2단계.
+    owns:
+      - writing-flow state design
+      - plain today-entry screens
+      - server draft restore after a full page reload
+    outputs:
+      - one diary entry written, completed and reopened on the iPhone home-screen app
+      - reload-and-restore browser E2E
+    gate: first-slice
+
+  - id: data-control
+    status: blocked
+    depends_on: [data-foundation]
+    # 2026-10-15 새 노드(D-116): 내 데이터 통제 — 내보내기(공유 창, S-05), 전체 삭제(부를 이름·앱 잠금까지 — D-112 ⑩), 본인 PC 백업과
+    # 다시 넣는 도구(D-109), 복원 연습(복원 뒤 세션 기록 비우기 — 감리 N-7), 합성 3년치로 내보내기 CPU 실측(무료 10ms — 감리 N-8).
+    # 여기서 정한다: 부를 이름을 내보내기에 넣을지. 근거: 감리 REPORT §3.3 3단계, DATA_MODEL §8.
+    owns:
+      - export and hard delete
+      - PC backup and re-import tool
+      - restore drill record
+    outputs:
+      - versioned JSON export through the share sheet
+      - full delete including owner settings
+      - backup that has been restored at least once
+    gate: data-control
+
+  - id: personal-start
+    status: blocked
+    depends_on: [first-slice, data-control]
+    # 2026-10-15 새 노드(D-116·D-117): 본인 사용 시작 관문 — 운영 건물·운영 열쇠(만들기 직전 사용자 확인), 위기 안내 '검토 전' 표기로
+    # 본인만(D-094·D-117). 위기 안내 화면(#/help)은 2026-10-15 앱에 아직 없다 — 이 노드에서 짓고, 설정 화면이 없는 동안의 진입점은
+    # 여기서 정한다(설정 입구는 direct-journal에서 옮긴다). 이때부터의 규칙: 창고 구조를 바꾸는 작업 전마다 내보내기 + 백업,
+    # 바꾼 뒤 복원 확인(RK-045).
+    # docs/DEPLOY.md §1 표·§8의 '제한 MVP 출시 전'(운영 건물을 만드는 때)을 이 노드에서 '본인 사용 시작 전'으로 고친다
+    # (TASK-CLEANUP-01의 소유 파일 밖이라 남겼다). 공개 기준(Android·별도 동의·임상 검토·S·T 전부·화면 낭독기)은 요구하지 않는다.
+    owns:
+      - production building and key (created only after the user confirms)
+      - first production backup and restore record
+      - crisis help screen (#/help) with the 'not yet clinically reviewed' label
+    outputs:
+      - the owner writes real entries daily on the production building
+    gate: personal-start
 
   - id: taxonomy-v1
     status: done
@@ -153,7 +220,10 @@ nodes:
 
   - id: direct-journal
     status: blocked
-    depends_on: [data-foundation, taxonomy-v1, taxonomy-v2-research]
+    depends_on: [personal-start]
+    # 2026-10-15(D-116): 실사용과 나란히 시안 화면을 하나씩 옮긴다(나머지 작성 단계·연출·달력·기록 상세·설정). 작성 흐름을 먼저 옮기고,
+    # 화면 동기화 코드가 3분의 1을 넘거나 '낡은 화면' 결함이 3건이면 화면 도구(Preact)를 다시 본다(감리 REPORT §5.3).
+    # 관문의 실기기는 iPhone만(mobile-core-flow-personal) — Android와 화면 낭독기는 공개 관문으로 갔다(D-117).
     owns:
       - direct-entry UI
       - autosave and completion flow
@@ -165,6 +235,8 @@ nodes:
   - id: dashboard-reminder
     status: blocked
     depends_on: [direct-journal]
+    # 2026-10-15(D-116): 시작은 실제 기록이 2주 쌓인 뒤. 기본 통계·달력 먼저, 기간 비교·친밀도는 그 뒤. 알림의 기본값(켜짐/꺼짐)은
+    # 이때 사용자와 정한다(감리 REPORT §3.3 6단계).
     owns:
       - deterministic statistics
       - dashboard UI
@@ -177,17 +249,22 @@ nodes:
   - id: limited-mvp-release
     status: blocked
     depends_on: [direct-journal, dashboard-reminder]
+    # 2026-10-15(D-117): id는 그대로 두고 뜻을 '공개 출시 — 다른 사람에게 열기로 정할 때만'으로 바꿨다. 본인 사용은 personal-start가 연다.
+    # 관문 limited-release에 public-only(Android Chrome 실기기, 건강정보 별도 동의·처리방침, 위기 연락처 임상 검토·1388 실측,
+    # 실제 앱의 S-00~S-12·T-01~T-07 전부, 화면 낭독기)를 더했다. 공개 갈림길 목록은 감리 REPORT §3.3 '공개 갈림길'.
     owns:
       - limited release evidence bundle
       - deployment checklist (AI paths disabled)
     outputs:
-      - tested private mobile deployment of direct journal + deterministic dashboard (D-018)
+      - tested public mobile deployment of direct journal + deterministic dashboard (D-018, D-117)
       - rollback and limitations including no AI and no automatic crisis scanning (D-020)
     gate: limited-release
 
   - id: ai-journal
     status: blocked
     depends_on: [direct-journal, model-access-spike]
+    # 2026-10-15(D-120): 지을지는 직접 쓰기 실사용 30일 뒤 사용자가 정한다. 짓게 되면 서버 → Claude API(Max 포함 월 크레딧),
+    # 크레딧이 없어지면 PC + claude -p로 바꿔 끼울 수 있게(작업 큐 + 처리기). 근거 없는 심리학 문장 0(D-121, SERVICE_WHY §19.9~§19.14).
     owns:
       - journal conversation endpoint and schemas
       - AI fallback UI
@@ -201,6 +278,8 @@ nodes:
   - id: evidence-pipeline
     status: blocked
     depends_on: [bootstrap-audit, vector-search-spike]
+    # 2026-10-15(D-121): 지을지는 실사용 60일 뒤 정한다. 하게 되면 사람이 고른 근거 카드 30~50장을 파일로 두고 태그로 찾는다 —
+    # 그때 선행 vector-search-spike를 뺄지 함께 정한다(노드 모양은 그 결정 때 고친다).
     owns:
       - evidence card schema and ingestion
       - approved evaluation corpus
@@ -213,6 +292,7 @@ nodes:
   - id: rag-analysis
     status: blocked
     depends_on: [dashboard-reminder, evidence-pipeline]
+    # 2026-10-15(D-121): 실사용 60일 뒤 결정. 그 전에는 AI가 심리학 설명을 하지 않는다.
     owns:
       - planner, search, gate, generator
       - verifier and safety validator
@@ -224,6 +304,7 @@ nodes:
   - id: release-candidate
     status: blocked
     depends_on: [limited-mvp-release, ai-journal, rag-analysis]
+    # 2026-10-15: 공개 출시(limited-mvp-release, D-117)에 AI 쓰기·근거 분석을 더한 전체 출시 — 둘 다 지을지부터 실사용 뒤 결정(D-120·D-121).
     owns:
       - release evidence bundle
       - deployment checklist
@@ -270,14 +351,26 @@ edges:
     to: data-foundation
     reason: migrations need an executable runtime
   - from: data-foundation
-    to: direct-journal
+    to: first-slice
     reason: UI must rest on database invariants
   - from: taxonomy-v1
-    to: direct-journal
+    to: first-slice
     reason: emotion choices must match source material
   - from: taxonomy-v2-research
-    to: direct-journal
+    to: first-slice
     reason: the product-facing emotion list must be the evidence-backed v2 list (D-038)
+  - from: data-foundation
+    to: data-control
+    reason: export, delete and backup act on the diary tables
+  - from: first-slice
+    to: personal-start
+    reason: real use starts only when one entry survives a reload on the phone (D-116)
+  - from: data-control
+    to: personal-start
+    reason: real diaries go in only after export, delete and a restored backup work (D-116)
+  - from: personal-start
+    to: direct-journal
+    reason: the rest of the prototype is ported while the owner already writes daily (D-116)
   - from: direct-journal
     to: ai-journal
     reason: AI must degrade to a working direct flow
@@ -286,10 +379,10 @@ edges:
     reason: reflection uses completed records
   - from: direct-journal
     to: limited-mvp-release
-    reason: limited MVP ships direct journaling first (D-018)
+    reason: a public release ships direct journaling first (D-018, D-117)
   - from: dashboard-reminder
     to: limited-mvp-release
-    reason: limited MVP includes the deterministic dashboard (D-018)
+    reason: a public release includes the deterministic dashboard (D-018, D-117)
   - from: dashboard-reminder
     to: rag-analysis
     reason: analysis begins with deterministic statistics

@@ -18,6 +18,10 @@
 // (projects/<프로젝트> 기록 폴더)·@PROJROOT(projects)는 케이스마다 새로 만드는 임시 폴더로 바뀐다 — 모두
 // 프로젝트 root 밖이다. 모든 케이스는 훅이 exit 0으로 끝나야 통과한다: 훅이 죽으면 stdout이 비어 "pass"로
 // 보이므로(2026-09-19~21에 ?theme=pebble 토큰으로 29회 죽었다) 종료 코드를 따로 본다.
+//
+// D-119(2026-10-15) — 선택 필드 fixture: 확인은 CURRENT_TASK에 `- 동시 작업: 켬` 줄이 있을 때만 한다. 기본 fixture는
+// 그 줄을 담아 위의 케이스들이 '켜졌을 때의 동작'을 계속 시험한다. fixture가 "off"(줄 없음)·"explicit-off"(`끔`)·
+// "prose"(문장 속 언급)·"list-prose"(목록 표식 뒤 설명문)이면 그 줄을 빼거나 바꾼 fixture를 쓴다 — 넷 다 꺼진 것으로 본다.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -36,12 +40,14 @@ const guardSource = fs.readFileSync(path.join(root, "scripts/claude-scope-guard.
 // 파일:")이 아니라 문장 속 언급이므로 허용 목록에 새면 안 된다(케이스 8, 회귀 테스트).
 // 섹션 C는 실제 CURRENT_TASK.md에서 훅을 죽인 형태 — 선언 줄 설명문 속 `?theme=pebble` 같은, 경로가
 // 아닌데 backtick에 싸인 조각 — 를 흉내낸다(D-060).
+const CONCURRENT_ON_LINE = "- 동시 작업: 켬(작업자 둘, 테스트)";
 const FIXTURE_CURRENT_TASK = `# 테스트용 CURRENT_TASK
 
 ## 섹션 A (진행 중)
 
 상태: 누구의 소유 파일도 아니었던 \`docs/DECOY_FROM_PROSE.md\`에 대한 이야기(선언 아님, 산문 언급).
 
+${CONCURRENT_ON_LINE}
 - 소유 파일: \`docs/DECISIONS.md\`, \`harness/*.yaml\`, \`.claude/agents/\`, 이 파일
 
 ## 섹션 B (완료)
@@ -53,12 +59,35 @@ const FIXTURE_CURRENT_TASK = `# 테스트용 CURRENT_TASK
 - 소유 파일: \`docs/DECISIONS.md\`(시안이 \`?theme=pebble\`일 때만 읽는다), \`data/after-bad-token.json\`
 `;
 
-function makeTempRoot() {
+// D-119: '동시 작업' 줄을 빼거나 바꾼 fixture. 마지막 둘은 꺼진 상태에서 그 낱말이 나오는 문장이 장치를 켜지 않는지 본다.
+const FIXTURE_VARIANTS = {
+  on: FIXTURE_CURRENT_TASK,
+  off: FIXTURE_CURRENT_TASK.replace(`${CONCURRENT_ON_LINE}\n`, ""),
+  "explicit-off": FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업: 끔"),
+  prose: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "병렬 작업을 띄울 때는 `- 동시 작업: 켬` 줄을 더한다(설명문)."),
+  "list-prose": FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업: 켬 줄이 있을 때만 확인한다는 설명(목록 표식 뒤 문장)"),
+  // 2026-10-15 마감 검토 지적 13·14: 정본 형태(맨 '켬')와 흔한 변형이 켜지는지, 예시·인용이 켜지지 않는지.
+  bare: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업: 켬"),
+  indented: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "  - 동시 작업: 켬"),
+  star: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "* 동시 작업: 켬"),
+  "fullwidth-colon": FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업：켬"),
+  "trailing-space": FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업: 켬   "),
+  "dash-memo": FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업: 켬 — 2026-10-20까지"),
+  "comma-memo": FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업: 켬, 작업자 둘"),
+  bold: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- **동시 작업**: 켬"),
+  numbered: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "1. 동시 작업: 켬"),
+  crlf: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업: 켬").replace(/\n/g, "\r\n"),
+  "on-and-off": FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "- 동시 작업: 켬\n- 동시 작업: 끔"),
+  fenced: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "```text\n- 동시 작업: 켬\n```"),
+  quoted: FIXTURE_CURRENT_TASK.replace(CONCURRENT_ON_LINE, "> - 동시 작업: 켬")
+};
+
+function makeTempRoot(fixture = "on") {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), "scope-guard-test-"));
   fs.mkdirSync(path.join(dir, "scripts"));
   fs.mkdirSync(path.join(dir, "tasks"));
   fs.writeFileSync(path.join(dir, "scripts/claude-scope-guard.mjs"), guardSource);
-  fs.writeFileSync(path.join(dir, "tasks/CURRENT_TASK.md"), FIXTURE_CURRENT_TASK);
+  fs.writeFileSync(path.join(dir, "tasks/CURRENT_TASK.md"), FIXTURE_VARIANTS[fixture]);
   return dir;
 }
 
@@ -185,11 +214,84 @@ const cases = [
   {
     name: "[default] 작업 폴더 밖 임의 경로는 두 필드가 다 있어도 확인한다",
     mode: "default", scratchpadDir: "@SCRATCH", transcriptPath: "@PROJ/session.jsonl", toolName: "Write", filePath: "OUTSIDE_ROOT", expect: "ask"
+  },
+
+  // D-119 — 확인 장치는 `- 동시 작업: 켬` 줄이 있을 때만 켜진다. 위의 케이스는 모두 그 줄이 있는 fixture다.
+  {
+    name: "[동시 작업 줄 없음] 소유 파일 밖 프로젝트 파일도 조용히 통과한다(차례로 일할 때)",
+    fixture: "off", mode: "default", toolName: "Edit", filePath: "docs/PROCESS_LOG.md", expect: "pass"
+  },
+  {
+    name: "[동시 작업 줄 없음] 모드 필드가 없어도 통과한다",
+    fixture: "off", toolName: "Write", filePath: "docs/PROCESS_LOG.md", expect: "pass"
+  },
+  {
+    name: "[동시 작업 줄 없음] 프로젝트 root 밖 경로도 통과한다",
+    fixture: "off", mode: "default", toolName: "Write", filePath: "OUTSIDE_ROOT", expect: "pass"
+  },
+  {
+    name: "[동시 작업 줄 없음] 선언된 경로는 그대로 통과한다",
+    fixture: "off", mode: "default", toolName: "Write", filePath: "docs/DECISIONS.md", expect: "pass"
+  },
+  {
+    name: "[동시 작업: 끔] 꺼짐으로 적혀 있으면 통과한다",
+    fixture: "explicit-off", mode: "default", toolName: "Edit", filePath: "docs/PROCESS_LOG.md", expect: "pass"
+  },
+  {
+    name: "[문장 속 언급] backtick 안의 '- 동시 작업: 켬'은 장치를 켜지 않는다",
+    fixture: "prose", mode: "default", toolName: "Edit", filePath: "docs/PROCESS_LOG.md", expect: "pass"
+  },
+  {
+    name: "[목록 표식 뒤 설명문] '- 동시 작업: 켬 줄이 있을 때만…' 같은 설명은 장치를 켜지 않는다",
+    fixture: "list-prose", mode: "default", toolName: "Edit", filePath: "docs/PROCESS_LOG.md", expect: "pass"
+  },
+  {
+    name: "[동시 작업: 켬 + auto] auto에서는 켜져 있어도 확인하지 않는다",
+    mode: "auto", toolName: "Edit", filePath: "docs/PROCESS_LOG.md", expect: "pass"
+  },
+  {
+    name: "[동시 작업: 켬 + 작업 폴더] scratchpad는 켜져 있어도 확인하지 않는다",
+    mode: "default", scratchpadDir: "@SCRATCH", toolName: "Write", filePath: "@SCRATCH/x.txt", expect: "pass"
+  },
+  {
+    name: "[동시 작업 줄 없음 + 손상된 입력] 판단하지 않고 통과한다",
+    fixture: "off", raw: "{ not json", expect: "pass"
+  },
+
+  // 형식 변형(마감 검토 지적 13·14) — 켜진 것으로 봐야 하는 줄: 소유 밖 쓰기를 확인한다.
+  ...[
+    ["bare", "맨 '- 동시 작업: 켬'(문서에 적힌 정본 형태)"],
+    ["indented", "들여쓴 줄"],
+    ["star", "'*' 목록 표식"],
+    ["fullwidth-colon", "전각 콜론 '：'"],
+    ["trailing-space", "'켬' 뒤 꼬리 공백"],
+    ["dash-memo", "'켬 — 메모'"],
+    ["comma-memo", "'켬, 메모'"],
+    ["bold", "굵은 글 '**동시 작업**'"],
+    ["numbered", "번호 목록 '1.'"],
+    ["crlf", "CRLF 줄바꿈의 CURRENT_TASK"],
+    ["on-and-off", "켬 줄과 끔 줄이 함께 있으면 켬이 이긴다(안전 쪽 — 끄려면 켬 줄을 지운다)"]
+  ].map(([fixture, what]) => ({
+    name: `[켜짐: ${what}] 소유 파일 밖 쓰기는 확인한다`,
+    fixture, mode: "default", toolName: "Edit", filePath: "docs/PROCESS_LOG.md", expect: "ask"
+  })),
+  // 꺼진 것으로 봐야 하는 줄: 예시와 인용은 선언이 아니다.
+  {
+    name: "[꺼짐: 코드 울타리 안의 예시] 장치를 켜지 않는다",
+    fixture: "fenced", mode: "default", toolName: "Edit", filePath: "docs/PROCESS_LOG.md", expect: "pass"
+  },
+  {
+    name: "[꺼짐: 인용문 '> - 동시 작업: 켬'] 장치를 켜지 않는다",
+    fixture: "quoted", mode: "default", toolName: "Edit", filePath: "docs/PROCESS_LOG.md", expect: "pass"
+  },
+  {
+    name: "[켜짐: 맨 형태] 선언된 경로는 그대로 통과한다",
+    fixture: "bare", mode: "default", toolName: "Write", filePath: "docs/DECISIONS.md", expect: "pass"
   }
 ];
 
 function runCase(testCase) {
-  const tempRoot = makeTempRoot();
+  const tempRoot = makeTempRoot(testCase.fixture);
   // 세션 scratchpad와 projects/<프로젝트> 기록 폴더를 흉내 내는 임시 폴더 — 프로젝트 root 밖이다.
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), "scope-guard-work-"));
   const scratch = path.join(workDir, "scratchpad");

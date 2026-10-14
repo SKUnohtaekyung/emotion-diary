@@ -38,7 +38,7 @@
 | B-03 | 서버 비밀값·CSRF | Workers secret이 client bundle/source/log/`wrangler.toml`에 없음, custom header 없는 변경 요청 403(D-025), worker 전용 경로는 Bearer secret만 허용, 휴대폰 브라우저 실제 요청으로 확인 | 배포 차단 |
 | B-04 | Cloudflare D1 | CRUD, unique, 조건부 UPDATE 완료 전환, CHECK/trigger, `batch()` 원자성/부분실패, migration(wrangler), hard delete 스파이크(D-024), 무료 한도·미사용 정지 없음 확인 | 무료 대체 DB 결정(예: Turso) |
 | B-05 | 보존/삭제/백업 | D1 저장 지역·암호화, Time Travel 무료 범위, worker export 백업 주기, 백업본 삭제 반영 지연, Claude 구독 경로의 데이터 정책을 사용자 고지 가능한 범위로 문서화(결함 I-17) | 백업 약속 축소 |
-| B-06 | 구독 기반 모델 호출 경로(재정의, D-019/D-029) | 유료 API 없이 본인 PC의 `claude -p`를 구독 로그인으로 server-only 호출, strict schema 출력, 보존 통제, refusal/incomplete/timeout 처리가 가능함을 실제 호출로 증명. Verifier용 독립 2회 호출, 10회 반복 지연 p95, 구독 한도 영향 포함(D-026). PC worker의 `ai_jobs` lease→호출→결과 반환 왕복과 PC 꺼짐 시 job 만료+직접 작성 fallback(D-032). 2026-09-02 최소 스파이크 1회 PASS(합성 입력, Opus 15초/Sonnet 8초) — 나머지 항목은 미검증 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
+| B-06 | 구독 기반 모델 호출 경로(재정의, D-019/D-029) | 유료 API 없이 본인 PC의 `claude -p`를 구독 로그인으로 server-only 호출, strict schema 출력, 보존 통제, refusal/incomplete/timeout 처리가 가능함을 실제 호출로 증명. Verifier용 독립 2회 호출, 10회 반복 지연 p95, 구독 한도 영향 포함(D-026). PC worker의 `ai_jobs` lease→호출→결과 반환 왕복과 PC 꺼짐 시 job 만료+직접 작성 fallback(D-032). 2026-09-02 최소 스파이크 1회 PASS(합성 입력, Opus 15초/Sonnet 8초) — 나머지 항목은 미검증. **2026-10-15 D-120**: AI 쓰기를 짓게 되면 서버 → Claude API(Max 포함 월 크레딧) 경로로 이 항목을 다시 정의한다 — 위 PC 경로는 대체 경로로 남고 보류 2건은 그 길에선 묻지 않는다 | AI 대화·RAG 보류, 제한 MVP만 진행(D-018) |
 | B-07 | 검색 계층 | 구독/무료 경로에서 query/filter/score/metadata, one-card-one-file, chunk 반환 시 source span 대조, 배열 attribute(topicCodes) 매핑 검증(결함 I-09) | retrieval 대안 결정 또는 RAG 보류 |
 | B-08 | 모바일 runtime | iPhone Safari/Android Chrome이 Worker 하나(앱 화면과 `/api/*`가 같은 주소, D-111)에 접속해 토큰 입력·저장·조회 기본 동작, 홈 화면 웹앱(아이콘으로 열어 주소창 없는 앱 모드)에서 같은 동작. 세부 항목은 아래 S-00~S-12. Android Chrome은 사용자 결정으로 `mobile-real-device`로 넘겼다(D-108) | framework/무료 hosting 교체 |
 
@@ -67,6 +67,8 @@
 **실제 앱(앱 뼈대, 개발용 건물 `emotion-diary-dev`)으로 본 것 — 2026-10-14 TASK-MOBILE T3 1회차**(iPhone iOS 26.5.2 홈 화면 앱, 근거 `tasks/mobile/2026-10-14-t3/PLAN.md` 6-3): S-01 PASS(`display-mode: standalone`·`navigator.standalone` 모두 참), S-02 PASS, S-04 성공 쪽 PASS(거부 쪽은 원격 검사), **S-07 자판이 아래 고정 버튼을 가린다**, S-12 화면 쪽 PASS(글을 적은 채 상태 칸에 글 0건, 서버 쪽은 원격 검사의 실시간 기록 0건). 나머지 S 항목과 T-01~T-07은 사용자 결정('전부 미룬다')으로 미검증이다 — `mobile-real-device`에서 본다.
 
 미검증 5건(S-03·S-06·S-07·S-10·S-11)은 B-08 판정을 막지 않았지만 통과한 것이 아니다. 실제 앱에서는 아래 §6과 `mobile-real-device`에서 S-00~S-12 전부를 다시 본다 — 연습용 화면의 결과를 실제 앱의 통과로 옮겨 적지 않는다.
+
+**본인/공개(D-117, 2026-10-15)**: 본인 사용 시작 전에 실제 앱으로 보는 것은 S-02·S-06·S-07(`first-slice`의 `mobile-slice`), S-01·S-05(`personal-start`의 `mobile-personal`), S-12의 서버 쪽(`deployment-boundary-review`)이다. S-00~S-12 전부의 재확인은 공개 관문(`mobile-real-device`)이다. 이 표와 §6 T 목록이 실기기 결과의 정본이다(D-118) — 다른 문서는 결과를 옮겨 적지 않고 여기를 가리킨다.
 
 `unknown`은 pass가 아니다. B-06/B-07은 RAG 트랙이며 제한 MVP(D-018)의 critical path에 있지 않다. 현재 제품 핵심과 양립하지 않는 후보 기술은 [DECISIONS.md](DECISIONS.md)에서 reject하고 그래프를 수정한다.
 
@@ -127,7 +129,7 @@
 
 ### 모바일·브라우저
 
-- 최소 iPhone Safari와 Android Chrome 실제 기기에서 직접/AI 작성, keyboard, 날짜, 저장, dashboard, delete/export를 점검한다.
+- 최소 iPhone Safari와 Android Chrome 실제 기기에서 직접/AI 작성, keyboard, 날짜, 저장, dashboard, delete/export를 점검한다. 본인 사용 동안은 iPhone만(`mobile-core-flow-personal`), Android Chrome은 공개 관문의 `public-only`다(D-117).
 - 360 CSS px, portrait/landscape, safe-area, 200% text 확대에서 핵심 기능에 가로 스크롤/가림이 없다.
 - **홈 화면 웹앱이 1차 환경이다**(D-111). Safari 탭의 결과를 홈 화면 앱의 결과로 옮겨 적지 않는다 — 증거에는 아이콘으로 연 앱 모드였음이 드러나야 한다(화면 표시 방식 `standalone` 표시나 주소창 없는 캡처).
 - 홈 화면 앱에서 §4의 S-00~S-12를 실제 앱으로 전부 다시 본다. 2026-10-14 스파이크 판정 때 미검증으로 남은 다섯(12시간 뒤 로그인, 자판과 아래 버튼, 5분 떠났다 오기, 아이콘 지웠다 다시 추가, '웹 앱으로 열기'를 끈 경우)을 포함한다. 그 뒤 같은 날: 12시간 뒤 로그인은 연습용 화면에서 PASS(사용자 보고), 자판과 아래 버튼은 실제 앱 뼈대에서 '가려진다'(§4 아래 문단, UX_SPEC §17 규칙 9) — 실제 앱의 12시간 뒤 로그인과 나머지 셋은 여전히 미검증이다.
@@ -137,7 +139,7 @@
 - Mac이 없으면 iPhone 화면 속 오류를 개발 도구로 볼 수 없다(RK-036). 실기기 증거는 캡처와 사용자 관찰로 남긴다.
 - 앱을 떠나 앱 전환 화면을 열었을 때 일기 내용이 보이지 않는다 — 앱 잠금을 켜지 않은 상태에서도(D-113 ①). 실기기로만 확인할 수 있다.
 - service worker·오프라인·Web Push는 제공하지 않으므로 시험 대상이 아니고(PRD §12) UI가 약속하지 않는지만 본다.
-- **앱 뼈대 실기기 실험 T-01~T-07**(실험 번호다 — TASK-MOBILE의 작업 단계 T0~T4와 다르다. TASK-MOBILE T3, 개발용 건물 — 가짜 데이터만. 결과와 근거는 `tasks/mobile/2026-10-14-t3/PLAN.md` 6단계). 공식 근거가 없어 실기기 결과만이 근거인 것들이다(조사 2026-10-14).
+- **앱 뼈대 실기기 실험 T-01~T-07**(실험 번호다 — TASK-MOBILE의 작업 단계 T0~T4와 다르다. TASK-MOBILE T3, 개발용 건물 — 가짜 데이터만. 결과와 근거는 `tasks/mobile/2026-10-14-t3/PLAN.md` 6단계). 공식 근거가 없어 실기기 결과만이 근거인 것들이다(조사 2026-10-14). 본인 사용 시작 전에는 T-03만 본다(`mobile-slice`·`mobile-personal`), 전부는 공개 관문(`mobile-real-device`, D-117).
   - T-01 다른 앱에 4분 → 돌아와도 안 잠김, 6분 → 잠김(뒤로 간 앱의 화면 신호가 멈추는지)
   - T-02 앱을 완전히 닫았다 1분 안에 다시 열기('앱을 켤 때' 잠금) / 바깥 링크에서 돌아와 화면이 새로 열렸을 때 잠기지 않는지 — 둘을 가르는 신호(탐색 종류·표식·떠난 시간)
   - T-03 앱 전환 화면에 내용이 보이지 않는지(잠금 꺼짐·켜짐 각각, D-113 ①, RK-039)
@@ -153,7 +155,7 @@
 - screen reader가 label/category/intensity/selected/error/status를 읽는다.
 - touch target 44×44 CSS px, AA 대비, 색상 외 의미, reduced motion.
 
-접근성 자동 검사만으로 합격하지 않고 keyboard와 적어도 한 screen reader 수동 증거를 포함한다. screen reader 증거는 **홈 화면 앱에서 VoiceOver로** 핵심 흐름(접근 열쇠 화면 → 작성 → 남기기 → 달력에서 다시 열기)을 지난 기록이어야 한다 — Safari 탭만으로는 채워지지 않는다. 2026-10-14 기준 화면 낭독기는 어느 환경에서도 확인하지 않았다(미검증).
+접근성 자동 검사만으로 합격하지 않고 keyboard와 적어도 한 screen reader 수동 증거를 포함한다(screen reader는 공개 관문의 `public-only` — 본인 사용 동안의 `accessibility-core-flow`는 keyboard·자동 검사만, D-117). screen reader 증거는 **홈 화면 앱에서 VoiceOver로** 핵심 흐름(접근 열쇠 화면 → 작성 → 남기기 → 달력에서 다시 열기)을 지난 기록이어야 한다 — Safari 탭만으로는 채워지지 않는다. 2026-10-14 기준 화면 낭독기는 어느 환경에서도 확인하지 않았다(미검증).
 
 ### 캐릭터 정적·동적 자산 (PR-010, D-045·D-046)
 
@@ -322,7 +324,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 - 실제 Cloudflare/대체 hosting의 접근·저장·secret·보존 경계 승인.
 - 미지원 기능과 데이터 한계가 UI/고지에 정확히 반영.
 
-제한 MVP 릴리스(D-018)는 기본 계획이다. `direct journal + deterministic dashboard` 제한 릴리스는 §14의 `limited-release` 게이트(권한·개인정보·데이터 무결성·모바일·배포 경계)를 모두 통과해야 하며, AI 경로가 비활성임을 UI가 정확히 표시해야 한다. 권한·개인정보·데이터 무결성이 미달이면 축소 출시도 불가하다. AI 대화·RAG는 그 뒤 `release` 게이트에서 추가된다.
+제한 MVP 릴리스(D-018)는 기본 계획이다. 2026-10-15(D-116·D-117)부터 첫 사용은 둘로 나뉜다. **본인 사용 시작**은 §14의 `personal-start` 게이트(저장 핵심·첫 조각·내 데이터 통제·운영 백업·iPhone 확인·배포 경계)를 통과하면 열리고, 공개 기준은 요구하지 않는다. **공개 출시**(다른 사람에게 열기로 정할 때만)는 `direct journal + deterministic dashboard`로 `limited-release` 게이트(권한·개인정보·데이터 무결성·모바일·배포 경계 + `public-only`)를 모두 통과해야 하며, AI 경로가 비활성임을 UI가 정확히 표시해야 한다. 권한·개인정보·데이터 무결성이 미달이면 본인 사용도 공개도 불가하다. AI 대화·RAG는 그 뒤 `release` 게이트에서 추가되고, 지을지부터 실사용 뒤 정한다(D-120·D-121).
 
 ## 14. 게이트 라벨 정의
 
@@ -343,8 +345,8 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | evidence-grade-recorded | taxonomy v2의 모든 세부 감정에 근거 등급(A·B·C)과 근거 참조가 있고 C등급 비율이 15% 이하. v1의 모든 항목이 매핑표에서 keep·move·rename·drop 중 하나로 처리되어 누락 0이며 발굴 어휘는 전부 add로 표시 | D-022, D-038, TASK-TAXONOMY §7.1 (C)(D)/§9.3 |
 | license-check-passed | 척도(PANAS-X·Geneva Emotion Wheel·DES 등)의 문항·어휘 목록을 제품 목록으로 이식한 건 0. 인용은 출처당 1개·15단어 이내이고, 임상 척도를 선별 도구로 차용하지 않음(PR-001) | D-038, TASK-TAXONOMY §6.4 |
 | taxonomy-evidence | `taxonomy-v2-research` 노드 게이트: literature-axes-covered, falsification-table-complete, evidence-grade-recorded, license-check-passed, user-or-human-review | D-038 |
-| mobile-core-flow | iPhone 홈 화면 웹앱(1차)·iPhone Safari·Android Chrome 실기기에서 직접 작성·저장·수정·삭제·export(공유 창) 완료 | §6 모바일 |
-| accessibility-core-flow | keyboard-only 완주, 한 screen reader 수동 증거(홈 화면 앱의 VoiceOver), axe serious/critical 0 | §6 접근성 |
+| mobile-core-flow-personal | iPhone 홈 화면 웹앱(1차)·iPhone Safari 실기기에서 직접 작성·저장·수정·삭제·export(공유 창) 완료. Android Chrome의 같은 흐름은 `public-only`(D-117 — 2026-10-15 전에는 `mobile-core-flow` 하나가 Android까지 요구했다) | §6 모바일 |
+| accessibility-core-flow | keyboard-only 완주, axe serious/critical 0. 화면 낭독기(홈 화면 앱의 VoiceOver) 수동 증거는 `public-only`로 옮겼다(D-117) | §6 접근성 |
 | ai-journal-fixed-set | §7 고정 합성 대화 세트(≥50) 전체 실행 기록 | §7 |
 | no-fabrication / no-emotion-assertion | §7 창작 0건 / 감정·강도 확정 0건 | §7 |
 | direct-entry-fallback | §7 오류 fixture에서 draft 보존+직접 작성 fallback 100% | §7 |
@@ -357,9 +359,23 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | citation-validity-100 / citation-coverage-100 / unsupported-claim-0 / gate-false-pass-0 / injection-success-0 / observation-accuracy-100 | §8.3 표의 해당 지표 | §8.3 |
 | crisis-flow-100 | §9 위기 분기 100% | §9 |
 | browser-e2e | 릴리스 후보에서 §3 browser E2E 전체 PASS | §3 |
-| mobile-real-device / security-and-privacy / deployment-boundary-review | §6 실기기(실제 앱으로 본 §4의 S-00~S-12 전부와 Android Chrome — D-108이 B-08에서 넘긴 것), §9 전 영역, §12 항목 7의 수동+자동 증거 | §4 S 표, §6, §9, §12 |
+| mobile-real-device / security-and-privacy | 공개 관문의 실기기(실제 앱으로 iPhone 홈 화면 웹앱에서 본 §4의 S-00~S-12 전부와 §6의 T-01~T-07 — Android Chrome은 `public-only`, D-117), §9 전 영역의 수동+자동 증거 | §4 S 표, §6, §9 |
+| deployment-boundary-review | 배포 경계 점검 — 본인 사용 시작(`personal-start`)과 공개 관문 모두에서 본다. 증거: ① 개발용·운영이 서로 다른 Worker·D1·비밀값(ARCHITECTURE §11.2) ② 커밋될 내용·배포 묶음·설정에 계정 값·비밀값 0건(스캔 명령과 결과, `verify --mode quick`의 모양 검사 포함) ③ 운영 묶음에 개발용 전용 코드 0건(`npm run build` 검사) ④ 운영 건물의 실시간 서버 기록에 열쇠·비밀번호·글 0건(S-12의 서버 쪽). 공개 관문에서는 §12 항목 7(공개 주소 노출·로그·백업 점검)까지 더한다 | §11·§12, ARCHITECTURE §11.2·§11.8, DEPLOY |
 | ai-evals | §7·§8·§9 AI 고정 세트 전체 최신 버전으로 실행 | §7~§9 |
 | ai-paths-disabled-or-verified | AI 진입점이 UI에서 비활성(D-019)이거나 `journal-ai`/`ai-safety` 게이트 통과 | UX §5, §13 |
 | blocker-0 / high-0 | §11 차단/높음 결함 열린 건 0 | §11 |
-| limited-release | `limited-mvp-release` 노드 게이트: full, browser-e2e, mobile-real-device, security-and-privacy, deployment-boundary-review, blocker-0, high-0, ai-paths-disabled-or-verified | D-018 |
+| limited-release | `limited-mvp-release` 노드 게이트 — **공개 출시**(다른 사람에게 열기로 정할 때만, D-117): full, browser-e2e, mobile-real-device, security-and-privacy, deployment-boundary-review, blocker-0, high-0, ai-paths-disabled-or-verified, public-only | D-018, D-117 |
+| public-only | 공개에만 필요한 묶음(D-117): ① Android Chrome 실기기에서 `mobile-core-flow-personal`과 같은 흐름 ② 건강정보 별도 동의 흐름과 처리방침(D-093, `SAFETY_POLICY` §3) ③ 위기 연락처 임상·안전 검토와 휴대전화 1388 통신사 실측, `kr.json`의 `review.clinicalSafety`를 바꾸는 근거(D-094) ④ 화면 낭독기 — 홈 화면 앱의 VoiceOver로 접근 열쇠 화면 → 작성 → 남기기 → 달력에서 다시 열기(§6 접근성). 감리 보고서 §3.3 '공개 갈림길'의 나머지(가입·사용자별 분리·서버가 못 읽는 암호화 여부·AI 이용 정책)는 공개를 정할 때 결정과 함께 이 묶음에 더한다 | D-093, D-094, D-108, D-117 |
+| ci-green | GitHub Actions(`.github/workflows/harness.yml`, Ubuntu·Windows)가 그 노드의 코드를 담은 커밋에서 초록. 2026-10-15 기준 앱 코드는 CI에서 한 번도 돌지 않았다(뼈대 푸시 전) — `data-integrity`가 첫 초록을 확인한다 | `gh pr checks` 결과 |
+| e2e-reload-restore | 실제 브라우저 E2E(도구는 `first-slice`에서 고른다)로 ① 작성 중 입력 → 강제 새로고침 → 서버 임시저장에서 쓰던 단계·내용 복원 ② 연결을 끊은 채 입력 → 연결 복귀 → 저장·복원. 잃는 것은 마지막 임시저장 뒤의 입력뿐(F-24 기준) | §3, F-24, RK-034 |
+| mobile-slice | 첫 조각을 iPhone 홈 화면 앱에서 약 10분: S-02(완전히 닫았다 열기), S-06(5분 떠났다 오기), S-07(자판과 아래 버튼 — 정한 배치에서 가리지 않음), T-03(앱 전환 화면 가림). 결과는 §4·§6 표에 적는다 | §4, §6 |
+| restore-drill | 개발용 건물에서 내보내기 → 백업 → 다시 넣는 도구로 되살리기 → 행 수·내용이 같음을 확인하고, 되살린 뒤 세션 기록을 비워 로그아웃한 cookie가 되살아나지 않음(감리 N-7). 명령과 결과를 남긴다 | `DATA_MODEL` §8, D-109 |
+| export-cpu-measured | 합성 3년치(하루 1편)로 내보내기 한 번의 CPU 시간을 재고 Workers 무료 한도(10ms)와의 여유를 기록한다. 넘으면 나눠 내보내기를 정한 뒤 다시 잰다(감리 N-8) | `harness/runtime-profile.json` 무료 한도 |
+| backup-and-restore-drill | 운영 건물에 실제 일기를 넣기 전 백업 1회와 그 백업을 운영이 아닌 곳에 되살려 같은지 확인. 그 뒤로는 창고 구조를 바꾸는 작업 전마다 내보내기 + 백업, 바꾼 뒤 복원 확인(D-116, RK-045) | `DATA_MODEL` §8, D-109 |
+| mobile-personal | 운영 건물로 iPhone 홈 화면 앱 설치·로그인(S-01·S-02), 내보내기 공유 창(S-05), 앱 전환 화면 가림(T-03) | §4, §6 |
+| crisis-help-unreviewed-label | 위기 안내 화면(`#/help`)이 열리고 연락처가 임상·안전 검토 전임을 화면에 표시하며(`kr.json`의 `review.clinicalSafety: pending`), 112·119는 파일 없이도 보인다. 본인 사용 한정이다(D-117) | D-094, `SAFETY_POLICY` |
+| data-integrity | `data-foundation` 노드 게이트 — **저장 핵심**(D-116): F-01, F-02, F-06, F-07, F-09, F-10, F-17, ci-green. F-14·F-15는 `data-control`로 옮겼다 | D-116 |
+| first-slice | `first-slice` 노드 게이트: F-03, F-04, F-05, F-08, F-24, e2e-reload-restore, mobile-slice | D-116 |
+| data-control | `data-control` 노드 게이트: F-14, F-15, restore-drill, export-cpu-measured | D-116 |
+| personal-start | `personal-start` 노드 게이트 — **본인 사용 시작**: full, F-01, F-02, F-06, F-07, F-09, F-10, F-14, F-15, F-17, F-24, deployment-boundary-review, backup-and-restore-drill, mobile-personal, crisis-help-unreviewed-label. 공개 기준(`public-only`)은 요구하지 않는다 | D-116, D-117 |
 
