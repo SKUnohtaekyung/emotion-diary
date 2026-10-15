@@ -40,7 +40,7 @@ Exit: 개인정보·권한·저장 경계가 설명되고, 구현 stack과 테�
 
 ### 앱 뼈대 (`app-scaffold`, 끝 — 2026-10-14)
 
-앱 scaffold, session/access guard, migration 방식. 구성은 [ARCHITECTURE.md](ARCHITECTURE.md) §11, 절차는 [DEPLOY.md](DEPLOY.md). 로컬 `verify full`로 끝났고, **CI(Ubuntu·Windows)가 앱 코드를 처음 도는 것은 뼈대를 푸시할 때다** — 다음 관문 `data-integrity`의 `ci-green`이 그 첫 초록을 확인한다.
+앱 scaffold, session/access guard, migration 방식. 구성은 [ARCHITECTURE.md](ARCHITECTURE.md) §11, 절차는 [DEPLOY.md](DEPLOY.md). 로컬 `verify full`로 끝났고, CI(Ubuntu·Windows)는 2026-10-15 PR #37에서 앱 코드를 처음 돌렸다 — 1회차는 Windows가 생성 타입 파일의 줄바꿈 때문에 실패해 `.gitattributes`로 고쳤고 2회차는 두 OS 모두 통과했다(STATUS §1 숫자 표). data-foundation 코드의 CI 초록은 관문 `data-integrity`의 `ci-green`이 본다.
 
 ### 1a. 저장 핵심 (`data-foundation`, 관문 `data-integrity`)
 

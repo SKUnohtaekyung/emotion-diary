@@ -99,11 +99,12 @@ nodes:
   - id: app-scaffold
     status: done
     depends_on: [hosting-identity-spike, data-store-spike]
-    # 2026-10-14 TASK-MOBILE T3(브랜치 app/scaffold, 로컬 커밋 323329b — 푸시 전)에서 끝났다. 화면은 도구 없이(D-114), 구성은 D-115,
+    # 2026-10-14 TASK-MOBILE T3(커밋 323329b — 2026-10-15 PR #37)에서 끝났다. 화면은 도구 없이(D-114), 구성은 D-115,
     # 정본은 docs/ARCHITECTURE.md §11·docs/DEPLOY.md. 게이트 code-quality 근거: 잠금 파일로 두 번 깨끗이 설치해 같은
     # 결과(npm 10.9.2 npm ci), package.json의 lint·typecheck·test·build가 verify full 안에서 PASS, lint가 일부러 넣은
     # 미사용 변수를 잡음(종료 코드 1), 개발용 건물 emotion-diary-dev 원격 검사 — 시험·검사 수는 docs/STATUS.md §1(D-118).
-    # CI(Ubuntu·Windows)는 앱 코드를 아직 돌리지 않았다(푸시 전) — 첫 초록은 data-foundation 관문의 ci-green이 확인한다.
+    # CI(Ubuntu·Windows)는 2026-10-15 PR #37에서 앱 코드를 처음 돌려 통과했다(1회차 Windows 줄바꿈 실패 → .gitattributes로 고침,
+    # docs/STATUS.md §1). data-foundation 코드의 CI 초록은 그 노드 관문의 ci-green이 본다.
     # iPhone은 1회차만 보고 나머지는 사용자 결정으로 미뤘다 — 결과는 docs/EVAL_PLAN.md §4, 근거 tasks/mobile/2026-10-14-t3/PLAN.md.
     # 경계: 이 노드는 로그인·세션 기록·앱 잠금·부를 이름·화면 오류 표(app/migrations 0001~0004)와 경로·화면 뼈대를 만들었다.
     # diary 표와 owner별 저장소·권한 검사는 data-foundation이다.

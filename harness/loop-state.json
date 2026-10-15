@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-CLEANUP-01",
-  "phase": "cleanup-done-awaiting-user-commit",
-  "iteration": 1,
-  "status": "in_progress",
-  "current_hypothesis": "Writing the review's user decisions U-1..U-7 (tasks/cleanup/2026-10-15/REQUESTS.md) into the decision log (D-116..D-121), the work graph, the gates and the design docs lets data-foundation start in the new order without re-deciding the order, the two gates or the AI path.",
+  "task_id": "TASK-DATA-01",
+  "phase": "data-foundation-planned",
+  "iteration": 0,
+  "status": "planned",
+  "current_hypothesis": "With the diary schema gaps S-1..S-9 decided (tasks/data-foundation/2026-10-15/REQUESTS.md), the diary tables from migration 0005 and the server rules (today's draft save, completion, read and edit; one entry per day; revision; idempotency; owner checks; access-key lockout that never blocks the correct key) pass gate data-integrity, so first-slice only adds screens.",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "1845e83",
+  "last_verified_commit": "5a71381",
   "completed_nodes": [
     "bootstrap-audit",
     "taxonomy-v1",
@@ -18,10 +18,9 @@
   ],
   "next_node": "data-foundation",
   "blockers": [
-    "Local-only commits on branch app/scaffold (323329b T3 scaffold, 1845e83 review) and this cleanup (uncommitted, branch docs/cleanup): commit, push and PR are the user's call. CI has never run the app code — gate data-integrity requires ci-green",
-    "Decided inside data-foundation (docs/STATUS.md §4): whether the writing step is stored on the server (RK-043) and the access-key lockout fix that never blocks the correct key (RK-041)",
-    "Production building is not created; it is created at personal-start right after the user confirms (D-116, D-117). docs/DEPLOY.md §1 and §8 still say 'before the limited MVP release' — outside TASK-CLEANUP-01's owned files, fixed at personal-start",
+    "PR #37 (docs/cleanup -> main: scaffold, review, cleanup, CI line-ending fix, data-foundation prep) has green CI on Ubuntu and Windows but is not merged: the auto mode safety check blocked the merge, so the user merges it on GitHub. TASK-DATA-01 starts from the merged main",
+    "Diary schema gaps S-1..S-9 must be decided first (tasks/data-foundation/2026-10-15/REQUESTS.md); the ones needing the user are asked in one question window",
     "Scope: single user (D-108). AI writing is decided after 30 days of real use (D-120), evidence analysis after 60 days (D-121)"
   ],
-  "last_checkpoint": "2026-10-15 TASK-CLEANUP-01 done on branch docs/cleanup (uncommitted; commit when the user says), verify full PASS, independent review passed after fixes. Progress and evidence live only in tasks/cleanup/2026-10-15/PLAN.md (D-118) — this field only points there. Earlier work: TASK-REVIEW-01 (tasks/review/2026-10-14/REPORT.md), TASK-MOBILE T3 (tasks/mobile/2026-10-14-t3/PLAN.md); full history in git log and tasks/archive/."
+  "last_checkpoint": "2026-10-15 TASK-DATA-01 planned by the session that finished TASK-CLEANUP-01. Progress will live only in tasks/data-foundation/2026-10-15/PLAN.md once a new session writes it (D-118); this field only points there. Earlier work: tasks/archive/ and git log."
 }

@@ -13,6 +13,7 @@
 
 | 파일 | 상태 | 남은 일이 간 곳 |
 | --- | --- | --- |
+| [TASK-CLEANUP-01.md](TASK-CLEANUP-01.md) 설계도 정리(감리 결정을 공정표·관문·결정 장부에) | done(2026-10-15, 커밋 `85c3bb5` — PR #37, CI 두 OS 통과) — 결정 D-116~D-121, 이슈 #1~#8 닫음 | PR #37 병합 → `docs/STATUS.md` §4 2번, 다음 작업 → TASK-DATA-01(`tasks/CURRENT_TASK.md`). 2026-10-15 옮김(원문 3,767B, SHA-256 앞 12자리 `3b8441d441d5`, 직전 커밋 `5a71381`, 상대 링크 2개의 경로 깊이만 고침) |
 | [TASK-MOBILE-T3.md](TASK-MOBILE-T3.md) Phase 1 뼈대의 모바일 명세와 착수 | done(2026-10-14, 로컬 커밋 `323329b`) — 앱 뼈대, 개발용 건물 원격 검사, iPhone 1회차 | 푸시·PR → 사용자 몫(`docs/STATUS.md` §4 2번), 아래 버튼 배치(S-07) → `first-slice`, 미룬 실기기 → `docs/EVAL_PLAN.md` §4 '본인/공개'. 2026-10-15 TASK-CLEANUP-01이 옮김(원문 7,058B, SHA-256 앞 12자리 `cb6a7afad7a5`, 직전 커밋 `1845e83`, 상대 링크 3개의 경로 깊이만 고침) |
 | [TASK-REVIEW-01.md](TASK-REVIEW-01.md) 종합 점검(현황·남은 작업·작업 방식·기술 스택) | done(2026-10-15, 로컬 커밋 `1845e83`) — 보고서 `tasks/review/2026-10-14/REPORT.md` | 사용자 결정 → D-116~D-121(TASK-CLEANUP-01), Q-E·Q-F → `docs/STATUS.md` §4 2번. 2026-10-15 옮김(원문 4,162B, SHA-256 앞 12자리 `6ecf7e4b8e90`, 직전 커밋 `1845e83`, 상대 링크 2개의 경로 깊이만 고침) |
 | [TASK-HOOK-AUTO.md](TASK-HOOK-AUTO.md) auto 모드에서 가드 훅 확인창 없애기 | done — 구현·검증 2026-09-21(D-060), '다른 세션 확인 대기'는 2026-10-15 D-119로 닫음 | 사후 점검(이슈 #27 세션 경계 스냅샷)·`bypassPermissions` → D-060·D-119의 다시 열 조건. 2026-10-15 옮김(원문 7,010B, SHA-256 앞 12자리 `8528c181160e`, 직전 커밋 `1845e83`, 고친 링크 0개) |

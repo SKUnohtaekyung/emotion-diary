@@ -366,7 +366,7 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | blocker-0 / high-0 | §11 차단/높음 결함 열린 건 0 | §11 |
 | limited-release | `limited-mvp-release` 노드 게이트 — **공개 출시**(다른 사람에게 열기로 정할 때만, D-117): full, browser-e2e, mobile-real-device, security-and-privacy, deployment-boundary-review, blocker-0, high-0, ai-paths-disabled-or-verified, public-only | D-018, D-117 |
 | public-only | 공개에만 필요한 묶음(D-117): ① Android Chrome 실기기에서 `mobile-core-flow-personal`과 같은 흐름 ② 건강정보 별도 동의 흐름과 처리방침(D-093, `SAFETY_POLICY` §3) ③ 위기 연락처 임상·안전 검토와 휴대전화 1388 통신사 실측, `kr.json`의 `review.clinicalSafety`를 바꾸는 근거(D-094) ④ 화면 낭독기 — 홈 화면 앱의 VoiceOver로 접근 열쇠 화면 → 작성 → 남기기 → 달력에서 다시 열기(§6 접근성). 감리 보고서 §3.3 '공개 갈림길'의 나머지(가입·사용자별 분리·서버가 못 읽는 암호화 여부·AI 이용 정책)는 공개를 정할 때 결정과 함께 이 묶음에 더한다 | D-093, D-094, D-108, D-117 |
-| ci-green | GitHub Actions(`.github/workflows/harness.yml`, Ubuntu·Windows)가 그 노드의 코드를 담은 커밋에서 초록. 2026-10-15 기준 앱 코드는 CI에서 한 번도 돌지 않았다(뼈대 푸시 전) — `data-integrity`가 첫 초록을 확인한다 | `gh pr checks` 결과 |
+| ci-green | GitHub Actions(`.github/workflows/harness.yml`, Ubuntu·Windows)가 그 노드의 코드를 담은 커밋에서 초록. 앱 뼈대 코드는 2026-10-15 PR #37에서 처음 초록이 됐다(STATUS §1 숫자 표). `data-integrity`는 data-foundation 코드를 담은 커밋의 초록을 본다 | `gh pr checks` 결과 |
 | e2e-reload-restore | 실제 브라우저 E2E(도구는 `first-slice`에서 고른다)로 ① 작성 중 입력 → 강제 새로고침 → 서버 임시저장에서 쓰던 단계·내용 복원 ② 연결을 끊은 채 입력 → 연결 복귀 → 저장·복원. 잃는 것은 마지막 임시저장 뒤의 입력뿐(F-24 기준) | §3, F-24, RK-034 |
 | mobile-slice | 첫 조각을 iPhone 홈 화면 앱에서 약 10분: S-02(완전히 닫았다 열기), S-06(5분 떠났다 오기), S-07(자판과 아래 버튼 — 정한 배치에서 가리지 않음), T-03(앱 전환 화면 가림). 결과는 §4·§6 표에 적는다 | §4, §6 |
 | restore-drill | 개발용 건물에서 내보내기 → 백업 → 다시 넣는 도구로 되살리기 → 행 수·내용이 같음을 확인하고, 되살린 뒤 세션 기록을 비워 로그아웃한 cookie가 되살아나지 않음(감리 N-7). 명령과 결과를 남긴다 | `DATA_MODEL` §8, D-109 |
