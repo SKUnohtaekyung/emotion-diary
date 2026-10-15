@@ -118,8 +118,12 @@ nodes:
     gate: code-quality
 
   - id: data-foundation
-    status: ready
+    status: verifying
+    # 2026-10-16: 관문 data-integrity의 F-01·F-02·F-06·F-07·F-09·F-10·F-17은 서버 시험 PASS, 개발용 건물 원격 검사 50/50.
+    # 남은 조건은 ci-green(이 작업의 코드를 담은 커밋에서 CI 초록) — 커밋·PR은 사용자 지시 때.
     depends_on: [app-scaffold]
+    # 2026-10-15 TASK-DATA-01 착수(D-122): 마이그레이션 0005~0007, 서버 길(오늘·조회·저장·완료·지우기·하루 기준 시각), 영수증,
+    # 틀린 열쇠 잠금 고침을 지었다. 진행·증거는 tasks/data-foundation/2026-10-15/PLAN.md 한 곳(D-118).
     # 2026-10-14 app-scaffold가 끝나 열렸다. 2026-10-15(D-116) 범위를 '저장 핵심'으로 좁혔다 — 내보내기·전체 삭제·백업은
     # data-control로 옮겼다. 만드는 것: 일기·감정 표(마이그레이션 0005부터), owner별 저장소와 서버 권한 검사, 오늘 임시저장·완료·
     # 조회·수정, 하루 1개·revision·idempotency, 일기 칸의 최대 길이와 경로별 본문 한도(ARCHITECTURE §11.9). 경로는

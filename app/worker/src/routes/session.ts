@@ -1,13 +1,5 @@
 // 로그인 상태·로그인·로그아웃·화면 신호(ARCHITECTURE §5·§6, DATA_MODEL §3.9·§3.10).
-import {
-  API_COMPAT,
-  KEY_FAIL_MAX,
-  KEY_FAIL_WINDOW_MS,
-  KEY_LOCK_MS,
-  KEY_MAX_LENGTH,
-  LOGIN_MAX_AGE_MS,
-  type SessionInfo
-} from "../../../shared/api";
+import { API_COMPAT, KEY_FAIL_MAX, KEY_FAIL_WINDOW_MS, KEY_LOCK_MS, KEY_MAX_LENGTH, LOGIN_MAX_AGE_MS, type SessionInfo } from "../../../shared/api";
 import { type Ctx, iso } from "../context";
 import { hmacHex, randomId, timingSafeEqual } from "../crypto";
 import { empty, fail, json } from "../http";
@@ -28,17 +20,13 @@ export async function sessionInfo(ctx: Ctx): Promise<Response> {
   } satisfies SessionInfo);
 }
 
-interface FailuresRow {
-  fail_count: number;
-  locked_until: string | null;
-}
-
 const retryAfterSeconds = (until: number, now: number) => Math.max(1, Math.ceil((until - now) / 1000));
 
 /**
  * `POST /api/session` — 접근 열쇠를 본문으로 받아 대조한다(주소로는 받지 않는다).
- * 틀린 열쇠는 전역 카운터(auth_failures 1행)로 센다: 60초 창에서 10번이면 5분 잠그고, 잠긴 동안에는 맞는 열쇠도 429.
- * 대조하기 전에 시도 한 번을 먼저 '예약'한다 — 여러 요청을 한꺼번에 보내 창의 한도를 넘겨 맞혀 보는 것을 막는다.
+ * **맞는 열쇠는 잠금과 상관없이 들어온다**(RK-041, 감리 REPORT §5.2) — 주소만 아는 누군가가 틀린 열쇠를 되풀이해 주인을 내쫓지 못하게.
+ * 열쇠는 맞혀 볼 수 없는 길이라(무작위 12자 이상) 잠금이 실제로 막던 것은 주인뿐이었다. 틀린 열쇠는 전역 카운터(auth_failures 1행)로
+ * 센다: 60초 창에서 10번이면 5분 동안 틀린 열쇠에 429. 잠긴 동안의 틀린 시도는 잠금을 늘리지 않는다. 대조는 상수 시간이다.
  */
 export async function login(ctx: Ctx): Promise<Response> {
   const body = await readJson(ctx.request);
@@ -51,34 +39,28 @@ export async function login(ctx: Ctx): Promise<Response> {
 
   const db = ctx.env.DB;
   const now = ctx.now;
-  const windowCutoff = iso(now - KEY_FAIL_WINDOW_MS);
-  const reserved = await db
-    .prepare(
-      `UPDATE auth_failures SET
-         fail_count = CASE WHEN window_start IS NULL OR window_start <= ?2 THEN 1 ELSE fail_count + 1 END,
-         window_start = CASE WHEN window_start IS NULL OR window_start <= ?2 THEN ?1 ELSE window_start END,
-         locked_until = NULL
-       WHERE id = 1
-         AND (locked_until IS NULL OR locked_until <= ?1)
-         AND NOT (window_start > ?2 AND fail_count >= ?3)
-       RETURNING fail_count`
-    )
-    .bind(iso(now), windowCutoff, KEY_FAIL_MAX)
-    .first<{ fail_count: number }>();
-  if (!reserved) {
-    const row = await db.prepare("SELECT fail_count, locked_until FROM auth_failures WHERE id = 1").first<FailuresRow>();
-    if (!row) return fail(500, "server_misconfigured"); // 마이그레이션 0001이 넣는 행이 없다 — '잠김'으로 오해하게 두지 않는다
-    const until = row.locked_until ? Date.parse(row.locked_until) : now + KEY_LOCK_MS;
-    return fail(429, "key_locked", { retryAfter: retryAfterSeconds(until, now) });
-  }
-
   const given = await hmacHex(ctx.secrets.accessKeySalt, key);
   if (!timingSafeEqual(given, ctx.secrets.accessKeyHash)) {
-    if (reserved.fail_count >= KEY_FAIL_MAX) {
-      const until = now + KEY_LOCK_MS;
-      await db.prepare("UPDATE auth_failures SET locked_until = ?1 WHERE id = 1").bind(iso(until)).run();
-      return fail(429, "key_locked", { retryAfter: retryAfterSeconds(until, now) });
+    // 틀린 시도 하나를 센다(한 문장 — 동시에 온 틀린 시도도 하나씩 센다). 잠긴 동안에는 쓰지 않는다 — 문장이 0행이고,
+    // 남은 시간만 읽어 알린다(틀린 열쇠를 퍼부어도 D1 쓰기 한도를 쓰지 않게 — 2026-10-16 마감 검토 M-1).
+    const counted = await db
+      .prepare(
+        `UPDATE auth_failures SET
+           fail_count = CASE WHEN window_start IS NULL OR window_start <= ?2 THEN 1 ELSE fail_count + 1 END,
+           window_start = CASE WHEN window_start IS NULL OR window_start <= ?2 THEN ?1 ELSE window_start END,
+           locked_until = CASE WHEN (CASE WHEN window_start IS NULL OR window_start <= ?2 THEN 1 ELSE fail_count + 1 END) >= ?3 THEN ?4 ELSE NULL END
+         WHERE id = 1 AND (locked_until IS NULL OR locked_until <= ?1)
+         RETURNING locked_until`
+      )
+      .bind(iso(now), iso(now - KEY_FAIL_WINDOW_MS), KEY_FAIL_MAX, iso(now + KEY_LOCK_MS))
+      .first<{ locked_until: string | null }>();
+    let lockedUntil = counted?.locked_until ?? null;
+    if (!counted) {
+      const row = await db.prepare("SELECT locked_until FROM auth_failures WHERE id = 1").first<{ locked_until: string | null }>();
+      if (!row) return fail(500, "server_misconfigured"); // 마이그레이션 0001이 넣는 행이 없다 — '잠김'으로 오해하게 두지 않는다
+      lockedUntil = row.locked_until;
     }
+    if (lockedUntil && Date.parse(lockedUntil) > now) return fail(429, "key_locked", { retryAfter: retryAfterSeconds(Date.parse(lockedUntil), now) });
     return fail(401, "invalid_key");
   }
 

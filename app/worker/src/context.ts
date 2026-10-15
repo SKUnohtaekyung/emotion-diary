@@ -46,6 +46,8 @@ export interface Session {
   /** owner가 앱 잠금을 켰는가 */
   lockOn: boolean;
   hasName: boolean;
+  /** owner의 하루 기준 시각(0~6, 설정 행이 없으면 기본 4 — DATA_MODEL §3.4) */
+  dayStartHour: number;
 }
 
 export interface Ctx {

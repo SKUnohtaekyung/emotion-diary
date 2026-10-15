@@ -4,7 +4,7 @@
 
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
-| TASK-DATA-01 data-foundation(저장 핵심) | **계획됨(2026-10-15) — 새 세션에서 착수**. PR #37이 `main`에 병합된 뒤 시작한다 | 이 파일 아래, 요청서는 [data-foundation/2026-10-15/](data-foundation/2026-10-15/REQUESTS.md) |
+| TASK-DATA-01 data-foundation(저장 핵심) | **확인 중(2026-10-16)** — 결정 D-122, 서버 시험·개발용 건물 원격 검사 50/50 통과, 남은 것은 CI(커밋·PR은 지시 때). 진행·증거는 PLAN 한 곳 | 이 파일 아래, 요청·계획은 [data-foundation/2026-10-15/](data-foundation/2026-10-15/PLAN.md) |
 | [TASK-CLEANUP-01](archive/TASK-CLEANUP-01.md) 설계도 정리(감리 결정을 공정표·관문·결정 장부에) | 끝(2026-10-15, 커밋 `85c3bb5` — PR #37, CI 통과·병합 대기) | [archive/](archive/README.md), 요청·계획은 [cleanup/2026-10-15/](cleanup/2026-10-15/PLAN.md) |
 | [TASK-REVIEW-01](archive/TASK-REVIEW-01.md) 종합 점검(현황·남은 작업·작업 방식·기술 스택) | 끝(2026-10-15, 커밋 `1845e83` — PR #37) | [archive/](archive/README.md), 보고서 [review/2026-10-14/REPORT.md](review/2026-10-14/REPORT.md) |
 | [TASK-MOBILE](TASK-MOBILE.md) 설치형 홈 화면 웹앱 | T2 끝(2026-10-14, PR #36 병합 `7b99e2c`) / T3 끝(2026-10-14, 커밋 `323329b` — PR #37). 결정 D-111~D-115. 이슈 #1~#8 닫음, #9는 Post-MVP(처리표 [cleanup/2026-10-15/PLAN.md](cleanup/2026-10-15/PLAN.md) 6-2) | T3 기록 [archive/TASK-MOBILE-T3.md](archive/TASK-MOBILE-T3.md)와 [mobile/2026-10-14-t3/](mobile/2026-10-14-t3/PLAN.md), T2 기록 [archive/TASK-MOBILE-T2.md](archive/TASK-MOBILE-T2.md)와 [mobile/2026-10-14/](mobile/2026-10-14/PLAN.md), 배경은 별도 파일 |
@@ -20,13 +20,7 @@
 
 ## 상태
 
-`planned`(2026-10-15) — 사용자 지시("새 세션에서 작업 할 수 있게 남은 작업 전부 해"). 준비는 TASK-CLEANUP-01을 마친 세션이 했고 **실행은 새 세션이 한다.**
-
-새 세션의 첫 순서:
-1. PR #37(`docs/cleanup` → `main`)이 병합됐는지 확인한다. 병합 전이면 사용자에게 알리고 기다린다 — 병합은 자동 모드 안전 장치가 막아 사용자가 GitHub에서 누른다.
-2. 병합된 `main`에서 새 브랜치를 만든다.
-3. 요청서 [data-foundation/2026-10-15/REQUESTS.md](data-foundation/2026-10-15/REQUESTS.md)를 읽는다. §1의 빈칸 S-1~S-9 가운데 사용자 판단이 필요한 것을 질문 창으로 한 번에 묻는다(비유와 추천을 붙여서).
-4. 답을 받은 뒤 같은 폴더에 PLAN.md를 쓴다. **그 PLAN이 이 작업의 유일한 진행 기록이다**(D-118).
+`in_progress`(2026-10-15 착수 — 사용자 지시 "data-foundation 시작"). 시작 때 PR #37은 병합 전이라 그 머리(`ac41609`) 위에 브랜치 `data/foundation`을 만들었다. 사용자에게 물은 둘(글 길이 1만 자, '오늘'은 지금 있는 곳의 시계)과 에이전트가 정한 나머지는 D-122. **진행·증거는 [PLAN.md](data-foundation/2026-10-15/PLAN.md) 한 곳이다**(D-118).
 
 ## 목표
 
@@ -44,9 +38,9 @@
 ## 소유권
 
 - Main/Writer: 새 세션. 하위 에이전트는 조사·검토(읽기 전용)만 쓰고 어떤 하위 에이전트도 커밋하지 않는다.
-- 소유 파일(예비 — PLAN에서 확정): `tasks/data-foundation/**`, `tasks/CURRENT_TASK.md`, `tasks/archive/**`, `app/migrations/**`, `app/worker/**`, `app/shared/**`, `app/test/worker/**`, `schemas/diary-entry.schema.json`, `docs/DATA_MODEL.md`, `docs/ARCHITECTURE.md`, `docs/EVAL_PLAN.md`, `docs/TRACEABILITY.md`, `docs/STATUS.md`, `docs/DECISIONS.md`, `docs/RISK_REGISTER.md`, `harness/work-graph.yaml`, `harness/loop-state.json`, `harness/runtime-profile.json`
+- 소유 파일: `tasks/data-foundation/**`, `tasks/CURRENT_TASK.md`, `tasks/archive/**`, `app/migrations/**`, `app/worker/**`, `app/shared/**`, `app/test/worker/**`, `app/scripts/remote-check.mjs`, `app/scripts/cf.mjs`, `schemas/diary-entry.schema.json`, `docs/DATA_MODEL.md`, `docs/ARCHITECTURE.md`, `docs/EVAL_PLAN.md`, `docs/TRACEABILITY.md`, `docs/STATUS.md`, `docs/DECISIONS.md`, `docs/RISK_REGISTER.md`, `docs/ROADMAP.md`, `harness/work-graph.yaml`, `harness/loop-state.json`, `harness/runtime-profile.json`
 
-## 인수 조건(예비 — PLAN에서 확정)
+## 인수 조건(시험 목록은 PLAN §5)
 
 - 관문 `data-integrity`: F-01·F-02·F-06·F-07·F-09·F-10·F-17이 자동 시험으로 PASS하고, 이 작업의 코드를 담은 커밋에서 CI 초록(`ci-green`).
 - 요청서 S-1~S-9마다 결정과 근거가 `docs/DATA_MODEL.md`(필요하면 `docs/DECISIONS.md`)에 있다. 사용자 결정은 사용자가 고른 것만 적는다.
@@ -62,3 +56,4 @@
   - 낡은 '커밋 전' 문장을 PR #37 결과로 고쳤다.
   - 이 준비 변경은 PR #37에 커밋으로 올렸다.
   - 다음: 사용자가 PR #37을 병합 → 새 세션이 위 '첫 순서'부터.
+- 착수(2026-10-15, 새 세션): 질문 둘(U-1·U-2)을 받고 PLAN을 썼다. 진행은 PLAN §4 체크리스트와 §9 기록에만 적는다.

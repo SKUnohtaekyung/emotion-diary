@@ -15,23 +15,80 @@ export const START = Date.parse("2026-10-14T00:00:00.000Z");
 
 const migrationsDir = fileURLToPath(new URL("../../migrations/", import.meta.url));
 
-/** 마이그레이션 파일을 문장으로 나눈다(주석 줄을 빼고 `;`로). 뼈대의 SQL에는 문자열 속 `;`가 없다. */
+type SqlState = "start" | "normal" | "create" | "trigger" | "semi" | "end";
+type SqlToken = "semi" | "ws" | "create" | "temp" | "trigger" | "end" | "other";
+
+/** SQLite `sqlite3_complete`의 상태표(wrangler `d1 migrations apply`의 분할기와 같다) — `CREATE TRIGGER … BEGIN … END;` 안의 `;`에서 끊지 않는다. */
+const NEXT: Record<SqlState, Partial<Record<SqlToken, SqlState>> & { other: SqlState }> = {
+  start: { semi: "start", ws: "start", create: "create", other: "normal" },
+  normal: { semi: "start", other: "normal" },
+  create: { semi: "start", ws: "create", temp: "create", trigger: "trigger", other: "normal" },
+  trigger: { semi: "semi", other: "trigger" },
+  semi: { semi: "semi", ws: "semi", end: "end", other: "trigger" },
+  end: { semi: "start", ws: "end", other: "trigger" }
+};
+
+const KEYWORDS: Record<string, SqlToken> = { create: "create", temp: "temp", temporary: "temp", trigger: "trigger", end: "end" };
+
+/** SQL 글을 문장으로 나눈다. 줄 주석·블록 주석과 따옴표 속은 건너뛴다. */
+export function splitSql(sql: string): string[] {
+  const statements: string[] = [];
+  let state: SqlState = "start";
+  let begin = 0;
+  for (let index = 0; index < sql.length; index += 1) {
+    const char = sql[index] ?? "";
+    let token: SqlToken = "other";
+    if (char === ";") token = "semi";
+    else if (/\s/.test(char)) token = "ws";
+    else if (char === "-" && sql[index + 1] === "-") {
+      const end = sql.indexOf("\n", index);
+      index = end < 0 ? sql.length : end;
+      token = "ws";
+    } else if (char === "/" && sql[index + 1] === "*") {
+      const end = sql.indexOf("*/", index + 2);
+      index = end < 0 ? sql.length : end + 1;
+      token = "ws";
+    } else if (char === "'" || char === '"' || char === "`") {
+      const end = sql.indexOf(char, index + 1);
+      index = end < 0 ? sql.length : end;
+    } else if (/[A-Za-z_]/.test(char)) {
+      let end = index;
+      while (end + 1 < sql.length && /[A-Za-z0-9_$]/.test(sql[end + 1] ?? "")) end += 1;
+      token = KEYWORDS[sql.slice(index, end + 1).toLowerCase()] ?? "other";
+      index = end;
+    }
+    state = NEXT[state][token] ?? NEXT[state].other;
+    if (token === "semi" && state === "start") {
+      const statement = stripComments(sql.slice(begin, index)).trim();
+      if (statement) statements.push(statement);
+      begin = index + 1;
+    }
+  }
+  const rest = stripComments(sql.slice(begin)).trim();
+  if (rest) statements.push(rest);
+  return statements;
+}
+
+/** 문장 앞뒤의 주석 줄만 걷어 낸다(문장 안의 글은 그대로). */
+function stripComments(statement: string): string {
+  return statement
+    .split(/\r?\n/)
+    .filter((line) => !line.trim().startsWith("--"))
+    .join("\n");
+}
+
+/** 마이그레이션 파일들을 번호 순서로 문장으로 나눈다. */
 export function migrationStatements(): string[] {
   return readdirSync(migrationsDir)
     .filter((name) => name.endsWith(".sql"))
     .sort()
-    .flatMap((name) =>
-      readFileSync(migrationsDir + name, "utf8")
-        .split(/\r?\n/)
-        .filter((line) => !line.trim().startsWith("--"))
-        .join("\n")
-        .split(";")
-        .map((statement) => statement.trim())
-        .filter(Boolean)
-    );
+    .flatMap((name) => splitSql(readFileSync(migrationsDir + name, "utf8")));
 }
 
-const TABLES = ["client_errors", "owner_settings", "sessions", "auth_failures"];
+export const migrationText = (name: string): string => readFileSync(migrationsDir + name, "utf8");
+
+/** 시험마다 비우는 표. 일기 딸린 행은 diary_entries를 지우면 연쇄로 지워진다(부모 먼저 — DATA_MODEL §8). */
+const TABLES = ["idempotency_records", "diary_entries", "client_errors", "owner_settings", "sessions", "auth_failures"];
 
 export interface TestServer {
   db: D1Database;
@@ -97,6 +154,8 @@ export interface CallOptions {
   headers?: Record<string, string>;
   devRoutes?: ReadonlyMap<string, Handler>;
   appEnv?: AppConfig["appEnv"];
+  /** 이 요청만 다른 바인딩으로(예: batch를 붙잡아 두는 DB — 경쟁 상황을 결정적으로 재현) */
+  env?: Partial<Bindings>;
 }
 
 export async function call(server: TestServer, method: string, path: string, options: CallOptions = {}): Promise<Reply> {
@@ -114,7 +173,7 @@ export async function call(server: TestServer, method: string, path: string, opt
   }
   const request = new Request(ORIGIN + path, { method, headers, body });
   const config: Partial<AppConfig> = { ...(options.appEnv ? { appEnv: options.appEnv } : {}), ...(options.devRoutes ? { devRoutes: options.devRoutes } : {}) };
-  const response = await server.app(config).fetch(request, server.env);
+  const response = await server.app(config).fetch(request, options.env ? { ...server.env, ...options.env } : server.env);
   const raw = await response.text();
   let parsed: Record<string, unknown> | null = null;
   try {
@@ -137,6 +196,35 @@ export async function login(server: TestServer, existingCookie?: string): Promis
   const reply = await call(server, "POST", "/api/session", { body: { key: server.key }, cookie: existingCookie ?? null });
   if (reply.status !== 200 || !reply.cookie) throw new Error(`login failed: ${reply.status}`);
   return reply.cookie;
+}
+
+/**
+ * batch를 붙잡아 두는 DB. `reached`는 그 요청이 batch 앞에 섰을 때 풀리고, `release()`를 불러야 batch가 돈다.
+ * 다른 요청이 그 사이에 끝까지 가게 해 '같은 판에서 출발한 두 요청'을 시간에 기대지 않고 만든다.
+ */
+export function heldBatchDb(db: D1Database): { db: D1Database; reached: Promise<void>; release: () => void } {
+  let signal = () => {};
+  let release = () => {};
+  const reached = new Promise<void>((resolve) => {
+    signal = resolve;
+  });
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const held = new Proxy(db, {
+    get(target, property) {
+      if (property === "batch") {
+        return async (statements: D1PreparedStatement[]) => {
+          signal();
+          await gate;
+          return target.batch(statements);
+        };
+      }
+      const value = Reflect.get(target, property);
+      return typeof value === "function" ? value.bind(target) : value;
+    }
+  });
+  return { db: held, reached, release };
 }
 
 export const minutes = (n: number) => n * 60_000;

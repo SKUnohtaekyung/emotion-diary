@@ -5,6 +5,8 @@ import { type AppConfig, type Bindings, type Ctx, type Handler, parseAllowlist, 
 import { fail, withCookie } from "./http";
 import { csrfOk } from "./request";
 import { clearAppLock, lockNow, setAppLock, unlock } from "./routes/appLock";
+import { getDayStart, putDayStart } from "./routes/dayStart";
+import { completeDiary, deleteDiary, getDiary, getToday, saveDiary } from "./routes/diaries";
 import { getProfile, putProfile } from "./routes/profile";
 import { createRouter } from "./router";
 import { heartbeat, login, logout, sessionInfo } from "./routes/session";
@@ -18,7 +20,14 @@ const ROUTES = new Map<string, Handler>([
   [`POST ${API.unlock}`, unlock],
   [`POST ${API.lock}`, lockNow],
   [`GET ${API.profile}`, getProfile],
-  [`PUT ${API.profile}`, putProfile]
+  [`PUT ${API.profile}`, putProfile],
+  [`GET ${API.dayStart}`, getDayStart],
+  [`PUT ${API.dayStart}`, putDayStart],
+  [`GET ${API.today}`, getToday],
+  [`GET ${API.diary}`, getDiary],
+  [`PUT ${API.diary}`, saveDiary],
+  [`DELETE ${API.diary}`, deleteDiary],
+  [`POST ${API.diaryComplete}`, completeDiary]
 ]);
 
 /** 잠긴 세션이 부를 수 있는 넷(ARCHITECTURE §6). POST /api/session(다시 로그인)은 로그인 확인 전에 처리된다. */

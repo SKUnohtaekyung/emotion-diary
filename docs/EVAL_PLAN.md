@@ -107,6 +107,8 @@
 
 **앱 뼈대에서 본 것(2026-10-14, TASK-MOBILE T3)**: F-22·F-23·F-25·F-27(서버 쪽)은 서버 시험(`app/test/worker/` — 로컬 D1, 시각을 옮겨 30일·하루·5분·10분·30초를 잰다), F-26·F-28과 F-27의 화면 쪽은 화면 시험(`app/test/client/`), F-27의 운영 묶음과 F-26의 빌드 번호는 빌드 검사(`npm run build`)로 본다. F-25의 정적 파일 헤더는 `_headers` 내용을 읽어 재는 시험(`app/test/worker/static-headers.test.ts`)과 원격 검사로, 공개 저장소의 계정 단서 0건은 `verify --mode quick`의 모양 검사(ARCHITECTURE §11.8)로 상시 본다. 개발용 건물에서는 원격 검사(`app/scripts/remote-check.mjs`)로 다시 본다. **뼈대에서 볼 수 없어 넘기는 것**: F-22의 '작성 중 만료 시 입력을 잃지 않음'과 F-23의 '전체 삭제' 두 줄은 작성·삭제가 생기는 Phase 2·`data-foundation`에서 본다(T3 A-18).
 
+**저장 핵심에서 본 것(2026-10-15, TASK-DATA-01 — D-122)**: F-01·F-02·F-06·F-07·F-09·F-10·F-17은 서버 시험 `app/test/worker/diary.test.ts`가 본다. 동시성은 `Promise.all`만으로는 실제로 겹치는지 보장이 없어, 한 요청의 batch를 붙잡아 두는 DB(`heldBatchDb`)로 '확인을 지난 뒤 다른 요청이 먼저 끝남'을 결정적으로 만든다. 창고 자물쇠(하루 한 행·달력 날짜·완료된 기록 보호·부모 먼저 지우기·외래 키)는 `diary-db.test.ts`, 날짜·시간대·글 검사는 `day.test.ts`, 틀린 열쇠 잠금 고침(RK-041)은 `session.test.ts`. 시험이 결함을 잡는지는 결함 주입으로 확인했다(수는 STATUS §1 숫자 표)(`tasks/data-foundation/2026-10-15/PLAN.md` 4-7). 개발용 건물에서는 원격 검사가 같은 흐름과 실제 런타임의 시간대 계산·`PRAGMA foreign_keys`·지운 뒤 딸린 행 0을 본다. **여기서 볼 수 없어 넘기는 것**: F-14의 통계·분석에서 빠짐과 F-23의 전체 삭제는 `data-control`, F-22의 '작성 중 만료 시 입력을 잃지 않음'은 `first-slice`(화면).
+
 필수 경계 fixture:
 
 - 자정 직전/직후, DST가 있는 timezone, timezone 변경, 윤년
