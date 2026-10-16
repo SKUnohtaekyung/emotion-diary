@@ -15,6 +15,8 @@ export interface Conflict {
   serverEntry: DiaryEntryView | null;
   currentRevision: number | null;
   sections: Section[];
+  /** 서버의 지금 글을 읽지 못했다(끊김·5xx·401·423) — 지운 것으로 보지 않고 다시 불러오게 한다(PR #40 리뷰) */
+  unavailable: boolean;
 }
 
 export interface FlowSession {
@@ -85,7 +87,8 @@ function conflictOf(mine: WorkingDiary, entry: DiaryEntryView | null): Conflict 
     server,
     serverEntry: entry,
     currentRevision: entry?.revision ?? null,
-    sections: differentSections(mine, server ?? emptyDiary())
+    sections: differentSections(mine, server ?? emptyDiary()),
+    unavailable: false
   };
 }
 
@@ -193,9 +196,11 @@ export async function openSession(date: string): Promise<OpenResult> {
 /** 저장 중에 다른 곳의 고침·지움을 알았다 — 서버의 지금 글을 받아 충돌을 채운다. */
 export async function loadConflict(session: FlowSession, currentRevision: number | null): Promise<Conflict> {
   const result = await fetchDiary(session.date);
-  const entry = result.ok ? result.data : null;
-  const conflict = conflictOf(session.saver.diary, entry);
-  if (!result.ok && result.status !== 404) conflict.currentRevision = currentRevision;
+  // 지운 것은 404로 확인됐을 때만이다. 다른 실패는 '읽지 못함'으로 두고 사본을 지킨다(PR #40 리뷰)
+  const conflict: Conflict =
+    result.ok || result.status === 404
+      ? conflictOf(session.saver.diary, result.ok ? result.data : null)
+      : { server: null, serverEntry: null, currentRevision, sections: [], unavailable: true };
   session.conflict = conflict;
   return conflict;
 }

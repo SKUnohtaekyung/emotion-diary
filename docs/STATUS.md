@@ -21,9 +21,9 @@
 
 | 무엇 | 값 | 언제·어떻게 |
 | --- | --- | --- |
-| 앱 시험 | 398건(28파일) PASS | 2026-10-16 `node scripts/verify.mjs --mode full` 안의 `vitest run`(서버 시험 `app/test/worker/` 8파일 153건, 화면 시험 `app/test/client/` 20파일 245건 — TASK-SLICE-01, 빌드 `20261016063630-47ddd90`). 이전 값 327건(25파일)은 TASK-DATA-01, 241건(22파일)은 2026-10-15 뼈대 시점 |
+| 앱 시험 | 401건(28파일) PASS | 2026-10-16 `node scripts/verify.mjs --mode full` 안의 `vitest run`(서버 시험 `app/test/worker/` 8파일 153건, 화면 시험 `app/test/client/` 20파일 248건 — TASK-SLICE-01, PR #40 리뷰 반영 뒤, 빌드 `20261016144234-98246a6`). 이전 값 327건(25파일)은 TASK-DATA-01, 241건(22파일)은 2026-10-15 뼈대 시점 |
 | 실제 브라우저 E2E | 18/18 PASS(WebKit 9·Chromium 9) | 2026-10-16 `npm run e2e`(Playwright 1.64.1, 로컬 https 서버 `app/scripts/e2e-server.mjs`) — TASK-SLICE-01. 홈 화면 앱·자판·앱 전환 화면은 대신하지 못한다(휴대폰 `mobile-slice`) |
-| 결함 주입(첫 조각) | 20종 모두 시험이 잡음 | 2026-10-16 TASK-SLICE-01 — 목록은 `tasks/first-slice/2026-10-16/PLAN.md` 5-8·5-10(마감 검토 지적 6종 포함, 등가 변이 1종은 뿌리 변이로 바꿈). 매번 원래 바이트로 되돌렸다 |
+| 결함 주입(첫 조각) | 22종 모두 시험이 잡음 | 2026-10-16 TASK-SLICE-01 — 목록은 `tasks/first-slice/2026-10-16/PLAN.md` 5-8·5-10·§11(마감 검토 지적 6종·PR #40 리뷰 지적 2종 포함, 등가 변이 1종은 뿌리 변이로 바꿈). 매번 원래 바이트로 되돌렸다 |
 | 결함 주입(저장 핵심) | 22종 모두 시험이 잡음 | 2026-10-16 TASK-DATA-01 — 목록은 `tasks/data-foundation/2026-10-15/PLAN.md` 4-7·§8. 일부러 망가뜨린 코드는 매번 원래 바이트로 되돌렸다 |
 | 개발용 건물 원격 검사 | 50/50 | 2026-10-16 `node app/scripts/remote-check.mjs dev --tail --reset-dev-data`, 빌드 `20261016064316-47ddd90`(첫 조각 화면을 올린 뒤 — `tasks/first-slice/2026-10-16/PLAN.md` 5-11, 버전 `9702fddf`). 그 전 같은 날 빌드 `20261015160102-ac41609`, 마이그레이션 0005~0007 원격 적용 뒤(`tasks/data-foundation/2026-10-15/PLAN.md` 4-10). 이전 34/34는 2026-10-14 뼈대 |
 | 가드 시험 | 소유 파일 확인 54/54(D-119 '동시 작업' 케이스 24건 포함), 커밋 확인 25/25 | 2026-10-15 `node scripts/test-claude-scope-guard.mjs`, `node scripts/test-claude-git-guard.mjs` |
