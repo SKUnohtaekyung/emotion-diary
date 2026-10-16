@@ -12,7 +12,7 @@ export function versionNotice(
   clientBuild: string,
   clientCompat: number
 ): VersionNotice | null {
-  // 서버가 화면보다 앞선 호환 단계면 저장이 어긋날 수 있다 — 문구만 바뀐다(저장을 막는 동작은 Phase 2).
+  // 서버가 화면보다 앞선 호환 단계면 저장이 어긋날 수 있다 — 문구가 바뀌고, 작성 흐름은 보내기를 멈추고 사본만 쓴다(write/saver blockSending, TASK-SLICE-01 A-14).
   if (serverCompat > clientCompat) return { kind: "compat", message: "새로 고쳐야 저장할 수 있어요" };
   if (serverBuild !== clientBuild) return { kind: "build", message: "새 버전이 있어요" };
   return null;

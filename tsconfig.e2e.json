@@ -1,0 +1,10 @@
+{
+  // 실제 브라우저 E2E(app/test/e2e, playwright.config.ts). 시험 코드는 Node에서 돌고 page.evaluate 안쪽은 브라우저에서 돈다 —
+  // 그래서 Node 타입과 DOM 타입을 함께 둔다. 서버 시험(tsconfig.test.json)과 나눈 까닭은 그쪽이 DOM 타입을 섞지 않아야 해서다.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "types": ["node"]
+  },
+  "include": ["app/test/e2e/**/*.ts", "playwright.config.ts"]
+}

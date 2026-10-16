@@ -2,7 +2,7 @@
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "vcs": { "enabled": false },
   "files": {
-    "includes": ["app/**", "vite.config.ts", "vitest.config.ts", "!app/worker/worker-configuration.d.ts"]
+    "includes": ["app/**", "vite.config.ts", "vitest.config.ts", "playwright.config.ts", "!app/worker/worker-configuration.d.ts"]
   },
   "formatter": { "enabled": false },
   "assist": { "enabled": false },

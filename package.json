@@ -14,12 +14,14 @@
     "verify:full": "node scripts/verify.mjs --mode full",
     "dev": "node app/scripts/dev.mjs",
     "lint": "biome lint --error-on-warnings",
-    "typecheck": "wrangler types --check app/worker/worker-configuration.d.ts && tsc -p tsconfig.worker.json && tsc -p tsconfig.client.json && tsc -p tsconfig.test.json",
+    "typecheck": "wrangler types --check app/worker/worker-configuration.d.ts && tsc -p tsconfig.worker.json && tsc -p tsconfig.client.json && tsc -p tsconfig.test.json && tsc -p tsconfig.e2e.json",
     "test": "node scripts/test-check-taxonomy.mjs && node scripts/test-claude-scope-guard.mjs && node scripts/test-claude-git-guard.mjs && node scripts/test-check-characters.mjs && node scripts/test-check-harness.mjs && vitest run",
-    "build": "node app/scripts/build.mjs"
+    "build": "node app/scripts/build.mjs",
+    "e2e": "playwright test"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
+    "@playwright/test": "1.64.1",
     "@types/node": "22.20.5",
     "happy-dom": "20.14.6",
     "sharp": "^0.35.4",

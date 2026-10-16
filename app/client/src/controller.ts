@@ -12,11 +12,20 @@ import { isReturnable } from "./lib/routes";
 import { readNavType, startLockDecision } from "./lib/startLock";
 import { KEYS, readStored, removeStored, writeStored } from "./lib/storage";
 import { currentRouteName, navigate, render, startRouter } from "./router";
-import { app, fetchSession, markLoggedOut, practice } from "./state";
+import { app, fetchSession, markLoggedOut } from "./state";
 import { hideCover, isCovered } from "./ui/cover";
 import { hideLockLayer, isLockLayerShown, showLockLayer } from "./ui/lockLayer";
 import { openSheet } from "./ui/sheet";
 import { showToast } from "./ui/toast";
+import { resumeSaving } from "./write/lifecycle";
+import { allSavers } from "./write/saver";
+import { dropAllSessions } from "./write/session";
+import { clearUnsent } from "./write/unsent";
+
+/** 쓰는 중인가 — 작성 흐름에 있거나, 서버가 아직 받지 않은 글이 있다. 로그인이 풀렸을 때 시트를 먼저 보일지 가른다. */
+function isWriting(): boolean {
+  return currentRouteName().startsWith("write/") || allSavers().some((saver) => saver.unsent);
+}
 
 let lossSheetOpen = false;
 let resuming = false;
@@ -34,6 +43,8 @@ function afterUnlock(): void {
   syncHeartbeat();
   // 층 아래에서 미뤄 둔 화면을 이제 그린다
   render();
+  // 잠긴 동안 멈춰 둔 저장을 잇는다(기기 사본에 붙잡아 두었다 — ARCHITECTURE §7)
+  resumeSaving();
 }
 
 /** 지금 잠근다(`지금 잠그기`). 서버에 청하고, 닿지 않아도 화면은 잠근다(더 잠기는 쪽이라 안전하다). */
@@ -87,7 +98,9 @@ export function handleUnauthorized(options: { already?: boolean } = {}): void {
     goAuthAgain();
     return;
   }
-  if (practice.text !== "") {
+  if (isWriting()) {
+    // 쓰던 글은 기기 사본에 붙잡아 둔다 — 다시 들어오면 쓰던 곳으로 돌아와 보낸다(F-22, U-2)
+    for (const saver of allSavers()) saver.hold();
     lossSheetOpen = true;
     openSheet({
       id: "session-lost",
@@ -118,8 +131,10 @@ export async function logout(): Promise<void> {
   stopHeartbeat();
   markLoggedOut();
   hideLockLayer();
-  // 다른 사람이 이어서 쓰지 못하게 연습 칸의 글도 비운다
-  practice.text = "";
+  // 다른 사람이 이어서 쓰지 못하게 화면의 글과 이 휴대폰에 남은 못 보낸 글을 모두 지운다(U-2 — 시트로 먼저 알렸다)
+  dropAllSessions();
+  for (const saver of allSavers()) saver.discard();
+  clearUnsent();
   removeStored("session", KEYS.returnTo);
   removeStored("session", KEYS.forgotPin);
   navigate("#/auth", { replace: true });
@@ -226,7 +241,10 @@ export async function resume(): Promise<void> {
     if (result.data.locked || isLockLayerShown()) enterLock();
     hideCover();
     // 돌아올 때마다 화면을 다시 그리지 않는다 — 쓰던 칸의 초점과 글이 사라진다
-    if (!app.locked) syncHeartbeat();
+    if (!app.locked) {
+      syncHeartbeat();
+      resumeSaving();
+    }
   } finally {
     resuming = false;
   }

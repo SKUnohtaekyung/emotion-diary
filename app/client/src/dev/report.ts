@@ -3,7 +3,7 @@
 // 이 폴더는 운영 묶음에 들어가지 않는다 — main.ts가 개발용일 때만 동적으로 불러온다.
 
 import { type ClientErrorReport, parseClientError } from "../../../shared/dev";
-import { type ErrorLike, errorParts, reportRouteOf, safeBuild } from "../lib/errorInfo";
+import { type ErrorLike, errorParts, maskApiPath, reportRouteOf, safeBuild } from "../lib/errorInfo";
 
 /**
  * 화면 오류를 보고 한 건으로 정리한다. 이름은 error.name이 안전한 모양이면 그대로 아니면 'Error', 파일은 경로만(query·# 버림,
@@ -28,7 +28,7 @@ export function apiReport(path: string, status: number, route: string, build: st
   return parseClientError({
     kind: "api",
     name: `HTTP${status}`,
-    source: path.split(/[?#]/)[0] ?? path,
+    source: maskApiPath(path),
     line: 0,
     col: 0,
     build: safeBuild(build),

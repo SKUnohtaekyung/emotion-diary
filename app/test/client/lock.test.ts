@@ -5,7 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { initController } from "../../client/src/controller";
 import { request, setApiHandlers } from "../../client/src/lib/api";
 import { registerViews, resetRouterForTest, startRouter, type ViewContext } from "../../client/src/router";
-import { app, practice } from "../../client/src/state";
+import { app } from "../../client/src/state";
 import { hideLockLayer, isLockLayerShown, showLockLayer } from "../../client/src/ui/lockLayer";
 import { openSheet, resetSheetsForTest } from "../../client/src/ui/sheet";
 import { showToast } from "../../client/src/ui/toast";
@@ -37,10 +37,9 @@ beforeEach(() => {
   history.replaceState(null, "", "/#/today");
   resetRouterForTest();
   resetSheetsForTest();
-  registerViews({ auth: stubView, today: stubView });
+  registerViews({ auth: stubView, today: stubView, "write/:date": stubView });
   startRouter();
   Object.assign(app, { authenticated: true, locked: true, appLock: true, hasName: true, name: "시험" });
-  practice.text = "";
   callbacks.onUnlocked.mockReset();
   callbacks.onForgot.mockReset();
 });
@@ -198,21 +197,21 @@ describe("어느 화면에서든", () => {
     expect(app.authenticated).toBe(false);
   });
 
-  it("401 unauthorized: 연습 칸에 글이 있으면 '다시 들어와야 해요' 시트가 먼저다", async () => {
+  it("401 unauthorized: 작성 흐름에 있으면 '다시 들어와야 해요' 시트가 먼저고, 돌아갈 자리는 그 글(날짜까지)이다", async () => {
     initController();
     app.locked = false;
-    practice.text = "가짜 연습 글";
+    history.replaceState(null, "", "/#/write/2026-10-16?step=reason");
     stubFetch(() => ({ status: 401, body: { error: "unauthorized" } }));
     await request("GET", "/api/anything");
     const sheet = document.querySelector(".sheet");
     expect(sheet?.textContent).toContain("다시 들어와야 해요");
     expect(sheet?.textContent).toContain("다시 들어오면 쓰던 곳으로 돌아와요.");
-    expect(location.hash).toBe("#/today");
+    expect(location.hash).toBe("#/write/2026-10-16?step=reason");
 
     [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find((b) => b.textContent === "다시 들어가기")?.click();
     await vi.waitFor(() => expect(location.hash).toBe("#/auth?s=again"));
-    // 글은 메모리에 그대로 있다(다시 들어오면 쓰던 곳으로 돌아온다)
-    expect(practice.text).toBe("가짜 연습 글");
+    // query(쓰던 단계)는 버리고 화면 주소만 — 단계는 서버·기기 사본에서 되살린다
+    expect(sessionStorage.getItem("returnTo")).toBe("write/2026-10-16");
   });
 
   it("열쇠 로그인 요청의 401(invalid_key)은 로그인 풀림으로 보지 않는다", async () => {

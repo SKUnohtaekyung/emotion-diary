@@ -1,0 +1,452 @@
+/* 평면 첫 조각의 화면들 — 오늘·작성 흐름·편지(검토·기록 보기)·완료(TASK-SLICE-01 PLAN A-4·A-7·A-8).
+   장면·친구·조약돌·움직임이 없다. 값은 tokens.ts가 심는 CSS 변수만 쓴다(감정 색은 --emotion-<계열>-<단계>).
+   버튼 줄은 화면 아래에 고정하지 않고 내용 바로 뒤에 둔다(사용자 결정 U-1 — 자판이 고정 버튼을 가린다, S-07).
+   색만으로 전달하지 않는다: 고른 것은 채움 + ✓, 계열은 이름 글자가 말한다(UX_SPEC §12). */
+
+/* display를 정한 부품에 hidden을 달면 숨게 한다(부품 클래스 + [hidden]이 부품 클래스보다 구체적이다) */
+.btn[hidden],
+.own-tag[hidden],
+.own-list[hidden] {
+  display: none;
+}
+
+/* 계열 색 — 표지(500, 기쁨만 흰 바탕 3:1을 넘는 700 — D-034)·옅은 면(50)·선(300) */
+[data-category="enjoyment"] { --cat-mark: var(--emotion-enjoyment-500); --cat-soft: var(--emotion-enjoyment-50); --cat-line: var(--emotion-enjoyment-300); }
+[data-category="wish"] { --cat-mark: var(--emotion-wish-500); --cat-soft: var(--emotion-wish-50); --cat-line: var(--emotion-wish-300); }
+[data-category="sadness"] { --cat-mark: var(--emotion-sadness-500); --cat-soft: var(--emotion-sadness-50); --cat-line: var(--emotion-sadness-300); }
+[data-category="anger"] { --cat-mark: var(--emotion-anger-500); --cat-soft: var(--emotion-anger-50); --cat-line: var(--emotion-anger-300); }
+[data-category="joy"] { --cat-mark: var(--emotion-joy-700); --cat-soft: var(--emotion-joy-50); --cat-line: var(--emotion-joy-300); }
+[data-category="love"] { --cat-mark: var(--emotion-love-500); --cat-soft: var(--emotion-love-50); --cat-line: var(--emotion-love-300); }
+[data-category="hate"] { --cat-mark: var(--emotion-hate-500); --cat-soft: var(--emotion-hate-50); --cat-line: var(--emotion-hate-300); }
+[data-category="fear"] { --cat-mark: var(--emotion-fear-500); --cat-soft: var(--emotion-fear-50); --cat-line: var(--emotion-fear-300); }
+[data-category="disgust"] { --cat-mark: var(--emotion-disgust-500); --cat-soft: var(--emotion-disgust-50); --cat-line: var(--emotion-disgust-300); }
+
+/* ── 작성 흐름 ── */
+.write-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: var(--size-touch-target-min);
+  margin-top: calc(var(--space-2) * -1);
+}
+
+.icon-button {
+  flex: none;
+  width: var(--size-touch-target-min);
+  height: var(--size-touch-target-min);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: none;
+  color: var(--neutral-text);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.icon-spacer {
+  flex: none;
+  width: var(--size-touch-target-min);
+}
+
+.write-progress-box {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.write-progress {
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-variant-numeric: tabular-nums;
+}
+
+.write-bar {
+  width: 100%;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--neutral-surface-soft);
+}
+
+.write-bar-fill {
+  width: calc(var(--progress, 0) * 100%);
+  height: 100%;
+  background: var(--service-ink);
+}
+
+.write-banner {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-control);
+  background: var(--neutral-surface-soft);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: 600;
+}
+
+.save-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--text-label-line);
+}
+
+.save-status {
+  min-height: var(--text-label-line);
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.save-status.is-warning {
+  color: var(--neutral-text);
+  font-weight: 600;
+}
+
+/* '다음'이 막힌 까닭 — 빨간 오류가 아니라 ink 안내 한 줄(D-098 ③) */
+.write-hint {
+  color: var(--service-ink);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: 700;
+}
+
+.write-text {
+  min-height: calc(var(--text-body-line) * 6 + var(--space-3) * 2);
+  overflow: hidden;
+  resize: none;
+}
+
+.write-chosen,
+.write-counter {
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  font-weight: 600;
+}
+
+.write-aside {
+  display: flex;
+}
+
+/* 내용 바로 뒤의 버튼 줄(U-1). 화면에 고정하지 않는다. */
+.write-nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+}
+
+/* 고르기 — 마음(아홉)·세부 감정(알약) */
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: var(--size-touch-target-min);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--neutral-border-strong);
+  background: var(--neutral-bg);
+  color: var(--neutral-text);
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.choice[aria-pressed="true"] {
+  border-color: var(--service-ink);
+  background: var(--service-ink);
+  color: var(--neutral-bg);
+}
+
+.choice[aria-pressed="true"]::after {
+  content: "✓";
+  margin-left: auto;
+  padding-left: var(--space-1);
+}
+
+/* 기본 3열, 글자를 키우거나 폭이 좁으면 2열·1열로 — 이름이 잘리지 않게(UX_SPEC §4 격자 폴백·§12 200% 글자) */
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 6.25em), 1fr));
+  gap: var(--space-2);
+}
+
+.choice-name {
+  min-width: 0;
+}
+
+.choice-feeling {
+  min-height: 56px;
+  border-radius: var(--radius-control);
+}
+
+.choice-mark {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--cat-mark, var(--neutral-border-strong));
+}
+
+.choice[aria-pressed="true"] .choice-mark {
+  box-shadow: 0 0 0 2px var(--neutral-bg);
+}
+
+.choice-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.choice-pill {
+  border-color: var(--cat-line, var(--neutral-border-strong));
+  border-radius: var(--radius-chip);
+  background: var(--cat-soft, var(--neutral-bg));
+  font-weight: 500;
+}
+
+/* 크기 */
+.intensity-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--neutral-border);
+  border-radius: var(--radius-card);
+}
+
+.intensity-name {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.intensity {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  container-type: inline-size;
+}
+
+/* 글자를 크게 키워 패널이 좁아지면 숫자를 위 줄로 올리고 −/+를 아래 줄 양끝에 둔다(넘치지 않게) */
+@container (max-width: 160px) {
+  .intensity-row {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .intensity-number {
+    flex-basis: 100%;
+    order: -1;
+  }
+}
+
+.intensity-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+/* 좁아져도 44px 아래로 줄지 않는다(UX_SPEC §12 터치 영역) */
+.stepper {
+  flex: none;
+  width: var(--size-touch-target-min);
+  padding: 0;
+  font-size: 20px;
+}
+
+.intensity-number {
+  min-width: 2.5ch;
+  font-size: var(--text-display-size);
+  line-height: var(--text-display-line);
+  font-weight: 800;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+/* 화면 왼쪽 끝 밀기(뒤로 가기)와 부딪히지 않게 길을 안쪽으로 들인다(UX_SPEC §17 규칙 8) */
+.intensity-track {
+  position: relative;
+  padding: 0 var(--space-3);
+}
+
+.intensity-range {
+  display: block;
+  width: 100%;
+  height: var(--size-touch-target-min);
+  margin: 0;
+  accent-color: var(--cat-mark, var(--service-ink));
+  /* 손가락·마우스는 위의 얇은 층이 받는다 — 키보드·낭독기는 range가 받는다 */
+  pointer-events: none;
+}
+
+.intensity-range.is-unset::-webkit-slider-thumb {
+  opacity: 0;
+}
+
+.intensity-range.is-unset::-moz-range-thumb {
+  opacity: 0;
+}
+
+.intensity-hit {
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.intensity-anchor {
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  text-align: center;
+}
+
+.own-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--neutral-border);
+}
+
+.own-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.own-name {
+  font-weight: 600;
+}
+
+.own-tag {
+  margin-left: var(--space-1);
+  padding: 0 var(--space-2);
+  border: 1px solid var(--neutral-border-strong);
+  border-radius: var(--radius-chip);
+  color: var(--neutral-text-muted);
+  font-size: var(--text-caption-size);
+  line-height: var(--text-caption-line);
+  font-weight: 600;
+}
+
+/* 편지(검토·기록 보기)의 평면판 */
+.letter,
+.record-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.letter-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--neutral-border);
+  border-radius: var(--radius-card);
+  background: var(--neutral-surface);
+}
+
+.letter-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.letter-head h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.letter-size {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.letter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.letter-pills li {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--cat-line, var(--neutral-border-strong));
+  border-radius: var(--radius-chip);
+  background: var(--cat-soft, var(--neutral-bg));
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.letter-text {
+  white-space: pre-wrap;
+}
+
+.letter-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+/* ── 오늘 ── */
+.today-date {
+  color: var(--neutral-text-muted);
+  font-weight: 600;
+}
+
+.today-state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.today-chip,
+.today-line {
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  text-align: center;
+}
+
+/* 지난 날 쓰던 글 줄 — 기본 링크 모양을 쓰지 않는다 */
+.link-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--size-touch-target-min);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--neutral-surface-soft);
+  color: var(--neutral-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.skeleton-button {
+  height: var(--size-touch-target-min);
+  border-radius: var(--radius-control);
+  background: var(--neutral-surface-soft);
+}
+
+.today-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-8);
+}

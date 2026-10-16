@@ -18,6 +18,10 @@ describe("tokenVars", () => {
     expect(vars["--service-ink"]).toBe(color.service.ink.light);
     expect(vars["--service-mint"]).toBe(color.service.mint.light);
     expect(vars["--font-sans"]).toContain("Pretendard Variable");
+    // 감정 색: 계열 아홉 × 단계, 글 칸(label·source)은 변수가 아니다
+    expect(vars["--emotion-joy-700"]).toBe(color.emotion.joy["700"]);
+    expect(vars["--emotion-sadness-100"]).toBe(color.emotion.sadness["100"]);
+    expect(Object.keys(vars).some((name) => name.startsWith("--emotion-") && /label|source/.test(name))).toBe(false);
     expect(vars["--text-body-size"]).toBe("16px");
     expect(vars["--text-body-line"]).toBe("24px");
     expect(vars["--space-4"]).toBe("16px");

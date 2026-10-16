@@ -6,6 +6,7 @@ import { type ApiResult, request } from "./lib/api";
 import { APP_BUILD } from "./lib/build";
 import { versionNotice } from "./lib/version";
 import { renderVersionBanner } from "./ui/banner";
+import { blockSending } from "./write/saver";
 
 export const app = {
   authenticated: false,
@@ -16,9 +17,6 @@ export const app = {
   hasName: false,
   name: null as string | null
 };
-
-/** 연습 칸의 글. 메모리에만 둔다 — 저장소·서버·개발용 상태 칸 어디에도 보내지 않는다(S-07 확인용). */
-export const practice = { text: "" };
 
 /** 이 기기의 로그인이 끝났을 때(로그아웃·풀림) 마지막으로 받은 답을 비운다. */
 export function markLoggedOut(): void {
@@ -43,8 +41,10 @@ export function applySession(info: SessionInfo): void {
   } else {
     markLoggedOut();
   }
-  // 새 버전 띠: 판단만 하고 새로 고치지는 않는다(T3 A-5)
-  renderVersionBanner(versionNotice(info.build, info.compat, APP_BUILD, API_COMPAT));
+  // 새 버전 띠: 판단만 하고 새로 고치지는 않는다(T3 A-5). 호환 단계가 앞서면 저장을 멈추고 사본만 쓴다(TASK-SLICE-01 A-14)
+  const notice = versionNotice(info.build, info.compat, APP_BUILD, API_COMPAT);
+  renderVersionBanner(notice);
+  blockSending(notice?.kind === "compat");
 }
 
 /** `GET /api/session`. 받으면 상태에 반영한다. 모양이 다르면 서버 오류로 본다. */

@@ -3,6 +3,7 @@
 
 import { API } from "../../../shared/api";
 import type { ClientErrorReport } from "../../../shared/dev";
+import { maskApiPath } from "../lib/errorInfo";
 import type { ProbeEvent } from "../lib/probe";
 
 export interface LifecycleRow {
@@ -40,7 +41,7 @@ export function createTrace(): Trace {
 
 export function record(trace: Trace, event: ProbeEvent, now: number = Date.now()): void {
   if (event.type === "api") {
-    const path = event.path.split(/[?#]/)[0] ?? event.path;
+    const path = maskApiPath(event.path);
     trace.lastApi = { path, status: event.status };
     if (event.method === "POST" && path === API.heartbeat) {
       trace.heartbeat.count += 1;

@@ -65,10 +65,10 @@
     "install": "npm ci",
     "dev": "npm run dev (app/scripts/dev.mjs: builds the dev bundle, applies migrations to the local D1, runs wrangler dev; needs .dev.vars from app/scripts/make-secrets.mjs local all)",
     "lint": "npm run lint (Biome 2.5.15, warnings fail via --error-on-warnings)",
-    "typecheck": "npm run typecheck (wrangler types --check, then tsc for worker, client and tests)",
+    "typecheck": "npm run typecheck (wrangler types --check, then tsc for worker, client, tests and e2e)",
     "test": "npm test (harness script self-tests: check-taxonomy, scope-guard, git-guard, check-characters, check-harness; then vitest run: worker tests against a local D1 via wrangler getPlatformProxy, client tests in happy-dom)",
     "build": "npm run build (app/scripts/build.mjs: Vite client + wrangler deploy --dry-run worker for dev and prod, then bundle checks)",
-    "e2e": null,
+    "e2e": "npm run e2e (Playwright Test 1.64.1, playwright.config.ts: WebKit 27.2 then Chromium headless shell 156, 360x740; webServer app/scripts/e2e-server.mjs = wrangler dev over https with a self-signed certificate on port 8788 and a fresh local D1 in .wrangler/e2e-state; needs .dev.vars and work/deploy/local.PHONE-KEY.txt from app/scripts/make-secrets.mjs local all, and browsers from npx playwright install --only-shell webkit chromium). Measured 2026-10-16 on Windows 11: over http://localhost WebKit stored the __Host- cookie but did not send it back (Chromium did), over https both kept the session. Cannot stand in for the iPhone home-screen app (standalone mode, keyboard, app switcher, cold relaunch) - that is mobile-slice",
     "verify_quick": "npm run verify:quick",
     "verify_full": "npm run verify:full"
   },

@@ -1,6 +1,6 @@
 /* 개발용 상태 칸. 운영 묶음에는 들어가지 않는다(이 파일은 dev/index.ts만 불러온다).
    오른쪽 아래 모서리에 둔다. 위쪽에는 새 버전 띠의 버튼이 있어 피했고, 모서리가 비도록 body에 has-dev-panel을 달아
-   화면 아래 여백과 오늘 화면의 고정 버튼 줄이 그만큼 비켜 준다 — 연습 버튼 줄을 가리지 않는다. */
+   화면 아래 여백이 그만큼 비켜 준다 — 내용 뒤의 버튼 줄(TASK-SLICE-01 U-1)을 가리지 않는다. */
 .dev-panel {
   position: fixed;
   bottom: calc(env(safe-area-inset-bottom) + var(--space-2));
@@ -19,16 +19,6 @@
   padding-bottom: calc(
     var(--space-6) + env(safe-area-inset-bottom) + var(--size-touch-target-min) + var(--space-2)
   );
-}
-
-.has-dev-panel .today {
-  padding-bottom: calc(
-    var(--size-touch-target-min) + var(--space-3) * 2 + var(--space-6) + env(safe-area-inset-bottom)
-  );
-}
-
-.has-dev-panel .bottom-bar-inner {
-  padding-right: calc(var(--size-touch-target-min) + var(--space-2));
 }
 
 .has-dev-panel .sheet {

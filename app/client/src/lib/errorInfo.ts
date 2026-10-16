@@ -61,6 +61,14 @@ export function safeBuild(build: string): string {
 }
 
 /** 화면 이름만. 주소의 # · / · query를 걷어 낸다(`#/settings/pin?from=welcome` → `settings/pin`). */
+/**
+ * 개발용 상태 칸·오류 보고에 싣는 API 경로. query·`#`을 버리고 날짜 조각을 `_date`로 가린다
+ * (`/api/diaries/2026-10-16/complete` → `/api/diaries/_date/complete`) — 기록 날짜가 서버 기록에 남지 않게(ARCHITECTURE §11.9).
+ */
+export function maskApiPath(path: string): string {
+  return (path.split(/[?#]/)[0] ?? path).replace(/\/\d{4}-\d{2}-\d{2}(?=\/|$)/g, "/_date");
+}
+
 export function routeNameOf(hash: string): string {
   const name = (hash.replace(/^#\/?/, "").split("?")[0] ?? "").replace(/\/+$/, "");
   return /^[a-z0-9/-]{1,40}$/.test(name) ? name : "unknown";

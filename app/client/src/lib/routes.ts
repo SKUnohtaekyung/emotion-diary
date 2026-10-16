@@ -1,17 +1,35 @@
 // 화면 주소(T3 A-4)와 들어갈 수 있는지의 판단. 주소는 해시 `#/…`이고 DOM과 떼어 두어 시험한다.
 // 로그인 전에는 어떤 주소로 와도 열쇠 화면만 연다(UX_SPEC §17).
+// 값이 든 화면(ARCHITECTURE §11.9)은 `이름/:date` 모양이다 — 작성 흐름·기록 보기·완료(TASK-SLICE-01 PLAN A-9).
+
+import { isIsoDate } from "../../../shared/diary";
 
 export const ROUTES = ["auth", "auth/name", "welcome", "today", "settings/lock", "settings/pin"] as const;
 export type RouteName = (typeof ROUTES)[number];
+
+/** 날짜 값을 받는 화면. 화면 표의 이름은 `write/:date`처럼 적는다. */
+export const DATE_ROUTES = ["write", "record", "done"] as const;
+export type DateRouteName = `${(typeof DATE_ROUTES)[number]}/:date`;
 
 /** 로그인이 끝난 뒤 돌아가도 되는 화면. 열쇠·이름·반가워요는 지나가면 사라지는 화면이라 뺀다. */
 const RETURNABLE: readonly string[] = ["today", "settings/lock", "settings/pin"];
 
 export interface ParsedRoute {
-  /** 화면 이름(query 없음). 비었거나 모르는 이름이면 known이 거짓 */
+  /** 화면 주소(query 없음, 값 포함 — 예: write/2026-10-16). 비었거나 모르는 이름이면 known이 거짓 */
   path: string;
+  /** 화면 표의 이름(값 자리는 `:date` — 예: write/:date). 정확한 이름이면 path와 같다 */
+  name: string;
+  /** 값 조각. 날짜 화면이면 date */
+  params: { date?: string };
   query: URLSearchParams;
   known: boolean;
+}
+
+/** `write/2026-10-16` → 이름과 날짜. 날짜 모양이 달력 날짜가 아니면 null. */
+function matchDateRoute(path: string): { name: DateRouteName; date: string } | null {
+  const [head, value, ...rest] = path.split("/");
+  if (rest.length || !value || !(DATE_ROUTES as readonly string[]).includes(head ?? "")) return null;
+  return isIsoDate(value) ? { name: `${head}/:date` as DateRouteName, date: value } : null;
 }
 
 export function parseHash(hash: string): ParsedRoute {
@@ -19,11 +37,13 @@ export function parseHash(hash: string): ParsedRoute {
   const cut = body.indexOf("?");
   const path = (cut === -1 ? body : body.slice(0, cut)).replace(/\/+$/, "");
   const query = new URLSearchParams(cut === -1 ? "" : body.slice(cut + 1));
-  return { path, query, known: (ROUTES as readonly string[]).includes(path) };
+  const dated = matchDateRoute(path);
+  if (dated) return { path, name: dated.name, params: { date: dated.date }, query, known: true };
+  return { path, name: path, params: {}, query, known: (ROUTES as readonly string[]).includes(path) };
 }
 
 export function isReturnable(path: string | null | undefined): path is string {
-  return typeof path === "string" && RETURNABLE.includes(path);
+  return typeof path === "string" && (RETURNABLE.includes(path) || matchDateRoute(path) !== null);
 }
 
 export interface GuardState {

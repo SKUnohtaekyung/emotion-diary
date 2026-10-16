@@ -1,7 +1,19 @@
 /// <reference path="../../client/src/env.d.ts" />
 // 기록 규칙(UX_SPEC §17, T3 A-4): 열쇠 화면은 로그인 뒤 replace로 사라지고, 하위 화면은 push이며, 시트가 열려 있을 때 밀면 시트만 닫힌다.
 import { beforeEach, describe, expect, it } from "vitest";
-import { back, backThenReplace, navigate, registerViews, render, resetRouterForTest, startRouter, type ViewContext } from "../../client/src/router";
+import {
+  back,
+  backThenReplace,
+  currentFlow,
+  leaveFlow,
+  navigate,
+  pushFlowStep,
+  registerViews,
+  render,
+  resetRouterForTest,
+  startRouter,
+  type ViewContext
+} from "../../client/src/router";
 import { app } from "../../client/src/state";
 import { closeSheet, openSheet, resetSheetsForTest } from "../../client/src/ui/sheet";
 import { flush, mountShell } from "./helpers";
@@ -207,6 +219,71 @@ describe("시트가 열려 있을 때 밀면 시트만 닫힌다", () => {
     expect(document.activeElement).toBe(document.querySelector(".sheet button"));
     await closeSheet();
     expect(document.activeElement).toBe(opener);
+  });
+});
+
+describe("작성 흐름의 기록(UX_SPEC §4·§17 규칙 3, D-082 ⑤, F-18)", () => {
+  beforeEach(() => {
+    registerViews({ "write/:date": fakeView("write"), "done/:date": fakeView("done"), "record/:date": fakeView("record") });
+  });
+
+  it("단계마다 한 칸씩 쌓고 깊이를 싣는다 — 뒤로 가면 앞 단계, 깊이도 하나 준다", async () => {
+    signIn();
+    history.replaceState(null, "", "/#/today");
+    render();
+    pushFlowStep("#/write/2026-10-16?step=event", "f1");
+    pushFlowStep("#/write/2026-10-16?step=feelings", "f1");
+    pushFlowStep("#/write/2026-10-16?step=details&c=joy", "f1");
+    expect(currentFlow()).toEqual({ id: "f1", depth: 3 });
+    history.back();
+    await flush(20);
+    expect(location.hash).toBe("#/write/2026-10-16?step=feelings");
+    expect(currentFlow()).toEqual({ id: "f1", depth: 2 });
+  });
+
+  it("흐름을 떠나면 쌓은 칸을 모두 되감아 들어오기 전 칸을 바꿔친다 — 다시 뒤로 가도 끝난 단계가 아니다", async () => {
+    signIn();
+    history.replaceState(null, "", "/#/today");
+    render();
+    pushFlowStep("#/write/2026-10-16?step=event", "f1");
+    pushFlowStep("#/write/2026-10-16?step=feelings", "f1");
+    pushFlowStep("#/write/2026-10-16?step=letter", "f1");
+    rendered.length = 0;
+    leaveFlow("#/done/2026-10-16");
+    await flush(20);
+    expect(location.hash).toBe("#/done/2026-10-16");
+    expect(rendered).toEqual(["done"]);
+    expect(currentFlow()).toBeNull();
+    // 실제 브라우저에서 뒤로 밀었을 때 끝난 단계로 가지 않는지는 E2E가 본다(앞으로 가기 칸의 처리는 엔진 몫이다)
+  });
+
+  it("흐름 안에서 시트를 열었다 닫아도 깊이가 어긋나지 않는다", async () => {
+    signIn();
+    history.replaceState(null, "", "/#/today");
+    render();
+    pushFlowStep("#/write/2026-10-16?step=event", "f1");
+    pushFlowStep("#/write/2026-10-16?step=feelings", "f1");
+    openSheet({ id: "menu", title: "메뉴", actions: [{ label: "닫기" }] });
+    history.back(); // 밀어서 시트만 닫기
+    await flush(20);
+    expect(location.hash).toBe("#/write/2026-10-16?step=feelings");
+    expect(currentFlow()).toEqual({ id: "f1", depth: 2 });
+    leaveFlow("#/today");
+    await flush(20);
+    expect(location.hash).toBe("#/today");
+    expect(currentFlow()).toBeNull();
+  });
+
+  it("다른 흐름의 칸 위에서 시작하면 깊이 1부터, 흐름 표시가 없으면 떠날 때 지금 칸만 바꿔친다", async () => {
+    signIn();
+    history.replaceState(null, "", "/#/write/2026-10-16?step=reason");
+    render();
+    expect(currentFlow()).toBeNull();
+    pushFlowStep("#/write/2026-10-16?step=praise", "f2");
+    expect(currentFlow()).toEqual({ id: "f2", depth: 1 });
+    history.replaceState(null, "", "/#/write/2026-10-16?step=reason");
+    leaveFlow("#/today");
+    expect(location.hash).toBe("#/today");
   });
 });
 
