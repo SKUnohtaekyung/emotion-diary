@@ -1,5 +1,6 @@
 // F-23 앱 잠금의 서버 확인(EVAL_PLAN §5, ARCHITECTURE §6, D-106·D-112 ③⑧). 전체 삭제 두 줄은 data-foundation(T3 A-18).
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { hmacHex } from "../../worker/src/crypto";
 import { call, login, minutes, startServer, type TestServer } from "./harness";
 
 let server: TestServer;
@@ -218,8 +219,12 @@ describe("비밀번호는 평문으로 남지 않는다", () => {
     expect(reply.raw).not.toContain("8642");
     const row = await server.db.prepare("SELECT app_lock_hash FROM owner_settings").first<{ app_lock_hash: string }>();
     expect(row?.app_lock_hash).toMatch(/^[0-9a-f]{64}$/);
-    const all = await server.db.prepare("SELECT * FROM owner_settings").all();
-    expect(JSON.stringify(all.results)).not.toContain("8642");
+    // 저장된 값은 서버 비밀값을 섞은 HMAC 그 자체다(평문·되돌릴 수 있는 모양이 아니다)
+    expect(row?.app_lock_hash).toBe(await hmacHex(server.env.APP_LOCK_SECRET ?? "", "owner:8642"));
+    // 해시 칸은 무작위 16진수라 우연히 '8642'를 품을 수 있다(약 0.1% — 2026-10-16 main CI 38853644189에서 실제로 걸렸다). 나머지 칸만 글자로 본다
+    const all = await server.db.prepare("SELECT * FROM owner_settings").all<Record<string, unknown>>();
+    const others = all.results.map(({ app_lock_hash: _hash, ...rest }) => rest);
+    expect(JSON.stringify(others)).not.toContain("8642");
   });
 
   it("로그인하지 않은 GET /api/session은 잠금 여부를 알려 주지 않는다", async () => {
