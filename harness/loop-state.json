@@ -19,8 +19,8 @@
   ],
   "next_node": "first-slice",
   "blockers": [
-    "PR #40 and #41 merged into main b74242c with CI green (5-13). The dev building runs build 20261016172442-b74242c (remote check 50/50, dev data reset, 2026-10-17). The phone check (5-12, tasks/first-slice/2026-10-16/PHONE-GUIDE.md) needs the user. data-control is also ready (D-116) and is not planned yet",
+    "PR #40 and #41 merged into main b74242c with CI green (5-13). The dev building runs build 20261016172442-b74242c (remote check passed, dev data reset, 2026-10-17; counts only in docs/STATUS.md section 1). The phone check (5-12, tasks/first-slice/2026-10-16/PHONE-GUIDE.md) needs the user. data-control is also ready (D-116) and is not planned yet",
     "Scope: single user (D-108). AI writing is decided after 30 days of real use (D-120), evidence analysis after 60 days (D-121)"
   ],
-  "last_checkpoint": "2026-10-17 TASK-SLICE-01: PLAN 5-1..5-11 and 5-13 done (PR #40 and #41 merged, main b74242c, CI green, dev building redeployed with the review fixes and remote check 50/50). Only 5-12, the phone check, remains for gate first-slice. Record: tasks/first-slice/2026-10-16/PLAN.md (D-118)."
+  "last_checkpoint": "2026-10-17 TASK-SLICE-01: PLAN 5-1..5-11 and 5-13 done (PR #40 and #41 merged, main b74242c, CI green, dev building redeployed with the review fixes and remote check passed). Only 5-12, the phone check, remains for gate first-slice. Record: tasks/first-slice/2026-10-16/PLAN.md (D-118)."
 }
