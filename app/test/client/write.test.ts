@@ -4,9 +4,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { DiaryEntryView } from "../../shared/diary";
 import { CATEGORIES } from "../../shared/taxonomy";
+import { enterLock, handleUnauthorized } from "../../client/src/controller";
 import { startDev } from "../../client/src/dev/index";
+import { setApiHandlers } from "../../client/src/lib/api";
 import { currentFlow, pushFlowStep, registerViews, render, resetRouterForTest, startRouter, type ViewContext } from "../../client/src/router";
 import { app } from "../../client/src/state";
+import { hideLockLayer, isLockLayerShown } from "../../client/src/ui/lockLayer";
 import { resetSheetsForTest } from "../../client/src/ui/sheet";
 import { clearToasts } from "../../client/src/ui/toast";
 import { renderDone } from "../../client/src/views/done";
@@ -539,6 +542,80 @@ describe("PR #40 리뷰 지적(2026-10-16)", () => {
     sheetButton("다시 불러오기")?.click();
     await vi.waitFor(() => expect(document.querySelector(".sheet")?.textContent).toContain("다른 부분:"));
     expect(calls.filter((call) => call.method === "GET" && call.path.startsWith("/api/diaries/")).length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("다시 불러오기 중 로그인이 풀리면(401) '다시 들어와야 해요' 시트를 충돌 시트로 덮지 않고, 닫으면 열쇠 화면으로 간다(PR #41 리뷰)", async () => {
+    setApiHandlers({ onLocked: enterLock, onUnauthorized: () => handleUnauthorized() });
+    try {
+      let get: "ok" | "fail" | "unauthorized" = "ok";
+      serve({
+        entry: entry(),
+        get: () =>
+          get === "ok"
+            ? { status: 200, body: entry() }
+            : get === "unauthorized"
+              ? { status: 401, body: { error: "unauthorized" } }
+              : { status: 500, body: { error: "server_error" } },
+        put: (request) =>
+          (request.body as { reasonText?: string }).reasonText
+            ? { status: 409, body: { error: "revision_conflict", currentRevision: 5 } }
+            : meta(4)
+      });
+      await open(`#/write/${TODAY}?step=reason`);
+      get = "fail";
+      const area = document.getElementById("reason") as HTMLTextAreaElement;
+      area.value = "가짜 이유: 충돌";
+      area.dispatchEvent(new Event("input"));
+      await vi.waitFor(() => expect(document.querySelector(".sheet")?.textContent).toContain("불러오지 못했어요"), { timeout: 3000 });
+      get = "unauthorized";
+      sheetButton("다시 불러오기")?.click();
+      await vi.waitFor(() => expect(document.querySelector(".sheet")?.textContent).toContain("다시 들어와야 해요"));
+      await flush(20);
+      // 충돌 시트가 로그인 풀림 시트를 바꿔치우지 않는다
+      expect(document.querySelector(".sheet")?.textContent).toContain("다시 들어와야 해요");
+      expect(document.querySelectorAll(".sheet")).toHaveLength(1);
+      sheetButton("다시 들어가기")?.click();
+      await vi.waitFor(() => expect(location.hash).toBe("#/auth?s=again"));
+      // 쓰던 글은 이 휴대폰 사본에 남아 다시 들어오면 이어 보낸다
+      expect(readUnsent(TODAY)?.diary.reasonText).toBe("가짜 이유: 충돌");
+    } finally {
+      setApiHandlers(null);
+    }
+  });
+
+  it("다시 불러오기 중 잠기면(423) 잠금 층 위에 충돌 시트를 열지 않는다(PR #41 리뷰)", async () => {
+    setApiHandlers({ onLocked: enterLock, onUnauthorized: () => handleUnauthorized() });
+    try {
+      let get: "ok" | "fail" | "locked" = "ok";
+      serve({
+        entry: entry(),
+        get: () =>
+          get === "ok"
+            ? { status: 200, body: entry() }
+            : get === "locked"
+              ? { status: 423, body: { error: "app_locked" } }
+              : { status: 500, body: { error: "server_error" } },
+        put: (request) =>
+          (request.body as { reasonText?: string }).reasonText
+            ? { status: 409, body: { error: "revision_conflict", currentRevision: 5 } }
+            : meta(4)
+      });
+      await open(`#/write/${TODAY}?step=reason`);
+      get = "fail";
+      const area = document.getElementById("reason") as HTMLTextAreaElement;
+      area.value = "가짜 이유: 충돌";
+      area.dispatchEvent(new Event("input"));
+      await vi.waitFor(() => expect(document.querySelector(".sheet")?.textContent).toContain("불러오지 못했어요"), { timeout: 3000 });
+      get = "locked";
+      sheetButton("다시 불러오기")?.click();
+      await vi.waitFor(() => expect(isLockLayerShown()).toBe(true));
+      await flush(20);
+      expect(document.querySelector(".sheet")).toBeNull();
+      expect(readUnsent(TODAY)?.diary.reasonText).toBe("가짜 이유: 충돌");
+    } finally {
+      setApiHandlers(null);
+      hideLockLayer();
+    }
   });
 
   it("다른 곳에서 완료된 날에 이 휴대폰의 임시저장 사본이 남아 있으면 기록 보기에서 그 글로 가는 길이 있다", async () => {

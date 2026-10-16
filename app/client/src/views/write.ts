@@ -10,6 +10,7 @@ import { EVENT_MAX_CHARS, REASON_MAX_CHARS, REFLECTION_MAX_CHARS } from "../../.
 import { announce, focusElement, h } from "../lib/dom";
 import { monthDay } from "../lib/format";
 import { currentFlow, leaveFlow, navigate, pushFlowStep, syncTitle, type ViewContext } from "../router";
+import { app } from "../state";
 import { openSheet } from "../ui/sheet";
 import { showToast } from "../ui/toast";
 import { intensityControl } from "../ui/intensity";
@@ -817,6 +818,9 @@ async function deleteDraft(session: FlowSession): Promise<void> {
 function showConflict(session: FlowSession): void {
   const conflict = session.conflict;
   if (!conflict) return;
+  // 충돌을 다시 읽는 사이 로그인이 풀렸거나(401) 잠겼으면(423) 전역 처리기가 이미 화면을 넘겨받았다 — 그 시트·층을 덮지 않는다.
+  // 충돌은 session.conflict에 남아, 다시 들어오거나 잠금을 푼 뒤 작성 화면이 그려질 때 다시 보인다(PR #41 리뷰).
+  if (!app.authenticated || app.locked) return;
   if (conflict.unavailable) {
     // 다른 곳의 글을 읽지 못했다 — 지운 것으로 보지도, 덮어쓰게 하지도 않는다. 사본은 그대로 두고 다시 불러온다(PR #40 리뷰)
     openSheet({
