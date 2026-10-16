@@ -6,6 +6,7 @@ import { type Ctx, iso, type Session } from "../context";
 import { hmacHex, timingSafeEqual } from "../crypto";
 import { empty, fail, json } from "../http";
 import { readJson } from "../request";
+import { liveSession } from "../session";
 
 const pinHash = (ctx: Ctx, owner: string, pin: string) => hmacHex(ctx.secrets.appLockSecret, `${owner}:${pin}`);
 
@@ -81,16 +82,18 @@ export async function setAppLock(ctx: Ctx): Promise<Response> {
   const denied = await authorizeChange(ctx, session, body.currentPin);
   if (denied) return denied;
   const t = iso(ctx.now);
-  await ctx.env.DB.batch([
+  const results = await ctx.env.DB.batch([
+    // 모든 기록 지우기 뒤에 들어온 묵은 요청은 잠금 설정을 되살리지 못한다(liveSession — 마이그레이션 0008)
     ctx.env.DB.prepare(
       `INSERT INTO owner_settings (owner_key, app_lock_hash, app_lock_fail_count, app_lock_retry_at, created_at, updated_at)
-       VALUES (?1, ?2, 0, NULL, ?3, ?3)
+       SELECT ?1, ?2, 0, NULL, ?3, ?3 WHERE ${liveSession(4, 5)}
        ON CONFLICT(owner_key) DO UPDATE SET app_lock_hash = excluded.app_lock_hash, app_lock_fail_count = 0,
          app_lock_retry_at = NULL, updated_at = excluded.updated_at`
-    ).bind(session.owner, await pinHash(ctx, session.owner, body.pin), t),
+    ).bind(session.owner, await pinHash(ctx, session.owner, body.pin), t, session.id, session.dataEpoch),
     // 정한 이 기기는 지금부터 5분 규칙을 다시 잰다.
     ctx.env.DB.prepare("UPDATE sessions SET locked = 0, last_active_at = ?2 WHERE id = ?1").bind(session.id, t)
   ]);
+  if (!results[0]?.meta.changes) return fail(401, "unauthorized");
   return json(200, { appLock: true });
 }
 

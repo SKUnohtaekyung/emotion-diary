@@ -27,6 +27,7 @@ import { type Ctx, iso, type Session } from "../context";
 import { fail, json } from "../http";
 import { type Operation, type Receipt, receiptFor, receiptStatements, replay } from "../idempotency";
 import { readJsonText } from "../request";
+import { liveSession, sessionIsLive } from "../session";
 
 export interface EntryRow {
   id: string;
@@ -342,14 +343,19 @@ export async function saveDiary(ctx: Ctx): Promise<Response> {
         .prepare(
           `INSERT INTO diary_entries (id, owner_key, entry_date, timezone, status, event_text, reason_text, revision, taxonomy_version,
                                       resume_step, resume_category, write_token, created_at, updated_at)
-           VALUES (?1, ?2, ?3, ?4, 'draft', ?5, ?6, 1, ?7, ?8, ?9, ?10, ?11, ?11)
+           SELECT ?1, ?2, ?3, ?4, 'draft', ?5, ?6, 1, ?7, ?8, ?9, ?10, ?11, ?11 WHERE ${liveSession(12, 13)}
            ON CONFLICT (owner_key, entry_date) DO NOTHING RETURNING id`
         )
-        .bind(id, session.owner, date, timeZone, diary.eventText, diary.reasonText, TAXONOMY_VERSION, resumeStep, resumeCategory, token, now),
+        .bind(id, session.owner, date, timeZone, diary.eventText, diary.reasonText, TAXONOMY_VERSION, resumeStep, resumeCategory, token, now, session.id, session.dataEpoch),
       ...childStatements(db, id, token, diary, false),
       ...receiptStatements(ctx, session, receipt, { status: 201, body }, { sql: "EXISTS (SELECT 1 FROM diary_entries WHERE id = ?9 AND write_token = ?10)", params: [id, token] })
     ]);
-    if (!results[0]?.results?.length) return afterLostRace(ctx, session, receipt, date); // 같은 날을 동시에 만든 다른 요청이 이겼다(F-06)
+    if (!results[0]?.results?.length) {
+      // 모든 기록 지우기가 이 요청을 받은 뒤에 끝났다 — 기록을 되살리지 않았다(liveSession, 마이그레이션 0008). 있는 기록을 고치는
+      // UPDATE는 지워진 행에 닿지 않아 따로 걸지 않는다 — 행을 새로 만드는 쓰기만 막으면 된다
+      if (!(await sessionIsLive(ctx, session))) return fail(401, "unauthorized");
+      return afterLostRace(ctx, session, receipt, date); // 같은 날을 동시에 만든 다른 요청이 이겼다(F-06)
+    }
     return json(201, body);
   }
 

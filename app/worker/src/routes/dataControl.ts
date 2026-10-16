@@ -149,8 +149,9 @@ export async function deleteAll(ctx: Ctx): Promise<Response> {
     db.prepare("DELETE FROM idempotency_records WHERE owner_key = ?1").bind(session.owner),
     db.prepare("DELETE FROM owner_settings WHERE owner_key = ?1").bind(session.owner),
     db.prepare("DELETE FROM sessions WHERE subject = ?1 AND id <> ?2").bind(session.owner, session.id),
-    // 이 기기는 처음 상태로 — 잠김을 풀고 5분 규칙을 다시 잰다(앱 잠금 설정이 사라졌다)
-    db.prepare("UPDATE sessions SET locked = 0, last_active_at = ?2 WHERE id = ?1").bind(session.id, iso(ctx.now))
+    // 이 기기는 처음 상태로 — 잠김을 풀고 5분 규칙을 다시 잰다(앱 잠금 설정이 사라졌다). 세대를 올려, 이 batch 전에 세션 확인을
+    // 지나 날아오던 쓰기(이 기기의 다른 탭 포함)가 뒤늦게 행을 만들지 못하게 한다 — 다른 기기의 것은 세션 행이 없어 막힌다(liveSession)
+    db.prepare("UPDATE sessions SET locked = 0, last_active_at = ?2, data_epoch = data_epoch + 1 WHERE id = ?1").bind(session.id, iso(ctx.now))
   ]);
   // 성공은 meta.changes(연쇄가 끼면 부풀려진다)가 아니라 지운 뒤 조회로 판정한다(DATA_MODEL §8)
   const left = await db
@@ -329,11 +330,15 @@ export function planImport(body: Row): ImportPlan | Response {
   }
   const entries: DiaryEntryView[] = [];
   const dates = new Set<string>();
+  // 같은 id가 날짜만 달리 두 번 오면 부모는 하나만 들어가고 두 기록의 딸린 행이 그 하나에 붙어 기본 키가 부딪힌다(500) — 먼저 막는다
+  const ids = new Set<string>();
   for (const [index, item] of (body.diaries as unknown[]).entries()) {
     const parsed = parseImportEntry(item);
     if (typeof parsed === "string") return fail(422, "invalid_import", { field: `diaries[${index}].${parsed}` });
     if (dates.has(parsed.entryDate)) return fail(422, "invalid_import", { field: `diaries[${index}].entryDate` });
+    if (ids.has(parsed.id)) return fail(422, "invalid_import", { field: `diaries[${index}].id` });
     dates.add(parsed.entryDate);
+    ids.add(parsed.id);
     entries.push(parsed);
   }
   let settings: ImportPlan["settings"] = null;

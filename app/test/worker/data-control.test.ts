@@ -7,7 +7,7 @@ import { API, DELETE_ALL_CONFIRM, diaryCompletePath, diaryPath, IDEMPOTENCY_HEAD
 import { addDays, EXPORT_PAGE_SIZE, type ExportFile, type ExportPage } from "../../shared/diary";
 import { EMOTIONS } from "../../shared/taxonomy";
 import { cookieValue } from "../../worker/src/session";
-import { call, login, type Reply, startServer, type TestServer } from "./harness";
+import { call, heldBatchDb, login, type Reply, startServer, type TestServer } from "./harness";
 import { syntheticEntry } from "./synthetic";
 
 let server: TestServer;
@@ -51,6 +51,56 @@ const exportAs = (cookie: string) => call(server, "GET", API.export, { cookie, h
 const deleteAll = (cookie: string, extra: Record<string, unknown> = {}) => call(server, "DELETE", API.diaries, { cookie, body: { confirm: DELETE_ALL_CONFIRM, ...extra } });
 const count = async (table: string) => (await server.db.prepare(`SELECT count(*) AS n FROM ${table}`).first<{ n: number }>())?.n ?? -1;
 const fileOf = (reply: Reply) => reply.body as unknown as ExportFile;
+
+/**
+ * `heldBatchDb`의 문장 판 — SQL이 pattern에 맞는 문장의 `run`(또는 그 문장이 든 batch)을 놓을 때까지 붙잡는다(설정 저장용).
+ */
+function heldRunDb(db: D1Database, pattern: RegExp): { db: D1Database; reached: Promise<void>; release: () => void } {
+  let signal = () => {};
+  let release = () => {};
+  const reached = new Promise<void>((resolve) => {
+    signal = resolve;
+  });
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const wrap = (statement: D1PreparedStatement, sql: string): D1PreparedStatement =>
+    new Proxy(statement, {
+      get(target, property) {
+        if (property === "__target") return target;
+        if (property === "__sql") return sql;
+        if (property === "bind") return (...values: unknown[]) => wrap(target.bind(...values), sql);
+        if (property === "run" && pattern.test(sql)) {
+          return async () => {
+            signal();
+            await gate;
+            return target.run();
+          };
+        }
+        const value = Reflect.get(target, property);
+        return typeof value === "function" ? value.bind(target) : value;
+      }
+    });
+  const held = new Proxy(db, {
+    get(target, property) {
+      if (property === "prepare") return (sql: string) => wrap(target.prepare(sql), sql);
+      if (property === "batch") {
+        // batch에는 진짜 문장을 넘긴다 — 붙잡을 문장이 들어 있으면 batch째 붙잡는다
+        return async (statements: D1PreparedStatement[]) => {
+          const parts = statements as unknown as { __target?: D1PreparedStatement; __sql?: string }[];
+          if (parts.some((part) => pattern.test(part.__sql ?? ""))) {
+            signal();
+            await gate;
+          }
+          return target.batch(parts.map((part, index) => part.__target ?? (statements[index] as D1PreparedStatement)));
+        };
+      }
+      const value = Reflect.get(target, property);
+      return typeof value === "function" ? value.bind(target) : value;
+    }
+  });
+  return { db: held, reached, release };
+}
 
 async function otherOwnerCookie(): Promise<string> {
   const sid = crypto.randomUUID().replaceAll("-", "").slice(0, 22);
@@ -201,6 +251,45 @@ describe("F-14 모든 기록 지우기", () => {
     await call(server, "POST", API.lock, { cookie });
     expect((await deleteAll(cookie, { pin: "4826" })).status).toBe(423);
   });
+
+  // 세션 확인을 이미 지나 날아오던 쓰기가 지우기 batch 뒤에 들어오는 경쟁(PR #43 리뷰). 쓰기를 붙잡아 두고 그 사이에 지운 뒤 놓아
+  // '지우기가 끝난 뒤 묵은 쓰기'를 결정적으로 만든다 — 행을 새로 만드는 쓰기는 liveSession(마이그레이션 0008)에 막혀야 한다.
+  it.each([
+    ["다른 기기", true],
+    ["이 기기의 다른 탭(같은 cookie)", false]
+  ])("(결정적) %s의 새 기록 만들기가 지우기 뒤에 들어와도 기록을 되살리지 못한다(401)", async (_name, otherDevice) => {
+    const cookie = await login(server);
+    const writer = otherDevice ? await login(server) : cookie;
+    const held = heldBatchDb(server.db);
+    const pending = call(server, "PUT", diaryPath(TODAY), { cookie: writer, body: body(), headers: { ...SEOUL, ...key() }, env: { DB: held.db } });
+    await held.reached;
+    expect((await deleteAll(cookie)).status).toBe(200);
+    held.release();
+    expect((await pending).status).toBe(401);
+    for (const table of ["diary_entries", "diary_categories", "diary_emotions", "diary_reflections", "idempotency_records", "owner_settings"]) {
+      expect(await count(table), table).toBe(0);
+    }
+    // 지운 기기는 로그인된 채 처음 상태다 — 다음 요청은 새 세대로 그대로 쓴다
+    expect((await call(server, "GET", API.profile, { cookie })).body).toEqual({ name: null });
+    await writeToday(cookie);
+    expect(await count("diary_entries")).toBe(1);
+  });
+
+  it.each([
+    ["부를 이름", API.profile, { name: "묵은 이름" }],
+    ["하루 기준 시각", API.dayStart, { dayStartHour: 6 }],
+    ["앱 잠금", API.appLock, { pin: "4826" }]
+  ])("(결정적) 다른 기기의 %s 저장이 지우기 뒤에 들어와도 설정 행을 되살리지 못한다(401)", async (_name, path, payload) => {
+    const cookie = await login(server);
+    const other = await login(server);
+    const held = heldRunDb(server.db, /INSERT INTO owner_settings/);
+    const pending = call(server, "PUT", path, { cookie: other, body: payload, env: { DB: held.db } });
+    await held.reached;
+    expect((await deleteAll(cookie)).status).toBe(200);
+    held.release();
+    expect((await pending).status).toBe(401);
+    expect(await count("owner_settings")).toBe(0);
+  });
 });
 
 describe("PC 백업 전용 경로(D-109)", () => {
@@ -307,6 +396,9 @@ describe("PC 백업 전용 경로(D-109)", () => {
     }
     const twice = await call(server, "POST", API.backupImport, { body: { diaries: [entry, { ...entry, id: crypto.randomUUID() }] }, headers: bearer(), env, csrf: false });
     expect(twice.body).toEqual({ error: "invalid_import", field: "diaries[1].entryDate" });
+    // 같은 id가 날짜만 달리 두 번 — 딸린 행이 부딪혀 500이 되기 전에 422(PR #43 리뷰)
+    const sameId = await call(server, "POST", API.backupImport, { body: { diaries: [entry, { ...entry, entryDate: "2026-10-02", firstCompletedLocalDate: "2026-10-02" }] }, headers: bearer(), env, csrf: false });
+    expect(sameId.body).toEqual({ error: "invalid_import", field: "diaries[1].id" });
     expect(await count("diary_entries")).toBe(0);
   });
 

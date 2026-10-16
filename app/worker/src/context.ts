@@ -50,6 +50,8 @@ export interface Session {
   hasName: boolean;
   /** owner의 하루 기준 시각(0~6, 설정 행이 없으면 기본 4 — DATA_MODEL §3.4) */
   dayStartHour: number;
+  /** 이 요청이 읽은 세션의 지우기 세대(모든 기록 지우기가 올린다 — 마이그레이션 0008). 행을 만드는 쓰기는 이 값으로 `liveSession`을 건다 */
+  dataEpoch: number;
 }
 
 export interface Ctx {
