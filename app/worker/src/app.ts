@@ -5,6 +5,7 @@ import { type AppConfig, type Bindings, type Ctx, type Handler, parseAllowlist, 
 import { fail, withCookie } from "./http";
 import { csrfOk } from "./request";
 import { clearAppLock, lockNow, setAppLock, unlock } from "./routes/appLock";
+import { backupConfigured, backupExport, backupImport, deleteAll, exportData } from "./routes/dataControl";
 import { getDayStart, putDayStart } from "./routes/dayStart";
 import { completeDiary, deleteDiary, getDiary, getToday, saveDiary } from "./routes/diaries";
 import { getProfile, putProfile } from "./routes/profile";
@@ -27,7 +28,15 @@ const ROUTES = new Map<string, Handler>([
   [`GET ${API.diary}`, getDiary],
   [`PUT ${API.diary}`, saveDiary],
   [`DELETE ${API.diary}`, deleteDiary],
-  [`POST ${API.diaryComplete}`, completeDiary]
+  [`POST ${API.diaryComplete}`, completeDiary],
+  [`GET ${API.export}`, exportData],
+  [`DELETE ${API.diaries}`, deleteAll]
+]);
+
+/** PC 백업 전용 경로(D-109) — 로그인 cookie·CSRF가 아니라 Authorization: Bearer로만 받는다(처리기가 확인한다). */
+const BACKUP_ROUTES = createRouter([
+  [`GET ${API.backupExport}`, backupExport],
+  [`POST ${API.backupImport}`, backupImport]
 ]);
 
 /** 잠긴 세션이 부를 수 있는 넷(ARCHITECTURE §6). POST /api/session(다시 로그인)은 로그인 확인 전에 처리된다. */
@@ -65,6 +74,14 @@ export function createApp(config: AppConfig) {
     if (key === `POST ${API.session}`) {
       if (!csrfOk(request, url)) return fail(403, "csrf");
       return login(ctx);
+    }
+
+    if (url.pathname.startsWith("/api/backup/")) {
+      // secret이 없으면 방식과 상관없이 경로가 없는 것과 같다(405로 경로가 있다는 것을 알리지 않는다)
+      if (!backupConfigured(env)) return fail(404, "not_found");
+      const backup = BACKUP_ROUTES.match(request.method, url.pathname);
+      if (backup.kind === "matched") return backup.handler(ctx);
+      return backup.kind === "method_not_allowed" ? fail(405, "method_not_allowed") : fail(404, "not_found");
     }
 
     ctx.session = await loadSession(ctx);

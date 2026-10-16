@@ -62,8 +62,18 @@ export const API = {
   today: "/api/today",
   /** 경로 표의 열쇠 — 실제 주소는 diaryPath(날짜) */
   diary: "/api/diaries/:date",
-  diaryComplete: "/api/diaries/:date/complete"
+  diaryComplete: "/api/diaries/:date/complete",
+  /** 모든 기록 지우기(DELETE) — D-112 ⑩, DATA_MODEL §8 */
+  diaries: "/api/diaries",
+  /** 내보내기(GET, 로그인 cookie) — 화면이 받아 공유 창으로 넘긴다(ARCHITECTURE §4.1) */
+  export: "/api/export",
+  /** PC 백업 전용(Authorization: Bearer — cookie·CSRF 없음, D-109). BACKUP_TOKEN_HASH가 없으면 404 */
+  backupExport: "/api/backup/export",
+  backupImport: "/api/backup/import"
 } as const;
+
+/** 모든 기록 지우기의 확인 문구(UX_SPEC §13 — 사용자가 그대로 입력해야 한다). 서버도 같은 문자열을 요구한다. */
+export const DELETE_ALL_CONFIRM = "모든 기록 삭제";
 
 export const diaryPath = (date: string) => `/api/diaries/${encodeURIComponent(date)}`;
 export const diaryCompletePath = (date: string) => `${diaryPath(date)}/complete`;
@@ -122,6 +132,8 @@ export type ErrorCode =
   | "revision_conflict" // 409 — 판 번호가 지금 것과 다르다(currentRevision)
   | "not_draft" // 409 — 이미 완료된 기록이다
   | "idempotency_mismatch" // 409 — 같은 영수증 열쇠로 다른 요청을 보냈다
+  | "confirm_mismatch" // 422 — 모든 기록 지우기의 확인 문구가 다르다
+  | "invalid_import" // 422 — 다시 넣을 기록의 모양이 틀렸다(field)
   | "server_misconfigured" // 500
   | "server_error"; // 500
 

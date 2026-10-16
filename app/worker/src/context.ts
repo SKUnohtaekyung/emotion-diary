@@ -13,6 +13,8 @@ export interface Bindings {
   ACCESS_KEY_SALT?: string;
   SESSION_SECRET?: string;
   APP_LOCK_SECRET?: string;
+  /** PC 백업 토큰의 SHA-256 16진수(선택 — 없으면 백업 경로가 404, D-109). 토큰 자체는 PC의 Git 제외 파일에만 있다 */
+  BACKUP_TOKEN_HASH?: string;
 }
 
 export interface Secrets {
@@ -48,6 +50,8 @@ export interface Session {
   hasName: boolean;
   /** owner의 하루 기준 시각(0~6, 설정 행이 없으면 기본 4 — DATA_MODEL §3.4) */
   dayStartHour: number;
+  /** 이 요청이 읽은 세션의 지우기 세대(모든 기록 지우기가 올린다 — 마이그레이션 0008). 행을 만드는 쓰기는 이 값으로 `liveSession`을 건다 */
+  dataEpoch: number;
 }
 
 export interface Ctx {

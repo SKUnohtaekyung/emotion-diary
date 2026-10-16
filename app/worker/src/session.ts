@@ -55,6 +55,7 @@ interface SessionRow {
   lock_on: number;
   has_name: number;
   day_start_hour: number;
+  data_epoch: number;
 }
 
 /**
@@ -68,7 +69,7 @@ export async function loadSession(ctx: Ctx): Promise<Session | null> {
   const parts = await verifyCookie(ctx.secrets.sessionSecret, value);
   if (!parts || !ctx.allowlist.has(parts.subject)) return null;
   const row = await ctx.env.DB.prepare(
-    `SELECT s.subject, s.key_login_at, s.issued_at, s.last_active_at, s.locked,
+    `SELECT s.subject, s.key_login_at, s.issued_at, s.last_active_at, s.locked, s.data_epoch,
             (o.app_lock_hash IS NOT NULL) AS lock_on, (o.display_name IS NOT NULL) AS has_name,
             COALESCE(o.day_start_hour, ?2) AS day_start_hour
        FROM sessions s LEFT JOIN owner_settings o ON o.owner_key = s.subject
@@ -91,7 +92,8 @@ export async function loadSession(ctx: Ctx): Promise<Session | null> {
     locked: row.locked === 1,
     lockOn: row.lock_on === 1,
     hasName: row.has_name === 1,
-    dayStartHour: row.day_start_hour
+    dayStartHour: row.day_start_hour,
+    dataEpoch: row.data_epoch
   };
 }
 
@@ -121,4 +123,20 @@ export async function touchSession(ctx: Ctx, session: Session): Promise<void> {
   session.locked = locked;
   session.lastActiveAt = lastActiveAt;
   session.issuedAt = issuedAt;
+}
+
+/**
+ * 행을 새로 만드는 쓰기에 거는 조건(SQL 조각): 이 요청이 읽은 세션이 아직 있고 같은 지우기 세대인가.
+ * 모든 기록 지우기는 다른 세션 행을 지우고 이 세션의 data_epoch를 올린다 — 세션 확인을 이미 지나 날아오던 쓰기가
+ * 지우기 batch 뒤에 들어와도 아무것도 만들지 못한다(D1 batch는 하나씩 차례로 돈다). 자리 번호는 부르는 쪽 문장에 맞춘다.
+ */
+export const liveSession = (sidParam: number, epochParam: number): string =>
+  `EXISTS (SELECT 1 FROM sessions WHERE id = ?${sidParam} AND data_epoch = ?${epochParam})`;
+
+/** 쓰기가 아무것도 바꾸지 않았을 때 `liveSession`에 막혔는지 본다 — 다른 까닭(같은 날을 먼저 만든 요청 등)과 가른다. */
+export async function sessionIsLive(ctx: Ctx, session: Session): Promise<boolean> {
+  const row = await ctx.env.DB.prepare("SELECT 1 AS ok FROM sessions WHERE id = ?1 AND data_epoch = ?2")
+    .bind(session.id, session.dataEpoch)
+    .first<{ ok: number }>();
+  return row !== null;
 }

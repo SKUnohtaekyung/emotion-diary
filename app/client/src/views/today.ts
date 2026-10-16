@@ -1,7 +1,7 @@
 // 오늘 `#/today` — 평면 첫 조각(TASK-SLICE-01 PLAN A-8, UX_SPEC §3·§11 '오늘 화면의 상태 여섯 가지').
 // 숲·돌·조약돌이 없는 평면판이라 시작 조작은 큰 버튼 하나다. 상태: 로딩·오류·연결 끊김·기록 없음(+지난 날 글 줄)·이어 쓰기·기록 있음.
 // 오늘 기록을 확인하지 못하면 시작을 막는다 — 확인 없이 새로 시작하면 하루 하나 규칙을 어길 수 있다(D-077 ⑧·D-083 ①).
-// 앱 잠금·지금 잠그기·로그아웃은 설정 화면이 생길 때까지 아래 작은 줄에 둔다.
+// 앱 잠금·지금 잠그기·내보내기·모든 기록 지우기·로그아웃은 설정 화면이 생길 때까지 아래 작은 줄에 둔다.
 
 import type { TodayInfo } from "../../../shared/diary";
 import { lockNow, logout } from "../controller";
@@ -33,6 +33,10 @@ export function renderToday({ root, alive }: ViewContext): () => void {
   lockNowButton?.addEventListener("click", () => {
     void lockNow();
   });
+  const exportButton = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "내 기록 내보내기" });
+  exportButton.addEventListener("click", () => navigate("#/settings/export"));
+  const deleteButton = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "모든 기록 지우기" });
+  deleteButton.addEventListener("click", () => navigate("#/settings/delete"));
   const logoutButton = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "로그아웃" });
   logoutButton.addEventListener("click", () => {
     const unsent = hasUnsent();
@@ -57,7 +61,7 @@ export function renderToday({ root, alive }: ViewContext): () => void {
       dateLine,
       title,
       area,
-      h("div", { class: "today-tools" }, lockSettings, lockNowButton, logoutButton)
+      h("div", { class: "today-tools" }, lockSettings, lockNowButton, exportButton, deleteButton, logoutButton)
     )
   );
 

@@ -98,13 +98,24 @@ const TIMEZONE_NAME = /^[A-Za-z][A-Za-z0-9_+-]*(?:\/[A-Za-z0-9_+-]+){0,3}$/;
  */
 export function canonicalTimeZone(value: unknown): string | null {
   if (typeof value !== "string" || value.length > TIMEZONE_MAX_CHARS || !TIMEZONE_NAME.test(value)) return null;
+  // Intl.DateTimeFormat을 만드는 데 한 번에 수십 μs가 든다 — 다시 넣기 조각은 기록마다 부르므로 답을 기억한다(마감 검토: 150편에 5ms).
+  // 대소문자만 다른 이름이 끝없이 쌓이지 않게 크기를 묶는다
+  const known = canonicalCache.get(value);
+  if (known !== undefined) return known;
+  let resolved: string | null = null;
   try {
-    const resolved = new Intl.DateTimeFormat("en-US", { timeZone: value }).resolvedOptions().timeZone;
-    return resolved.length <= TIMEZONE_MAX_CHARS ? resolved : null;
+    const name = new Intl.DateTimeFormat("en-US", { timeZone: value }).resolvedOptions().timeZone;
+    resolved = name.length <= TIMEZONE_MAX_CHARS ? name : null;
   } catch {
-    return null;
+    resolved = null;
   }
+  if (canonicalCache.size >= CANONICAL_CACHE_MAX) canonicalCache.clear();
+  canonicalCache.set(value, resolved);
+  return resolved;
 }
+
+const CANONICAL_CACHE_MAX = 64;
+const canonicalCache = new Map<string, string | null>();
 
 const formatters = new Map<string, Intl.DateTimeFormat>();
 
@@ -402,6 +413,54 @@ export interface DiarySummary {
   categories: string[];
   resume: ResumeView | null;
   updatedAt: string;
+}
+
+/** 내보내기 파일 형식(`schemas/export.schema.json`). */
+export const EXPORT_SCHEMA_VERSION = "emotion-diary-export-v1";
+
+/** `GET /api/export`·`GET /api/backup/export`의 응답 = 내보내기 파일 그대로. 비밀값·owner key·앱 잠금 해시·write_token은 없다(DATA_MODEL §8). */
+export interface ExportFile {
+  schemaVersion: typeof EXPORT_SCHEMA_VERSION;
+  exportedAt: string;
+  /** 내보낸 기기의 시간대(X-Timezone) */
+  timezone: string;
+  dayStartHour: number;
+  /** 부를 이름(2026-10-17 사용자 결정 — 파일에 넣는다). 없으면 null */
+  displayName: string | null;
+  diaries: DiaryEntryView[];
+}
+
+/**
+ * 내보내기 한 번(요청 하나)에 싣는 기록 수. 합성 3년치(1,095편, 1.7MB)를 한 번에 내보내면 무료 CPU 한도(10ms)를 넘을 공산이 커서
+ * 나눠 받는다(TASK-DATA-02, export-cpu-measured). 화면·백업 도구는 `next`가 null이 될 때까지 `?after=`로 이어 받아 붙인다.
+ */
+export const EXPORT_PAGE_SIZE = 100;
+
+/** `GET /api/export[?after=YYYY-MM-DD]`·`GET /api/backup/export[?after=]`의 응답 — 파일의 칸 + 다음 조각의 시작점(없으면 null). */
+export interface ExportPage extends ExportFile {
+  next: string | null;
+}
+
+/** 파일 이름: 내보낸 날(기기 시간대·하루 기준 시각으로 센 날)을 붙인다(UX_SPEC §13). */
+export const exportFileName = (date: string): string => `emotion-diary-${date}.json`;
+
+/** `DELETE /api/diaries` 본문. 앱 잠금을 켰으면 pin이 필요하다(D-112 ⑤). */
+export interface DeleteAllInput {
+  confirm: string;
+  pin?: string;
+}
+
+/** `POST /api/backup/import` 본문 — 한 번에 보내는 조각. settings는 첫 조각에만 싣고, 설정 행이 없을 때만 되살린다. */
+export interface ImportChunk {
+  diaries: DiaryEntryView[];
+  settings?: { displayName: string | null; dayStartHour: number };
+}
+
+/** `POST /api/backup/import` 응답. 이미 있는 날짜는 덮지 않고 건너뛴다. */
+export interface ImportResult {
+  inserted: number;
+  skipped: string[];
+  settingsRestored: boolean;
 }
 
 /** `GET /api/today`. */

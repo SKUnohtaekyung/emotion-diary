@@ -75,11 +75,12 @@ switch (command) {
     const file = path.join(root, "work", "deploy", `${envName}.secrets.env`);
     if (!existsSync(file)) die(`비밀값 파일이 없다 — 먼저 'node app/scripts/make-secrets.mjs ${envName} all'`);
     writeLocalConfig();
-    const names = ["ACCESS_KEY_HASH", "ACCESS_KEY_SALT", "SESSION_SECRET", "APP_LOCK_SECRET"];
+    // BACKUP_TOKEN_HASH는 선택(D-109 PC 백업) — 파일에 있을 때만 올린다
+    const names = ["ACCESS_KEY_HASH", "ACCESS_KEY_SALT", "SESSION_SECRET", "APP_LOCK_SECRET", "BACKUP_TOKEN_HASH"];
     const values = Object.fromEntries(
       readFileSync(file, "utf8").split(/\r?\n/).filter((line) => line.includes("=")).map((line) => [line.slice(0, line.indexOf("=")), line.slice(line.indexOf("=") + 1)])
     );
-    const only = rest.length ? rest : names;
+    const only = rest.length ? rest : names.filter((name) => values[name]);
     for (const name of only) {
       if (!names.includes(name) || !values[name]) die(`비밀값 '${name}'이 파일에 없다`);
       // 값은 표준 입력으로만 넘긴다 — 명령줄 인자·로그에 남지 않게.

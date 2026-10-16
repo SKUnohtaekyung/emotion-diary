@@ -12,7 +12,9 @@ import { installLifecycle } from "./lifecycle";
 import { registerViews } from "./router";
 import { applyTokens } from "./tokens";
 import { renderAuth } from "./views/auth";
+import { renderDeleteAll, renderDeleted } from "./views/deleteAll";
 import { renderDone } from "./views/done";
+import { renderExportData } from "./views/exportData";
 import { renderLockSettings } from "./views/lockSettings";
 import { renderName } from "./views/name";
 import { renderPinSetup } from "./views/pinSetup";
@@ -34,6 +36,9 @@ registerViews({
   today: renderToday,
   "settings/lock": renderLockSettings,
   "settings/pin": renderPinSetup,
+  "settings/export": renderExportData,
+  "settings/delete": renderDeleteAll,
+  "settings/deleted": renderDeleted,
   "write/:date": renderWrite,
   "record/:date": renderRecord,
   "done/:date": renderDone

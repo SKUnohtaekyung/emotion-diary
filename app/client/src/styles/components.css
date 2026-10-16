@@ -275,3 +275,34 @@
   z-index: 100;
   background: var(--forest-sky);
 }
+
+/* 내보내기·모든 기록 지우기(data-control) — 박스 없이 글 묶음과 목록으로만 나눈다 */
+.data-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.data-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.data-filename {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.data-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* 지우기 화면은 제목만 빨강이다(UX_SPEC §13) */
+.data-danger-title {
+  color: var(--semantic-danger);
+}
