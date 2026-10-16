@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-DATA-01",
-  "phase": "data-foundation-done",
+  "task_id": "TASK-SLICE-01",
+  "phase": "first-slice-building",
   "iteration": 1,
-  "status": "done",
-  "current_hypothesis": "Confirmed 2026-10-16: migrations 0005-0007 and the diary API (today, read, draft save, complete, delete, day start; one entry per day; revision; idempotency; owner checks; access-key lockout that never blocks the correct key) pass gate data-integrity, so first-slice only adds screens and data-control adds export, delete-all, backup and restore.",
+  "status": "in_progress",
+  "current_hypothesis": "With the four user answers U-1..U-4 (tasks/first-slice/2026-10-16/REQUESTS.md) and the writing-flow state design in PLAN §3, plain screens on top of the existing diary API (event, feelings, details, intensity, reason, praise, gratitude, review, done; completed-entry edit; draft delete; past drafts) with one-request-at-a-time autosave, reused idempotency keys and a device copy of unsent text kept only until the server acknowledges it pass gate first-slice (F-03, F-04, F-05, F-08, F-24, e2e-reload-restore with Playwright WebKit and Chromium, mobile-slice on the iPhone home-screen app).",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "adb3d06",
+  "last_verified_commit": "47ddd90",
   "completed_nodes": [
     "bootstrap-audit",
     "taxonomy-v1",
@@ -19,8 +19,8 @@
   ],
   "next_node": "first-slice",
   "blockers": [
-    "Next task not planned yet: first-slice and data-control are ready (D-116). A new CURRENT_TASK section with requests and a plan comes first; TASK-DATA-01 moves to tasks/archive then",
+    "Plan approved 2026-10-16; 5-1..5-11 done (dev building build 20261016064316-47ddd90, remote check 50/50, dev data reset). The phone check (5-12, tasks/first-slice/2026-10-16/PHONE-GUIDE.md) needs the user; commit/PR only on user instruction. data-control is also ready (D-116) and is not planned yet",
     "Scope: single user (D-108). AI writing is decided after 30 days of real use (D-120), evidence analysis after 60 days (D-121)"
   ],
-  "last_checkpoint": "2026-10-16 TASK-DATA-01 done: PR #38 (89c0017) merged into docs/cleanup, PR #37 merged into main as adb3d06, CI green on both OS. Decisions D-122. Record: tasks/data-foundation/2026-10-15/PLAN.md (D-118). Earlier work: tasks/archive/ and git log."
+  "last_checkpoint": "2026-10-16 TASK-SLICE-01 built on branch slice/first-slice (from main 47ddd90), not committed: PLAN 5-1..5-10 done (plain screens, saver and device copy, Playwright E2E 18/18 on WebKit and Chromium, 20 injected defects caught, docs synced with D-123, final review findings fixed, verify full PASS). Next: 5-11 deploy to the dev building after user confirmation, 5-12 phone check, 5-13 commit/PR and CI. Record: tasks/first-slice/2026-10-16/PLAN.md (D-118)."
 }

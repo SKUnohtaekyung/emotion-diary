@@ -90,9 +90,9 @@ export function render(): void {
   const mine = token;
   root.replaceChildren();
   root.removeAttribute("aria-busy");
-  root.setAttribute("data-route", route.path);
+  root.setAttribute("data-route", route.name);
 
-  const view = views.get(route.path);
+  const view = views.get(route.name);
   if (!view) return;
   try {
     cleanup = view({ root, route, alive: () => mine === token });
@@ -112,14 +112,55 @@ export function render(): void {
 }
 
 /** 화면 이름이나 해시로 간다. replace면 기록을 더하지 않고 지금 칸을 바꾼다. */
-export function navigate(hash: string, options: { replace?: boolean } = {}): void {
+export function navigate(hash: string, options: { replace?: boolean; flow?: FlowMark } = {}): void {
   const target = hash.startsWith("#") ? hash : `#/${hash}`;
   if (options.replace || target === location.hash) {
-    history.replaceState(history.state, "", target);
+    history.replaceState(options.flow ? { ...(history.state as object | null), flow: options.flow } : history.state, "", target);
   } else {
-    history.pushState({ pushed: true }, "", target);
+    history.pushState(options.flow ? { pushed: true, flow: options.flow } : { pushed: true }, "", target);
   }
   render();
+}
+
+// ───────── 작성 흐름의 기록(UX_SPEC §4·§17 규칙 3, D-082 ⑤, TASK-SLICE-01 PLAN A-10) ─────────
+// 흐름에 들어갈 때와 단계를 옮길 때 기록 칸을 쌓고, 칸마다 { 흐름 번호, 깊이 }를 싣는다(history.state는 새로 고쳐도 남는다).
+// 흐름을 떠날 때(완료·×·지우기·저장하기) 깊이만큼 되감고 나갈 화면으로 바꿔친다 — 다시 밀어도 끝난 단계로 돌아가지 않는다.
+
+export interface FlowMark {
+  id: string;
+  depth: number;
+  /** 편지의 '고치기'로 들어온 칸 — 그 단계의 '다음'이 '편지로 돌아가기'가 된다(칸마다 실려 밀어서 돌아와도 어긋나지 않는다) */
+  review?: boolean;
+}
+
+/** 지금 기록 칸의 흐름 표시(없으면 null). */
+export function currentFlow(): FlowMark | null {
+  const flow = (history.state as { flow?: Partial<FlowMark> } | null)?.flow;
+  return flow && typeof flow.id === "string" && Number.isInteger(flow.depth) && (flow.depth as number) > 0
+    ? { id: flow.id, depth: flow.depth as number, ...(flow.review === true ? { review: true } : {}) }
+    : null;
+}
+
+/** 흐름의 다음 단계(또는 흐름에 처음 들어감)로 간다 — 기록 한 칸을 쌓는다. */
+export function pushFlowStep(hash: string, flowId: string, options: { review?: boolean } = {}): void {
+  const here = currentFlow();
+  const depth = here?.id === flowId ? here.depth + 1 : 1;
+  navigate(hash, { flow: options.review ? { id: flowId, depth, review: true } : { id: flowId, depth } });
+}
+
+/**
+ * 흐름을 떠난다: 흐름이 쌓은 칸을 모두 되감아, 흐름에 들어오기 전 칸을 target으로 바꿔친다.
+ * 흐름 표시가 없으면(아이콘으로 새로 켜 주소로 바로 들어온 경우) 지금 칸만 바꿔친다.
+ */
+export function leaveFlow(target: string): void {
+  const here = currentFlow();
+  const hash = target.startsWith("#") ? target : `#/${target}`;
+  if (here && isPushed()) {
+    afterPop = hash;
+    history.go(-here.depth);
+  } else {
+    navigate(hash, { replace: true });
+  }
 }
 
 /** 화면 안의 뒤로 가기(‹). 밀어서 뒤로 가는 것과 같은 결과다. 앱 안에서 쌓은 칸이 아니면 fallback으로 바꿔친다. */

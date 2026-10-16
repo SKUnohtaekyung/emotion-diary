@@ -5,21 +5,27 @@ import "./styles/fonts.css";
 import "./styles/base.css";
 import "./styles/components.css";
 import "./styles/scenes.css";
+import "./styles/write.css";
 import { boot, initController } from "./controller";
 import { installErrorHandlers } from "./errors";
 import { installLifecycle } from "./lifecycle";
 import { registerViews } from "./router";
 import { applyTokens } from "./tokens";
 import { renderAuth } from "./views/auth";
+import { renderDone } from "./views/done";
 import { renderLockSettings } from "./views/lockSettings";
 import { renderName } from "./views/name";
 import { renderPinSetup } from "./views/pinSetup";
+import { renderRecord } from "./views/record";
 import { renderToday } from "./views/today";
 import { renderWelcome } from "./views/welcome";
+import { renderWrite } from "./views/write";
+import { installWriteLifecycle } from "./write/lifecycle";
 
 applyTokens();
 installErrorHandlers();
 installLifecycle();
+installWriteLifecycle();
 initController();
 registerViews({
   auth: renderAuth,
@@ -27,7 +33,10 @@ registerViews({
   welcome: renderWelcome,
   today: renderToday,
   "settings/lock": renderLockSettings,
-  "settings/pin": renderPinSetup
+  "settings/pin": renderPinSetup,
+  "write/:date": renderWrite,
+  "record/:date": renderRecord,
+  "done/:date": renderDone
 });
 
 // 개발용 묶음(상태 칸·오류 보고)은 운영 묶음에서 코드째 빠진다 — 반드시 이 조건 안의 동적 import로만 부른다(D-115 ②).

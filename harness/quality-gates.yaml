@@ -57,10 +57,11 @@ gates:
     blocking: true
     commands:
       - name: browser-e2e
-        # 2026-10-15(D-116): 도구는 first-slice에서 고른다(후보 Playwright WebKit — 홈 화면 앱을 어디까지 대신하는지는 미확인).
-        # 첫 쓰임은 first-slice 관문의 e2e-reload-restore다.
-        command: null
-        status: configure_after_bootstrap
+        # 2026-10-16 first-slice(D-123): Playwright Test 1.64.1, WebKit·Chromium, 로컬 https 서버(app/scripts/e2e-server.mjs).
+        # 첫 쓰임은 first-slice 관문의 e2e-reload-restore다. 홈 화면 앱 모드·자판·앱 전환 화면은 대신하지 못한다 — mobile-slice.
+        # CI는 .github/workflows/harness.yml의 Ubuntu e2e job이 돈다.
+        command: npm run e2e
+        status: ready
       - name: mobile-real-device
         # 공개 관문(D-117)의 실기기: 실제 앱으로 docs/EVAL_PLAN.md §4의 S-00~S-12 전부와 §6의 T-01~T-07을 iPhone 홈 화면 웹앱에서
         # 다시 본다(D-111). Android Chrome은 public-only에 있다. 본인 사용 시작 전에는 조각마다 해당 항목만 본다 —

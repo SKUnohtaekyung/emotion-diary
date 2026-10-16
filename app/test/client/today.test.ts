@@ -1,20 +1,23 @@
 /// <reference path="../../client/src/env.d.ts" />
-// 오늘 자리표시·반가워요·개발용 상태 칸. 연습 칸의 글은 메모리에만 있고 어디에도 새지 않는다(S-12).
+// 오늘 화면의 평면판(TASK-SLICE-01 PLAN A-8, UX_SPEC §3·§11)·반가워요·개발용 상태 칸. 서버는 가짜 fetch다.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { DiarySummary, TodayInfo } from "../../shared/diary";
 import { startDev } from "../../client/src/dev/index";
 import { emit } from "../../client/src/lib/probe";
-import { registerViews, render, resetRouterForTest, startRouter, type ViewContext } from "../../client/src/router";
-import { app, practice } from "../../client/src/state";
+import { currentFlow, registerViews, render, resetRouterForTest, startRouter, type ViewContext } from "../../client/src/router";
+import { app } from "../../client/src/state";
 import { hideLockLayer } from "../../client/src/ui/lockLayer";
 import { resetSheetsForTest } from "../../client/src/ui/sheet";
 import { clearToasts } from "../../client/src/ui/toast";
 import { renderToday } from "../../client/src/views/today";
 import { renderWelcome } from "../../client/src/views/welcome";
-import { flush, mountShell, session, stubFetch } from "./helpers";
+import { emptyDiary, withText } from "../../client/src/write/flow";
+import { resetSaversForTest } from "../../client/src/write/saver";
+import { resetSessionsForTest } from "../../client/src/write/session";
+import { readUnsent, writeUnsent } from "../../client/src/write/unsent";
+import { type FakeReply, flush, mountShell, session, stubFetch } from "./helpers";
 
-// 시험 안에서 만든 가짜 글이다 — 실제 일기가 아니다.
-const FAKE_NOTE = "가짜 연습 문장: 오늘 있었던 일은 아무에게도 말하지 않았다";
-
+const TODAY = "2026-10-16";
 let stopDev: (() => void) | null = null;
 
 const stub = (context: ViewContext) => {
@@ -22,15 +25,39 @@ const stub = (context: ViewContext) => {
   return () => {};
 };
 
+const summary = (overrides: Partial<DiarySummary> = {}): DiarySummary => ({
+  entryDate: TODAY,
+  status: "draft",
+  revision: 2,
+  categories: [],
+  resume: null,
+  updatedAt: "",
+  ...overrides
+});
+
+const todayReply = (overrides: Partial<TodayInfo> = {}): FakeReply => ({
+  status: 200,
+  body: { date: TODAY, timezone: "Asia/Seoul", dayStartHour: 4, entry: null, pastDraft: null, ...overrides }
+});
+
 beforeEach(() => {
   mountShell();
   localStorage.clear();
   sessionStorage.clear();
   resetRouterForTest();
   resetSheetsForTest();
-  practice.text = "";
+  resetSaversForTest();
+  resetSessionsForTest();
   Object.assign(app, { authenticated: true, locked: false, appLock: false, hasName: true, name: "시험" });
-  registerViews({ today: renderToday, welcome: renderWelcome, auth: stub, "settings/lock": stub, "settings/pin": stub });
+  registerViews({
+    today: renderToday,
+    welcome: renderWelcome,
+    auth: stub,
+    "settings/lock": stub,
+    "settings/pin": stub,
+    "write/:date": stub,
+    "record/:date": stub
+  });
   startRouter();
 });
 
@@ -46,127 +73,125 @@ afterEach(() => {
 const buttons = () => [...document.querySelectorAll<HTMLButtonElement>("button")];
 const byText = (text: string) => buttons().find((button) => button.textContent === text);
 
-describe("오늘 자리표시", () => {
-  it("제목·한 줄·확인용 작은 글·연습 칸·버튼", () => {
-    history.replaceState(null, "", "/#/today");
-    render();
-    expect(document.querySelector("h1")?.textContent).toBe("오늘");
-    expect(document.body.textContent).toContain("들어와 있어요. 시험님의 기록 공간이에요.");
-    expect(document.body.textContent).toContain("이 화면은 앱 뼈대를 확인하는 자리예요.");
-    expect(document.querySelector("label[for=practice]")?.textContent).toBe("연습 칸");
-    expect(document.getElementById("practice-help")?.textContent).toBe("여기에 적은 글은 어디에도 보내지 않아요.");
-    expect(byText("앱 잠금")).toBeDefined();
-    expect(byText("시트 열기")).toBeDefined();
-    expect(byText("로그아웃")).toBeDefined();
-    expect(byText("연습 버튼")).toBeDefined();
-    // 잠금이 꺼져 있으면 '지금 잠그기'는 없다
-    expect(byText("지금 잠그기")).toBeUndefined();
-    // 연습 버튼은 화면 아래 고정 줄에 있다
-    expect(byText("연습 버튼")?.closest(".bottom-bar")).not.toBeNull();
+async function openToday(reply: FakeReply | "offline" | ((path: string) => FakeReply | "offline")) {
+  const calls = stubFetch((request) => (typeof reply === "function" ? reply(request.path) : reply));
+  history.replaceState(null, "", "/#/today");
+  render();
+  await flush(10);
+  return calls;
+}
+
+describe("오늘 — 상태", () => {
+  it("기록 없음: 날짜·큰 질문·시작 버튼, 누르면 작성 첫 단계로 흐름 한 칸(시간대 머리글을 싣는다)", async () => {
+    const calls = await openToday(todayReply());
+    expect(document.querySelector(".today-date")?.textContent).toBe("10월 16일 금요일");
+    expect(document.querySelector("h1")?.textContent).toBe("오늘은 어떤 마음이 머물렀나요?");
+    expect(calls[0]?.headers["x-timezone"]).toBeTruthy();
+    byText("오늘의 마음 남기기")?.click();
+    expect(location.hash).toBe(`#/write/${TODAY}?step=event`);
+    expect(currentFlow()?.depth).toBe(1);
+    // 화면 아래 고정 버튼 줄이 없다(U-1)
+    expect(document.querySelector(".bottom-bar")).toBeNull();
   });
 
+  it("이어 쓰기: 쓰던 단계 칩, 누르면 그 단계로", async () => {
+    await openToday(todayReply({ entry: summary({ resume: { step: "details", categoryCode: "sadness" }, categories: ["sadness"] }) }));
+    expect(document.querySelector(".today-chip")?.textContent).toBe("슬픔 세부 감정 중 · 임시저장됨");
+    byText("이어서 써요")?.click();
+    expect(location.hash).toBe(`#/write/${TODAY}?step=details&c=sadness`);
+  });
+
+  it("기록 있음: 새로 만들지 않고 그 기록을 연다", async () => {
+    await openToday(todayReply({ entry: summary({ status: "completed" }) }));
+    expect(byText("오늘의 마음 남기기")).toBeUndefined();
+    byText("오늘의 기록 보기")?.click();
+    expect(location.hash).toBe(`#/record/${TODAY}`);
+  });
+
+  it("지난 날 쓰던 글 줄: 어제면 '어제', 더 지난 글은 날짜로 — 누르면 그 글을 이어 쓴다", async () => {
+    await openToday(todayReply({ pastDraft: summary({ entryDate: "2026-10-15", resume: { step: "reason", categoryCode: null } }) }));
+    byText("어제 쓰던 글이 있어요 ›")?.click();
+    expect(location.hash).toBe("#/write/2026-10-15?step=reason");
+    await openToday(todayReply({ pastDraft: summary({ entryDate: "2026-10-12" }) }));
+    expect(byText("10월 12일에 쓰던 글이 있어요 ›")).toBeDefined();
+  });
+
+  it("연결이 끊기면 시작을 막고 다시 시도를 둔다 — 확인 없이 새로 시작하지 않는다(D-083 ①)", async () => {
+    let online = false;
+    const calls = await openToday(() => (online ? todayReply() : "offline"));
+    expect(byText("오늘의 마음 남기기")?.getAttribute("aria-disabled")).toBe("true");
+    expect(document.querySelector(".today-line")?.textContent).toBe("연결이 끊겼어요 · 연결되면 시작할 수 있어요");
+    byText("오늘의 마음 남기기")?.click();
+    expect(location.hash).toBe("#/today");
+    online = true;
+    byText("다시 시도")?.click();
+    await flush(10);
+    expect(calls).toHaveLength(2);
+    expect(byText("오늘의 마음 남기기")?.getAttribute("aria-disabled")).toBeNull();
+  });
+
+  it("서버 오류면 '확인하지 못했어요'", async () => {
+    await openToday({ status: 500, body: { error: "server_error" } });
+    expect(document.querySelector(".today-line")?.textContent).toBe("오늘 기록을 확인하지 못했어요 · 잠시 뒤 다시 시도해 주세요");
+  });
+
+  it("서버에 없어도 이 휴대폰에 못 보낸 오늘 글이 있으면 이어 쓰기다(U-2)", async () => {
+    writeUnsent({ v: 1, date: TODAY, mode: "draft", baseRevision: null, diary: withText(emptyDiary(), "eventText", "가짜"), step: { step: "feelings", category: null }, pending: null, savedAt: 1 });
+    await openToday((path) => (path === "/api/today" ? todayReply() : { status: 404, body: { error: "not_found" } }));
+    expect(document.querySelector(".today-chip")?.textContent).toBe("마음 고르기 중 · 이 휴대폰에 잠시 보관 중");
+  });
+});
+
+describe("오늘 — 아래 작은 줄", () => {
   it("잠금이 켜져 있을 때만 '지금 잠그기'가 있고, 누르면 잠금을 청하고 잠금 층이 뜬다", async () => {
     app.appLock = true;
-    const calls = stubFetch(() => ({ status: 204 }));
+    const calls = stubFetch((request) => (request.path === "/api/today" ? todayReply() : { status: 204 }));
     history.replaceState(null, "", "/#/today");
     render();
     byText("지금 잠그기")?.click();
     await vi.waitFor(() => expect(document.getElementById("lock-layer")).not.toBeNull());
-    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(["POST /api/app-lock/lock"]);
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toContain("POST /api/app-lock/lock");
     expect(app.locked).toBe(true);
   });
 
-  it("앱 잠금은 하위 화면으로 push한다", () => {
-    history.replaceState(null, "", "/#/today");
-    render();
+  it("앱 잠금은 하위 화면으로 push한다", async () => {
+    await openToday(todayReply());
     const length = history.length;
     byText("앱 잠금")?.click();
     expect(location.hash).toBe("#/settings/lock");
     expect(history.length).toBe(length + 1);
   });
 
-  it("연습 버튼은 토스트 '눌렀어요', 시트 열기는 시트를 연다", () => {
-    history.replaceState(null, "", "/#/today");
-    render();
-    byText("연습 버튼")?.click();
-    expect(document.querySelector(".toast")?.textContent).toBe("눌렀어요");
-    byText("시트 열기")?.click();
-    expect(document.querySelector(".sheet")).not.toBeNull();
-  });
-
-  it("로그아웃: 확인 시트 → DELETE /api/session → 열쇠 화면 replace + 토스트, 연습 칸의 글도 비운다", async () => {
-    const calls = stubFetch(() => ({ status: 200, body: { ok: true } }));
-    history.replaceState(null, "", "/#/today");
-    render();
+  it("로그아웃: 확인 시트 → DELETE /api/session → 열쇠 화면 replace + 토스트", async () => {
+    const calls = await openToday((path) => (path === "/api/today" ? todayReply() : { status: 200, body: { ok: true } }));
     byText("로그아웃")?.click();
     const sheet = document.querySelector(".sheet");
     expect(sheet?.textContent).toContain("로그아웃할까요?");
-    expect(sheet?.textContent).toContain("다시 들어올 때 열쇠가 필요해요.");
-    practice.text = FAKE_NOTE;
     [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find((b) => b.textContent === "로그아웃")?.click();
     await vi.waitFor(() => expect(location.hash).toBe("#/auth"));
-    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(["DELETE /api/session"]);
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toContain("DELETE /api/session");
     expect(app.authenticated).toBe(false);
     expect(document.querySelector(".toast")?.textContent).toBe("로그아웃했어요");
-    expect(practice.text).toBe("");
+  });
+
+  it("못 보낸 글이 있으면 먼저 알리고, 그래도 로그아웃하면 이 휴대폰의 사본을 지운다(U-2)", async () => {
+    writeUnsent({ v: 1, date: "2026-10-15", mode: "draft", baseRevision: 3, diary: withText(emptyDiary(), "eventText", "가짜"), step: null, pending: null, savedAt: 1 });
+    await openToday((path) => (path === "/api/today" ? todayReply() : path.startsWith("/api/diaries") ? "offline" : { status: 200, body: {} }));
+    byText("로그아웃")?.click();
+    expect(document.querySelector(".sheet")?.textContent).toContain("아직 보내지 못한 글이 있어요");
+    [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find((b) => b.textContent === "그래도 로그아웃")?.click();
+    await vi.waitFor(() => expect(location.hash).toBe("#/auth"));
+    expect(readUnsent("2026-10-15")).toBeNull();
+    expect(localStorage.getItem("unsentDiaries")).toBeNull();
   });
 
   it("로그아웃이 연결 문제로 안 되면 로그인 상태를 그대로 두고 알린다", async () => {
-    stubFetch(() => "offline");
-    history.replaceState(null, "", "/#/today");
-    render();
+    await openToday((path) => (path === "/api/today" ? todayReply() : "offline"));
     byText("로그아웃")?.click();
     [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find((b) => b.textContent === "로그아웃")?.click();
     await vi.waitFor(() => expect(document.querySelector(".toast")?.textContent).toBe("인터넷에 연결되면 로그아웃할 수 있어요."));
     expect(app.authenticated).toBe(true);
     expect(location.hash).toBe("#/today");
-  });
-
-  it("이름은 새로 열린 뒤에는 서버에서 다시 받는다", async () => {
-    Object.assign(app, { name: null });
-    stubFetch(() => ({ status: 200, body: { name: "다시받음" } }));
-    history.replaceState(null, "", "/#/today");
-    render();
-    await vi.waitFor(() => expect(document.body.textContent).toContain("다시받음님의 기록 공간이에요."));
-  });
-});
-
-describe("연습 칸의 글은 어디에도 새지 않는다(S-12)", () => {
-  it("서버 요청·저장소·개발용 상태 칸에 글이 없다", async () => {
-    const calls = stubFetch(() => session({ appLock: true }));
-    stopDev = startDev();
-    history.replaceState(null, "", "/#/today");
-    render();
-    const box = document.getElementById("practice") as HTMLTextAreaElement;
-    box.value = FAKE_NOTE;
-    box.dispatchEvent(new Event("input", { bubbles: true }));
-    expect(practice.text).toBe(FAKE_NOTE);
-
-    // 이것저것 눌러 본다
-    byText("연습 버튼")?.click();
-    byText("시트 열기")?.click();
-    emit({ type: "lifecycle", kind: "hidden", persisted: false });
-    emit({ type: "startLock", navType: "navigate", hasMarker: false, lock: false, reason: "시험" });
-    document.querySelector<HTMLButtonElement>(".dev-panel-toggle")?.click();
-    await flush(20);
-
-    const panel = document.querySelector(".dev-panel")?.textContent ?? "";
-    expect(panel).toContain("마지막 API 응답");
-    expect(panel).not.toContain(FAKE_NOTE);
-    expect(panel).not.toContain("가짜 연습");
-    expect(JSON.stringify(calls)).not.toContain("가짜 연습");
-    expect(JSON.stringify({ ...localStorage, ...sessionStorage })).not.toContain("가짜 연습");
-    expect(location.href).not.toContain("가짜");
-  });
-
-  it("글이 다시 그려진 화면에도 남는다(잠금을 풀고 돌아오면 쓰던 글 그대로)", () => {
-    history.replaceState(null, "", "/#/today");
-    render();
-    const box = document.getElementById("practice") as HTMLTextAreaElement;
-    box.value = FAKE_NOTE;
-    box.dispatchEvent(new Event("input", { bubbles: true }));
-    render();
-    expect((document.getElementById("practice") as HTMLTextAreaElement).value).toBe(FAKE_NOTE);
   });
 });
 
@@ -181,6 +206,7 @@ describe("반가워요", () => {
   });
 
   it("오늘 시작하기는 오늘로 바꿔치고, 비밀번호로 잠그고 시작하기는 정하기로 push한다", () => {
+    stubFetch(() => todayReply());
     history.replaceState(null, "", "/#/welcome");
     render();
     const length = history.length;
@@ -233,7 +259,6 @@ describe("개발용 상태 칸", () => {
     ]) {
       expect(text).toContain(expected);
     }
-    // 위치는 아래 고정 버튼 줄을 가리지 않는 위쪽이다(CSS) — 여기서는 눌러도 잠금 층 밖 inert에 걸리지 않는 표시만 본다
     expect(document.querySelector(".dev-panel")?.getAttribute("data-keep-active")).toBe("true");
   });
 
@@ -255,7 +280,6 @@ describe("개발용 상태 칸", () => {
     expect(calls[0]).toMatchObject({ method: "POST", path: "/api/client-errors" });
     expect(Object.keys(calls[0]?.body as object).sort()).toEqual(["build", "col", "kind", "line", "name", "route", "source"]);
 
-    // 잠겨 있으면 보내지 않고 상태 칸에만 남는다
     app.locked = true;
     emit({ type: "error", error: { kind: "unhandledrejection", name: "RangeError" } });
     await flush(20);

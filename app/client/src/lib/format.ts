@@ -13,3 +13,17 @@ export function formatRemaining(totalSeconds: number): string {
 export function codePointLength(value: string): number {
   return [...value].length;
 }
+
+const WEEKDAYS = ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"];
+
+/** 'YYYY-MM-DD' → '10월 16일'. 달력 날짜라 시간대와 상관없다. */
+export function monthDay(isoDate: string): string {
+  const [, month, day] = isoDate.split("-").map(Number);
+  return `${month}월 ${day}일`;
+}
+
+/** 'YYYY-MM-DD' → '10월 16일 금요일'. */
+export function monthDayWeekday(isoDate: string): string {
+  const [year = 1970, month = 1, day = 1] = isoDate.split("-").map(Number);
+  return `${monthDay(isoDate)} ${WEEKDAYS[new Date(Date.UTC(year, month - 1, day)).getUTCDay()]}`;
+}

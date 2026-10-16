@@ -19,6 +19,8 @@ export interface ApiFail {
   retryAfter: number | null;
   remaining: number | null;
   offline: boolean;
+  /** 오류 본문의 나머지 칸(field·missing·currentRevision — 일기 저장이 쓴다) */
+  detail?: Partial<ErrorBody>;
 }
 
 export type ApiResult<T> = ApiOk<T> | ApiFail;
@@ -33,6 +35,8 @@ export interface RequestOptions {
   /** 거짓이면 423·401을 가로채지 않는다(호출한 쪽이 직접 다룰 때) */
   intercept?: boolean;
   timeoutMs?: number;
+  /** 더 붙일 머리글(시간대·영수증 열쇠). 표식 머리글은 여기서 바꿀 수 없다 */
+  headers?: Record<string, string>;
 }
 
 let handlers: ApiHandlers | null = null;
@@ -50,7 +54,7 @@ export async function request<T = unknown>(
   path: string,
   options: RequestOptions = {}
 ): Promise<ApiResult<T>> {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = { ...options.headers };
   const init: RequestInit = { method, headers, credentials: "same-origin", cache: "no-store" };
   if (method !== "GET") headers[CSRF_HEADER] = CSRF_VALUE;
   if (options.body !== undefined) {
@@ -92,7 +96,8 @@ export async function request<T = unknown>(
     code: typeof body.error === "string" ? body.error : null,
     retryAfter: numberOrNull(body.retryAfter) ?? (Number.isFinite(headerRetry) && headerRetry > 0 ? headerRetry : null),
     remaining: numberOrNull(body.remaining),
-    offline: false
+    offline: false,
+    detail: body
   };
   if (options.intercept !== false && handlers) {
     if (result.status === 423 && result.code === "app_locked") handlers.onLocked();

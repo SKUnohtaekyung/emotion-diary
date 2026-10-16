@@ -149,30 +149,6 @@ textarea {
   gap: var(--space-3);
 }
 
-/* 오늘 화면: 아래 고정 버튼 줄에 내용이 가려지지 않게 그만큼 비운다 */
-.today {
-  padding-bottom: calc(
-    var(--size-touch-target-min) + var(--space-3) * 2 + var(--space-6) + env(safe-area-inset-bottom)
-  );
-}
-
-.bottom-bar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  padding: var(--space-3) max(var(--space-4), env(safe-area-inset-right)) calc(var(--space-3) + env(safe-area-inset-bottom))
-    max(var(--space-4), env(safe-area-inset-left));
-  background: var(--neutral-bg);
-  border-top: 1px solid var(--neutral-border);
-}
-
-.bottom-bar-inner {
-  max-width: var(--size-content-max-width);
-  margin: 0 auto;
-}
-
 /* 새 버전 띠: 맨 위에 붙는다 */
 #banner {
   position: sticky;

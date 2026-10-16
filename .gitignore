@@ -13,6 +13,9 @@ node_modules/
 dist/
 coverage/
 .next/
+# Playwright E2E 결과(npm run e2e — 실패한 시나리오의 기록·화면)
+test-results/
+playwright-report/
 
 # Local agent/runtime state that may contain machine paths
 harness/runtime-profile.local.json

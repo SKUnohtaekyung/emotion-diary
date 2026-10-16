@@ -81,6 +81,33 @@ describe("loginDestination", () => {
   });
 });
 
+describe("날짜가 든 화면 주소(TASK-SLICE-01 PLAN A-9)", () => {
+  it("write·record·done 뒤의 달력 날짜를 값으로 읽고, 화면 표 이름은 이름/:date다", () => {
+    const route = parseHash("#/write/2026-10-16?step=details&c=sadness");
+    expect(route).toMatchObject({ path: "write/2026-10-16", name: "write/:date", params: { date: "2026-10-16" }, known: true });
+    expect(route.query.get("step")).toBe("details");
+    expect(parseHash("#/record/2026-02-28").name).toBe("record/:date");
+    expect(parseHash("#/done/2026-10-16/").path).toBe("done/2026-10-16");
+  });
+
+  it("달력에 없는 날짜·모르는 이름·조각이 더 있으면 모르는 화면이다", () => {
+    for (const hash of ["#/write/2026-02-30", "#/write/20261016", "#/write/", "#/note/2026-10-16", "#/write/2026-10-16/x"]) {
+      expect(parseHash(hash).known).toBe(false);
+    }
+  });
+
+  it("값까지 든 화면도 돌아갈 자리가 된다 — query는 버린다", () => {
+    expect(isReturnable("write/2026-10-16")).toBe(true);
+    expect(isReturnable("record/2026-10-16")).toBe(true);
+    expect(isReturnable("write/2026-13-01")).toBe(false);
+    expect(loginDestination({ variant: null, hasName: true, returnTo: "write/2026-10-16" })).toBe("#/write/2026-10-16");
+    expect(guardRoute(state(), parseHash("#/write/2026-10-16?step=reason"))).toEqual({
+      redirect: "#/auth?s=again",
+      returnTo: "write/2026-10-16"
+    });
+  });
+});
+
 describe("formatRemaining", () => {
   it("초를 N분 N초로 읽기 쉽게", () => {
     expect(formatRemaining(300)).toBe("5분");

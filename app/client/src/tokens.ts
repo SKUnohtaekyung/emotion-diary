@@ -16,6 +16,12 @@ export function tokenVars(): Record<string, string> {
       if (hasLight(value)) vars[`--${group}-${name}`] = value.light;
     }
   }
+  // 감정 색(계열마다 50~900 단계) — 평면 작성 화면의 작은 표지·선택 알약이 쓴다(TASK-SLICE-01 PLAN A-4). `label`·`source` 같은 글 칸은 뺀다.
+  for (const [code, scale] of Object.entries(color.emotion as Record<string, Record<string, unknown>>)) {
+    for (const [step, value] of Object.entries(scale)) {
+      if (/^\d+$/.test(step) && typeof value === "string") vars[`--emotion-${code}-${step}`] = value;
+    }
+  }
   vars["--font-sans"] = typography.family.sans;
   for (const [name, spec] of Object.entries(typography.scale)) {
     vars[`--text-${name}-size`] = `${spec.size}px`;
