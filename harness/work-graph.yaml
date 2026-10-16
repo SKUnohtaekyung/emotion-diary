@@ -118,9 +118,9 @@ nodes:
     gate: code-quality
 
   - id: data-foundation
-    status: verifying
-    # 2026-10-16: 관문 data-integrity의 F-01·F-02·F-06·F-07·F-09·F-10·F-17은 서버 시험 PASS, 개발용 건물 원격 검사 50/50.
-    # 남은 조건은 ci-green(이 작업의 코드를 담은 커밋에서 CI 초록) — 커밋·PR은 사용자 지시 때.
+    status: done
+    # 2026-10-16 gate data-integrity 통과: F-01·F-02·F-06·F-07·F-09·F-10·F-17 서버 시험 PASS, 개발용 환경 원격 검사 50/50,
+    # ci-green — 커밋 89c0017의 PR #38 실행 38768446587(Ubuntu·Windows success), main 병합 adb3d06의 push 실행 38847441556 success.
     depends_on: [app-scaffold]
     # 2026-10-15 TASK-DATA-01 착수(D-122): 마이그레이션 0005~0007, 서버 길(오늘·조회·저장·완료·지우기·하루 기준 시각), 영수증,
     # 틀린 열쇠 잠금 고침을 지었다. 진행·증거는 tasks/data-foundation/2026-10-15/PLAN.md 한 곳(D-118).
@@ -146,7 +146,7 @@ nodes:
     gate: data-integrity
 
   - id: first-slice
-    status: blocked
+    status: ready
     depends_on: [data-foundation, taxonomy-v1, taxonomy-v2-research]
     # 2026-10-15 새 노드(D-116): 첫 조각 '오늘 한 편' — 연출 없는 평면 화면으로 사건 → 계열·세부·강도 → 이유 → 칭찬·감사(비워도 됨)
     # → 완료, 서버 임시저장, 화면이 통째로 새로 열린 뒤 쓰던 단계로 복구(F-24, RK-034). 여기서 정한다: 작성 흐름 상태 설계 한 장,
@@ -162,7 +162,7 @@ nodes:
     gate: first-slice
 
   - id: data-control
-    status: blocked
+    status: ready
     depends_on: [data-foundation]
     # 2026-10-15 새 노드(D-116): 내 데이터 통제 — 내보내기(공유 창, S-05), 전체 삭제(부를 이름·앱 잠금까지 — D-112 ⑩), 본인 PC 백업과
     # 다시 넣는 도구(D-109), 복원 연습(복원 뒤 세션 기록 비우기 — 감리 N-7), 합성 3년치로 내보내기 CPU 실측(무료 10ms — 감리 N-8).
