@@ -91,7 +91,16 @@ export function renderToday({ root, alive }: ViewContext): () => void {
       const open = h("button", { type: "button", class: "btn btn-primary btn-block", text: "오늘의 기록 보기" });
       open.addEventListener("click", () => navigate(`#/record/${info.date}`));
       nodes.push(open);
-      if (copies.today?.mode === "edit") nodes.push(h("p", { class: "today-line", text: "고치던 내용이 이 휴대폰에 남아 있어요" }));
+      // 이 휴대폰에 남은 사본(고치던 내용, 또는 다른 곳에서 완료되기 전에 쓰던 임시저장)으로 가는 길 — 열면 덮지 않고 묻는다(PR #40 리뷰)
+      const copy = copies.today;
+      if (copy) {
+        const resume = h("button", { type: "button", class: "btn btn-block", text: "남은 글 보기" });
+        resume.addEventListener("click", () => startFlow(info.date, copy.step ?? { step: "letter", category: null }));
+        nodes.push(
+          h("p", { class: "today-line", text: copy.mode === "edit" ? "고치던 내용이 이 휴대폰에 남아 있어요" : "이 휴대폰에 보내지 못한 글이 남아 있어요" }),
+          resume
+        );
+      }
     } else if (entry || copies.today) {
       const key = copies.today?.step ?? resumeKey(entry?.resume) ?? { step: "event" as const, category: null };
       const resume = h("button", { type: "button", class: "btn btn-primary btn-block", text: "이어서 써요" });

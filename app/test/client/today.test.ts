@@ -135,6 +135,16 @@ describe("오늘 — 상태", () => {
     expect(document.querySelector(".today-line")?.textContent).toBe("오늘 기록을 확인하지 못했어요 · 잠시 뒤 다시 시도해 주세요");
   });
 
+  it("다른 곳에서 완료된 날에도 이 휴대폰의 임시저장 사본이 있으면 알리고 그 글로 가는 길이 있다(PR #40 리뷰)", async () => {
+    writeUnsent({ v: 1, date: TODAY, mode: "draft", baseRevision: 2, diary: withText(emptyDiary(), "eventText", "가짜"), step: { step: "reason", category: null }, pending: null, savedAt: 1 });
+    // 그날 기록 조회는 닿지 않게 둔다 — 배경 보내기는 닿지 못하면 다음 기회로 미룬다(오늘 화면만 본다)
+    await openToday((path) => (path === "/api/today" ? todayReply({ entry: summary({ status: "completed", revision: 4 }) }) : "offline"));
+    expect(byText("오늘의 기록 보기")).toBeDefined();
+    expect(document.querySelector(".today-line")?.textContent).toBe("이 휴대폰에 보내지 못한 글이 남아 있어요");
+    byText("남은 글 보기")?.click();
+    expect(location.hash).toBe(`#/write/${TODAY}?step=reason`);
+  });
+
   it("서버에 없어도 이 휴대폰에 못 보낸 오늘 글이 있으면 이어 쓰기다(U-2)", async () => {
     writeUnsent({ v: 1, date: TODAY, mode: "draft", baseRevision: null, diary: withText(emptyDiary(), "eventText", "가짜"), step: { step: "feelings", category: null }, pending: null, savedAt: 1 });
     await openToday((path) => (path === "/api/today" ? todayReply() : { status: 404, body: { error: "not_found" } }));

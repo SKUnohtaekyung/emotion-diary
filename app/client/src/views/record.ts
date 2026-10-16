@@ -89,10 +89,16 @@ export function renderRecord({ root, route, alive }: ViewContext): () => void {
     }
     if (result.ok) {
       const nodes = letter(result.data);
-      if (readUnsent(date)?.mode === "edit") {
-        const resume = h("button", { type: "button", class: "btn btn-block", text: "고치던 내용 이어서 고치기" });
-        resume.addEventListener("click", () => editFrom(date, readUnsent(date)?.step ?? { step: "letter", category: null }));
-        nodes.unshift(h("p", { class: "today-line", text: "고치던 내용이 이 휴대폰에 남아 있어요" }), resume);
+      // 이 휴대폰에 남은 사본 — 고치던 내용이든, 다른 곳에서 완료되기 전에 쓰던 임시저장이든 — 으로 가는 길(PR #40 리뷰).
+      // 들어가면 흐름이 서버 기록과 비교해 덮지 않고 묻는다.
+      const copy = readUnsent(date);
+      if (copy) {
+        const resume = h("button", { type: "button", class: "btn btn-block", text: "남은 글 보기" });
+        resume.addEventListener("click", () => editFrom(date, copy.step ?? { step: "letter", category: null }));
+        nodes.unshift(
+          h("p", { class: "today-line", text: copy.mode === "edit" ? "고치던 내용이 이 휴대폰에 남아 있어요" : "이 휴대폰에 보내지 못한 글이 남아 있어요" }),
+          resume
+        );
       }
       area.replaceChildren(...nodes);
       return;

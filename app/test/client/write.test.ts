@@ -66,6 +66,8 @@ interface Server {
   put?: (request: FakeRequest) => FakeReply | "offline";
   complete?: (request: FakeRequest) => FakeReply | "offline";
   del?: (request: FakeRequest) => FakeReply | "offline";
+  /** 그날 기록 조회를 대신한다(없으면 entry로 200·404) */
+  get?: (request: FakeRequest) => FakeReply | "offline";
 }
 
 function serve(server: Server): FakeRequest[] {
@@ -75,7 +77,10 @@ function serve(server: Server): FakeRequest[] {
     }
     if (request.path.endsWith("/complete")) return server.complete?.(request) ?? meta((server.entry?.revision ?? 0) + 1, "completed");
     if (request.path.startsWith("/api/diaries/")) {
-      if (request.method === "GET") return server.entry ? { status: 200, body: server.entry } : { status: 404, body: { error: "not_found" } };
+      if (request.method === "GET") {
+        if (server.get) return server.get(request);
+        return server.entry ? { status: 200, body: server.entry } : { status: 404, body: { error: "not_found" } };
+      }
       if (request.method === "PUT") return server.put?.(request) ?? meta((server.entry?.revision ?? 0) + 1);
       if (request.method === "DELETE") return server.del?.(request) ?? { status: 200, body: { deleted: true, entryDate: TODAY } };
     }
@@ -503,6 +508,58 @@ describe("글이 새지 않는다(S-12)", () => {
     expect(JSON.stringify({ ...localStorage, ...sessionStorage })).not.toContain("가짜 비밀");
     // 오류 보고·상태 칸의 화면 이름에는 날짜가 없다
     expect(document.querySelector(".dev-panel")?.textContent).not.toContain(TODAY);
+  });
+});
+
+describe("PR #40 리뷰 지적(2026-10-16)", () => {
+  it("409 뒤 서버 글을 읽지 못하면(500) 지운 글로 보지 않고, 사본을 두고 다시 불러오기를 준다", async () => {
+    let getFails = false;
+    const calls = serve({
+      entry: entry(),
+      get: () => (getFails ? { status: 500, body: { error: "server_error" } } : { status: 200, body: entry() }),
+      put: (request) =>
+        (request.body as { reasonText?: string }).reasonText
+          ? { status: 409, body: { error: "revision_conflict", currentRevision: 5 } }
+          : meta(4)
+    });
+    await open(`#/write/${TODAY}?step=reason`);
+    getFails = true;
+    const area = document.getElementById("reason") as HTMLTextAreaElement;
+    area.value = "가짜 이유: 충돌";
+    area.dispatchEvent(new Event("input"));
+    await vi.waitFor(() => expect(document.querySelector(".sheet")).not.toBeNull(), { timeout: 3000 });
+    const sheet = document.querySelector(".sheet")?.textContent ?? "";
+    expect(sheet).toContain("다른 곳에서 고친 내용이 있어요");
+    expect(sheet).toContain("불러오지 못했어요");
+    expect(sheet).not.toContain("지운 글");
+    expect(sheetButton("이 휴대폰의 글로 남기기")).toBeUndefined();
+    expect(readUnsent(TODAY)?.diary.reasonText).toBe("가짜 이유: 충돌");
+    // 다시 불러오면 이번엔 읽혀 무엇이 다른지 보인다
+    getFails = false;
+    sheetButton("다시 불러오기")?.click();
+    await vi.waitFor(() => expect(document.querySelector(".sheet")?.textContent).toContain("다른 부분:"));
+    expect(calls.filter((call) => call.method === "GET" && call.path.startsWith("/api/diaries/")).length).toBeGreaterThanOrEqual(3);
+  });
+
+  it("다른 곳에서 완료된 날에 이 휴대폰의 임시저장 사본이 남아 있으면 기록 보기에서 그 글로 가는 길이 있다", async () => {
+    writeUnsent({
+      v: 1,
+      date: TODAY,
+      mode: "draft",
+      baseRevision: 3,
+      diary: withText(emptyDiary(), "eventText", "가짜 이 휴대폰의 사건"),
+      step: { step: "event", category: null },
+      pending: null,
+      savedAt: 1
+    });
+    serve({ entry: entry({ status: "completed", revision: 6, reasonText: "가짜 이유" }) });
+    history.replaceState(null, "", `/#/record/${TODAY}`);
+    render();
+    await flush(20);
+    expect(document.body.textContent).toContain("이 휴대폰에 보내지 못한 글이 남아 있어요");
+    byText("남은 글 보기")?.click();
+    expect(location.hash).toBe(`#/write/${TODAY}?step=event`);
+    await vi.waitFor(() => expect(document.querySelector(".sheet")?.textContent).toContain("다른 곳에서 고친 내용이 있어요"));
   });
 });
 

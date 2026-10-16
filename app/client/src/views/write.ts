@@ -736,7 +736,7 @@ async function finish(session: FlowSession, button: HTMLButtonElement): Promise<
       const state = saver.status().state;
       if (state === "conflict") {
         // 다른 곳의 고침 때문에 막혔다 — 무엇이 다른지 보이고 고르게 한다
-        if (!session.conflict) await loadConflict(session, saver.revision);
+        if (!session.conflict || session.conflict.unavailable) await loadConflict(session, session.conflict?.currentRevision ?? saver.revision);
         showConflict(session);
       } else if (state !== "held") {
         showToast("아직 저장하지 못했어요. 연결되면 남길 수 있어요.");
@@ -817,6 +817,25 @@ async function deleteDraft(session: FlowSession): Promise<void> {
 function showConflict(session: FlowSession): void {
   const conflict = session.conflict;
   if (!conflict) return;
+  if (conflict.unavailable) {
+    // 다른 곳의 글을 읽지 못했다 — 지운 것으로 보지도, 덮어쓰게 하지도 않는다. 사본은 그대로 두고 다시 불러온다(PR #40 리뷰)
+    openSheet({
+      id: "conflict",
+      title: "다른 곳에서 고친 내용이 있어요",
+      body: ["지금은 다른 곳의 글을 불러오지 못했어요.", "이 휴대폰의 글은 그대로 남아 있어요. 연결되면 다시 불러와 고를 수 있어요."],
+      actions: [
+        {
+          label: "다시 불러오기",
+          kind: "primary",
+          onClick: () => {
+            void loadConflict(session, conflict.currentRevision).then(() => showConflict(session));
+          }
+        },
+        { label: "닫기", kind: "quiet" }
+      ]
+    });
+    return;
+  }
   const deleted = conflict.serverEntry === null;
   const canRecreate = session.date === session.today;
   if (deleted && !canRecreate) {
