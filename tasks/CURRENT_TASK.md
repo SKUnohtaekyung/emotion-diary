@@ -4,8 +4,8 @@
 
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
-| TASK-DATA-01 data-foundation(저장 핵심) | **확인 중(2026-10-16)** — 결정 D-122, 서버 시험·개발용 건물 원격 검사 50/50 통과, 남은 것은 CI(커밋·PR은 지시 때). 진행·증거는 PLAN 한 곳 | 이 파일 아래, 요청·계획은 [data-foundation/2026-10-15/](data-foundation/2026-10-15/PLAN.md) |
-| [TASK-CLEANUP-01](archive/TASK-CLEANUP-01.md) 설계도 정리(감리 결정을 공정표·관문·결정 장부에) | 끝(2026-10-15, 커밋 `85c3bb5` — PR #37, CI 통과·병합 대기) | [archive/](archive/README.md), 요청·계획은 [cleanup/2026-10-15/](cleanup/2026-10-15/PLAN.md) |
+| TASK-DATA-01 data-foundation(저장 핵심) | **끝(2026-10-16)** — 결정 D-122, 관문 `data-integrity` 통과(서버 시험, 개발용 환경 원격 검사 50/50, CI 두 OS). 커밋 `89c0017` — PR #38 → PR #37 → `main` `adb3d06`. 다음 작업을 세울 때 이 절을 archive로 옮긴다 | 이 파일 아래, 요청·계획은 [data-foundation/2026-10-15/](data-foundation/2026-10-15/PLAN.md) |
+| [TASK-CLEANUP-01](archive/TASK-CLEANUP-01.md) 설계도 정리(감리 결정을 공정표·관문·결정 장부에) | 끝(2026-10-15, 커밋 `85c3bb5` — PR #37, 2026-10-16 `main` 병합 `adb3d06`) | [archive/](archive/README.md), 요청·계획은 [cleanup/2026-10-15/](cleanup/2026-10-15/PLAN.md) |
 | [TASK-REVIEW-01](archive/TASK-REVIEW-01.md) 종합 점검(현황·남은 작업·작업 방식·기술 스택) | 끝(2026-10-15, 커밋 `1845e83` — PR #37) | [archive/](archive/README.md), 보고서 [review/2026-10-14/REPORT.md](review/2026-10-14/REPORT.md) |
 | [TASK-MOBILE](TASK-MOBILE.md) 설치형 홈 화면 웹앱 | T2 끝(2026-10-14, PR #36 병합 `7b99e2c`) / T3 끝(2026-10-14, 커밋 `323329b` — PR #37). 결정 D-111~D-115. 이슈 #1~#8 닫음, #9는 Post-MVP(처리표 [cleanup/2026-10-15/PLAN.md](cleanup/2026-10-15/PLAN.md) 6-2) | T3 기록 [archive/TASK-MOBILE-T3.md](archive/TASK-MOBILE-T3.md)와 [mobile/2026-10-14-t3/](mobile/2026-10-14-t3/PLAN.md), T2 기록 [archive/TASK-MOBILE-T2.md](archive/TASK-MOBILE-T2.md)와 [mobile/2026-10-14/](mobile/2026-10-14/PLAN.md), 배경은 별도 파일 |
 | [TASK-HOOK-AUTO](archive/TASK-HOOK-AUTO.md) auto 모드에서 가드 훅 확인창 없애기 | 끝 — 구현·검증 2026-09-21(D-060), 남은 '다른 세션 확인 대기'는 2026-10-15 D-119로 닫음 | [archive/](archive/README.md) |
@@ -20,7 +20,7 @@
 
 ## 상태
 
-`in_progress`(2026-10-15 착수 — 사용자 지시 "data-foundation 시작"). 시작 때 PR #37은 병합 전이라 그 머리(`ac41609`) 위에 브랜치 `data/foundation`을 만들었다. 사용자에게 물은 둘(글 길이 1만 자, '오늘'은 지금 있는 곳의 시계)과 에이전트가 정한 나머지는 D-122. **진행·증거는 [PLAN.md](data-foundation/2026-10-15/PLAN.md) 한 곳이다**(D-118).
+`done`(2026-10-16) — 관문 `data-integrity` 통과, 사용자가 PR #38·PR #37을 병합했다(`main` `adb3d06`, CI 두 OS 통과). 다음은 `first-slice`·`data-control`(둘 다 ready — 새 작업 절은 사용자 지시 때 세운다). 착수: 2026-10-15(사용자 지시 "data-foundation 시작"). 시작 때 PR #37은 병합 전이라 그 머리(`ac41609`) 위에 브랜치 `data/foundation`을 만들었다. 사용자에게 물은 둘(글 길이 1만 자, '오늘'은 지금 있는 곳의 시계)과 에이전트가 정한 나머지는 D-122. **진행·증거는 [PLAN.md](data-foundation/2026-10-15/PLAN.md) 한 곳이다**(D-118).
 
 ## 목표
 

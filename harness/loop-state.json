@@ -1,26 +1,26 @@
 {
   "schema_version": "1.0",
   "task_id": "TASK-DATA-01",
-  "phase": "data-foundation-verifying",
+  "phase": "data-foundation-done",
   "iteration": 1,
-  "status": "verifying",
-  "current_hypothesis": "With the diary schema gaps S-1..S-9 decided (tasks/data-foundation/2026-10-15/REQUESTS.md), the diary tables from migration 0005 and the server rules (today's draft save, completion, read and edit; one entry per day; revision; idempotency; owner checks; access-key lockout that never blocks the correct key) pass gate data-integrity, so first-slice only adds screens.",
+  "status": "done",
+  "current_hypothesis": "Confirmed 2026-10-16: migrations 0005-0007 and the diary API (today, read, draft save, complete, delete, day start; one entry per day; revision; idempotency; owner checks; access-key lockout that never blocks the correct key) pass gate data-integrity, so first-slice only adds screens and data-control adds export, delete-all, backup and restore.",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
-  "last_verified_commit": "5a71381",
+  "last_verified_commit": "adb3d06",
   "completed_nodes": [
     "bootstrap-audit",
     "taxonomy-v1",
     "taxonomy-v2-research",
     "hosting-identity-spike",
     "data-store-spike",
-    "app-scaffold"
+    "app-scaffold",
+    "data-foundation"
   ],
-  "next_node": "data-foundation",
+  "next_node": "first-slice",
   "blockers": [
-    "PR #37 (docs/cleanup -> main) is still not merged; branch data/foundation was cut from its head ac41609 so it continues after a merge commit. The user merges PR #37 on GitHub",
-    "ci-green needs a commit and PR of this work, which happen only on the user's instruction (AGENTS 2.1)",
+    "Next task not planned yet: first-slice and data-control are ready (D-116). A new CURRENT_TASK section with requests and a plan comes first; TASK-DATA-01 moves to tasks/archive then",
     "Scope: single user (D-108). AI writing is decided after 30 days of real use (D-120), evidence analysis after 60 days (D-121)"
   ],
-  "last_checkpoint": "2026-10-15 TASK-DATA-01 started (decisions D-122: user picked U-1 10,000 chars and U-2 local clock). Progress lives only in tasks/data-foundation/2026-10-15/PLAN.md (D-118); this field only points there. Earlier work: tasks/archive/ and git log."
+  "last_checkpoint": "2026-10-16 TASK-DATA-01 done: PR #38 (89c0017) merged into docs/cleanup, PR #37 merged into main as adb3d06, CI green on both OS. Decisions D-122. Record: tasks/data-foundation/2026-10-15/PLAN.md (D-118). Earlier work: tasks/archive/ and git log."
 }
