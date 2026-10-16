@@ -1,0 +1,9 @@
+{
+  // 화면과 화면 시험. 도구 없이 짓는다(D-114) — 브라우저 DOM 타입만 쓴다(Workers 런타임 타입을 섞지 않는다).
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM", "DOM.Iterable"]
+  },
+  "files": [],
+  "include": ["app/client/src/**/*.ts", "app/shared/**/*.ts", "app/test/client/**/*.ts"]
+}

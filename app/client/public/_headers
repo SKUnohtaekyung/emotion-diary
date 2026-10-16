@@ -1,0 +1,14 @@
+# 정적 파일(앱 화면)의 응답 헤더 — Cloudflare Workers Static Assets의 _headers 형식(D-115 ⑦, A-8·A-9).
+# /api/* 는 Worker가 만든 응답이라 이 파일이 붙지 않는다 — 그쪽 헤더는 app/worker/src/http.ts에서 건다.
+# 화면 코드는 인라인 스크립트와 style 속성을 쓰지 않는다(CSSOM만). 그래서 'unsafe-inline' 없이 둔다.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: no-referrer
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+# Vite가 이름에 내용 해시를 넣는 파일만 오래 둔다. 첫 화면 파일·manifest·아이콘은 기본값(매번 서버에 확인)이다 — 새 버전이 바로 보이게.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable

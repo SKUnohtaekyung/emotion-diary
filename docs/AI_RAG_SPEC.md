@@ -6,7 +6,9 @@
 
 이 문서의 AI 기능 전체는 **후행 단계**다(D-018). 제한 MVP(직접 작성+결정론적 대시보드)는 이 문서의 어떤 구성요소도 없이 배포된다.
 
-모델 접근 경로는 **유료 API가 아니어야 한다**(D-019). 확정 경로는 본인 PC의 worker가 백엔드 `ai_jobs` 큐를 가져가 Claude Code CLI 헤드리스 호출(`claude -p --json-schema`, 구독 로그인, 작성은 Sonnet 5·verifier/RAG는 Opus 5)로 처리하는 것이며 사용자 본인 1명 전용이다(D-029, D-031, D-032). 2026-09-02 최소 스파이크에서 구독 인증·strict schema 출력·비창작·`safety_signal` 필드를 확인했고, 보존 설정·독립 verifier·지연 p95는 G2c에서 마저 검증한다. OpenAI Responses API·Vector Store search 표기는 이 결정 이전의 후보이며, 실제로는 사용자가 구독 중인 Codex/Claude 자원으로 가능한 경로가 B-06(G2c)에서 server-only 호출, strict schema 출력, refusal/incomplete/error 처리, 데이터 보존 통제를 만족하는지로 판정한다. 확인되지 않으면 AI 대화 작성·RAG 분석은 보류 상태로 남고 [DECISIONS.md](DECISIONS.md)에 그 사실을 기록한다. 검색 계층(B-07, G2d)도 유료 Vector Store 대신 구독 경로 또는 로컬/무료 대안이어야 하며 확인 전에는 `unknown`이다.
+**2026-10-15 교정(D-120·D-121)**: AI 대화 작성은 직접 쓰기를 30일 써 본 뒤 지을지 정한다. 짓게 되면 **서버(Worker)가 Claude API를 직접 부르는 경로**가 기본이다 — 사용자 요금제 Max에 포함된 월 API 크레딧 안에서만 쓰고(추가 지출 0이라 D-019 안, 따로 산 크레딧·자동 충전은 쓰지 않는다), API 키는 Workers secret에만 둔다. 아래의 본인 PC worker + `claude -p` 경로는 크레딧이 없어질 때 돌아갈 **대체 경로**이고, 처리기를 바꿔 끼울 수 있게 `ai_jobs` 큐 + 처리기 모양으로 짓는다. 근거 분석(§6~§10)은 60일 뒤 지을지 정하고, 하게 되면 사람이 고른 근거 카드 30~50장을 파일로 두고 태그로 찾는 작은 방식이다. **그 전에는 어떤 경로의 AI도 일반적 심리학 설명을 하지 않는다**(작성 AI는 원래 연구 근거를 쓰지 않는다 — §2의 2).
+
+모델 접근 경로는 **유료 API가 아니어야 한다**(D-019 — 위 크레딧 안의 호출은 추가 지출이 없어 이 원칙 안이다, D-120). 2026-10-15까지의 확정 경로(이제 대체 경로)는 본인 PC의 worker가 백엔드 `ai_jobs` 큐를 가져가 Claude Code CLI 헤드리스 호출(`claude -p --json-schema`, 구독 로그인, 작성은 Sonnet 5·verifier/RAG는 Opus 5)로 처리하는 것이며 사용자 본인 1명 전용이다(D-029, D-031, D-032). 2026-09-02 최소 스파이크에서 구독 인증·strict schema 출력·비창작·`safety_signal` 필드를 확인했고, 보존 설정·독립 verifier·지연 p95는 G2c에서 마저 검증한다. OpenAI Responses API·Vector Store search 표기는 이 결정 이전의 후보이며, 실제로는 사용자가 구독 중인 Codex/Claude 자원으로 가능한 경로가 B-06(G2c)에서 server-only 호출, strict schema 출력, refusal/incomplete/error 처리, 데이터 보존 통제를 만족하는지로 판정한다. 확인되지 않으면 AI 대화 작성·RAG 분석은 보류 상태로 남고 [DECISIONS.md](DECISIONS.md)에 그 사실을 기록한다. 검색 계층(B-07, G2d)도 유료 Vector Store 대신 구독 경로 또는 로컬/무료 대안이어야 하며 확인 전에는 `unknown`이다.
 
 기계 검증 시드는 [../schemas/journal-assist-output.schema.json](../schemas/journal-assist-output.schema.json), [../schemas/evidence-card.schema.json](../schemas/evidence-card.schema.json), [../schemas/analysis-output.schema.json](../schemas/analysis-output.schema.json)에 있다.
 
@@ -52,7 +54,7 @@ Evidence Vector Store <── approved Evidence Cards
 - 일기 원문과 AI 작성 transcript를 Evidence Vector Store에 업로드하지 않는다.
 - 분석 기본 입력은 기간, 기록 수, emotion code/label, intensity 집계, 사용자가 입력한 상황의 최소 발췌다. 전체 일기는 명시된 필요와 사용자 표시 가능성을 확인한 경우에만 제한적으로 포함한다.
 - account identity, owner key, token, API key는 prompt, Vector Store attributes, Evidence Card, 평가 fixture에 넣지 않는다.
-- 모델은 서버에서만 호출하며 유료 API는 사용하지 않는다(D-019). 구독 기반 경로가 확인되면 그 경로의 보존·학습 사용 설정(`store: false` 상당)을 명시·확인하고, 통제할 수 없는 경로에는 일기 원문을 보내지 않는다.
+- 모델은 서버(대체 경로에서는 본인 PC worker)에서만 호출하며 추가 지출이 생기는 호출은 하지 않는다(D-019·D-120 — Max 포함 월 크레딧 안). 경로마다 보존·학습 사용 설정(`store: false` 상당)을 명시·확인하고(서버 직통은 짓기로 정할 때 공급자 문서로, 대체 경로는 D-110 ①②), 통제할 수 없는 경로에는 일기 원문을 보내지 않는다.
 - 공급자 측 대화 상태 ID(`previous_response_id` 등)를 다른 사용자 간에 재사용하지 않는다. 작성 대화의 장기 server state는 기본 사용하지 않는다.
 - 모델에 내부 DB/사용자 조회 도구를 제공하지 않는다. 애플리케이션이 먼저 권한을 검사하고 최소 입력을 조립한다.
 
@@ -160,6 +162,8 @@ content_hash: sha256
 ## 7. 검색과 Evidence Gate
 
 ### 7.1 애플리케이션 통제 검색
+
+2026-10-15 D-121: 근거 분석을 하게 되면 기본은 카드 30~50장을 파일로 두고 서버가 태그·metadata로 고르는 방식이다. 아래 Vector Store 검색 경로는 그 결정 때 필요한지 다시 본다(B-07, `vector-search-spike`). 어느 쪽이든 모델이 검색을 자율 호출하지 않고 서버가 고른다는 원칙과 아래 1~5의 대조는 그대로다.
 
 MVP 후보는 모델이 `file_search`를 자율 호출하는 경로가 아니라 서버가 Vector Store search endpoint를 직접 호출하는 경로다.
 

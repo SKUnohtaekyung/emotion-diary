@@ -1,0 +1,54 @@
+// 감정일기 앱 — Worker 하나가 화면(정적 파일)과 /api/*를 같은 주소에서 낸다(D-111, D-115).
+// 이 파일은 공개 저장소에 커밋된다. 계정 id·D1 id·앱 주소를 적지 않는다(D-115 ①).
+// 원격 명령은 node app/scripts/cf.mjs <env> <wrangler 인자…>로 한다 — 이름으로 D1 id를 찾아
+// Git 제외 파일 wrangler.local.jsonc를 만든 뒤 --config로 실행한다. 절차는 docs/DEPLOY.md.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  // 최상위는 로컬 개발·시험용이다(APP_ENV local). 원격에 올리는 것은 env.dev와 env.prod뿐이다.
+  "name": "emotion-diary",
+  "main": "app/worker/src/index.ts",
+  "compatibility_date": "2026-06-01",
+  "workers_dev": true,
+  "preview_urls": false,
+  "minify": true,
+  "send_metrics": false,
+  "upload_source_maps": false,
+  "define": { "__APP_ENV__": "\"local\"", "__APP_BUILD__": "\"local\"" },
+  "assets": {
+    "directory": "dist/dev/client",
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/api/*"]
+  },
+  "vars": { "OWNER_SUBJECT": "owner", "OWNER_ALLOWLIST": "owner" },
+  "d1_databases": [{ "binding": "DB", "database_name": "emotion-diary-local", "migrations_dir": "app/migrations" }],
+  "env": {
+    // 개발용 건물(가짜 데이터만). 화면 오류 보고와 상태 칸이 켜진다(D-113 ②).
+    "dev": {
+      "define": { "__APP_ENV__": "\"dev\"", "__APP_BUILD__": "\"local\"" },
+      "assets": {
+        "directory": "dist/dev/client",
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application",
+        "run_worker_first": ["/api/*"]
+      },
+      "vars": { "OWNER_SUBJECT": "owner", "OWNER_ALLOWLIST": "owner" },
+      "d1_databases": [{ "binding": "DB", "database_name": "emotion-diary-dev", "migrations_dir": "app/migrations" }],
+      "secrets": { "required": ["ACCESS_KEY_HASH", "ACCESS_KEY_SALT", "SESSION_SECRET", "APP_LOCK_SECRET"] }
+    },
+    // 운영(실제 일기). 이름만 정해 두었고 TASK-MOBILE T3에서는 만들지 않는다 — 만드는 것은 제한 MVP 출시 전이다.
+    // 빌드(npm run build)는 이 설정으로 운영 묶음을 만들어 개발용 전용 코드가 빠졌는지 검사한다.
+    "prod": {
+      "define": { "__APP_ENV__": "\"prod\"", "__APP_BUILD__": "\"local\"" },
+      "assets": {
+        "directory": "dist/prod/client",
+        "binding": "ASSETS",
+        "not_found_handling": "single-page-application",
+        "run_worker_first": ["/api/*"]
+      },
+      "vars": { "OWNER_SUBJECT": "owner", "OWNER_ALLOWLIST": "owner" },
+      "d1_databases": [{ "binding": "DB", "database_name": "emotion-diary-prod", "migrations_dir": "app/migrations" }],
+      "secrets": { "required": ["ACCESS_KEY_HASH", "ACCESS_KEY_SALT", "SESSION_SECRET", "APP_LOCK_SECRET"] }
+    }
+  }
+}

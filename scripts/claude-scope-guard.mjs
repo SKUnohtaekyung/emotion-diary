@@ -10,7 +10,11 @@
 // 전체에서 "- 소유 파일: ..." 선언 줄의 backtick 경로/글롭을 모아 허용 목록으로 삼고,
 // Write/Edit 대상이 그 목록 밖이면 permissionDecision: "ask"를 돌려준다.
 //
-// 확인창을 띄우지 않는 경우(D-060, docs/PROCESS_LOG.md §5):
+// 확인창을 띄우지 않는 경우(D-060·D-119, docs/PROCESS_LOG.md §5·§8):
+// - tasks/CURRENT_TASK.md에 `- 동시 작업: 켬` 줄이 없다(D-119, 2026-10-15 사용자 결정 '동시 작업 때만 켠다').
+//   한 명씩 차례로 일할 때는 이 확인을 끈다. 여러 작업자를 같은 시간에 띄울 때 docs/AGENT_WORKFLOW.md §10.2가
+//   그 줄을 더하고 끝나면 지운다. 줄 앞머리가 목록 표식이고 '켬' 뒤가 끝·괄호·줄표·쉼표·마침표일 때만 켜진 것으로
+//   본다 — 문장 속 언급이나 '켬 줄이 있을 때만…' 같은 설명, 코드 울타리 안의 예시가 장치를 켜지 않게 한다(isConcurrentWork).
 // - 권한 모드가 auto다(입력의 permission_mode). 사용자가 자동 진행을 택한 세션에서 이 훅이
 //   ask를 돌려주면 auto 모드도 그 확인창을 막지 못해 작업마다 창이 떴다. 모드를 알 수 없으면
 //   (필드 없음) 안전 쪽인 확인을 유지한다.
@@ -52,6 +56,26 @@ const root = path.resolve(scriptDir, "..");
 // "이 파일"이라는 관용구는 각 작업 섹션이 tasks/CURRENT_TASK.md 자신을 가리킬 때 쓰는
 // 표현이라 특례로 처리한다(실제 사례, TASK-CBM·TASK-BOOTSTRAP·TASK-ISSUE-27 섹션).
 const OWNED_FILES_DECLARATION = /^[-*]\s*소유\s*파일\s*[:：]/;
+
+// D-119: 확인 장치를 켜는 줄. 예) `- 동시 작업: 켬`, `- 동시 작업: 켬(작업자 둘)`, `- 동시 작업: 켬 — 2026-10-20까지`,
+// `* 동시 작업：켬`, `1. 동시 작업: 켬`, `- **동시 작업**: 켬, 작업자 둘`. 목록 표식(-·*·+·번호)으로 시작해야 하고 '켬' 뒤에는
+// 끝 또는 괄호·줄표·쉼표·마침표로 시작하는 메모만 온다 — '켬 줄이 있을 때만…' 같은 설명문은 켜지 않는다.
+// 코드 울타리(``` 또는 ~~~) 안의 예시는 세지 않는다. 켬 줄이 하나라도 있으면 켜진다 — `끔` 줄을 더해도 끄지 못한다(안전 쪽).
+// 끄려면 켬 줄을 지운다.
+const CONCURRENT_WORK_ON = /^(?:[-*+]|\d+[.)])\s*(?:\*\*)?동시\s*작업(?:\*\*)?\s*[:：]\s*(?:\*\*)?켬(?:\*\*)?\s*(?:[(（—–\-,.].*)?$/;
+
+export function isConcurrentWork(currentTaskContent) {
+  let inFence = false;
+  for (const raw of currentTaskContent.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (/^(```|~~~)/.test(line)) {
+      inFence = !inFence;
+      continue;
+    }
+    if (!inFence && CONCURRENT_WORK_ON.test(line)) return true;
+  }
+  return false;
+}
 
 export function parseOwnedPaths(currentTaskContent) {
   const owned = [];
@@ -169,6 +193,9 @@ async function main() {
   } catch {
     return;
   }
+
+  // D-119: 여러 작업자가 동시에 쓰는 때가 아니면 확인하지 않는다.
+  if (!isConcurrentWork(currentTaskContent)) return;
 
   const ownedPaths = parseOwnedPaths(currentTaskContent);
   const relative = path.relative(root, path.resolve(filePath)).replace(/\\/g, "/");

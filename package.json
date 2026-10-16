@@ -5,16 +5,27 @@
   "description": "모바일 우선 개인용 감정일기 MVP",
   "type": "module",
   "engines": {
-    "node": ">=22"
+    "node": ">=22.12"
   },
   "scripts": {
     "characters:build": "node scripts/build-character-animations.mjs",
     "verify": "node scripts/verify.mjs --mode full",
     "verify:quick": "node scripts/verify.mjs --mode quick",
     "verify:full": "node scripts/verify.mjs --mode full",
-    "test": "node scripts/test-check-taxonomy.mjs && node scripts/test-claude-scope-guard.mjs && node scripts/test-claude-git-guard.mjs && node scripts/test-check-characters.mjs && node scripts/test-check-harness.mjs"
+    "dev": "node app/scripts/dev.mjs",
+    "lint": "biome lint --error-on-warnings",
+    "typecheck": "wrangler types --check app/worker/worker-configuration.d.ts && tsc -p tsconfig.worker.json && tsc -p tsconfig.client.json && tsc -p tsconfig.test.json",
+    "test": "node scripts/test-check-taxonomy.mjs && node scripts/test-claude-scope-guard.mjs && node scripts/test-claude-git-guard.mjs && node scripts/test-check-characters.mjs && node scripts/test-check-harness.mjs && vitest run",
+    "build": "node app/scripts/build.mjs"
   },
   "devDependencies": {
-    "sharp": "^0.35.4"
+    "@biomejs/biome": "2.5.15",
+    "@types/node": "22.20.5",
+    "happy-dom": "20.14.6",
+    "sharp": "^0.35.4",
+    "typescript": "6.0.3",
+    "vite": "8.3.3",
+    "vitest": "5.0.3",
+    "wrangler": "4.148.0"
   }
 }

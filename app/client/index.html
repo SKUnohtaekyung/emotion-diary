@@ -1,0 +1,23 @@
+<!doctype html>
+<!-- 인라인 스크립트·인라인 스타일·style 속성을 두지 않는다 — CSP가 막는다. 모양은 CSS 파일, 동작은 /src/main.ts. -->
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- 숲 색(design/tokens.json color.forest.sky). manifest.webmanifest의 theme_color·background_color와 같아야 한다 — 시험이 대조한다. -->
+    <meta name="theme-color" content="#0B1228" />
+    <meta name="apple-mobile-web-app-title" content="감정일기" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <title>감정일기</title>
+  </head>
+  <body>
+    <div id="banner" role="status"></div>
+    <main id="app" aria-busy="true">
+      <p class="boot-note">불러오는 중…</p>
+    </main>
+    <div id="live" class="sr-only" role="status" aria-live="polite"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

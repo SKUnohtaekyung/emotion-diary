@@ -101,11 +101,11 @@
 flowchart LR
   U["iPhone 홈 화면 웹앱<br/>(Safari·PC 브라우저도 가능)"] --> W["Cloudflare Worker 하나 · 주소 하나<br/>앱 화면(정적 파일) + /api/*<br/>유일한 진입점 · 권한·완료조건·멱등성"]
   W --> D[("D1 (SQLite)<br/>CHECK · UNIQUE · trigger")]
-  W --> Q["AI 작업 큐"]
-  Q <-.-> PC["PC worker<br/>Claude Code 헤드리스"]
+  W -.->|짓게 되면| C["Claude API<br/>(요금제에 포함된 월 크레딧)"]
+  W -.->|크레딧이 없어지면| PC["PC worker<br/>Claude Code 헤드리스"]
 ```
 
-앱 화면과 API를 Worker 하나가 같은 주소에서 냅니다. 휴대폰에서는 '홈 화면에 추가'로 설치해 앱처럼 엽니다(오프라인·푸시 없음). AI가 없어도 직접 작성과 돌아보기는 그대로 동작합니다. 일기 원문은 서버 권한 검사 뒤에만 읽고 쓰며 근거 저장소나 로그에 섞이지 않습니다. 삭제는 확인 뒤 영구 삭제, 내보내기는 schema version이 있는 UTF-8 JSON입니다.
+앱 화면과 API를 Worker 하나가 같은 주소에서 냅니다. 휴대폰에서는 '홈 화면에 추가'로 설치해 앱처럼 엽니다(오프라인·푸시 없음). AI와 대화하며 쓰기는 직접 쓰기를 30일 써 본 뒤 지을지 정하고, 짓게 되면 서버가 Claude API를 바로 부릅니다(점선). AI가 없어도 직접 작성과 돌아보기는 그대로 동작합니다. 일기 원문은 서버 권한 검사 뒤에만 읽고 쓰며 근거 저장소나 로그에 섞이지 않습니다. 삭제는 확인 뒤 영구 삭제, 내보내기는 schema version이 있는 UTF-8 JSON입니다.
 
 ---
 
@@ -113,13 +113,14 @@ flowchart LR
 
 | 단계 | 상태 |
 | --- | --- |
-| Phase 0 부트스트랩 — 정본 명세·검증 하네스·기술 스파이크 | 끝남(2026-10-14, 스파이크 잔여 판정까지 — `docs/STATUS.md` §3) |
-| **브라우저 화면 시안(`web/`)** — 사용자 QA로 무드·흐름 재구성(결정 D-050~D-107) | 사용자 QA 마감(2026-10-13) · 저장·인증·AI 없음 |
-| Phase 1 기반·데이터 무결성 → Phase 2 직접 작성 → Phase 4 돌아보기·알림 | Phase 1 착수 가능 — 구성은 Worker 하나 + 설치형 홈 화면 웹앱(D-111) |
-| 제한 MVP 릴리스 | 대기 — 위기 연락처 임상·안전 검토, 건강 민감정보 별도 동의가 출시 조건 |
-| Phase 3·5 AI 대화 작성·근거 있는 돌아보기 | 후행 |
+| Phase 0 부트스트랩 — 정본 명세·검증 하네스·기술 스파이크 | 끝남 |
+| **브라우저 화면 시안(`web/`)** — 사용자 QA로 무드·흐름 재구성(결정 D-050~D-107) | 사용자 QA 마감 · 저장·인증·AI 없음 |
+| 앱 뼈대 → 저장 핵심 → 첫 조각 '오늘 한 편'·내 데이터 통제 → **본인 사용 시작** | 앱 뼈대(`app/`, Worker 하나 + 설치형 홈 화면 웹앱, 화면은 도구 없이) 끝남, 다음 저장 핵심 |
+| 쓰면서 시안 이식 → 돌아보기·알림(실사용 2주 뒤) | 대기 |
+| 공개 출시 | 다른 사람에게 열기로 정할 때만 — 위기 연락처 임상·안전 검토, 건강 민감정보 별도 동의 등이 조건 |
+| AI 대화 작성·근거 있는 돌아보기 | 직접 쓰기를 30일·60일 써 본 뒤 지을지 결정 |
 
-진행 상황과 다음 할 일은 [docs/STATUS.md](docs/STATUS.md), 결정은 [docs/DECISIONS.md](docs/DECISIONS.md), 과정은 [docs/PROCESS_LOG.md](docs/PROCESS_LOG.md)에 있습니다.
+순서는 2026-10-15에 '오늘 한 편'을 휴대폰까지 먼저 뚫고 그날부터 실제로 쓰는 순서로 바꿨습니다(D-116·D-117). 지금 상태·날짜·숫자는 [docs/STATUS.md](docs/STATUS.md) 한 곳에만 있고(D-118), 결정은 [docs/DECISIONS.md](docs/DECISIONS.md), 과정은 [docs/PROCESS_LOG.md](docs/PROCESS_LOG.md)에 있습니다.
 
 ---
 
@@ -173,6 +174,7 @@ npm run verify:full
 | 서비스를 만드는 이유(모든 판단의 기준) | [docs/SERVICE_WHY.md](docs/SERVICE_WHY.md) |
 | 제품 범위·완료 조건 | [PRD.md](PRD.md) |
 | 시스템 경계·배포·신뢰 경계 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) |
+| 만들기·올리기·비밀값·되돌리기 절차 | [docs/DEPLOY.md](docs/DEPLOY.md) |
 | 저장 구조·무결성·삭제·내보내기 | [docs/DATA_MODEL.md](docs/DATA_MODEL.md) |
 | 화면·직접 작성·AI 작성 흐름 | [docs/UX_SPEC.md](docs/UX_SPEC.md) |
 | 색·글자·구성요소·접근성 | [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md), [design/tokens.json](design/tokens.json), [design/style-guide.html](design/style-guide.html) |
@@ -184,9 +186,9 @@ npm run verify:full
 | 테스트·평가·출시 게이트 | [docs/EVAL_PLAN.md](docs/EVAL_PLAN.md) |
 | 확정 기술 결정 | [docs/DECISIONS.md](docs/DECISIONS.md) |
 | 알려진 위험 | [docs/RISK_REGISTER.md](docs/RISK_REGISTER.md) |
-| 단계별 구현 순서 | [docs/ROADMAP.md](docs/ROADMAP.md) |
+| 단계별 구현 순서(노드 상태는 [harness/work-graph.yaml](harness/work-graph.yaml)) | [docs/ROADMAP.md](docs/ROADMAP.md) |
 | 요구사항 추적 | [docs/TRACEABILITY.md](docs/TRACEABILITY.md) |
-| 진행 상황·다음 할 일 | [docs/STATUS.md](docs/STATUS.md) |
+| 진행 상황·다음 할 일·숫자(시험·검사 수) — 숫자와 상태는 이곳에만(D-118) | [docs/STATUS.md](docs/STATUS.md) |
 | 개발 과정 기록(단계·시행착오·검증) | [docs/PROCESS_LOG.md](docs/PROCESS_LOG.md) |
 | 기계 검증용 데이터/AI 계약 | [schemas/README.md](schemas/README.md) |
 | 사용자 제공 원자료 | [references/README.md](references/README.md) |

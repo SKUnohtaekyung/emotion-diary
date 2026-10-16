@@ -1,0 +1,12 @@
+{
+  // 서버 시험과 설정 파일. 서버 시험은 Node에서 Worker 코드를 직접 부른다(D-115 ⑥).
+  // 브라우저 DOM 타입을 섞지 않는다 — Workers 런타임 타입의 Element(HTMLRewriter)가 DOM의 Element와 합쳐져 화면 코드 타입이 깨진다.
+  // 화면 시험(app/test/client)은 tsconfig.client.json이 검사한다.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["node"]
+  },
+  "files": ["app/worker/worker-configuration.d.ts"],
+  "include": ["app/test/worker/**/*.ts", "app/shared/**/*.ts", "vite.config.ts", "vitest.config.ts"]
+}

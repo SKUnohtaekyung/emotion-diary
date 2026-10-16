@@ -15,7 +15,7 @@
 2. `unknown`을 추측으로 채우지 말고 명령 결과·공식 URL·스파이크 경로를 evidence에 남긴다.
 3. 선행 노드가 `done`이 되기 전에는 다음 노드를 `in_progress`·`verifying`·`done`으로 바꾸지 않는다. 노드의 현재 상태는 이 문서에 적지 않는다 — `work-graph.yaml`이 유일한 기록이다. 증거가 일부만 모인 노드는 `verifying`으로 두고 남은 항목을 그 노드의 주석에 적는다.
 4. quality gates의 `command: null`은 도구 미선택을 뜻한다. `package.json`에 해당 script가 생기면 같은 변경에서 채운다.
-5. 한 번의 루프가 끝날 때 `loop-state.json`과 `tasks/CURRENT_TASK.md`를 함께 갱신한다. `loop-state.json`의 `task_id`는 `CURRENT_TASK`에서 진행 중인 작업의 머리글과 같아야 하고, `completed_nodes`는 `work-graph.yaml`의 `done` 노드와 같아야 한다. `last_verified_commit`은 full 검증을 통과한 가장 최근 커밋이다(자기 자신을 담는 커밋의 해시는 미리 알 수 없으므로 한 커밋 뒤처지는 것이 정상이다).
+5. 한 번의 루프가 끝날 때 `loop-state.json`과 `tasks/CURRENT_TASK.md`를 함께 갱신한다. `loop-state.json`의 `task_id`는 `CURRENT_TASK`에서 진행 중인 작업의 머리글과 같아야 하고, `completed_nodes`는 `work-graph.yaml`의 `done` 노드와 같아야 한다. `last_verified_commit`은 full 검증을 통과한 가장 최근 커밋이다(자기 자신을 담는 커밋의 해시는 미리 알 수 없으므로 한 커밋 뒤처지는 것이 정상이다). **`loop-state.json`은 진행의 사본이 아니라 가리키는 곳이다**(D-118, 2026-10-15) — `last_checkpoint`는 한 줄과 그 작업 PLAN의 경로만 적고, 진행·증거는 PLAN에, 노드 상태는 `work-graph.yaml`에, 숫자는 `docs/STATUS.md`에 둔다. `runtime-profile.json`도 외부 사실(공식 문서·무료 한도, 확인일과 함께)의 한 곳이고 실기기 결과는 `docs/EVAL_PLAN.md` §4·§6을 가리킨다.
 
 YAML/JSON 파일은 자율 실행기가 아니다. 에이전트가 선행조건을 건너뛰지 않고, 실패를 기록하며, 긴 작업을 재개하기 위한 상태 계약이다.
 
