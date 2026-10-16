@@ -6,7 +6,7 @@
 //   node app/scripts/cf.mjs dev migrate     원격 D1에 마이그레이션을 적용한다
 //   node app/scripts/cf.mjs dev deploy      개발용 묶음을 빌드해 비밀값 파일(work/deploy/dev.secrets.env)과 함께 올린다(빌드 번호는 화면·서버 같음)
 //   node app/scripts/cf.mjs dev secrets [이름…]  올리지 않고 비밀값만 바꾼다(열쇠 바꾸기)
-//   node app/scripts/cf.mjs dev sql "<SQL>" 원격 D1에 SQL 한 줄(점검·T-07 재현용 — 가짜 데이터만)
+//   node app/scripts/cf.mjs dev sql "<SQL>" [--json]  원격 D1에 SQL 한 줄(점검·T-07 재현용 — 가짜 데이터만). --json이면 결과를 JSON으로 찍는다
 //   node app/scripts/cf.mjs dev tail        실시간 기록(JSON 줄)
 //   node app/scripts/cf.mjs dev destroy     Worker와 D1을 지운다(되돌릴 수 없다 — 사용자 확인 뒤)
 // 운영(prod)은 제한 MVP 출시 전까지 만들지 않는다. 운영 명령은 ALLOW_PROD=1일 때만 받는다.
@@ -113,7 +113,9 @@ switch (command) {
   case "sql": {
     if (!rest[0]) die("SQL 한 줄을 따옴표로 준다");
     writeLocalConfig();
-    wrangler(scoped(["d1", "execute", database.database_name, "--remote", "--command", rest[0]]));
+    // `--json`을 붙이면 결과를 JSON으로 받아 그대로 찍는다(remote-check.mjs가 읽는다).
+    if (rest[1] === "--json") process.stdout.write(wrangler(scoped(["d1", "execute", database.database_name, "--remote", "--json", "--command", rest[0]]), { capture: true }));
+    else wrangler(scoped(["d1", "execute", database.database_name, "--remote", "--command", rest[0]]));
     break;
   }
   case "tail": {

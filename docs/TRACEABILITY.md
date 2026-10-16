@@ -35,17 +35,19 @@
 
 | 불변조건 | 관련 요구 | 차단 증거 |
 | --- | --- | --- |
-| client 지정 owner를 신뢰하지 않음 | PR-002, PR-014 | F-01/F-02와 IDOR red-team |
+| client 지정 owner를 신뢰하지 않음 | PR-002, PR-014 | F-01/F-02와 IDOR red-team — 서버 시험 `app/test/worker/diary.test.ts` 'F-02 주인 격리'(본문의 주인 칸 400, 다른 주인의 세션은 읽기·고치기·완료·지우기 불가) |
 | 일기 원문이 Evidence/로그에 없음 | PR-007, PR-013, PR-014 | F-16, EVAL §9 검색·로그 검사 |
 | 분석 실패가 직접 작성/저장을 막지 않음 | PR-006, PR-007, PR-012, PR-013 | 오류 injection과 degraded-mode E2E |
 | completed만 통계/분석에 포함 | PR-008, PR-009, PR-012, PR-013 | F-11/F-12와 snapshot unit test |
-| backfill이 과거 streak를 복구하지 않음 | PR-008, PR-012 | F-07, timezone/DST fixture |
-| 새 draft 생성은 서버가 `day_start_hour`로 계산한 오늘의 `entry_date`에만 허용, 클라이언트가 보낸 날짜를 신뢰하지 않음(D-081, D-082) | PR-006, PR-008, PR-009 | F-07(갱신), F-17, ARCHITECTURE §3 날짜 검증, §5 |
+| backfill이 과거 streak를 복구하지 않음 | PR-008, PR-012 | F-07, timezone/DST fixture — 최초 완료일 = 실제 완료한 날(`diary.test.ts` F-07), 서머타임·날짜선 fixture(`day.test.ts`) |
+| 새 draft 생성은 서버가 `day_start_hour`로 계산한 오늘의 `entry_date`에만 허용, 클라이언트가 보낸 날짜를 신뢰하지 않음(D-081, D-082) | PR-006, PR-008, PR-009 | F-07(갱신), F-17, ARCHITECTURE §3 날짜 검증, §5 — `diary.test.ts` F-07·F-17(2026-10-15) |
 | 외부 심리 claim은 정확한 active card version으로 100% 지지 | PR-001, PR-013 | Citation Validity/Coverage 100%, unsupported 0 |
 | AI 관여 경로의 위기 신호에서 일반 작성/분석 중단(직접 작성 원문 자동 스캔 없음, D-020) | PR-001, PR-007, PR-013, PR-014 | EVAL §7 위기 케이스, §9 crisis 전 사례 pass, 한계 고지 문구 존재 |
 | 추가 지출 없음 — 유료 API·크레딧 밖 과금 없음(D-019·D-120) | PR-014, PR-015 | AI를 짓기 전: 의존성·설정·네트워크 로그에 유료 API endpoint/키 없음. 짓게 되면: Max 포함 월 크레딧만 쓰고 따로 산 크레딧·자동 충전 0, B-06(서버 직통으로 다시 정의) 증거 |
 | 클라이언트가 보낸 이전 대화 턴을 서명 없이 신뢰하지 않음 | PR-007, PR-014 | EVAL §9 턴 위조 0건 |
-| 완료 전환·삭제는 원자적 statement/batch로만 수행(D-024) | PR-008, PR-009, PR-014 | B-04, F-06, F-14 동시성 fixture |
+| 완료 전환·삭제는 원자적 statement/batch로만 수행(D-024) | PR-008, PR-009, PR-014 | B-04, F-06, F-14 동시성 fixture — 저장·완료·지우기는 batch 하나, 딸린 행은 쓰기 표 조건(`diary.test.ts`의 결정적 경쟁 시험, `diary-db.test.ts`) |
+| 같은 요청의 재전송은 한 번만 반영되고 영수증에 일기 글이 없음(DATA_MODEL §3.7, D-122) | PR-008, PR-009, PR-014 | F-10 — `diary.test.ts` |
+| 맞는 접근 열쇠는 틀린 열쇠 잠금에 막히지 않음(RK-041, D-122) | PR-002 | `session.test.ts` RK-041 시험 |
 | 위기 안내·AI 위기 전환 화면에 친구·감정 색·조약돌·빛·움직임을 쓰지 않음(D-061 ⑤, D-065 ①) | PR-001, PR-007, PR-010 | 위기 안내(`#/help`)와 AI 위기 전환의 화면 대조(UI-MOOD-005). 시안의 `#/help`는 코드상 친구·감정 색·조약돌·빛·움직임이 없다(2026-09-22), AI 위기 전환은 후행 단계. 위기 안내로 가는 입구는 설정과 AI 위기 전환뿐이다(D-093 — 온보딩의 입구는 2026-09-25에 뺐다) |
 | 온보딩에는 PHI 입력 안내·안전 고지·위기 안내 링크가 없음, '시작하기 전에'는 WHY의 약속 두 줄(D-093) | PR-001, PR-010 | `#/welcome`의 마지막 장('시작하기 전에')이 SAFETY_POLICY §3·§6의 정적 문구가 아니라 SERVICE_WHY §12·§17의 약속 두 줄만 보이는지 화면 대조. **옛 검증 항목 소멸**: 옛 온보딩 2쪽의 PHI 미입력 안내·자동 분석 없음 고지·위기 안내 링크 검증(구 UI-MOOD 계열)은 D-093으로 화면 자체가 사라져 더는 검증하지 않는다 — 같은 문구는 이제 설정의 개인정보 안내(SAFETY_POLICY §3·§6)에서 검증한다 |
 | 위기 안내 연락처는 versioned resource 한 곳(`data/crisis-resources/kr.json`)에서 읽고, 공식 출처만 싣고, 112·119는 파일 없이도 먼저 보임(D-094) | PR-001, PR-013 | `node scripts/verify.mjs`의 위기 연락처 검사(필수 필드·출처가 공식 누리집·허용 번호 목록·검토 상태 필드) + `#/help` 화면 대조(파일을 막아도 112·119 전화 버튼이 남음). 임상·안전 검토는 출시 차단(ROADMAP) |

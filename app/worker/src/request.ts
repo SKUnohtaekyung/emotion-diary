@@ -59,14 +59,20 @@ async function readLimited(request: Request, limit: number): Promise<string | nu
  * DATA_MODEL의 칸 길이로 계산한 한도를 넘긴다(ARCHITECTURE §11.9).
  */
 export async function readJson(request: Request, limit: number = MAX_BODY_BYTES): Promise<JsonBody | Response> {
+  const read = await readJsonText(request, limit);
+  return read instanceof Response ? read : read.body;
+}
+
+/** readJson과 같고, 받은 본문 글도 함께 돌려준다 — 영수증의 요청 지문을 본문 바이트 그대로로 만들려고(DATA_MODEL §3.7). */
+export async function readJsonText(request: Request, limit: number = MAX_BODY_BYTES): Promise<{ body: JsonBody; text: string } | Response> {
   const declared = Number(request.headers.get("content-length") ?? "0");
   if (declared > limit) return fail(413, "too_large");
   const text = await readLimited(request, limit);
   if (text === null) return fail(413, "too_large");
-  if (text.trim() === "") return {};
+  if (text.trim() === "") return { body: {}, text };
   try {
     const value: unknown = JSON.parse(text);
-    if (value && typeof value === "object" && !Array.isArray(value)) return value as JsonBody;
+    if (value && typeof value === "object" && !Array.isArray(value)) return { body: value as JsonBody, text };
   } catch {
     // 아래의 400으로 간다
   }

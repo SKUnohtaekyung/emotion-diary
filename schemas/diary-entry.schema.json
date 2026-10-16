@@ -2,72 +2,337 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://example.invalid/schemas/diary-entry.schema.json",
   "title": "Diary entry",
+  "description": "GET /api/diaries/:date의 응답과 내보내기의 기록 하나(DATA_MODEL §3.1~§3.3, TASK-DATA-01). v2: 고른 계열·대표 크기, 세부 감정의 '따로 정함', 쓰던 단계, 임시저장의 '아직 안 정함'(null). 글자 수는 코드 포인트, 상한은 app/shared/diary.ts와 같다.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "id", "entryDate", "timezone", "status", "revision", "taxonomyVersion", "eventText", "reasonText", "emotions", "praises", "gratitudes"],
+  "required": [
+    "schemaVersion",
+    "id",
+    "entryDate",
+    "timezone",
+    "status",
+    "revision",
+    "taxonomyVersion",
+    "eventText",
+    "reasonText",
+    "categories",
+    "emotions",
+    "praises",
+    "gratitudes",
+    "resume",
+    "firstCompletedAt",
+    "firstCompletedLocalDate",
+    "completedAt",
+    "createdAt",
+    "updatedAt"
+  ],
   "$defs": {
     "reflectionSlot": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["slot", "text"],
+      "required": [
+        "slot",
+        "text"
+      ],
       "properties": {
-        "slot": { "type": "integer", "minimum": 1, "maximum": 3 },
-        "text": { "type": "string", "pattern": "\\S", "minLength": 1, "maxLength": 2000 }
+        "slot": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S",
+          "minLength": 1,
+          "maxLength": 2000
+        }
       }
     },
     "reflectionSlots": {
       "type": "array",
       "maxItems": 3,
       "uniqueItems": true,
-      "items": { "$ref": "#/$defs/reflectionSlot" }
+      "items": {
+        "$ref": "#/$defs/reflectionSlot"
+      }
     }
   },
   "properties": {
-    "schemaVersion": { "const": "diary-entry-v1" },
-    "id": { "type": "string", "minLength": 16, "maxLength": 64 },
-    "entryDate": { "type": "string", "format": "date" },
-    "timezone": { "type": "string", "minLength": 1, "maxLength": 64 },
-    "status": { "enum": ["draft", "completed"] },
-    "revision": { "type": "integer", "minimum": 1 },
-    "taxonomyVersion": { "type": "string", "minLength": 1, "maxLength": 64 },
-    "eventText": { "type": "string", "maxLength": 10000 },
-    "reasonText": { "type": "string", "maxLength": 10000 },
+    "schemaVersion": {
+      "const": "diary-entry-v2"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 16,
+      "maxLength": 64
+    },
+    "entryDate": {
+      "type": "string",
+      "format": "date"
+    },
+    "timezone": {
+      "description": "이 기록의 날짜를 정한 시간대(처음 만들 때의 휴대폰 시간대, IANA 이름)",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "completed"
+      ]
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "taxonomyVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "eventText": {
+      "type": "string",
+      "maxLength": 10000
+    },
+    "reasonText": {
+      "type": "string",
+      "maxLength": 10000
+    },
+    "categories": {
+      "description": "고른 계열(고른 순서)과 대표 크기. null은 아직 안 정함(임시저장에서만)",
+      "type": "array",
+      "maxItems": 9,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "categoryCode",
+          "intensity"
+        ],
+        "properties": {
+          "categoryCode": {
+            "enum": [
+              "enjoyment",
+              "wish",
+              "sadness",
+              "anger",
+              "joy",
+              "love",
+              "hate",
+              "fear",
+              "disgust"
+            ]
+          },
+          "intensity": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          }
+        }
+      }
+    },
     "emotions": {
+      "description": "고른 세부 감정(고른 순서). intensity는 실제 크기 — custom이 false면 그 계열의 대표 크기다(D-059)",
       "type": "array",
       "maxItems": 100,
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["categoryCode", "emotionCode", "labelSnapshot", "intensity", "displayOrder"],
+        "required": [
+          "categoryCode",
+          "emotionCode",
+          "labelSnapshot",
+          "intensity",
+          "custom"
+        ],
         "properties": {
-          "categoryCode": { "enum": ["enjoyment", "wish", "sadness", "anger", "joy", "love", "hate", "fear", "disgust"] },
-          "emotionCode": { "type": "string", "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate|fear|disgust)-[a-z0-9][a-z0-9-]{0,55}$" },
-          "labelSnapshot": { "type": "string", "pattern": "\\S", "minLength": 1, "maxLength": 100 },
-          "intensity": { "type": "integer", "minimum": 1, "maximum": 10 },
-          "displayOrder": { "type": "integer", "minimum": 0 }
+          "categoryCode": {
+            "enum": [
+              "enjoyment",
+              "wish",
+              "sadness",
+              "anger",
+              "joy",
+              "love",
+              "hate",
+              "fear",
+              "disgust"
+            ]
+          },
+          "emotionCode": {
+            "type": "string",
+            "pattern": "^(enjoyment|wish|sadness|anger|joy|love|hate|fear|disgust)-[a-z0-9][a-z0-9-]{0,55}$"
+          },
+          "labelSnapshot": {
+            "type": "string",
+            "pattern": "\\S",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "intensity": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "custom": {
+            "type": "boolean"
+          }
         }
       }
     },
-    "praises": { "$ref": "#/$defs/reflectionSlots" },
-    "gratitudes": { "$ref": "#/$defs/reflectionSlots" },
-    "firstCompletedAt": { "type": ["string", "null"], "format": "date-time" },
-    "firstCompletedLocalDate": { "type": ["string", "null"], "format": "date" },
-    "completedAt": { "type": ["string", "null"], "format": "date-time" },
-    "createdAt": { "type": "string", "format": "date-time" },
-    "updatedAt": { "type": "string", "format": "date-time" }
+    "praises": {
+      "$ref": "#/$defs/reflectionSlots"
+    },
+    "gratitudes": {
+      "$ref": "#/$defs/reflectionSlots"
+    },
+    "resume": {
+      "description": "쓰던 단계(RK-043) — 화면이 통째로 새로 열려도 이 단계로 다시 연다. categoryCode는 세부 감정 단계(details)일 때만",
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "step",
+            "categoryCode"
+          ],
+          "properties": {
+            "step": {
+              "enum": [
+                "event",
+                "feelings",
+                "details",
+                "intensity",
+                "reason",
+                "praise",
+                "gratitude",
+                "letter"
+              ]
+            },
+            "categoryCode": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "enum": [
+                    "enjoyment",
+                    "wish",
+                    "sadness",
+                    "anger",
+                    "joy",
+                    "love",
+                    "hate",
+                    "fear",
+                    "disgust"
+                  ]
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "firstCompletedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "firstCompletedLocalDate": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date"
+    },
+    "completedAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
   },
   "allOf": [
     {
-      "if": { "properties": { "status": { "const": "completed" } }, "required": ["status"] },
-      "then": {
-        "required": ["firstCompletedAt", "firstCompletedLocalDate", "completedAt"],
+      "if": {
         "properties": {
-          "eventText": { "type": "string", "pattern": "\\S", "maxLength": 10000 },
-          "reasonText": { "type": "string", "pattern": "\\S", "maxLength": 10000 },
-          "emotions": { "minItems": 1 },
-          "firstCompletedAt": { "type": "string", "format": "date-time" },
-          "firstCompletedLocalDate": { "type": "string", "format": "date" },
-          "completedAt": { "type": "string", "format": "date-time" }
+          "status": {
+            "const": "completed"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "eventText": {
+            "type": "string",
+            "pattern": "\\S",
+            "maxLength": 10000
+          },
+          "reasonText": {
+            "type": "string",
+            "pattern": "\\S",
+            "maxLength": 10000
+          },
+          "categories": {
+            "minItems": 1,
+            "items": {
+              "properties": {
+                "intensity": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
+                }
+              }
+            }
+          },
+          "emotions": {
+            "minItems": 1,
+            "items": {
+              "properties": {
+                "intensity": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 10
+                }
+              }
+            }
+          },
+          "firstCompletedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "firstCompletedLocalDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "completedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       }
     }

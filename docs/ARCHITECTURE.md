@@ -153,10 +153,11 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 | `DELETE /api/session` | 로그아웃 — 이 기기의 로그인 cookie를 지운다 | CSRF |
 | `PUT /api/app-lock`, `DELETE /api/app-lock` | 앱 잠금 비밀번호를 정하기·바꾸기 / 끄기(§6, D-106·D-112) | 비밀번호는 본문으로만. 이미 걸려 있으면 **지금 비밀번호**를 함께 받거나, **이 세션이 접근 열쇠로 로그인한 지 10분 안**이어야 한다(§6 '잊었을 때') |
 | `POST /api/app-lock/unlock`, `POST /api/app-lock/lock` | 이 세션의 잠금 풀기(비밀번호) / 이 세션을 지금 잠그기 | 풀기: 서버가 대조하고 틀린 횟수를 센다. 잠그기: 비밀번호 없이 받는다(더 잠기는 쪽이라 화면의 요청을 믿어도 된다) |
-| `GET /api/diaries?date=` | 해당 날짜의 draft/completed 조회 | owner 강제 |
-| `PUT /api/diaries/:date` | draft upsert | revision + idempotency |
-| `POST /api/diaries/:date/complete` | 완료조건 검사 후 상태 전환 | transaction + unique |
-| `DELETE /api/diaries/:date` | 확인 토큰 후 영구 삭제(기록 하나 — 화면은 2단계 확인) | CSRF + 확인 토큰 + cascade |
+| `GET /api/today` | 서버가 센 오늘 날짜·시간대·하루 기준 시각, 오늘 기록의 요약(상태·판 번호·고른 계열·쓰던 단계 — 글 없음), 가장 최근의 지난 임시저장(D-122) | `X-Timezone` 필수 |
+| `GET /api/diaries/:date` | 해당 날짜의 draft/completed 전체(없으면 404 — 없는·미래 날짜도 새로 만들지 않는다) | owner 강제, 날짜 모양 400 |
+| `PUT /api/diaries/:date` | 임시저장(통째로 — 새로 만들기 201 / 고치기 200). 완료된 기록은 완료 조건을 다시 검사한다(D-023) | revision + `Idempotency-Key` + `X-Timezone`, 새로 만들기는 서버가 센 오늘만(422 `not_today`), 본문 160,768바이트(DATA_MODEL §2), 모르는 칸 400 |
+| `POST /api/diaries/:date/complete` | 완료조건 검사 후 상태 전환(본문 `{revision}`) | 조건부 UPDATE 하나 + `Idempotency-Key`, 모자라면 422와 빠진 단계 목록 |
+| `DELETE /api/diaries/:date` | 영구 삭제(기록 하나 — 화면은 2단계 확인). 확인 토큰은 **지금 판 번호**(본문 `{revision}` — 본 그 판만 지운다, D-122) | CSRF + 판 번호 + `Idempotency-Key` + cascade(부모 먼저) |
 | `DELETE /api/diaries`(전체) | 확인 문구를 받은 뒤 모든 기록과 부를 이름·앱 잠금·알림·하루 기준 시각 설정을 영구 삭제(D-112 ⑩ — 접근 열쇠와 세션은 남는다) | CSRF + 확인 토큰 + **본인 확인**(앱 잠금을 켠 경우 비밀번호를 한 번 더 — D-112 ⑤) + cascade |
 | `GET /api/dashboard?range=` | 완료 기록의 결정론적 집계 | 범위 제한 |
 | `POST /api/journal-assist` | 현재 턴을 `ai_jobs`에 등록하고 job ID 반환 | full chat 비저장, payload 최소화 |
@@ -164,14 +165,15 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 | `GET /api/ai-jobs/next`, `POST /api/ai-jobs/:id/result` | PC worker 전용 lease/결과 반환 | worker secret, lease 만료, 결과 schema 재검증 |
 | `POST /api/analyses` | snapshot 분석 job 등록 | version, rate/cost limit |
 | `GET /api/export` | versioned JSON export. 화면 코드가 받아 공유 창으로 넘긴다(§4.1) | owner + `Cache-Control: no-store`, 주소에 인증 정보 없음(1회용 내려받기 주소를 만들지 않는다) |
-| `GET/PUT /api/settings/reminder` | 알림·하루 기준 시각 등 owner 설정(D-081) | timezone validation, `day_start_hour` 0~6 범위 검사 |
+| `GET/PUT /api/settings/reminder` | 알림 설정(`dashboard-reminder`가 만든다) | timezone validation |
+| `GET/PUT /api/settings/day-start` | 하루 기준 시각(D-081 — `owner_settings.day_start_hour`, D-122) | 0~6 정수, 바꿔도 저장된 날짜는 다시 세지 않는다 |
 | `GET/PUT /api/settings/profile` | 부를 이름(D-112 ④, 12자) | 길이·빈칸 검사 |
 
 이 표에서 '재인증'이라는 말은 쓰지 않는다. 지울 때의 본인 확인은 위 두 삭제 행이 전부다(D-112 ⑤ — 기록 하나는 2단계 확인, 전체는 확인 문구 + 잠금을 켠 경우 비밀번호). 접근 열쇠를 다시 넣게 하지 않는다.
 
-`PUT /api/diaries/:date`는 이미 존재하는 diary(과거 `entry_date`의 draft 포함)라면 언제든 upsert를 허용하지만, **새로 행을 만드는 요청은 `:date`가 서버가 owner의 timezone과 `day_start_hour`(DATA_MODEL §2·§3.4)로 계산한 오늘과 같을 때만 허용**하고 다르면 404/422로 거부한다(D-082). `POST /api/diaries/:date/complete`는 `entry_date`가 과거여도 그 diary가 draft 상태이고 완료조건을 만족하면 허용한다 — 완료 시점이 `entry_date`보다 나중이어도 막지 않는다.
+`PUT /api/diaries/:date`는 이미 존재하는 diary(과거 `entry_date`의 draft 포함)라면 언제든 upsert를 허용하지만, **새로 행을 만드는 요청은 `:date`가 서버가 owner의 timezone과 `day_start_hour`(DATA_MODEL §2·§3.4)로 계산한 오늘과 같을 때만 허용**하고 다르면 422(`not_today`)로 거부한다(D-082). `POST /api/diaries/:date/complete`는 `entry_date`가 과거여도 그 diary가 draft 상태이고 완료조건을 만족하면 허용한다 — 완료 시점이 `entry_date`보다 나중이어도 막지 않는다.
 
-모든 변경 API는 인증, CSRF 방어, schema validation, request size limit, rate limit, audit event를 검토한다. CSRF 방어는 다음으로 확정한다(D-025).
+모든 변경 API는 인증, CSRF 방어, schema validation, request size limit, rate limit을 검토한다(감사 기록 표는 두지 않는다 — DATA_MODEL §5, D-122). CSRF 방어는 다음으로 확정한다(D-025).
 
 - 모든 변경 요청(PUT/POST/DELETE)은 서버가 정한 custom header(예: `X-Requested-With: emotion-diary`)를 요구한다. 단순 form 제출이나 cross-site fetch는 이 header를 붙일 수 없으므로 header가 없으면 403이다.
 - 추가로 `Origin`(없으면 `Referer`)과 `Sec-Fetch-Site`를 배포 origin 허용 목록과 대조한다. 두 검사는 서로 대체가 아니라 중첩이다.
@@ -222,7 +224,7 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 
 **실패 제한과 운영**
 
-- 실패 시도 제한은 **D1 기반 전역 잠금 카운터**(`auth_failures` 1행, DATA_MODEL §3.9)로 한다: 60초 창에서 실패 10회면 5분 잠금, 잠금 중에는 올바른 토큰도 429. 1인 도구이므로 IP별이 아니라 전역이며 공격자 IP 분산에도 동일하게 잠긴다. Workers Rate Limiting binding은 2026-09-02 스파이크에서 같은 key 30회(HKG/NRT 분산)에도 한 번도 차단하지 않았고 문서상 "permissive, eventually consistent, per location"이므로 보안 경계로 채택하지 않는다(보조 완화로만 추가 가능).
+- 실패 시도 제한은 **D1 기반 전역 잠금 카운터**(`auth_failures` 1행, DATA_MODEL §3.9)로 한다: 60초 창에서 실패 10회면 5분 동안 틀린 열쇠에 429. **맞는 열쇠는 잠금과 상관없이 들어온다**(2026-10-15 D-122, RK-041 — 잠금이 실제로 막던 것은 주인뿐이었다). 1인 도구이므로 IP별이 아니라 전역이다. **이 잠금은 열쇠를 맞혀 보는 속도를 막지 않는다** — 맞는 열쇠는 늘 들어오므로 잠긴 동안에도 대조는 한다(틀리면 429). 경계는 열쇠의 길이(무작위 12자 이상, 지금 43자)이고 잠금은 틀린 열쇠에 답을 늦추는 겹일 뿐이다. 잠긴 동안의 틀린 시도는 D1에 쓰지 않는다(DATA_MODEL §3.9). Workers Rate Limiting binding은 2026-09-02 스파이크에서 같은 key 30회(HKG/NRT 분산)에도 한 번도 차단하지 않았고 문서상 "permissive, eventually consistent, per location"이므로 보안 경계로 채택하지 않는다(보조 완화로만 추가 가능).
 - secret 회전은 전파 지연(약 20초 관찰)이 있으므로, 회전 절차는 새 값 등록 → 전파 확인(옛 값 401) → 세션 재발급 순으로 한다.
 - 앱 주소는 공개 인터넷에 있으므로 로그인 없는 요청에는 정적 파일과 로그인 상태(`GET /api/session`) 말고 어떤 데이터도 주지 않는다.
 - **Cloudflare Access는 첫 버전에서 쓰지 않는다**(D-108 ③). 공식 문서로는 `workers.dev` 주소에 붙일 수 있고 무료 50명 범위지만 조직을 만들 때 결제수단 입력이 필요하다 — 켜 본 적은 없다. 나중에 도입한다면 홈 화면 앱 안에서 바깥 로그인 화면을 다녀와 cookie가 돌아오는지를 실기기로 먼저 확인해야 한다(확인한 적 없음).
@@ -350,9 +352,9 @@ Mac이 없어 iPhone 화면의 개발 도구를 쓸 수 없으므로(RK-036) 개
 §6의 계약을 지키며 정한 세부다(T3 A-17).
 
 - cookie 이름은 `__Host-session`(브라우저가 Secure·`Path=/`·Domain 없음을 강제), 값은 `v1.<세션 번호>.<주체>.<발급 ms>.<서명>`. 세션 번호는 16바이트 무작위, 서명은 `SESSION_SECRET`의 HMAC-SHA256. 기한은 cookie가 아니라 서버 기록의 마지막 발급 시각으로 잰다 — cookie 사본끼리 엇갈려도 끊기지 않게(홈 화면에 추가할 때 cookie가 복사된다는 WebKit 버그 보고가 있다 — bugs.webkit.org 325412, 우리 실측 S-01과는 반대).
-- 틀린 열쇠와 틀린 비밀번호는 **대조하기 전에 시도 한 번을 먼저 예약한다**(조건부 `UPDATE … RETURNING`). 요청을 한꺼번에 여럿 보내도 창의 한도(열쇠 60초 10번, 비밀번호 5번)를 넘겨 맞혀 볼 수 없다.
+- 틀린 비밀번호는 **대조하기 전에 시도 한 번을 먼저 예약한다**(조건부 `UPDATE … RETURNING`) — 요청을 한꺼번에 여럿 보내도 다섯 번을 넘겨 맞혀 볼 수 없다. 접근 열쇠는 2026-10-15부터 먼저 대조하고 틀린 시도만 한 문장으로 센다 — 맞는 열쇠는 잠금과 상관없이 들어오고, 열쇠는 맞혀 볼 수 없는 길이라 대조 전 예약이 지키던 것이 없다(D-122, RK-041).
 - **활동 갱신은 잠금을 풀지 못한다.** 요청이 세션을 읽은 뒤 쓰기 전에 다른 요청('지금 잠그기')이 끼어도 되돌리지 않게, 잠김은 `MAX`로만 올리고 시각들도 뒤로 돌리지 않는다. 푸는 것은 비밀번호 풀기와 잠금 끄기뿐이다(2026-10-14 독립 검토 지적, 시험 `app/test/worker/router-and-race.test.ts`).
-- 오류 응답의 번호와 사유 코드: 400 `invalid_body`(본문 모양), 401 `unauthorized`(로그인 풀림)·`invalid_key`(틀린 열쇠), 403 `csrf`, 404·405, 409 `app_lock_off`, 413, 422 `invalid_pin`·`wrong_pin`·`pin_required`·`invalid_name`, 423 `app_locked`, 429 `key_locked`·`pin_resting`(+`Retry-After`), 500 `server_misconfigured`·`server_error`. 틀린 비밀번호를 422로 두는 것은 401(로그인 풀림)·403(CSRF)과 화면이 섞어 읽지 않게 하려는 것이다.
+- 오류 응답의 번호와 사유 코드: 400 `invalid_body`(본문 모양), 401 `unauthorized`(로그인 풀림)·`invalid_key`(틀린 열쇠), 403 `csrf`, 404·405, 409 `app_lock_off`, 413, 422 `invalid_pin`·`wrong_pin`·`pin_required`·`invalid_name`, 423 `app_locked`, 429 `key_locked`·`pin_resting`(+`Retry-After`), 500 `server_misconfigured`·`server_error`. 틀린 비밀번호를 422로 두는 것은 401(로그인 풀림)·403(CSRF)과 화면이 섞어 읽지 않게 하려는 것이다. 일기(2026-10-15): 400 `invalid_date`·`invalid_timezone`·`idempotency_key_required`, 409 `revision_conflict`(+`currentRevision`)·`not_draft`·`idempotency_mismatch`, 422 `invalid_text`·`invalid_category`·`invalid_emotion`·`invalid_intensity`·`invalid_reflection`·`invalid_resume`(+`field`)·`invalid_day_start`·`not_today`·`incomplete`(+`missing` — 흐름 순서의 단계 이름).
 - 쓸 수 없는 cookie(기한 지남·기록 없음·서명 틀림)를 받으면 응답에서 그 cookie를 지운다.
 
 ### 11.8 검사
@@ -374,5 +376,5 @@ Phase 1a~Phase 2(`data-foundation`·`first-slice`와 직접 작성 흐름 — 20
 
 - **서버 경로**: 경로 표(`app/worker/src/router.ts`)의 열쇠는 `"방식 /api/경로"`이고 경로 조각 하나를 `:이름`으로 받는다(예: `PUT /api/diaries/:date`, `POST /api/diaries/:date/complete`). 조각은 주소의 `/` 사이 한 칸이지만 URL 디코딩 뒤 값에는 어떤 글자든 올 수 있다(`%2F`면 `/`) — 그 값이 `ctx.params`로 처리기에 가고, **모양 검사(날짜 형식 `YYYY-MM-DD` 등)와 권한 검사는 반드시 처리기가 한다**(§3). 정확한 경로가 매개변수 경로보다 먼저 맞는다. 같은 경로에 그 방식이 없으면 405, 경로가 없으면 404다. 이 판정은 로그인(401)·CSRF(403)·잠김(423) **뒤**에 한다 — 로그인 전이나 잠긴 세션에는 어떤 경로가 있는지 알려 주지 않는다. 새 경로를 더해도 `app.ts`의 순서는 바꾸지 않는다.
 - **화면 주소**: `#/이름` 뒤에 값이 필요하면 경로 조각으로 둔다(예: `#/record/2026-10-14`) — query(`?…`)는 한 화면 안의 상태(`?s=again`, `?step=` 같은 것)에만 쓴다. 화면 표(`app/client/src/lib/routes.ts`)는 지금 정확한 이름만 알고, 값이 든 화면이 처음 생길 때 `이름/:값` 모양을 더한다. 로그인이 풀려 돌아갈 자리(`returnTo`)에는 **값까지 든 화면 주소**를 두되 query는 버린다(열쇠는 원래 주소에 실리지 않는다 — §6). 값이 든 화면도 기록 규칙(UX_SPEC §17)은 같다. 개발용 오류 보고의 화면 칸(`route`)과 상태 칸에는 **값 조각을 빼고 화면 이름만** 싣는다(`record/2026-10-14` → `record`) — 기록 날짜 같은 값이 서버 기록에 남지 않게(§11.3·§11.5).
-- **본문 한도**: 기본은 8KB(`MAX_BODY_BYTES`)이고, 더 큰 본문이 필요한 경로는 처리기가 `readJson(request, 한도)`로 넓힌다. 한도는 그 경로가 받는 칸들의 최대 길이(DATA_MODEL)로 계산해 정하고 한도를 넘으면 413이다. 일기 글의 칸별 최대 길이는 `data-foundation`이 DATA_MODEL에 수치로 적는다 — 그 전에는 8KB를 넘는 경로를 만들지 않는다.
-- **로그**: 지금은 처리하지 못한 오류(500) 때 방식·경로·오류 이름만 남긴다. §8의 구조화 로그(correlation ID 등)와 보안 이벤트 기록은 Phase 2가 저장 경로를 만들 때 같은 규칙(본문·cookie·메시지를 남기지 않는다)으로 더한다.
+- **본문 한도**: 기본은 8KB(`MAX_BODY_BYTES`)이고, 더 큰 본문이 필요한 경로는 처리기가 `readJson(request, 한도)`로 넓힌다. 한도는 그 경로가 받는 칸들의 최대 길이(DATA_MODEL)로 계산해 정하고 한도를 넘으면 413이다. 일기 글의 칸별 최대 길이는 DATA_MODEL §2의 표이고(2026-10-15), 그 수로 계산한 일기 저장 경로의 한도는 160,768바이트다(`DIARY_MAX_BODY_BYTES`). 다른 경로는 8KB 그대로다.
+- **로그**: 지금은 처리하지 못한 오류(500) 때 방식·경로·오류 이름만 남긴다. 일기 저장 경로(2026-10-15)에도 따로 남기는 기록은 없다 — 감사 기록 표를 두지 않기로 했다(D-122). §8의 구조화 로그(correlation ID 등)는 운영 문제를 가려야 할 때 같은 규칙(본문·cookie·메시지를 남기지 않는다)으로 더한다.

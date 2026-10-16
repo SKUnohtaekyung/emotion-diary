@@ -1,6 +1,7 @@
 // 로그인 cookie와 서버의 세션 기록(ARCHITECTURE §6, DATA_MODEL §3.10, D-112 ①③).
 // 요청마다 ① 서명 ② 주체의 허용 목록 ③ 세션 기록이 살아 있는지 ④ 기한(마지막 발급에서 30일) ⑤ 잠김 여부를 본다.
 import { AWAY_LOCK_MS, LOGIN_MAX_AGE_MS, MINUTE_MS, RENEW_AFTER_MS, SESSION_COOKIE } from "../../shared/api";
+import { DAY_START_DEFAULT } from "../../shared/diary";
 import { type Ctx, iso, type Session } from "./context";
 import { hmacBase64Url, timingSafeEqual } from "./crypto";
 
@@ -53,6 +54,7 @@ interface SessionRow {
   locked: number;
   lock_on: number;
   has_name: number;
+  day_start_hour: number;
 }
 
 /**
@@ -67,11 +69,12 @@ export async function loadSession(ctx: Ctx): Promise<Session | null> {
   if (!parts || !ctx.allowlist.has(parts.subject)) return null;
   const row = await ctx.env.DB.prepare(
     `SELECT s.subject, s.key_login_at, s.issued_at, s.last_active_at, s.locked,
-            (o.app_lock_hash IS NOT NULL) AS lock_on, (o.display_name IS NOT NULL) AS has_name
+            (o.app_lock_hash IS NOT NULL) AS lock_on, (o.display_name IS NOT NULL) AS has_name,
+            COALESCE(o.day_start_hour, ?2) AS day_start_hour
        FROM sessions s LEFT JOIN owner_settings o ON o.owner_key = s.subject
       WHERE s.id = ?1`
   )
-    .bind(parts.sid)
+    .bind(parts.sid, DAY_START_DEFAULT)
     .first<SessionRow>();
   if (!row || row.subject !== parts.subject) return null;
   const issuedAt = Date.parse(row.issued_at);
@@ -87,7 +90,8 @@ export async function loadSession(ctx: Ctx): Promise<Session | null> {
     lastActiveAt: Date.parse(row.last_active_at),
     locked: row.locked === 1,
     lockOn: row.lock_on === 1,
-    hasName: row.has_name === 1
+    hasName: row.has_name === 1,
+    dayStartHour: row.day_start_hour
   };
 }
 

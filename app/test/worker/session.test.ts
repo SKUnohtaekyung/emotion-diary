@@ -149,7 +149,7 @@ describe("로그인(접근 열쇠)", () => {
     }
   });
 
-  it("틀린 열쇠는 401, 60초 안에 10번이면 429(Retry-After 300), 잠긴 동안 맞는 열쇠도 429, 5분 뒤 다시 된다", async () => {
+  it("틀린 열쇠는 401, 60초 안에 10번이면 틀린 열쇠에 429(Retry-After 300), 5분 뒤 다시 401", async () => {
     for (let i = 1; i <= 9; i += 1) {
       const reply = await call(server, "POST", "/api/session", { body: { key: "wrong-key" } });
       expect(reply.status).toBe(401);
@@ -158,11 +158,36 @@ describe("로그인(접근 열쇠)", () => {
     const tenth = await call(server, "POST", "/api/session", { body: { key: "wrong-key" } });
     expect(tenth.status).toBe(429);
     expect(tenth.headers.get("retry-after")).toBe("300");
-    const correctWhileLocked = await call(server, "POST", "/api/session", { body: { key: server.key } });
-    expect(correctWhileLocked.status).toBe(429);
-    expect(correctWhileLocked.cookie).toBeNull();
     server.clock.now += minutes(5) + 1000;
-    expect((await call(server, "POST", "/api/session", { body: { key: server.key } })).status).toBe(200);
+    expect((await call(server, "POST", "/api/session", { body: { key: "wrong-key" } })).status).toBe(401);
+  });
+
+  it("RK-041: 틀린 열쇠로 잠긴 동안에도 맞는 열쇠는 들어오고, 들어오면 틀린 횟수가 0이 된다", async () => {
+    for (let i = 0; i < 10; i += 1) await call(server, "POST", "/api/session", { body: { key: "wrong-key" } });
+    expect((await call(server, "POST", "/api/session", { body: { key: "wrong-key" } })).status).toBe(429);
+    const correct = await call(server, "POST", "/api/session", { body: { key: server.key } });
+    expect(correct.status).toBe(200);
+    expect(correct.cookie).toBeTruthy();
+    const row = await server.db.prepare("SELECT fail_count, locked_until FROM auth_failures WHERE id = 1").first();
+    expect(row).toEqual({ fail_count: 0, locked_until: null });
+    expect((await call(server, "POST", "/api/session", { body: { key: "wrong-key" } })).status).toBe(401);
+  });
+
+  it("잠긴 동안의 틀린 시도는 잠금을 늘리지 않는다(남은 시간이 줄어든다)", async () => {
+    for (let i = 0; i < 10; i += 1) await call(server, "POST", "/api/session", { body: { key: "wrong-key" } });
+    server.clock.now += minutes(2);
+    const later = await call(server, "POST", "/api/session", { body: { key: "wrong-key" } });
+    expect(later.status).toBe(429);
+    expect(later.headers.get("retry-after")).toBe("180");
+  });
+
+  it("잠긴 동안의 틀린 시도는 창고에 쓰지 않는다(퍼부어도 쓰기 한도를 쓰지 않는다)", async () => {
+    for (let i = 0; i < 10; i += 1) await call(server, "POST", "/api/session", { body: { key: "wrong-key" } });
+    const before = await server.db.prepare("SELECT fail_count, window_start, locked_until FROM auth_failures WHERE id = 1").first();
+    server.clock.now += 30_000;
+    const replies = await Promise.all(Array.from({ length: 5 }, () => call(server, "POST", "/api/session", { body: { key: "wrong-key" } })));
+    expect(replies.every((reply) => reply.status === 429)).toBe(true);
+    expect(await server.db.prepare("SELECT fail_count, window_start, locked_until FROM auth_failures WHERE id = 1").first()).toEqual(before);
   });
 
   it("창(60초)이 지나면 틀린 횟수가 다시 1부터다", async () => {

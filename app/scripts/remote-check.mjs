@@ -2,7 +2,7 @@
 //   node app/scripts/remote-check.mjs dev --reset-dev-data          경로·헤더·로그인·잠금·오류 보고를 확인한다
 //   node app/scripts/remote-check.mjs dev --tail --reset-dev-data   같은 검사를 하며 실시간 서버 기록을 받아 열쇠·비밀번호·글이 0건인지 본다
 // 주소·열쇠는 Git 제외 파일(work/deploy/dev.url, dev.PHONE-KEY.txt)에서 읽고 화면에 찍지 않는다.
-// 끝나면 개발용 D1의 이름·잠금 설정과 **모든** 세션을 지운다(cf.mjs sql) — 휴대폰의 로그인도 함께 사라진다.
+// 끝나면 개발용 D1의 이름·잠금 설정·일기·영수증과 **모든** 세션을 지운다(cf.mjs sql) — 휴대폰의 로그인도 함께 사라진다.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { spawn, spawnSync } from "node:child_process";
@@ -125,6 +125,56 @@ check("틀린 비밀번호 422", (await api("POST", "/api/app-lock/unlock", { bo
 check("맞는 비밀번호 200", (await api("POST", "/api/app-lock/unlock", { body: { pin: PIN } })).status === 200);
 check("잠금 끄기", (await api("DELETE", "/api/app-lock")).status === 200);
 
+// 4b. 일기 저장 핵심(TASK-DATA-01) — 실제 Workers 런타임의 시간대 계산, 오늘만 만들기, 영수증, 판 번호, 완료, 지우기와 연쇄 삭제.
+const TZ = { "x-timezone": "Asia/Seoul" };
+const receipt = () => ({ "idempotency-key": crypto.randomUUID() });
+const taxonomy = JSON.parse(readFileSync(path.join(root, "data", "taxonomy", "v2.json"), "utf8"));
+const joyCode = taxonomy.categories.find((category) => category.code === "joy").emotions[0].code;
+/** 원격 D1에 읽기 SQL 한 줄 — 결과 첫 행 */
+function remoteRow(sql) {
+  const run = spawnSync(process.execPath, [path.join(root, "app", "scripts", "cf.mjs"), envName, "sql", sql, "--json"], { cwd: root, encoding: "utf8" });
+  try {
+    return JSON.parse(run.stdout)[0]?.results?.[0] ?? null;
+  } catch {
+    return null;
+  }
+}
+const today = await api("GET", "/api/today", { headers: TZ });
+const date = today.json?.date ?? "";
+check("오늘(서버가 센 일기 날짜)", today.status === 200 && /^\d{4}-\d{2}-\d{2}$/.test(date) && today.json?.dayStartHour === 4, date);
+const east = await api("GET", "/api/today", { headers: { "x-timezone": "Pacific/Kiritimati" } });
+const west = await api("GET", "/api/today", { headers: { "x-timezone": "Etc/GMT+12" } });
+check("실제 런타임이 IANA 시간대로 센다(UTC+14와 UTC-12의 날짜가 다르다)", east.status === 200 && west.status === 200 && east.json?.date !== west.json?.date, `${east.json?.date} / ${west.json?.date}`);
+check("모르는 시간대 400", (await api("GET", "/api/today", { headers: { "x-timezone": "Mars/Phobos" } })).status === 400);
+const diaryBody = {
+  eventText: DIARY,
+  reasonText: `${DIARY} 이유`,
+  categories: [{ categoryCode: "joy", intensity: 6 }],
+  emotions: [{ emotionCode: joyCode }],
+  praises: [{ slot: 1, text: `${DIARY} 칭찬` }],
+  gratitudes: []
+};
+const yesterday = new Date(Date.parse(`${date}T00:00:00Z`) - 86_400_000).toISOString().slice(0, 10);
+check("어제 날짜로 새로 만들기 422", (await api("PUT", `/api/diaries/${yesterday}`, { body: diaryBody, headers: { ...TZ, ...receipt() } })).status === 422);
+const createKey = receipt();
+const created = await api("PUT", `/api/diaries/${date}`, { body: diaryBody, headers: { ...TZ, ...createKey } });
+check("오늘 기록 만들기 201", created.status === 201 && created.json?.revision === 1);
+const replayedCreate = await api("PUT", `/api/diaries/${date}`, { body: diaryBody, headers: { ...TZ, ...createKey } });
+check("같은 영수증 열쇠의 재전송은 첫 응답 그대로", replayedCreate.status === 201 && replayedCreate.headers.get("idempotent-replayed") === "true" && replayedCreate.json?.id === created.json?.id);
+check("다른 탭의 새로 만들기 409", (await api("PUT", `/api/diaries/${date}`, { body: diaryBody, headers: { ...TZ, ...receipt() } })).status === 409);
+check("판 번호 맞춘 고치기 200", (await api("PUT", `/api/diaries/${date}`, { body: { ...diaryBody, revision: 1 }, headers: { ...TZ, ...receipt() } })).json?.revision === 2);
+check("오래된 판 번호 409", (await api("PUT", `/api/diaries/${date}`, { body: { ...diaryBody, revision: 1 }, headers: { ...TZ, ...receipt() } })).status === 409);
+const completed = await api("POST", `/api/diaries/${date}/complete`, { body: { revision: 2 }, headers: { ...TZ, ...receipt() } });
+check("완료 200", completed.status === 200 && completed.json?.status === "completed" && completed.json?.firstCompletedLocalDate === date);
+const readBack = await api("GET", `/api/diaries/${date}`, { headers: TZ });
+check("다시 열면 완료된 기록과 글", readBack.status === 200 && readBack.json?.status === "completed" && readBack.json?.eventText === DIARY);
+check("완료된 기록의 빈 이유로 고치기 422", (await api("PUT", `/api/diaries/${date}`, { body: { ...diaryBody, reasonText: " ", revision: 3 }, headers: { ...TZ, ...receipt() } })).status === 422);
+check("외래 키 검사가 켜져 있다(PRAGMA foreign_keys = 1)", remoteRow("PRAGMA foreign_keys")?.foreign_keys === 1);
+check("기록 하나 지우기 200", (await api("DELETE", `/api/diaries/${date}`, { body: { revision: 3 }, headers: { ...TZ, ...receipt() } })).status === 200);
+check("지운 기록 404", (await api("GET", `/api/diaries/${date}`, { headers: TZ })).status === 404);
+const orphans = remoteRow("SELECT (SELECT count(*) FROM diary_categories) + (SELECT count(*) FROM diary_emotions) + (SELECT count(*) FROM diary_reflections) AS n");
+check("지운 뒤 딸린 행 0(연쇄 삭제)", orphans?.n === 0, `실측: ${orphans?.n}`);
+
 // 5. 개발용 오류 보고
 const report = { kind: "error", name: "TypeError", source: "/assets/remote-check.js", line: 1, col: 1, build: after.json?.build ?? "x", route: "today" };
 check("오류 보고 204(개발용)", (await api("POST", "/api/client-errors", { body: report })).status === 204);
@@ -138,7 +188,7 @@ check("로그아웃한 cookie의 사본 401", (await api("GET", "/api/settings/p
 cookie = null;
 
 // 7. 정리 — 검사가 만든 이름과 세션을 지운다(가짜 데이터)
-const cleanup = spawnSync(process.execPath, [path.join(root, "app", "scripts", "cf.mjs"), envName, "sql", "DELETE FROM owner_settings; DELETE FROM sessions; DELETE FROM client_errors WHERE source = '/assets/remote-check.js';"], { cwd: root, encoding: "utf8" });
+const cleanup = spawnSync(process.execPath, [path.join(root, "app", "scripts", "cf.mjs"), envName, "sql", "DELETE FROM diary_entries; DELETE FROM idempotency_records; DELETE FROM owner_settings; DELETE FROM sessions; DELETE FROM client_errors WHERE source = '/assets/remote-check.js';"], { cwd: root, encoding: "utf8" });
 check("검사 데이터 정리", cleanup.status === 0);
 
 if (tail) {

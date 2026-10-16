@@ -48,7 +48,7 @@ Exit: 개인정보·권한·저장 경계가 설명되고, 구현 stack과 테�
 - 일기·감정 표의 versioned migration(0005부터)
 - 오늘 임시저장·완료·조회·수정(draft CRUD), 하루 1개 unique, revision, idempotency
 - 틀린 열쇠 잠금 고침 — 맞는 열쇠는 잠금과 상관없이 통과하고 틀린 시도만 막는다(감리 보고서 §5.2, RK-041)
-- 여기서 정한다: '쓰던 단계'를 서버에 둘지(RK-043), 하루 기준 시각(`day_start_hour`, 기본 4시 — DATA_MODEL §2·§3.4)을 담는 설정 표를 여기서 만들지 기본값으로 계산하고 바꾸는 화면은 Phase 2로 미룰지
+- 정했다(2026-10-15, D-122): '쓰던 단계'는 서버에(RK-043), 하루 기준 시각(`day_start_hour`, 기본 4시)은 `owner_settings`에 두고 바꾸는 서버 길은 지금·화면은 `direct-journal`에서. 진행은 `tasks/data-foundation/2026-10-15/PLAN.md`
 - 합성 fixture, 권한/날짜/transaction 테스트
 
 Exit: 다른 owner 접근, 중복 날짜, stale overwrite, 하루 기준 시각 경계(F-17 — 저장된 날짜는 나중에 고칠 수 없다)가 자동 테스트에서 차단되고 CI가 초록.
