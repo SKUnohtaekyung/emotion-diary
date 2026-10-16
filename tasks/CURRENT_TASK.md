@@ -4,7 +4,7 @@
 
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
-| TASK-DATA-02 data-control(내 데이터 통제) | **진행 중(2026-10-17 착수)** — 사용자 결정 U-1~U-4(질문 창 한 번), 결정 D-124. 브랜치 `data/control` | 이 파일 아래, 요청·계획은 [data-control/2026-10-17/](data-control/2026-10-17/PLAN.md) |
+| [TASK-DATA-02](archive/TASK-DATA-02.md) data-control(내 데이터 통제) | 끝(2026-10-17) — 결정 D-124, 관문 `data-control` 통과(F-14·F-15 시험, 개발용 환경 restore-drill, export-cpu-measured, CI). 커밋 `eedc783`·`85ac8c9` — PR #43 → PR #42 → `main` `8416734` | [archive/](archive/README.md), 요청·계획은 [data-control/2026-10-17/](data-control/2026-10-17/PLAN.md) |
 | TASK-SLICE-01 first-slice('오늘 한 편' 첫 조각) | **진행 중(2026-10-16 계획 승인)** — 질문 넷(U-1~U-4)의 답과 계획대로 짓는 중. 브랜치 `slice/first-slice`(`main` `47ddd90` 위) | 이 파일 아래, 요청·계획은 [first-slice/2026-10-16/](first-slice/2026-10-16/PLAN.md) |
 | [TASK-DATA-01](archive/TASK-DATA-01.md) data-foundation(저장 핵심) | 끝(2026-10-16) — 결정 D-122, 관문 `data-integrity` 통과(서버 시험, 개발용 환경 원격 검사 50/50, CI 두 OS). 커밋 `89c0017` — PR #38 → PR #37 → `main` `adb3d06`, 마감 정리 PR #39 → `main` `47ddd90` | [archive/](archive/README.md), 요청·계획은 [data-foundation/2026-10-15/](data-foundation/2026-10-15/PLAN.md) |
 | [TASK-CLEANUP-01](archive/TASK-CLEANUP-01.md) 설계도 정리(감리 결정을 공정표·관문·결정 장부에) | 끝(2026-10-15, 커밋 `85c3bb5` — PR #37, 2026-10-16 `main` 병합 `adb3d06`) | [archive/](archive/README.md), 요청·계획은 [cleanup/2026-10-15/](cleanup/2026-10-15/PLAN.md) |
@@ -17,26 +17,6 @@
 | [TASK-DS-REF](TASK-DS-REF.md) 기본 부품 명세를 빠짐없이(D-039·D-097~D-100) | 완료(2026-09-26) — PR #31 병합(`838a0ef`), 이슈 #10~#14 닫음. 남은 일은 `docs/STATUS.md` §4-2로 옮겼다 | 별도 파일(여러 문서가 경로로 인용해 옮기지 않았다). 이 파일의 절(소유 파일 선언)은 뺐다 |
 | [TASK-TAXONOMY](TASK-TAXONOMY.md) · [V1](TASK-TAXONOMY-V1.md) · [PLAN-V2](TASK-TAXONOMY-PLAN-V2.md) | 완료(2026-09-05, D-038·D-040 accepted) | 별도 파일(다른 문서가 경로로 인용해 옮기지 않았다) |
 | TASK-INFRA-01 · ISSUE-26 · ISSUE-27 · CBM · DESIGN · BOOTSTRAP | 완료·보류 기록 | [archive/](archive/README.md) |
-
-# TASK-DATA-02 — data-control(내 데이터 통제): 내보내기·모든 기록 지우기·PC 백업과 다시 넣기·복원 연습
-
-## 상태
-
-`in_progress`(2026-10-17 — 사용자 지시 "그냥 계속 진행해", "한번에 할 수 있는 것들은 한번에 해"). 2026-10-17 PLAN 2-1~2-7 끝(관문 증거를 갖춤, 공정표 `verifying`) — 남은 것은 2-8 커밋·PR·CI. 진행 중 확인은 질문 창 한 번(U-1~U-4)으로 받았고 끝(커밋·PR)까지 묻지 않고 진행한다. **진행·증거는 [PLAN.md](data-control/2026-10-17/PLAN.md) 한 곳이다**(D-118). 화면 작업자(같은 폴더, 아래 소유 파일)는 끝났다 — 동시 작업 줄을 지웠다.
-
-## 범위
-
-- 포함: 관문 `data-control`(F-14·F-15·restore-drill·export-cpu-measured), 내보내기 화면·모든 기록 지우기 화면, PC 백업 도구(`pull`·`restore`·등록 명령 출력), 개발용 환경의 복원 연습
-- 제외: 운영 환경 만들기·작업 스케줄러 실제 등록(`personal-start`, U-3), 분석 결과 내보내기(분석 기능이 없다)
-
-## 소유권
-
-- 메인 소유 파일: `tasks/data-control/**`, `tasks/CURRENT_TASK.md`, `app/shared/**`, `app/worker/**`, `app/test/worker/**`, `app/scripts/**`, `schemas/export.schema.json`, `docs/**`, `harness/**`
-- 화면 작업자 소유 파일: `app/client/src/views/exportData.ts`, `app/client/src/views/deleteAll.ts`, `app/client/src/write/dataApi.ts`, `app/client/src/lib/routes.ts`, `app/client/src/main.ts`, `app/client/src/views/today.ts`, `app/client/src/styles/components.css`, `app/test/client/data-control.test.ts`, `app/test/client/routes.test.ts`
-
-## 인수 조건(시험 목록은 PLAN)
-
-- F-14·F-15 서버·화면 시험 PASS, export-cpu-measured 측정 기록, 개발용 환경 restore-drill PASS, `verify --mode full` PASS, CI 초록.
 
 # TASK-SLICE-01 — first-slice('오늘 한 편' 첫 조각): 평면 화면으로 한 편을 쓰고, 남기고, 다시 연다
 

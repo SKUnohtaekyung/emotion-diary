@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-DATA-02",
-  "phase": "data-control-verifying",
+  "task_id": "TASK-SLICE-01",
+  "phase": "first-slice-phone-check",
   "iteration": 1,
   "status": "in_progress",
-  "current_hypothesis": "Paged export (100 entries per page), full delete with confirm phrase and app-lock PIN, a Bearer-only backup path and a skip-existing re-import tool (tasks/data-control/2026-10-17/PLAN.md decisions A-1..A-7, D-124) pass gate data-control (F-14, F-15, restore-drill on the dev building, export-cpu-measured within the free 10 ms CPU limit).",
+  "current_hypothesis": "first-slice passes its gate once the user runs the phone check (mobile-slice, tasks/first-slice/2026-10-16/PHONE-GUIDE.md); the code, E2E and CI are already in main.",
   "same_hypothesis_failures": 0,
-  "transient_retries": 1,
-  "last_verified_commit": "b74242c",
+  "transient_retries": 0,
+  "last_verified_commit": "8416734",
   "completed_nodes": [
     "bootstrap-audit",
     "taxonomy-v1",
@@ -15,13 +15,13 @@
     "hosting-identity-spike",
     "data-store-spike",
     "app-scaffold",
-    "data-foundation"
+    "data-foundation",
+    "data-control"
   ],
-  "next_node": "data-control",
+  "next_node": "first-slice",
   "blockers": [
-    "Gate data-control evidence is in (server and client tests, fault injection, final review fixes, dev remote check and restore drill on build 20261016183421-06820b6; counts only in docs/STATUS.md section 1). The PR's CI is the last step; the user merges on GitHub (U-4).",
-    "first-slice still waits for the phone check (5-12, tasks/first-slice/2026-10-16/PHONE-GUIDE.md) by the user; PR #42 (records) is open.",
+    "first-slice waits for the phone check (5-12, tasks/first-slice/2026-10-16/PHONE-GUIDE.md) by the user. After that: personal-start (production environment, user confirmation before creating resources).",
     "Scope: single user (D-108). AI writing is decided after 30 days of real use (D-120), evidence analysis after 60 days (D-121)"
   ],
-  "last_checkpoint": "2026-10-17 TASK-DATA-02: PLAN 2-1..2-7 done (export, delete-all, backup path and tools, client screens, 10 injected defects caught, 8 final-review findings fixed, verify full and E2E pass, dev deploy with backup token, remote check and restore drill pass, dev data reset). Next: 2-8 commit, PR stacked on PR #42, Auto-fix. Record: tasks/data-control/2026-10-17/PLAN.md (D-118)."
+  "last_checkpoint": "2026-10-17 TASK-DATA-02 data-control done (PR #43 -> PR #42 -> main 8416734, CI green, gate data-control passed; migration 0008 applied on dev). Archived to tasks/archive/TASK-DATA-02.md. Remaining in Phase 1: first-slice phone check."
 }
