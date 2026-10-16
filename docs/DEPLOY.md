@@ -67,5 +67,18 @@
 - 사용자 확인: 실제 일기가 들어가는 건물이다. 이름·요금(0)·바뀌는 것·지우는 법을 다시 보인다.
 - `cf.mjs`의 운영 막음(`ALLOW_PROD=1`)을 그 작업에서만 풀고, 개발용과 **다른** 비밀값을 만든다(`make-secrets.mjs`에 `prod`를 더한다). 운영 열쇠를 전하는 방법은 그때 사용자와 정한다(STATUS §4).
 - 운영 묶음에 개발용 코드가 없는지는 `npm run build`가 매번 검사한다(ARCHITECTURE §11.2). 올린 뒤 `remote-check`의 운영판(오류 보고 경로 404, 상태 칸 없음, 끝에 데이터를 지우는 정리 없음 — 실제 일기가 있다)을 만든다.
-- 백업(D-109): Time Travel 7일 + 본인 PC 내려받기(하루 1번, 30일 보관) — 도구는 `data-foundation` 뒤.
+- 백업(D-109): Time Travel 7일 + 본인 PC 내려받기(하루 1번, 30일 보관) — 도구는 §9(2026-10-17 `data-control`). 운영 환경을 만들 때 `make-secrets.mjs`에 `prod`를 더하며 백업 토큰도 만들고, `backup.mjs schedule-command prod`가 출력한 명령을 본인이 실행한다(D-124 — 등록은 그때).
+
+## 9. PC 백업과 다시 넣기(D-109·D-124)
+
+| 단계 | 명령 | 결과 |
+| --- | --- | --- |
+| 토큰 만들기 | `node app/scripts/make-secrets.mjs dev backup` | 비밀값 파일에 `BACKUP_TOKEN_HASH`(SHA-256)를 더하고 토큰을 `work/deploy/dev.BACKUP-TOKEN.txt`(Git 제외)에만 쓴다. 다른 비밀값은 그대로 |
+| 올리기 | `node app/scripts/cf.mjs dev secrets BACKUP_TOKEN_HASH` 또는 `cf.mjs dev deploy` | Worker가 백업 경로를 연다(secret이 없으면 404) |
+| 받기(매일) | `node app/scripts/backup.mjs pull dev [--dir <폴더>]` | 조각을 이어 받아 `<홈>/emotion-diary-backup/dev/emotion-diary-YYYY-MM-DD.json`, 30일 지난 파일 삭제. 경로 이름에 OneDrive·Dropbox·Google Drive·iCloud가 든 폴더는 거부(이름으로만 본다) |
+| 매일 실행 등록 | `node app/scripts/backup.mjs schedule-command dev` | 작업 스케줄러 등록 명령(`schtasks /Create …`)을 **출력만** 한다 — 명령 프롬프트용 줄과 PowerShell용 줄(`schtasks --% …` — PowerShell 5.1은 cmd식 따옴표를 달리 읽어 `/TR` 값이 깨진다). 실행은 본인이 |
+| 다시 넣기 | `node app/scripts/backup.mjs restore dev <파일> [--dry-run]` | 300KB·100편 조각으로 넣는다(조각의 Worker 안 계산 — STATUS §1). 이미 있는 날짜는 건너뛰고 설정은 행이 없을 때만 |
+| 복원 연습 | `node app/scripts/drill.mjs dev --reset-dev-data` | 합성 3년치 → 조각 내보내기 → 백업 → 모두 지우기 → 다시 넣기 → 같은지 → 로그아웃 cookie 401 → 정리. D1 쓰기 약 4만~5만 행이라 하루에 두 번 돌리지 않는다 |
+
+**Time Travel로 되돌린 뒤**에는 세션 표가 그 시점으로 돌아가 로그아웃한 cookie가 되살아날 수 있다 — 되돌린 직후 `node app/scripts/cf.mjs <env> sql "DELETE FROM sessions"`로 세션을 비우고(모든 기기가 다시 로그인한다) 그 뒤에 쓴 기록을 `backup.mjs restore`로 채운다(감리 N-7).
 - EVAL_PLAN §12 출시 증거 묶음과 `deployment-boundary-review`.

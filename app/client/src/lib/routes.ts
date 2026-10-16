@@ -4,7 +4,17 @@
 
 import { isIsoDate } from "../../../shared/diary";
 
-export const ROUTES = ["auth", "auth/name", "welcome", "today", "settings/lock", "settings/pin"] as const;
+export const ROUTES = [
+  "auth",
+  "auth/name",
+  "welcome",
+  "today",
+  "settings/lock",
+  "settings/pin",
+  "settings/export",
+  "settings/delete",
+  "settings/deleted"
+] as const;
 export type RouteName = (typeof ROUTES)[number];
 
 /** 날짜 값을 받는 화면. 화면 표의 이름은 `write/:date`처럼 적는다. */
@@ -12,7 +22,8 @@ export const DATE_ROUTES = ["write", "record", "done"] as const;
 export type DateRouteName = `${(typeof DATE_ROUTES)[number]}/:date`;
 
 /** 로그인이 끝난 뒤 돌아가도 되는 화면. 열쇠·이름·반가워요는 지나가면 사라지는 화면이라 뺀다. */
-const RETURNABLE: readonly string[] = ["today", "settings/lock", "settings/pin"];
+/** 삭제 완료(settings/deleted)는 한 번 보고 지나가는 화면이라 뺀다. */
+const RETURNABLE: readonly string[] = ["today", "settings/lock", "settings/pin", "settings/export", "settings/delete"];
 
 export interface ParsedRoute {
   /** 화면 주소(query 없음, 값 포함 — 예: write/2026-10-16). 비었거나 모르는 이름이면 known이 거짓 */
@@ -70,7 +81,8 @@ export function guardRoute(state: GuardState, route: ParsedRoute): GuardResult {
   }
   if (route.path === "auth") return { redirect: state.hasName ? "#/today" : "#/auth/name", returnTo: null };
   if (!state.hasName) {
-    return route.path === "auth/name" ? STAY : { redirect: "#/auth/name", returnTo: null };
+    // 모든 기록 지우기가 끝나면 이름도 지워져 이름이 없는 상태로 삭제 완료 화면이 열린다(UX_SPEC §13) — 그 화면만 예외다
+    return route.path === "auth/name" || route.path === "settings/deleted" ? STAY : { redirect: "#/auth/name", returnTo: null };
   }
   if (route.path === "auth/name" || !route.known) return { redirect: "#/today", returnTo: null };
   return STAY;

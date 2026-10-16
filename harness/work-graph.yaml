@@ -164,11 +164,13 @@ nodes:
     gate: first-slice
 
   - id: data-control
-    status: ready
+    status: verifying
+    # 2026-10-17 TASK-DATA-02 착수(D-124, 사용자 결정 U-1~U-4). 진행·증거는 tasks/data-control/2026-10-17/PLAN.md 한 곳(D-118).
+    # 2026-10-17 verifying: 관문 증거(F-14·F-15 서버·화면 시험, 개발용 환경 restore-drill, export-cpu-measured)를 갖췄다 — PR의 CI 초록이면 done.
     depends_on: [data-foundation]
     # 2026-10-15 새 노드(D-116): 내 데이터 통제 — 내보내기(공유 창, S-05), 전체 삭제(부를 이름·앱 잠금까지 — D-112 ⑩), 본인 PC 백업과
     # 다시 넣는 도구(D-109), 복원 연습(복원 뒤 세션 기록 비우기 — 감리 N-7), 합성 3년치로 내보내기 CPU 실측(무료 10ms — 감리 N-8).
-    # 여기서 정한다: 부를 이름을 내보내기에 넣을지. 근거: 감리 REPORT §3.3 3단계, DATA_MODEL §8.
+    # 여기서 정한다: 부를 이름을 내보내기에 넣을지 → 넣는다(U-2, D-124). 근거: 감리 REPORT §3.3 3단계, DATA_MODEL §8.
     owns:
       - export and hard delete
       - PC backup and re-import tool

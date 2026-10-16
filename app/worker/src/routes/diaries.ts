@@ -27,8 +27,9 @@ import { type Ctx, iso, type Session } from "../context";
 import { fail, json } from "../http";
 import { type Operation, type Receipt, receiptFor, receiptStatements, replay } from "../idempotency";
 import { readJsonText } from "../request";
+import { liveSession, sessionIsLive } from "../session";
 
-interface EntryRow {
+export interface EntryRow {
   id: string;
   entry_date: string;
   timezone: string;
@@ -46,12 +47,12 @@ interface EntryRow {
   updated_at: string;
 }
 
-interface CategoryRow {
+export interface CategoryRow {
   category_code: string;
   intensity: number | null;
 }
 
-interface EmotionRow {
+export interface EmotionRow {
   category_code: string;
   emotion_code: string;
   label_snapshot: string;
@@ -59,13 +60,13 @@ interface EmotionRow {
   intensity_custom: number;
 }
 
-interface ReflectionRow {
+export interface ReflectionRow {
   kind: "praise" | "gratitude";
   slot: number;
   text: string;
 }
 
-const ENTRY_COLUMNS = `id, entry_date, timezone, status, revision, taxonomy_version, event_text, reason_text, resume_step, resume_category,
+export const ENTRY_COLUMNS = `id, entry_date, timezone, status, revision, taxonomy_version, event_text, reason_text, resume_step, resume_category,
   first_completed_at, first_completed_local_date, completed_at, created_at, updated_at`;
 
 /** 이번 요청이 부모 행을 바꿨는가 — 딸린 행 문장과 영수증의 조건. ?1 = 일기 번호, ?2 = 쓰기 표. */
@@ -100,7 +101,16 @@ async function loadEntry(ctx: Ctx, owner: string, date: string): Promise<DiaryEn
   ]);
   const row = (entries?.results as EntryRow[] | undefined)?.[0];
   if (!row) return null;
-  const reflectionRows = (reflections?.results ?? []) as ReflectionRow[];
+  return entryView(
+    row,
+    (categories?.results ?? []) as CategoryRow[],
+    (emotions?.results ?? []) as EmotionRow[],
+    (reflections?.results ?? []) as ReflectionRow[]
+  );
+}
+
+/** 창고의 행들 → 응답·내보내기의 기록 하나(diary-entry-v2). 딸린 행은 표시 순서대로 받는다. */
+export function entryView(row: EntryRow, categoryRows: CategoryRow[], emotionRows: EmotionRow[], reflectionRows: ReflectionRow[]): DiaryEntryView {
   return {
     schemaVersion: "diary-entry-v2",
     id: row.id,
@@ -111,8 +121,8 @@ async function loadEntry(ctx: Ctx, owner: string, date: string): Promise<DiaryEn
     taxonomyVersion: row.taxonomy_version,
     eventText: row.event_text,
     reasonText: row.reason_text,
-    categories: ((categories?.results ?? []) as CategoryRow[]).map((item) => ({ categoryCode: item.category_code, intensity: item.intensity })),
-    emotions: ((emotions?.results ?? []) as EmotionRow[]).map((item) => ({
+    categories: categoryRows.map((item) => ({ categoryCode: item.category_code, intensity: item.intensity })),
+    emotions: emotionRows.map((item) => ({
       categoryCode: item.category_code,
       emotionCode: item.emotion_code,
       labelSnapshot: item.label_snapshot,
@@ -333,14 +343,19 @@ export async function saveDiary(ctx: Ctx): Promise<Response> {
         .prepare(
           `INSERT INTO diary_entries (id, owner_key, entry_date, timezone, status, event_text, reason_text, revision, taxonomy_version,
                                       resume_step, resume_category, write_token, created_at, updated_at)
-           VALUES (?1, ?2, ?3, ?4, 'draft', ?5, ?6, 1, ?7, ?8, ?9, ?10, ?11, ?11)
+           SELECT ?1, ?2, ?3, ?4, 'draft', ?5, ?6, 1, ?7, ?8, ?9, ?10, ?11, ?11 WHERE ${liveSession(12, 13)}
            ON CONFLICT (owner_key, entry_date) DO NOTHING RETURNING id`
         )
-        .bind(id, session.owner, date, timeZone, diary.eventText, diary.reasonText, TAXONOMY_VERSION, resumeStep, resumeCategory, token, now),
+        .bind(id, session.owner, date, timeZone, diary.eventText, diary.reasonText, TAXONOMY_VERSION, resumeStep, resumeCategory, token, now, session.id, session.dataEpoch),
       ...childStatements(db, id, token, diary, false),
       ...receiptStatements(ctx, session, receipt, { status: 201, body }, { sql: "EXISTS (SELECT 1 FROM diary_entries WHERE id = ?9 AND write_token = ?10)", params: [id, token] })
     ]);
-    if (!results[0]?.results?.length) return afterLostRace(ctx, session, receipt, date); // 같은 날을 동시에 만든 다른 요청이 이겼다(F-06)
+    if (!results[0]?.results?.length) {
+      // 모든 기록 지우기가 이 요청을 받은 뒤에 끝났다 — 기록을 되살리지 않았다(liveSession, 마이그레이션 0008). 있는 기록을 고치는
+      // UPDATE는 지워진 행에 닿지 않아 따로 걸지 않는다 — 행을 새로 만드는 쓰기만 막으면 된다
+      if (!(await sessionIsLive(ctx, session))) return fail(401, "unauthorized");
+      return afterLostRace(ctx, session, receipt, date); // 같은 날을 동시에 만든 다른 요청이 이겼다(F-06)
+    }
     return json(201, body);
   }
 
