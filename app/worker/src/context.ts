@@ -13,6 +13,8 @@ export interface Bindings {
   ACCESS_KEY_SALT?: string;
   SESSION_SECRET?: string;
   APP_LOCK_SECRET?: string;
+  /** PC 백업 토큰의 SHA-256 16진수(선택 — 없으면 백업 경로가 404, D-109). 토큰 자체는 PC의 Git 제외 파일에만 있다 */
+  BACKUP_TOKEN_HASH?: string;
 }
 
 export interface Secrets {

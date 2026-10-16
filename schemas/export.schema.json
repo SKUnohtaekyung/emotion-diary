@@ -4,12 +4,13 @@
   "title": "Emotion diary export",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "exportedAt", "timezone", "dayStartHour", "diaries"],
+  "required": ["schemaVersion", "exportedAt", "timezone", "dayStartHour", "displayName", "diaries"],
   "properties": {
     "schemaVersion": { "const": "emotion-diary-export-v1" },
     "exportedAt": { "type": "string", "format": "date-time" },
     "timezone": { "type": "string", "minLength": 1, "maxLength": 64 },
     "dayStartHour": { "description": "owner의 하루 기준 시각(DATA_MODEL §3.4 day_start_hour, D-081 ②). 기록 날짜·streak·통계 기간의 하루 경계다.", "type": "integer", "minimum": 0, "maximum": 6 },
+    "displayName": { "description": "부를 이름(DATA_MODEL §3.4, 2026-10-17 사용자 결정 — 파일에 넣는다). 정하지 않았으면 null", "type": ["string", "null"], "minLength": 1, "maxLength": 12 },
     "diaries": {
       "type": "array",
       "items": { "$ref": "diary-entry.schema.json" }

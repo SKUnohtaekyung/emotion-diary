@@ -1,12 +1,12 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-SLICE-01",
-  "phase": "first-slice-building",
+  "task_id": "TASK-DATA-02",
+  "phase": "data-control-verifying",
   "iteration": 1,
   "status": "in_progress",
-  "current_hypothesis": "With the four user answers U-1..U-4 (tasks/first-slice/2026-10-16/REQUESTS.md) and the writing-flow state design in PLAN §3, plain screens on top of the existing diary API (event, feelings, details, intensity, reason, praise, gratitude, review, done; completed-entry edit; draft delete; past drafts) with one-request-at-a-time autosave, reused idempotency keys and a device copy of unsent text kept only until the server acknowledges it pass gate first-slice (F-03, F-04, F-05, F-08, F-24, e2e-reload-restore with Playwright WebKit and Chromium, mobile-slice on the iPhone home-screen app).",
+  "current_hypothesis": "Paged export (100 entries per page), full delete with confirm phrase and app-lock PIN, a Bearer-only backup path and a skip-existing re-import tool (tasks/data-control/2026-10-17/PLAN.md decisions A-1..A-7, D-124) pass gate data-control (F-14, F-15, restore-drill on the dev building, export-cpu-measured within the free 10 ms CPU limit).",
   "same_hypothesis_failures": 0,
-  "transient_retries": 0,
+  "transient_retries": 1,
   "last_verified_commit": "b74242c",
   "completed_nodes": [
     "bootstrap-audit",
@@ -17,10 +17,11 @@
     "app-scaffold",
     "data-foundation"
   ],
-  "next_node": "first-slice",
+  "next_node": "data-control",
   "blockers": [
-    "PR #40 and #41 merged into main b74242c with CI green (5-13). The dev building runs build 20261016172442-b74242c (remote check passed, dev data reset, 2026-10-17; counts only in docs/STATUS.md section 1). The phone check (5-12, tasks/first-slice/2026-10-16/PHONE-GUIDE.md) needs the user. data-control is also ready (D-116) and is not planned yet",
+    "Gate data-control evidence is in (server and client tests, fault injection, final review fixes, dev remote check and restore drill on build 20261016183421-06820b6; counts only in docs/STATUS.md section 1). The PR's CI is the last step; the user merges on GitHub (U-4).",
+    "first-slice still waits for the phone check (5-12, tasks/first-slice/2026-10-16/PHONE-GUIDE.md) by the user; PR #42 (records) is open.",
     "Scope: single user (D-108). AI writing is decided after 30 days of real use (D-120), evidence analysis after 60 days (D-121)"
   ],
-  "last_checkpoint": "2026-10-17 TASK-SLICE-01: PLAN 5-1..5-11 and 5-13 done (PR #40 and #41 merged, main b74242c, CI green, dev building redeployed with the review fixes and remote check passed). Only 5-12, the phone check, remains for gate first-slice. Record: tasks/first-slice/2026-10-16/PLAN.md (D-118)."
+  "last_checkpoint": "2026-10-17 TASK-DATA-02: PLAN 2-1..2-7 done (export, delete-all, backup path and tools, client screens, 10 injected defects caught, 8 final-review findings fixed, verify full and E2E pass, dev deploy with backup token, remote check and restore drill pass, dev data reset). Next: 2-8 commit, PR stacked on PR #42, Auto-fix. Record: tasks/data-control/2026-10-17/PLAN.md (D-118)."
 }

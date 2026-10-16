@@ -80,7 +80,7 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 | Evidence 수집 → Store | 악성 지시, 잘못된 출처, 권리 불명 | 인간 승인, 해시, 상태, provenance, prompt injection 격리 |
 | 앱 → 사용자 | 진단성 주장, 무근거 해석, 위기 혼합 | Gate, Verifier, Safety Validator, 안전 대체 응답 |
 
-서버 접근 토큰 해시와 그 해시에 섞는 HMAC salt, 세션 서명 비밀값, 앱 잠금 비밀번호 해시에 섞는 비밀값(§6), worker secret은 Cloudflare Workers secret(`wrangler secret`)으로, PC worker의 API URL·worker secret은 본인 PC의 `.env`(Git 제외)로 관리한다. 클라이언트 번들, 저장소, 로그, `wrangler.toml`에 넣지 않는다. Claude 구독 자격 증명은 Claude Code가 관리하는 저장소에만 있으며 worker가 읽거나 복사하지 않는다.
+서버 접근 토큰 해시와 그 해시에 섞는 HMAC salt, 세션 서명 비밀값, 앱 잠금 비밀번호 해시에 섞는 비밀값(§6), PC 백업 토큰의 SHA-256(`BACKUP_TOKEN_HASH`, 선택 — D-124), worker secret은 Cloudflare Workers secret(`wrangler secret`)으로, PC 백업 토큰 자체는 본인 PC의 Git 제외 파일(`work/deploy/<env>.BACKUP-TOKEN.txt`)로, PC worker의 API URL·worker secret은 본인 PC의 `.env`(Git 제외)로 관리한다. 클라이언트 번들, 저장소, 로그, `wrangler.toml`에 넣지 않는다. Claude 구독 자격 증명은 Claude Code가 관리하는 저장소에만 있으며 worker가 읽거나 복사하지 않는다.
 
 ## 4. 구성요소 계약
 
@@ -158,13 +158,14 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 | `PUT /api/diaries/:date` | 임시저장(통째로 — 새로 만들기 201 / 고치기 200). 완료된 기록은 완료 조건을 다시 검사한다(D-023) | revision + `Idempotency-Key` + `X-Timezone`, 새로 만들기는 서버가 센 오늘만(422 `not_today`), 본문 160,768바이트(DATA_MODEL §2), 모르는 칸 400 |
 | `POST /api/diaries/:date/complete` | 완료조건 검사 후 상태 전환(본문 `{revision}`) | 조건부 UPDATE 하나 + `Idempotency-Key`, 모자라면 422와 빠진 단계 목록 |
 | `DELETE /api/diaries/:date` | 영구 삭제(기록 하나 — 화면은 2단계 확인). 확인 토큰은 **지금 판 번호**(본문 `{revision}` — 본 그 판만 지운다, D-122) | CSRF + 판 번호 + `Idempotency-Key` + cascade(부모 먼저) |
-| `DELETE /api/diaries`(전체) | 확인 문구를 받은 뒤 모든 기록과 부를 이름·앱 잠금·알림·하루 기준 시각 설정을 영구 삭제(D-112 ⑩ — 접근 열쇠와 세션은 남는다) | CSRF + 확인 토큰 + **본인 확인**(앱 잠금을 켠 경우 비밀번호를 한 번 더 — D-112 ⑤) + cascade |
+| `DELETE /api/diaries`(전체) | 확인 문구(`{ confirm: "모든 기록 삭제", pin? }`)를 받은 뒤 모든 기록과 영수증, 부를 이름·앱 잠금·하루 기준 시각 설정, 다른 기기 세션을 batch 하나로 영구 삭제(D-112 ⑩ — 접근 열쇠와 이 기기 세션은 남는다, D-124) | CSRF + 확인 토큰 + **본인 확인**(앱 잠금을 켠 경우 비밀번호를 한 번 더 — D-112 ⑤) + cascade |
 | `GET /api/dashboard?range=` | 완료 기록의 결정론적 집계 | 범위 제한 |
 | `POST /api/journal-assist` | 현재 턴을 `ai_jobs`에 등록하고 job ID 반환 | full chat 비저장, payload 최소화 |
 | `GET /api/ai-jobs/:id` | job 상태/결과 조회(owner 전용) | timeout 시 fallback 안내 |
 | `GET /api/ai-jobs/next`, `POST /api/ai-jobs/:id/result` | PC worker 전용 lease/결과 반환 | worker secret, lease 만료, 결과 schema 재검증 |
 | `POST /api/analyses` | snapshot 분석 job 등록 | version, rate/cost limit |
-| `GET /api/export` | versioned JSON export. 화면 코드가 받아 공유 창으로 넘긴다(§4.1) | owner + `Cache-Control: no-store`, 주소에 인증 정보 없음(1회용 내려받기 주소를 만들지 않는다) |
+| `GET /api/export[?after=YYYY-MM-DD]` | versioned JSON export를 100편씩 조각으로(`next`로 이어 받는다 — D-124). 화면 코드가 이어 붙여 파일로 만들어 공유 창으로 넘긴다(§4.1) | owner + `Cache-Control: no-store` + `X-Timezone`, 주소에 인증 정보 없음(1회용 내려받기 주소를 만들지 않는다) |
+| `GET /api/backup/export[?after=]`, `POST /api/backup/import` | 본인 PC 백업 도구 전용 — 내보내기 조각 받기 / 백업 파일을 조각으로 다시 넣기(이미 있는 날짜는 건너뜀, D-109·D-124) | cookie·CSRF가 아니라 `Authorization: Bearer`(서버는 SHA-256 해시와 상수 시간 대조, secret이 없으면 404), 다시 넣기 조각 ≤200편·≤1MiB, 조각 전체를 먼저 검사 |
 | `GET/PUT /api/settings/reminder` | 알림 설정(`dashboard-reminder`가 만든다) | timezone validation |
 | `GET/PUT /api/settings/day-start` | 하루 기준 시각(D-081 — `owner_settings.day_start_hour`, D-122) | 0~6 정수, 바꿔도 저장된 날짜는 다시 세지 않는다 |
 | `GET/PUT /api/settings/profile` | 부를 이름(D-112 ④, 12자) | 길이·빈칸 검사 |

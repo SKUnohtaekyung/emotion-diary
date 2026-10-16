@@ -28,7 +28,7 @@ import { fail, json } from "../http";
 import { type Operation, type Receipt, receiptFor, receiptStatements, replay } from "../idempotency";
 import { readJsonText } from "../request";
 
-interface EntryRow {
+export interface EntryRow {
   id: string;
   entry_date: string;
   timezone: string;
@@ -46,12 +46,12 @@ interface EntryRow {
   updated_at: string;
 }
 
-interface CategoryRow {
+export interface CategoryRow {
   category_code: string;
   intensity: number | null;
 }
 
-interface EmotionRow {
+export interface EmotionRow {
   category_code: string;
   emotion_code: string;
   label_snapshot: string;
@@ -59,13 +59,13 @@ interface EmotionRow {
   intensity_custom: number;
 }
 
-interface ReflectionRow {
+export interface ReflectionRow {
   kind: "praise" | "gratitude";
   slot: number;
   text: string;
 }
 
-const ENTRY_COLUMNS = `id, entry_date, timezone, status, revision, taxonomy_version, event_text, reason_text, resume_step, resume_category,
+export const ENTRY_COLUMNS = `id, entry_date, timezone, status, revision, taxonomy_version, event_text, reason_text, resume_step, resume_category,
   first_completed_at, first_completed_local_date, completed_at, created_at, updated_at`;
 
 /** 이번 요청이 부모 행을 바꿨는가 — 딸린 행 문장과 영수증의 조건. ?1 = 일기 번호, ?2 = 쓰기 표. */
@@ -100,7 +100,16 @@ async function loadEntry(ctx: Ctx, owner: string, date: string): Promise<DiaryEn
   ]);
   const row = (entries?.results as EntryRow[] | undefined)?.[0];
   if (!row) return null;
-  const reflectionRows = (reflections?.results ?? []) as ReflectionRow[];
+  return entryView(
+    row,
+    (categories?.results ?? []) as CategoryRow[],
+    (emotions?.results ?? []) as EmotionRow[],
+    (reflections?.results ?? []) as ReflectionRow[]
+  );
+}
+
+/** 창고의 행들 → 응답·내보내기의 기록 하나(diary-entry-v2). 딸린 행은 표시 순서대로 받는다. */
+export function entryView(row: EntryRow, categoryRows: CategoryRow[], emotionRows: EmotionRow[], reflectionRows: ReflectionRow[]): DiaryEntryView {
   return {
     schemaVersion: "diary-entry-v2",
     id: row.id,
@@ -111,8 +120,8 @@ async function loadEntry(ctx: Ctx, owner: string, date: string): Promise<DiaryEn
     taxonomyVersion: row.taxonomy_version,
     eventText: row.event_text,
     reasonText: row.reason_text,
-    categories: ((categories?.results ?? []) as CategoryRow[]).map((item) => ({ categoryCode: item.category_code, intensity: item.intensity })),
-    emotions: ((emotions?.results ?? []) as EmotionRow[]).map((item) => ({
+    categories: categoryRows.map((item) => ({ categoryCode: item.category_code, intensity: item.intensity })),
+    emotions: emotionRows.map((item) => ({
       categoryCode: item.category_code,
       emotionCode: item.emotion_code,
       labelSnapshot: item.label_snapshot,

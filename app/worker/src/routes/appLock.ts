@@ -16,7 +16,7 @@ const retryAfterSeconds = (until: number, now: number) => Math.max(1, Math.ceil(
  * 대조하기 전에 시도 한 번을 먼저 예약한다(조건부 UPDATE … RETURNING) — 요청을 한꺼번에 여럿 보내도
  * 쉬기 전까지 다섯 번 넘게 맞혀 볼 수 없다. 화면을 새로 열거나 요청을 직접 보내도 같은 카운터다(F-23).
  */
-async function verifyPin(ctx: Ctx, owner: string, pin: string): Promise<Response | null> {
+export async function verifyPin(ctx: Ctx, owner: string, pin: string): Promise<Response | null> {
   const db = ctx.env.DB;
   const now = ctx.now;
   const reserved = await db

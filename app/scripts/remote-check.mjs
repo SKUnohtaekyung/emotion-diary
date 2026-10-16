@@ -175,6 +175,16 @@ check("지운 기록 404", (await api("GET", `/api/diaries/${date}`, { headers: 
 const orphans = remoteRow("SELECT (SELECT count(*) FROM diary_categories) + (SELECT count(*) FROM diary_emotions) + (SELECT count(*) FROM diary_reflections) AS n");
 check("지운 뒤 딸린 행 0(연쇄 삭제)", orphans?.n === 0, `실측: ${orphans?.n}`);
 
+// 4c. 내 데이터 통제(TASK-DATA-02) — 복원 왕복·3년치는 app/scripts/drill.mjs가 따로 본다
+const exported = await api("GET", "/api/export", { headers: TZ });
+check(
+  "내보내기 200·no-store·형식(조각)",
+  exported.status === 200 && exported.headers.get("cache-control") === "no-store" && exported.json?.schemaVersion === "emotion-diary-export-v1" && "next" in (exported.json ?? {})
+);
+check("확인 문구가 다른 모든 기록 지우기 422", (await api("DELETE", "/api/diaries", { body: { confirm: "모든 기록" } })).status === 422);
+check("백업 경로는 토큰 없이 401(로그인 cookie로도 못 들어감)", (await api("GET", "/api/backup/export", { headers: TZ })).status === 401);
+check("백업 경로는 틀린 토큰도 401", (await api("GET", "/api/backup/export", { useCookie: false, headers: { ...TZ, authorization: `Bearer ${"x".repeat(43)}` } })).status === 401);
+
 // 5. 개발용 오류 보고
 const report = { kind: "error", name: "TypeError", source: "/assets/remote-check.js", line: 1, col: 1, build: after.json?.build ?? "x", route: "today" };
 check("오류 보고 204(개발용)", (await api("POST", "/api/client-errors", { body: report })).status === 204);
@@ -194,8 +204,17 @@ check("검사 데이터 정리", cleanup.status === 0);
 if (tail) {
   await sleep(8_000);
   tail.kill();
-  const hits = [key, PIN, NAME, DIARY].filter((secret) => tailOutput.includes(secret));
-  check("실시간 서버 기록에 열쇠·비밀번호·이름·글 0건", hits.length === 0, `기록 ${tailOutput.length}자, 걸린 것 ${hits.length}개`);
+  // 네 자리 비밀번호는 15만 자 기록의 요청 번호·시각 같은 숫자열과 우연히 겹친다(2026-10-17 한 번) — 앞뒤가 영숫자가 아닌 독립된 값만 센다.
+  // 걸린 것은 값이 아니라 이름으로 알린다.
+  const standalone = (value) => new RegExp(`(?<![0-9A-Za-z])${value}(?![0-9A-Za-z])`).test(tailOutput);
+  const hits = [
+    ["열쇠", tailOutput.includes(key)],
+    ["비밀번호", standalone(PIN)],
+    ["이름", tailOutput.includes(NAME)],
+    ["글", tailOutput.includes(DIARY)]
+  ].filter(([, hit]) => hit).map(([label]) => label);
+  const embedded = tailOutput.split(PIN).length - 1;
+  check("실시간 서버 기록에 열쇠·비밀번호·이름·글 0건", hits.length === 0, `기록 ${tailOutput.length}자, 걸린 것 ${hits.length ? hits.join("·") : "없음"}(비밀번호 숫자열이 다른 값 안에 ${embedded}번)`);
   check("실시간 서버 기록을 실제로 받았다(검사가 헛돌지 않게)", tailOutput.includes("/api/session"));
 }
 
