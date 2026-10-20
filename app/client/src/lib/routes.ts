@@ -13,7 +13,8 @@ export const ROUTES = [
   "settings/pin",
   "settings/export",
   "settings/delete",
-  "settings/deleted"
+  "settings/deleted",
+  "help"
 ] as const;
 export type RouteName = (typeof ROUTES)[number];
 
@@ -22,8 +23,8 @@ export const DATE_ROUTES = ["write", "record", "done"] as const;
 export type DateRouteName = `${(typeof DATE_ROUTES)[number]}/:date`;
 
 /** 로그인이 끝난 뒤 돌아가도 되는 화면. 열쇠·이름·반가워요는 지나가면 사라지는 화면이라 뺀다. */
-/** 삭제 완료(settings/deleted)는 한 번 보고 지나가는 화면이라 뺀다. */
-const RETURNABLE: readonly string[] = ["today", "settings/lock", "settings/pin", "settings/export", "settings/delete"];
+/** 삭제 완료(settings/deleted)는 한 번 보고 지나가는 화면이라 뺀다. 도움이 필요할 때(help)는 로그인 뒤 화면이라 넣는다. */
+const RETURNABLE: readonly string[] = ["today", "settings/lock", "settings/pin", "settings/export", "settings/delete", "help"];
 
 export interface ParsedRoute {
   /** 화면 주소(query 없음, 값 포함 — 예: write/2026-10-16). 비었거나 모르는 이름이면 known이 거짓 */

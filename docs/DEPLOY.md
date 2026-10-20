@@ -11,11 +11,13 @@
 - **새로 만들거나 지우는 일은 하기 직전에 사용자에게 다시 묻는다** — 무료여도 그렇다(사용자 규칙 2026-09-02). 무엇을 만드는지·요금·바뀌는 것·되돌리는 법을 먼저 말한다.
 - **개발용 건물에는 가짜 데이터만** 넣는다. 실제 일기·실제 이름은 운영 건물에만 들어간다.
 
-| 환경 | Worker | D1 | 쓰는 것 | 상태(2026-10-14) |
+| 환경 | Worker | D1 | 쓰는 것 | 상태 |
 | --- | --- | --- | --- | --- |
 | local | (이 PC의 `wrangler dev`) | `emotion-diary-local`(이 PC의 `.wrangler/`) | 개발 | `npm run dev` |
 | dev | `emotion-diary-dev` | `emotion-diary-dev`(APAC) | 개발용 건물 — 가짜 데이터, 화면 오류 보고·상태 칸 켜짐, 홈 화면 이름 '감정일기 개발' | 2026-10-14 만들었다(TASK-MOBILE T3, 사용자 확인 U-2) |
-| prod | `emotion-diary-prod` | `emotion-diary-prod` | 운영 — 실제 일기 | **아직 만들지 않는다**(제한 MVP 출시 전, §8) |
+| prod | `emotion-diary-prod` | `emotion-diary-prod`(APAC) | 운영 — 실제 일기(본인 한 사람, D-108) | 2026-10-20 만들었다(TASK-PERSONAL-01, 사용자 승인 U-1) — §8 |
+
+**무료 한도는 계정 단위다** — 개발용과 운영이 Workers 요청 하루 10만·D1 쓰기 하루 10만 행을 나눠 쓴다(`harness/runtime-profile.json`). 운영을 쓰기 시작한 뒤에는 개발용에서 쓰기가 많은 명령(`drill.mjs` 약 4만~5만 행)을 돌린 날 운영의 여유가 그만큼 준다 — 하루 한 번을 넘기지 않는다.
 
 ## 2. 준비
 
@@ -60,14 +62,30 @@
 - **데이터 되돌리기**: D1 Time Travel(7일, D-109, DATA_MODEL §8)로 시점을 되돌린다. 운영 데이터에는 실습한 절차만 쓴다.
 - **개발용 건물 지우기**(되돌릴 수 없다 — 사용자 확인 뒤): `CONFIRM_DESTROY=emotion-diary-dev node app/scripts/cf.mjs dev destroy`(Worker와 D1을 지운다). Git 제외 파일 `work/deploy/dev.*`도 지운다.
 
-## 8. 운영을 만들 때 더할 것(제한 MVP 출시 전)
+## 8. 운영(본인 사용 시작 전 — personal-start, D-117)
 
-이 절은 계획이다 — 아직 하지 않았다.
+2026-10-20 TASK-PERSONAL-01에서 만들었다(사용자 승인 U-1 — 이름·요금 0원·지우는 법을 보이고 받았다). 진행 기록은 `tasks/personal-start/2026-10-20/PLAN.md`.
 
-- 사용자 확인: 실제 일기가 들어가는 건물이다. 이름·요금(0)·바뀌는 것·지우는 법을 다시 보인다.
-- `cf.mjs`의 운영 막음(`ALLOW_PROD=1`)을 그 작업에서만 풀고, 개발용과 **다른** 비밀값을 만든다(`make-secrets.mjs`에 `prod`를 더한다). 운영 열쇠를 전하는 방법은 그때 사용자와 정한다(STATUS §4).
-- 운영 묶음에 개발용 코드가 없는지는 `npm run build`가 매번 검사한다(ARCHITECTURE §11.2). 올린 뒤 `remote-check`의 운영판(오류 보고 경로 404, 상태 칸 없음, 끝에 데이터를 지우는 정리 없음 — 실제 일기가 있다)을 만든다.
-- 백업(D-109): Time Travel 7일 + 본인 PC 내려받기(하루 1번, 30일 보관) — 도구는 §9(2026-10-17 `data-control`). 운영 환경을 만들 때 `make-secrets.mjs`에 `prod`를 더하며 백업 토큰도 만들고, `backup.mjs schedule-command prod`가 출력한 명령을 본인이 실행한다(D-124 — 등록은 그때).
+**운영 명령은 `ALLOW_PROD=1`을 앞에 붙인다** — 개발용 습관대로 운영에 보내지 않게 하는 걸쇠다(`cf.mjs`·`remote-check.mjs`·`prod-restore-check.mjs`·`backup.mjs restore prod`). 읽기뿐인 `backup.mjs pull prod`(매일 예약 실행)만 걸쇠 없이 돈다. 운영에는 데이터를 지우는 명령(`--reset-dev-data`, `drill.mjs`, `sql "DELETE …"`)을 쓰지 않는다. 예외는 실제 일기를 넣기 전 빈 운영에서만 도는 `--fresh` 둘이고, 둘 다 시작할 때 일기·설정이 0행인지 확인한다.
+
+| 단계 | 명령 | 결과 |
+| --- | --- | --- |
+| 1 | `node app/scripts/make-secrets.mjs prod all` → `… prod backup` | 개발용과 **다른** 비밀값 넷·열쇠·백업 토큰(`work/deploy/prod.*`, Git 제외). 이미 있으면 `all`·`key`·`backup` 모두 멈춘다 — 알고 바꿀 때만 `--rotate`(`all`은 모든 기기 로그아웃, `backup`은 새 해시를 올리기 전까지 매일 백업이 401) |
+| 2 | `ALLOW_PROD=1 node app/scripts/cf.mjs prod create` | D1 `emotion-diary-prod`(APAC) |
+| 3 | `ALLOW_PROD=1 node app/scripts/cf.mjs prod migrate` | 마이그레이션 |
+| 4 | `ALLOW_PROD=1 node app/scripts/cf.mjs prod deploy` | 운영 묶음(개발용 코드 0건 검사 — ARCHITECTURE §11.2)을 비밀값 파일과 함께 올린다. Worker는 첫 올리기에 생기고 주소는 `work/deploy/prod.url` |
+| 5 | `ALLOW_PROD=1 node app/scripts/remote-check.mjs prod --fresh --tail` | **빈 운영에서 한 번**: 개발용과 같은 쓰기 검사 + 오류 보고 경로 404 + 실시간 기록 0건, 끝에 비우고 다시 0행인지 본다 |
+| 6 | `ALLOW_PROD=1 node app/scripts/prod-restore-check.mjs --fresh --reset-dev-data` | **첫 백업·복원 확인**(`backup-and-restore-drill`): 빈 운영에 가짜 한 편 → `backup.mjs pull prod` → 개발용에 `restore` → 같은지 → 양쪽 정리 |
+| 7 | `node app/scripts/backup.mjs schedule-command prod` | 매일 백업 등록 명령을 출력한다 — 실행은 본인(D-124) |
+
+**`--fresh`가 중간에 멈췄을 때**(실제 일기를 넣기 전에만): `prod-restore-check`는 멈춰도 끝에 정리하지만 `remote-check --fresh`는 그렇지 않다 — 남은 가짜 '오늘' 기록은 그날 실제 일기를 막는다(하루 1편). 원격 읽기로 남은 행을 본 뒤 `ALLOW_PROD=1 node app/scripts/cf.mjs prod sql "DELETE FROM diary_entries; DELETE FROM idempotency_records; DELETE FROM owner_settings; DELETE FROM sessions;"` — **실제 일기가 한 편이라도 들어간 뒤에는 쓰지 않는다.**
+
+**다시 올릴 때**(실제 일기가 있다): `ALLOW_PROD=1 node app/scripts/cf.mjs prod deploy` → `ALLOW_PROD=1 node app/scripts/remote-check.mjs prod --tail`(운영판 — 이름·잠금·일기·설정을 쓰지 않고 지우기 경로도 부르지 않으며 정리도 없다. 일기를 받아 오지 않게 내보내기는 빈 조각만 본다. 로그인했다 로그아웃하고 읽기·거절 경로, 오류 보고 경로 404, 실시간 기록의 열쇠 0건을 본다). 창고 구조를 바꾸는 작업 전에는 내보내기 + `backup.mjs pull prod`, 바꾼 뒤 복원 확인(RK-045).
+
+- 운영 열쇠는 `work/deploy/prod.PHONE-KEY.txt`를 이 PC에서 보고 휴대폰에 직접 넣는다 — 채팅·캡처·문서에 옮기지 않는다. 앱 주소는 계정 하위 도메인이 들어 있어 저장소에 적지 않는다.
+- 실제 일기가 생긴 뒤의 복원 확인을 어디에 되살려 볼지(개발용 건물에는 실제 글을 넣지 않는다 — §1 규칙)는 다음에 정한다. 후보는 이 PC의 로컬 D1(`wrangler dev`).
+- 운영 지우기(되돌릴 수 없다 — 실제 일기가 사라진다): 사용자 확인 뒤 내보내기 + 백업을 먼저 하고 `CONFIRM_DESTROY=emotion-diary-prod ALLOW_PROD=1 node app/scripts/cf.mjs prod destroy`.
+- 공개 때(`limited-release`)는 EVAL_PLAN §12 출시 증거 묶음과 `deployment-boundary-review`의 공개판을 더한다.
 
 ## 9. PC 백업과 다시 넣기(D-109·D-124)
 
@@ -80,5 +98,6 @@
 | 다시 넣기 | `node app/scripts/backup.mjs restore dev <파일> [--dry-run]` | 300KB·100편 조각으로 넣는다(조각의 Worker 안 계산 — STATUS §1). 이미 있는 날짜는 건너뛰고 설정은 행이 없을 때만 |
 | 복원 연습 | `node app/scripts/drill.mjs dev --reset-dev-data` | 합성 3년치 → 조각 내보내기 → 백업 → 모두 지우기 → 다시 넣기 → 같은지 → 로그아웃 cookie 401 → 정리. D1 쓰기 약 4만~5만 행이라 하루에 두 번 돌리지 않는다 |
 
-**Time Travel로 되돌린 뒤**에는 세션 표가 그 시점으로 돌아가 로그아웃한 cookie가 되살아날 수 있다 — 되돌린 직후 `node app/scripts/cf.mjs <env> sql "DELETE FROM sessions"`로 세션을 비우고(모든 기기가 다시 로그인한다) 그 뒤에 쓴 기록을 `backup.mjs restore`로 채운다(감리 N-7).
-- EVAL_PLAN §12 출시 증거 묶음과 `deployment-boundary-review`.
+**Time Travel로 되돌린 뒤**에는 세션 표가 그 시점으로 돌아가 로그아웃한 cookie가 되살아날 수 있다 — 되돌린 직후 `node app/scripts/cf.mjs <env> sql "DELETE FROM sessions"`로 세션을 비우고(모든 기기가 다시 로그인한다) 그 뒤에 쓴 기록을 `backup.mjs restore`로 채운다(감리 N-7). 운영이면 명령 앞에 `ALLOW_PROD=1`.
+
+운영은 같은 표의 `dev`를 `prod`로 바꿔 쓴다(토큰 `work/deploy/prod.BACKUP-TOKEN.txt`, 폴더 `<홈>/emotion-diary-backup/prod/`). 복원 연습(`drill.mjs`)은 개발용 전용이다 — 운영의 첫 확인은 §8의 6단계.

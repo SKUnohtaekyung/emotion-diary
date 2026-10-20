@@ -108,6 +108,25 @@ describe("날짜가 든 화면 주소(TASK-SLICE-01 PLAN A-9)", () => {
   });
 });
 
+describe("도움이 필요할 때(help) 주소 (TASK-PERSONAL-01 A-2)", () => {
+  it("알려진 화면이고 돌아갈 자리가 된다", () => {
+    expect(parseHash("#/help")).toMatchObject({ path: "help", name: "help", known: true });
+    expect(parseHash("#/help/").known).toBe(true);
+    expect(isReturnable("help")).toBe(true);
+    expect(isReturnable("help/extra")).toBe(false);
+  });
+
+  it("로그인 전에는 열쇠 화면을 거쳐 돌아온다", () => {
+    expect(guardRoute(state(), parseHash("#/help"))).toEqual({ redirect: "#/auth?s=again", returnTo: "help" });
+    expect(loginDestination({ variant: "again", hasName: true, returnTo: "help" })).toBe("#/help");
+  });
+
+  it("로그인 뒤에는 그대로 열리고, 이름이 없으면 이름 화면이 먼저다", () => {
+    expect(guardRoute(state({ authenticated: true, hasName: true }), parseHash("#/help"))).toEqual({ redirect: null, returnTo: null });
+    expect(guardRoute(state({ authenticated: true }), parseHash("#/help")).redirect).toBe("#/auth/name");
+  });
+});
+
 describe("formatRemaining", () => {
   it("초를 N분 N초로 읽기 쉽게", () => {
     expect(formatRemaining(300)).toBe("5분");

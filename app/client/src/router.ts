@@ -107,7 +107,9 @@ export function render(): void {
   const heading = root.querySelector("h1");
   heading?.setAttribute("tabindex", "-1");
   syncTitle();
+  // 스크롤은 #app이 한다(base.css, D-125) — 새 화면은 맨 위에서 시작한다. 창은 스크롤하지 않지만 남은 값이 있으면 함께 되돌린다
   window.scrollTo(0, 0);
+  document.getElementById("app")?.scrollTo(0, 0);
   heading?.focus({ preventScroll: true });
 }
 

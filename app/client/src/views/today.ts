@@ -1,7 +1,8 @@
 // 오늘 `#/today` — 평면 첫 조각(TASK-SLICE-01 PLAN A-8, UX_SPEC §3·§11 '오늘 화면의 상태 여섯 가지').
 // 숲·돌·조약돌이 없는 평면판이라 시작 조작은 큰 버튼 하나다. 상태: 로딩·오류·연결 끊김·기록 없음(+지난 날 글 줄)·이어 쓰기·기록 있음.
 // 오늘 기록을 확인하지 못하면 시작을 막는다 — 확인 없이 새로 시작하면 하루 하나 규칙을 어길 수 있다(D-077 ⑧·D-083 ①).
-// 앱 잠금·지금 잠그기·내보내기·모든 기록 지우기·로그아웃은 설정 화면이 생길 때까지 아래 작은 줄에 둔다.
+// 도움이 필요할 때·앱 잠금·지금 잠그기·내보내기·모든 기록 지우기·로그아웃은 설정 화면이 생길 때까지 아래 작은 줄에 둔다.
+// 위기 안내(#/help)로 가는 길은 그 줄의 맨 앞이다 — 줄이 접혀도 먼저 보이고, 지우기 버튼 곁에 놓이지 않는다(TASK-PERSONAL-01 A-1).
 
 import type { TodayInfo } from "../../../shared/diary";
 import { lockNow, logout } from "../controller";
@@ -27,6 +28,8 @@ export function renderToday({ root, alive }: ViewContext): () => void {
   const title = h("h1", { text: "오늘은 어떤 마음이 머물렀나요?" });
   const area = h("div", { class: "today-state", "aria-live": "polite" });
 
+  const helpButton = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "도움이 필요할 때" });
+  helpButton.addEventListener("click", () => navigate("#/help"));
   const lockSettings = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "앱 잠금" });
   lockSettings.addEventListener("click", () => navigate("#/settings/lock"));
   const lockNowButton = app.appLock ? h("button", { type: "button", class: "btn btn-quiet btn-small", text: "지금 잠그기" }) : null;
@@ -61,7 +64,7 @@ export function renderToday({ root, alive }: ViewContext): () => void {
       dateLine,
       title,
       area,
-      h("div", { class: "today-tools" }, lockSettings, lockNowButton, exportButton, deleteButton, logoutButton)
+      h("div", { class: "today-tools" }, helpButton, lockSettings, lockNowButton, exportButton, deleteButton, logoutButton)
     )
   );
 

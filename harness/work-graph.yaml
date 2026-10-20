@@ -146,9 +146,11 @@ nodes:
     gate: data-integrity
 
   - id: first-slice
-    status: in_progress
+    status: done
     depends_on: [data-foundation, taxonomy-v1, taxonomy-v2-research]
     # 2026-10-16 TASK-SLICE-01 착수(사용자가 계획 승인): 진행·증거는 tasks/first-slice/2026-10-16/PLAN.md 한 곳(D-118).
+    # 2026-10-20 done: 관문 증거(F-03·F-04·F-05·F-08·F-24 화면 시험·E2E, e2e-reload-restore, PR #40·#41 CI)와 mobile-slice(iPhone,
+    # 개발용 빌드 20261019161722-d2ed814 — EVAL §4·§6). 함께 찾은 결함(자판이 뜰 때 상단 줄이 상태 막대와 겹침)은 PLAN 5-12.
     # 정한 것은 D-123(버튼은 내용 바로 뒤, 못 보낸 글만 휴대폰에 잠깐, 고치기·지우기 포함, E2E는 Playwright WebKit·Chromium).
     # 2026-10-15 새 노드(D-116): 첫 조각 '오늘 한 편' — 연출 없는 평면 화면으로 사건 → 계열·세부·강도 → 이유 → 칭찬·감사(비워도 됨)
     # → 완료, 서버 임시저장, 화면이 통째로 새로 열린 뒤 쓰던 단계로 복구(F-24, RK-034). 여기서 정한다: 작성 흐름 상태 설계 한 장,
@@ -182,8 +184,10 @@ nodes:
     gate: data-control
 
   - id: personal-start
-    status: blocked
+    status: in_progress
     depends_on: [first-slice, data-control]
+    # 2026-10-20 TASK-PERSONAL-01 착수(사용자 답 U-1~U-4 — 운영 건물 미리 승인, 겹침 결함 포함, 계획 승인 없이 진행).
+    # 진행·증거는 tasks/personal-start/2026-10-20/PLAN.md 한 곳(D-118).
     # 2026-10-15 새 노드(D-116·D-117): 본인 사용 시작 관문 — 운영 건물·운영 열쇠(만들기 직전 사용자 확인), 위기 안내 '검토 전' 표기로
     # 본인만(D-094·D-117). 위기 안내 화면(#/help)은 2026-10-15 앱에 아직 없다 — 이 노드에서 짓고, 설정 화면이 없는 동안의 진입점은
     # 여기서 정한다(설정 입구는 direct-journal에서 옮긴다). 이때부터의 규칙: 창고 구조를 바꾸는 작업 전마다 내보내기 + 백업,

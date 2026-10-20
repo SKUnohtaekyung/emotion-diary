@@ -7,7 +7,8 @@ import { request } from "../lib/api";
 import { APP_BUILD } from "../lib/build";
 import { listen, type ProbeEvent } from "../lib/probe";
 import { app } from "../state";
-import { mountPanel } from "./panel";
+import { startKeyboardLab } from "./keyboard";
+import { mountPanel, type Panel } from "./panel";
 import "./panel.css";
 import { apiReport, toReport } from "./report";
 import { createTrace, record } from "./trace";
@@ -15,7 +16,11 @@ import { createTrace, record } from "./trace";
 /** 시작하고, 멈추는 함수를 돌려준다(시험에서 쓴다). */
 export function startDev(): () => void {
   const trace = createTrace();
-  const panel = mountPanel(trace);
+  // 자판 실험(TASK-PERSONAL-01 A-8) — 측정이 쌓이면 펼친 상태 칸을 다시 그린다(칸은 실험 다음에 붙는다)
+  const redraw: { panel: Panel | null } = { panel: null };
+  const lab = startKeyboardLab(() => redraw.panel?.refresh());
+  const panel = mountPanel(trace, lab);
+  redraw.panel = panel;
 
   const send = (report: NonNullable<ReturnType<typeof toReport>>): void => {
     trace.lastError = report;
@@ -39,6 +44,7 @@ export function startDev(): () => void {
   const stop = listen(onEvent);
   return () => {
     stop();
+    lab.stop();
     panel.destroy();
   };
 }

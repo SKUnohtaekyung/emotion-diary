@@ -55,6 +55,7 @@ beforeEach(() => {
     auth: stub,
     "settings/lock": stub,
     "settings/pin": stub,
+    help: stub,
     "write/:date": stub,
     "record/:date": stub
   });
@@ -169,6 +170,19 @@ describe("오늘 — 아래 작은 줄", () => {
     const length = history.length;
     byText("앱 잠금")?.click();
     expect(location.hash).toBe("#/settings/lock");
+    expect(history.length).toBe(length + 1);
+  });
+
+  it("'도움이 필요할 때'는 줄의 맨 앞이고 다른 버튼과 같은 모양이며, 위기 안내로 push한다(TASK-PERSONAL-01 A-1)", async () => {
+    await openToday(todayReply());
+    const tools = [...document.querySelectorAll<HTMLButtonElement>(".today-tools button")];
+    expect(tools.map((button) => button.textContent)).toEqual(["도움이 필요할 때", "앱 잠금", "내 기록 내보내기", "모든 기록 지우기", "로그아웃"]);
+    const help = byText("도움이 필요할 때");
+    expect(help?.className).toBe("btn btn-quiet btn-small");
+    expect(help?.className).toBe(byText("앱 잠금")?.className);
+    const length = history.length;
+    help?.click();
+    expect(location.hash).toBe("#/help");
     expect(history.length).toBe(length + 1);
   });
 
