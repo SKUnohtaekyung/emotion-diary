@@ -5,7 +5,7 @@
 ## 0. 이어 받는 사람에게
 
 - 읽는 순서: 이 문서 → [REQUESTS.md](REQUESTS.md) → `harness/quality-gates.yaml`의 `personal-start` → `docs/EVAL_PLAN.md` §14(`deployment-boundary-review`·`backup-and-restore-drill`·`mobile-personal`·`crisis-help-unreviewed-label`) → `docs/DEPLOY.md` §8·§9 → `docs/UX_SPEC.md` §3 '도움이 필요할 때 보기'·§17 → `app/scripts/`(cf·make-secrets·remote-check·backup·drill).
-- 브랜치 `slice/phone-check`(`main` `d2ed814` 위). first-slice 마감 기록(커밋 전)이 같은 작업 트리에 있다 — 커밋할 때 둘로 가른다(U-4).
+- 브랜치 `slice/phone-check`(`main` `d2ed814` 위). 2026-10-20 사용자 지시로 휴대폰 확인 전에 커밋 셋(first-slice 마감 기록 / personal-start / direct-journal 착수 준비)을 만들어 `main`에 반영했다(4-10). 다음 세션은 `main`에서 새 브랜치로 이어 간다.
 - SERVICE_WHY §20 점검: 위기 안내는 진단·판단이 아니라 연락처 안내이고 '검토 전'을 숨기지 않는다 / 운영은 본인 한 사람(D-108) / 기록 강제 없음 / 데이터 통제(내보내기·지우기·백업)는 data-control에서 갖췄다 — 일곱 질문 모두 통과로 본다.
 
 ## 1. 사실표 (여기 한 벌만)
@@ -69,6 +69,9 @@
   - 2026-10-20 02:40~02:42(KST) 1부 일부 — 개발용 빌드 `20261019171940-d2ed814`, 상태 칸 캡처 10장(채팅, 저장소에 두지 않음). **배치 A에서만 자판을 띄워 쟀다**(B·C는 오늘 화면에서 버튼만 바꿈 — 자판 기록 없음). A: 누른 순간 `scrollY` 0·`innerHeight` 793·문서 793/793·맨 위 줄 16 → 0.5초·1.5초 뒤 `innerHeight` **730**(자판이 뜨자 레이아웃 높이가 63 줄어듦)·`vv.height` 417·문서 높이 **793 그대로**(body 최소 높이 793px — 100dvh가 줄지 않음)·`scrollY` **63**(= 793 − 730, 문서가 넘친 만큼 창이 끝까지 스크롤)·`vv.offsetTop`·`pageTop` 63·맨 위 줄 **−47** → 자판 내린 뒤 모두 0·793으로 돌아오고 빈 띠 없음. **판정: H1** — 자판이 뜨면 레이아웃 높이만 63 줄고 body 최소 높이는 그대로라 문서가 63 넘치고, iOS가 그만큼 창을 스크롤해 상단 줄이 상태 막대 자리(웹 화면 위쪽 밖)에 그려진다. 문서가 넘치지 않는 B·C에서는 이 자동 올림이 없을 것으로 본다(추측 — 실기기 B·C 자판 기록으로 확인할 것). '다음'은 B에서는 자판 뒤에 놓여 밀어야 닿고(밀면 상단 줄이 다시 위로 나감), C는 `#app` 안에서 밀려 상단 줄이 웹 화면 위쪽에서 잘린다(상태 막대 자리에 그려지지 않을 것 — 추측)
   - 2026-10-20 사용자 결정(D-125): "c로 그럼 그냥 하고 운영앱 하는 방법 알려줘" — **배치 C를 B·C 실기기 자판 측정 없이 채택**. 메인이 정식 코드로 옮김: `styles/base.css`(`html, body { height: 100%; overflow: hidden }`, `#app { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; padding-bottom: var(--keyboard-inset, 0px) }`, body의 100dvh 최소 높이 뺌), 새 `lib/viewport.ts`(`visualViewport` resize·scroll마다 `innerHeight − vv.height − vv.offsetTop`을 `--keyboard-inset`로 — 실측 숫자면 313px), `main.ts`에서 설치, `router.ts`가 화면을 바꿀 때 `#app`도 맨 위로. 개발용 상태 칸은 배치 버튼·`vk-*` 규칙을 걷고 측정만 남김(자판이 가린 높이 칸을 더함). 시험: 새 `viewport.test.ts` 4건, `dev-keyboard.test.ts` 4건으로 고침, E2E `layout.spec.ts`·`help.spec.ts`가 `#app`의 가로 넘침과 '문서는 위아래로 넘치지 않음'까지 본다 — `html, body` 규칙을 빼는 결함 주입을 layout E2E가 잡음('문서가 위아래로 넘친다 1224 > 640'), 원래 바이트로 되돌림. `biome check app` 0, `typecheck` 0, `verify --mode full` PASS, `npm run e2e` 20/20(수는 STATUS §1). 올림: 개발용 `20261019175556-d2ed814`, 운영 `20261019175608-d2ed814` → 운영판 `remote-check prod --tail` 통과(이때 운영에 설정 1행·세션 2행 — 사용자가 2부를 시작해 로그인·이름을 정했다. 운영판이라 건드리지 않음). **실기기 미확인**: C에서 위쪽 줄이 겹치지 않는지, 자판이 떠 있는 동안 `다음`까지 밀어서 닿는지, 자판을 내린 뒤 빈 띠가 없는지 — 사용자가 운영에서 처음 쓸 때 본다
 - [ ] 4-10 고른 방식 운영 반영 → 정본 기록 → 관문 판정 → 커밋 둘 + PR
+  - 고른 방식(배치 C) 운영 반영: 끝(4-9 — 운영 빌드 `20261019175608-d2ed814`).
+  - 2026-10-20 사용자 지시("지금까지 작업한거 전부 커밋 + pr + 메인에 푸시까지 진행하고 다음에 해야 할 작업 인수인계 남겨놔줘")로 **휴대폰 확인 전에** 커밋·PR·`main` 반영을 먼저 했다(direct-journal 착수 준비 세션): `0773a25` first-slice 마감 기록 · `0fb1781` personal-start · 셋째 커밋 direct-journal 착수 준비와 인계. U-4의 '커밋 둘'은 이 둘이다. U-4는 '병합은 사용자'였으나 이번 지시가 `main` 반영까지 맡겼다. CURRENT_TASK·STATUS·loop-state의 first-slice 변경은 personal-start 변경과 한 hunk로 섞여 `0fb1781`에 들어갔다.
+  - 남은 것: 4-9 휴대폰 → 그 결과를 EVAL §4·§6·STATUS §1에 → 관문 `personal-start` 판정 → work-graph done·archive 이동 → 그 기록의 커밋·PR(사용자 지시 때). 순서는 `tasks/CURRENT_TASK.md` '다음 세션이 할 일'.
 
 ## 5. 검사 목록 (관문 `personal-start`)
 

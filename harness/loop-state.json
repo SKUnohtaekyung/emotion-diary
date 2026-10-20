@@ -4,7 +4,7 @@
   "phase": "personal-start-phone-check",
   "iteration": 1,
   "status": "in_progress",
-  "current_hypothesis": "personal-start passes its gate once the user runs the phone guide (tasks/personal-start/2026-10-20/PHONE-GUIDE.md): keyboard layout A/B/C choice on dev, mobile-personal on prod, T-03 with lock on, backup schedule command. Prod building, remote checks, first backup restore and boundary review are done.",
+  "current_hypothesis": "personal-start passes its gate once the user runs the phone guide on the prod app (tasks/personal-start/2026-10-20/PHONE-GUIDE.md): layout C on a real keyboard, mobile-personal, T-03 with lock on, backup schedule command. Prod environment, remote checks, first backup restore, boundary review and the layout C deploy are done and in main.",
   "same_hypothesis_failures": 0,
   "transient_retries": 1,
   "last_verified_commit": "d2ed814",
@@ -21,8 +21,8 @@
   ],
   "next_node": "personal-start",
   "blockers": [
-    "One phone session by the user (mobile-personal, overlap fix choice, T-03 with lock on, backup schedule command).",
+    "One phone session by the user (layout C on a real keyboard, mobile-personal, T-03 with lock on, backup schedule command).",
     "Scope: single user (D-108). AI writing is decided after 30 days of real use (D-120), evidence analysis after 60 days (D-121)"
   ],
-  "last_checkpoint": "2026-10-20 TASK-PERSONAL-01: prod emotion-diary-prod created and deployed (fresh check, routine check, first backup restored on dev, boundary scan 0 hits), #/help and dev keyboard lab built, final review (7 findings) handled, verify full and e2e pass. Not committed. Next: phone guide, then the chosen keyboard layout to prod, gate, two commits and PR (U-4)."
+  "last_checkpoint": "2026-10-20 TASK-PERSONAL-01: prod emotion-diary-prod created and deployed (fresh check, routine check, first backup restored on dev, boundary scan 0 hits), #/help built, keyboard overlap fixed with layout C (document fixed, only #app scrolls) and deployed to prod, final review handled, verify full and e2e pass. Committed and merged to main on user instruction before the phone check (first-slice close, personal-start, direct-journal prep + handover). Next: phone guide, record results, gate judgment; then direct-journal (user answers tasks/direct-journal/2026-10-20/QUESTIONS.md)."
 }
