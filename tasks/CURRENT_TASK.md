@@ -44,10 +44,11 @@
 
 - 2026-10-20 짓기·올리기: PLAN 4-1~4-8 끝(운영 환경 `emotion-diary-prod`, `#/help`, 자판 겹침 배치 C — 운영 빌드 `20261019175608-d2ed814`에 이미 들어감). 사용자가 운영에서 로그인·부를 이름까지 했다.
 - 2026-10-20 커밋·`main` 반영(사용자 지시 — "지금까지 작업한거 전부 커밋 + pr + 메인에 푸시"): 커밋 셋 — first-slice 마감 기록 / personal-start / direct-journal 착수 준비와 이 인계. **휴대폰 확인과 관문 판정 전**에 반영한 것이라 personal-start는 여전히 `in_progress`다. PR 번호와 병합 결과는 PLAN 4-10.
+- 2026-10-20 휴대폰 2부(PLAN 4-9): 위기 안내 '검토 전'·S-05 내보내기 PASS. 배치 C에서도 자판이 뜨면 위쪽 줄이 상태 막대 자리로 밀려(실패) — 보이는 영역이 밀린 만큼 위를 비우는 고침을 개발용에서 실기기로 확인하고 운영에 올렸다(빌드 `20261020080719`, 운영판 검사 31/31). T-03 앱 전환 화면은 FAIL — 신호(blur·hidden)는 오지만 iOS가 카드 사진을 먼저 찍어 웹으로는 막을 수 없다(RK-039 일어남). 이 고침과 기록은 커밋해 `main`에 반영했다.
 
 ## 다음 세션이 할 일
 
-1. **사용자 휴대폰 확인**(PLAN 4-9, 안내서 [PHONE-GUIDE.md](personal-start/2026-10-20/PHONE-GUIDE.md)) — 운영 앱에서: 배치 C 실기기(작성 흐름에서 자판을 띄워 위쪽 줄이 상태 막대와 겹치지 않는지, `다음`까지 밀어서 닿는지, 자판을 내린 뒤 빈 띠가 없는지), `mobile-personal`(S-01·S-02·S-05), T-03 잠금 켜짐, 백업 예약 명령(`node app/scripts/backup.mjs schedule-command prod`가 출력한 것을 사용자가 실행). 결과를 사용자에게 받는다 — 에이전트는 iPhone을 조작할 수 없다.
+1. **사용자 휴대폰 확인의 남은 것**(PLAN 4-9) — 운영 앱(빌드 `20261020080719` 이후)에서 자판을 띄워 위쪽 줄이 제자리인지·`다음`까지 밀어서 닿는지(개발용에서는 확인됨), S-02(완전히 닫았다 열기), **T-03 FAIL을 받아들일지 사용자 결정**(RISK RK-039 — 받아들이면 관문은 한계를 적고 진행), 백업 예약 명령(`node app/scripts/backup.mjs schedule-command prod`가 출력한 것을 사용자가 실행). 결과를 사용자에게 받는다 — 에이전트는 iPhone을 조작할 수 없다.
 2. **정본 기록 → 관문 판정**(PLAN 4-10): 결과를 EVAL §4·§6 표에, 숫자는 STATUS §1에, 관문 `personal-start` 판정 → work-graph `personal-start` done → 이 절을 `tasks/archive/TASK-PERSONAL-01.md`로 옮김 → 커밋·PR(사용자 지시 때).
 3. **그다음 `direct-journal`**: 사용자가 [QUESTIONS.md](direct-journal/2026-10-20/QUESTIONS.md)의 질문 6개에 답 → DECISIONS에 기록(D-066 상태 포함) → Q1 답에 맞춰 work-graph·`quality-gates.yaml`(F-21)·ROADMAP·STATUS → `tasks/direct-journal/<날짜>/PLAN.md` → 조각 0부터([MAP.md](direct-journal/2026-10-20/MAP.md) §5). 질문 답은 휴대폰 확인을 기다리는 동안 미리 받아도 된다.
 4. **날짜가 걸린 것**: 있었던 일 안내 2단계 문구는 쓰기 시작한 지 30일째(추정 2026-11-19 무렵)에 바뀌어야 한다 — 서버에 첫 기록일 값이 그 전에 들어가야 한다(MAP A-7, 조각 4).

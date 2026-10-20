@@ -5,9 +5,12 @@
 import { APP_ENV } from "./build";
 import type { ErrorLike } from "./errorInfo";
 
+/** 보임·숨김 사건 종류. blur·focus는 창이 초점을 잃고 되찾을 때(앱 전환 화면에 들어갈 때 오는지 실기기로 본다 — T-03). */
+export type LifecycleKind = "visible" | "hidden" | "pagehide" | "pageshow" | "blur" | "focus";
+
 export type ProbeEvent =
   | { type: "api"; method: string; path: string; status: number }
-  | { type: "lifecycle"; kind: "visible" | "hidden" | "pagehide" | "pageshow"; persisted: boolean }
+  | { type: "lifecycle"; kind: LifecycleKind; persisted: boolean }
   | { type: "startLock"; navType: string; hasMarker: boolean; lock: boolean; reason: string }
   | { type: "error"; error: ErrorLike };
 

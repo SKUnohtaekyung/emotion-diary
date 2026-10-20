@@ -4,10 +4,10 @@
 import { API } from "../../../shared/api";
 import type { ClientErrorReport } from "../../../shared/dev";
 import { maskApiPath } from "../lib/errorInfo";
-import type { ProbeEvent } from "../lib/probe";
+import type { LifecycleKind, ProbeEvent } from "../lib/probe";
 
 export interface LifecycleRow {
-  kind: "visible" | "hidden" | "pagehide" | "pageshow";
+  kind: LifecycleKind;
   persisted: boolean;
   at: number;
 }

@@ -62,6 +62,8 @@ describe("개발용 자판 측정", () => {
       "vv.height",
       "innerHeight",
       "자판이 가린 높이",
+      "위쪽 보정",
+      "vv.scale",
       "안전 영역 위",
       "맨 위 줄 top",
       "#app scrollTop",
