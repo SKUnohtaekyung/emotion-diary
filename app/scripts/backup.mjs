@@ -25,6 +25,8 @@ const [command, envName, ...rest] = process.argv.slice(2);
 if (!["pull", "restore", "schedule-command"].includes(command ?? "") || !["dev", "prod"].includes(envName ?? "")) {
   die("사용법: node app/scripts/backup.mjs <pull|restore|schedule-command> <dev|prod> …");
 }
+// 운영에 쓰는 명령(다시 넣기)은 걸쇠를 요구한다. 받기는 읽기뿐이라 매일 예약 실행이 그대로 돈다(docs/DEPLOY.md §8).
+if (command === "restore" && envName === "prod" && process.env.ALLOW_PROD !== "1") die("운영(실제 일기)에 다시 넣는 명령이다. 알고 보낼 때만 ALLOW_PROD=1을 붙인다.");
 const flag = (name) => {
   const index = rest.indexOf(name);
   return index >= 0 ? rest[index + 1] : undefined;

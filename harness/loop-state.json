@@ -1,13 +1,13 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-SLICE-01",
-  "phase": "first-slice-phone-check",
+  "task_id": "TASK-PERSONAL-01",
+  "phase": "personal-start-phone-check",
   "iteration": 1,
   "status": "in_progress",
-  "current_hypothesis": "first-slice passes its gate once the user runs the phone check (mobile-slice, tasks/first-slice/2026-10-16/PHONE-GUIDE.md); the code, E2E and CI are already in main.",
+  "current_hypothesis": "personal-start passes its gate once the user runs the phone guide (tasks/personal-start/2026-10-20/PHONE-GUIDE.md): keyboard layout A/B/C choice on dev, mobile-personal on prod, T-03 with lock on, backup schedule command. Prod building, remote checks, first backup restore and boundary review are done.",
   "same_hypothesis_failures": 0,
-  "transient_retries": 0,
-  "last_verified_commit": "8416734",
+  "transient_retries": 1,
+  "last_verified_commit": "d2ed814",
   "completed_nodes": [
     "bootstrap-audit",
     "taxonomy-v1",
@@ -16,12 +16,13 @@
     "data-store-spike",
     "app-scaffold",
     "data-foundation",
+    "first-slice",
     "data-control"
   ],
-  "next_node": "first-slice",
+  "next_node": "personal-start",
   "blockers": [
-    "first-slice waits for the phone check (5-12, tasks/first-slice/2026-10-16/PHONE-GUIDE.md) by the user. After that: personal-start (production environment, user confirmation before creating resources).",
+    "One phone session by the user (mobile-personal, overlap fix choice, T-03 with lock on, backup schedule command).",
     "Scope: single user (D-108). AI writing is decided after 30 days of real use (D-120), evidence analysis after 60 days (D-121)"
   ],
-  "last_checkpoint": "2026-10-17 TASK-DATA-02 data-control done (PR #43 -> PR #42 -> main 8416734, CI green, gate data-control passed; migration 0008 applied on dev). Archived to tasks/archive/TASK-DATA-02.md. Remaining in Phase 1: first-slice phone check."
+  "last_checkpoint": "2026-10-20 TASK-PERSONAL-01: prod emotion-diary-prod created and deployed (fresh check, routine check, first backup restored on dev, boundary scan 0 hits), #/help and dev keyboard lab built, final review (7 findings) handled, verify full and e2e pass. Not committed. Next: phone guide, then the chosen keyboard layout to prod, gate, two commits and PR (U-4)."
 }

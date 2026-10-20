@@ -7,9 +7,17 @@ async function zoom(page: Page): Promise<void> {
   await page.evaluate(() => document.documentElement.style.setProperty("zoom", "2"));
 }
 
+/** 문서와 스크롤을 맡은 #app(D-125) 둘 다 옆으로 넘치지 않는다. 문서는 위아래로도 넘치지 않는다 — 넘치면 iPhone이 자판을 띄울 때 창을 스크롤해
+ *  상단 줄이 상태 막대 자리에 그려진다(TASK-PERSONAL-01 PLAN 4-9). 200%로 키워 내용이 화면보다 길어도 스크롤은 #app이 한다. */
 async function noSideScroll(page: Page, label: string): Promise<void> {
-  const [scroll, client] = await page.evaluate(() => [document.documentElement.scrollWidth, document.documentElement.clientWidth]);
+  const [scroll, client, appScroll, appClient, docHeight, docClient] = await page.evaluate(() => {
+    const app = document.getElementById("app") as HTMLElement;
+    const doc = document.documentElement;
+    return [doc.scrollWidth, doc.clientWidth, app.scrollWidth, app.clientWidth, doc.scrollHeight, doc.clientHeight];
+  });
   expect(scroll, `${label}: 가로 스크롤 ${scroll} > ${client}`).toBeLessThanOrEqual(client);
+  expect(appScroll, `${label}: #app 가로 넘침 ${appScroll} > ${appClient}`).toBeLessThanOrEqual(appClient);
+  expect(docHeight, `${label}: 문서가 위아래로 넘친다 ${docHeight} > ${docClient}`).toBeLessThanOrEqual(docClient);
 }
 
 test("200% 확대·360×640: 가로 스크롤 없음, 이름이 잘리지 않음, −/+ 44px 이상·패널 안", async ({ page }) => {

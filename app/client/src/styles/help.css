@@ -1,0 +1,141 @@
+/* 도움이 필요할 때(위기 안내) `#/help` — 평면. 친구·감정 색·조약돌·빛·움직임이 없다(UX_SPEC §3). 접두어 help-.
+   색·간격·글자는 토큰 변수만 쓴다. 박스 속 박스를 만들지 않고 글 묶음과 줄 사이 선으로만 나눈다. */
+
+/* 전화·문자 링크는 .btn 모양을 그대로 쓰되 기본 링크 밑줄만 없앤다 */
+.help-screen a.btn {
+  text-decoration: none;
+}
+
+/* '검토 전' 표기: 숨기거나 작게 묻지 않는다 — 본문 크기·본문 색 */
+.help-review {
+  color: var(--neutral-text);
+}
+
+.help-review strong {
+  font-weight: 700;
+}
+
+.help-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+/* 지금 위험하다면: 112·119 전화 버튼 둘이 나란히, 가장 크다. 글자를 키우면 한 줄에 하나씩으로 접힌다 */
+.help-now-btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.help-now-btns .btn {
+  flex: 1 1 8em;
+  min-height: calc(var(--size-touch-target-min) + var(--space-3));
+  font-size: var(--text-heading-size);
+}
+
+.help-sub {
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+/* 이야기할 곳·출처 목록: 줄 사이 선 하나로만 나눈다 */
+.help-list {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.help-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) 0;
+  border-top: 1px solid var(--neutral-border);
+}
+
+.help-row:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* 출처 줄은 드물게 쓰는 자리라 선 없이 촘촘하게 */
+.help-source {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2) 0;
+}
+
+.help-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.help-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-2);
+  font-weight: 600;
+}
+
+.help-num {
+  color: var(--neutral-text-muted);
+}
+
+.help-meta {
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+.help-acts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.help-acts .btn {
+  flex: 1 1 8em;
+}
+
+/* 확인일·해외 안내·고지 */
+.help-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  color: var(--neutral-text-muted);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+}
+
+/* 출처 링크: 기본 링크 색·밑줄을 쓰지 않고 본문 색에 옅은 밑줄. 터치 자리는 44px */
+.help-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-4);
+}
+
+.help-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-height: var(--size-touch-target-min);
+  color: var(--neutral-text);
+  font-size: var(--text-label-size);
+  line-height: var(--text-label-line);
+  text-decoration: underline;
+  text-decoration-color: var(--neutral-border-strong);
+  text-underline-offset: 0.2em;
+  overflow-wrap: anywhere;
+}
+
+.help-host {
+  color: var(--neutral-text-muted);
+}

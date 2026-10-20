@@ -9,7 +9,8 @@
 //   node app/scripts/cf.mjs dev sql "<SQL>" [--json]  원격 D1에 SQL 한 줄(점검·T-07 재현용 — 가짜 데이터만). --json이면 결과를 JSON으로 찍는다
 //   node app/scripts/cf.mjs dev tail        실시간 기록(JSON 줄)
 //   node app/scripts/cf.mjs dev destroy     Worker와 D1을 지운다(되돌릴 수 없다 — 사용자 확인 뒤)
-// 운영(prod)은 제한 MVP 출시 전까지 만들지 않는다. 운영 명령은 ALLOW_PROD=1일 때만 받는다.
+// 운영(prod, 실제 일기)은 본인 사용 시작(personal-start, D-117)에 만들었다. 운영 명령은 ALLOW_PROD=1일 때만 받는다 —
+// 개발용 습관대로 운영에 명령을 보내지 않게 하는 걸쇠다. 운영에는 데이터를 지우는 sql·검사를 쓰지 않는다(docs/DEPLOY.md §8).
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
@@ -27,7 +28,7 @@ function die(message) {
 }
 
 if (!["dev", "prod"].includes(envName ?? "")) die("사용법: node app/scripts/cf.mjs <dev|prod> <create|secrets|migrate|deploy|sql|tail|destroy> …");
-if (envName === "prod" && process.env.ALLOW_PROD !== "1") die("운영은 아직 만들지 않는다(TASK-MOBILE T3). 출시 준비 때 docs/DEPLOY.md '운영을 만들 때'를 따른다.");
+if (envName === "prod" && process.env.ALLOW_PROD !== "1") die("운영(실제 일기) 명령이다. 알고 보낼 때만 ALLOW_PROD=1을 붙인다 — 절차는 docs/DEPLOY.md §8.");
 
 /** 주석 줄(// 로 시작)을 뺀 JSON. wrangler.jsonc는 주석을 줄 단위로만 쓴다. */
 function readConfig() {

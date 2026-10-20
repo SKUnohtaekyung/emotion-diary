@@ -8,6 +8,7 @@ import { APP_BUILD, APP_ENV } from "../lib/build";
 import { h } from "../lib/dom";
 import { KEYS, readStored } from "../lib/storage";
 import { app } from "../state";
+import type { KeyboardLab } from "./keyboard";
 import { clock, type Trace } from "./trace";
 
 type Row = [label: string, value: string];
@@ -112,7 +113,15 @@ export interface Panel {
   destroy(): void;
 }
 
-export function mountPanel(trace: Trace): Panel {
+/** 자판 측정 기록(최근 것이 위) — 숫자만 */
+function labSections(lab: KeyboardLab | undefined): Array<{ title: string; rows: Row[] }> {
+  if (!lab) return [];
+  const shots = lab.snapshots().reverse();
+  if (shots.length === 0) return [{ title: "자판 측정", rows: [["기록", "없음"]] }];
+  return shots.map((shot) => ({ title: `자판 · ${shot.label}`, rows: shot.rows }));
+}
+
+export function mountPanel(trace: Trace, lab?: KeyboardLab): Panel {
   const toggle = h("button", {
     type: "button",
     class: "dev-panel-toggle",
@@ -137,7 +146,7 @@ export function mountPanel(trace: Trace): Panel {
     if (body.hidden) return;
     const now = Date.now();
     body.replaceChildren(
-      ...sections(trace, now).map((section) =>
+      ...[...labSections(lab), ...sections(trace, now)].map((section) =>
         h(
           "section",
           { class: "dev-panel-section" },

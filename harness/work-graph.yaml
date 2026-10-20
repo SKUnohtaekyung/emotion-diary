@@ -184,8 +184,10 @@ nodes:
     gate: data-control
 
   - id: personal-start
-    status: blocked
+    status: in_progress
     depends_on: [first-slice, data-control]
+    # 2026-10-20 TASK-PERSONAL-01 착수(사용자 답 U-1~U-4 — 운영 건물 미리 승인, 겹침 결함 포함, 계획 승인 없이 진행).
+    # 진행·증거는 tasks/personal-start/2026-10-20/PLAN.md 한 곳(D-118).
     # 2026-10-15 새 노드(D-116·D-117): 본인 사용 시작 관문 — 운영 건물·운영 열쇠(만들기 직전 사용자 확인), 위기 안내 '검토 전' 표기로
     # 본인만(D-094·D-117). 위기 안내 화면(#/help)은 2026-10-15 앱에 아직 없다 — 이 노드에서 짓고, 설정 화면이 없는 동안의 진입점은
     # 여기서 정한다(설정 입구는 direct-journal에서 옮긴다). 이때부터의 규칙: 창고 구조를 바꾸는 작업 전마다 내보내기 + 백업,

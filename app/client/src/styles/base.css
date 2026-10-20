@@ -11,6 +11,15 @@ html {
   text-size-adjust: 100%;
 }
 
+/* 문서는 스크롤하지 않고 #app만 스크롤한다(TASK-PERSONAL-01 A-8, D-125). iPhone 홈 화면 앱에서 자판이 뜨면 레이아웃 높이만 63 줄고
+   100dvh 최소 높이는 그대로라 문서가 넘쳤고, iOS가 넘친 만큼 창을 스크롤해 상단 줄이 상태 막대 자리에 그려졌다(실측 —
+   tasks/personal-start/2026-10-20/PLAN.md 4-9). 문서 높이를 화면 높이에 묶으면 넘칠 것이 없고, #app 안에서 밀린 내용은 웹 화면 위쪽에서 잘린다. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
 body {
   margin: 0;
   background: var(--neutral-bg);
@@ -24,19 +33,17 @@ body {
   /* 위에 새 버전 띠가 붙어도 화면이 한 장 높이를 넘지 않게: 띠는 제 높이만, 나머지를 #app이 채운다 */
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
 }
 
-@supports (min-height: 100dvh) {
-  body {
-    min-height: 100dvh;
-  }
-}
-
+/* 스크롤은 여기서만 한다. 자판이 가린 높이(--keyboard-inset, lib/viewport.ts)만큼 아래를 비워 자판이 떠 있어도 '다음'까지 밀어서 닿는다(U-1) */
 #app {
   display: flex;
   flex: 1;
   flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  padding-bottom: var(--keyboard-inset, 0px);
 }
 
 h1,

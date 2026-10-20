@@ -4,8 +4,9 @@
 
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
+| TASK-PERSONAL-01 personal-start(본인 사용 시작) | **진행 중(2026-10-20)** — 사용자 답 U-1~U-4대로 계획 승인 없이 진행 | 이 파일 아래, 요청·계획은 [personal-start/2026-10-20/](personal-start/2026-10-20/PLAN.md) |
+| [TASK-SLICE-01](archive/TASK-SLICE-01.md) first-slice('오늘 한 편' 첫 조각) | 끝(2026-10-20) — 결정 D-123, 관문 `first-slice` 통과(화면 시험·E2E·CI는 PR #40·#41 → `main` `b74242c`, iPhone `mobile-slice` 2026-10-20). 남은 결함 하나(자판이 뜰 때 상단 줄이 상태 막대와 겹침 — PLAN 5-12) | [archive/](archive/README.md), 요청·계획은 [first-slice/2026-10-16/](first-slice/2026-10-16/PLAN.md) |
 | [TASK-DATA-02](archive/TASK-DATA-02.md) data-control(내 데이터 통제) | 끝(2026-10-17) — 결정 D-124, 관문 `data-control` 통과(F-14·F-15 시험, 개발용 환경 restore-drill, export-cpu-measured, CI). 커밋 `eedc783`·`85ac8c9` — PR #43 → PR #42 → `main` `8416734` | [archive/](archive/README.md), 요청·계획은 [data-control/2026-10-17/](data-control/2026-10-17/PLAN.md) |
-| TASK-SLICE-01 first-slice('오늘 한 편' 첫 조각) | **진행 중(2026-10-16 계획 승인)** — 질문 넷(U-1~U-4)의 답과 계획대로 짓는 중. 브랜치 `slice/first-slice`(`main` `47ddd90` 위) | 이 파일 아래, 요청·계획은 [first-slice/2026-10-16/](first-slice/2026-10-16/PLAN.md) |
 | [TASK-DATA-01](archive/TASK-DATA-01.md) data-foundation(저장 핵심) | 끝(2026-10-16) — 결정 D-122, 관문 `data-integrity` 통과(서버 시험, 개발용 환경 원격 검사 50/50, CI 두 OS). 커밋 `89c0017` — PR #38 → PR #37 → `main` `adb3d06`, 마감 정리 PR #39 → `main` `47ddd90` | [archive/](archive/README.md), 요청·계획은 [data-foundation/2026-10-15/](data-foundation/2026-10-15/PLAN.md) |
 | [TASK-CLEANUP-01](archive/TASK-CLEANUP-01.md) 설계도 정리(감리 결정을 공정표·관문·결정 장부에) | 끝(2026-10-15, 커밋 `85c3bb5` — PR #37, 2026-10-16 `main` 병합 `adb3d06`) | [archive/](archive/README.md), 요청·계획은 [cleanup/2026-10-15/](cleanup/2026-10-15/PLAN.md) |
 | [TASK-REVIEW-01](archive/TASK-REVIEW-01.md) 종합 점검(현황·남은 작업·작업 방식·기술 스택) | 끝(2026-10-15, 커밋 `1845e83` — PR #37) | [archive/](archive/README.md), 보고서 [review/2026-10-14/REPORT.md](review/2026-10-14/REPORT.md) |
@@ -18,41 +19,22 @@
 | [TASK-TAXONOMY](TASK-TAXONOMY.md) · [V1](TASK-TAXONOMY-V1.md) · [PLAN-V2](TASK-TAXONOMY-PLAN-V2.md) | 완료(2026-09-05, D-038·D-040 accepted) | 별도 파일(다른 문서가 경로로 인용해 옮기지 않았다) |
 | TASK-INFRA-01 · ISSUE-26 · ISSUE-27 · CBM · DESIGN · BOOTSTRAP | 완료·보류 기록 | [archive/](archive/README.md) |
 
-# TASK-SLICE-01 — first-slice('오늘 한 편' 첫 조각): 평면 화면으로 한 편을 쓰고, 남기고, 다시 연다
+# TASK-PERSONAL-01 — personal-start(본인 사용 시작): 운영 건물에서 본인이 실제 일기를 쓰기 시작한다
 
 ## 상태
 
-`in_progress`(2026-10-16 사용자가 계획 승인 — "PLAN.md 그대로 승인해요. 5-1부터 시작해 주세요."). 처음 상태는 planned였다: data-foundation을 마친 세션이 맡긴 착수 준비를 이 세션이 했다: 정본·서버 계약을 읽고 요청서를 쓰고, 질문 창 하나로 넷을 물어 모두 추천안을 받았다(U-1 버튼은 내용 바로 뒤, U-2 못 보낸 글만 휴대폰에 잠깐, U-3 완료한 기록 고치기·쓰던 글 지우기를 넣음, U-4 PR #39 병합 뒤 시작). 사용자가 PR #39를 병합해(`main` `47ddd90`) 그 위에 브랜치 `slice/first-slice`를 만들었다. 화면 구현은 사용자가 계획을 승인한 뒤 시작한다. **진행·증거는 [PLAN.md](first-slice/2026-10-16/PLAN.md) 한 곳이다**(D-118). 요청과 답은 [REQUESTS.md](first-slice/2026-10-16/REQUESTS.md).
+`in_progress`(2026-10-20 — 사용자 답 U-1~U-4: 운영 건물 지금 승인, 겹침 결함 포함, 계획 승인 없이 진행, 끝에 커밋 둘 + PR). **진행·증거는 [PLAN.md](personal-start/2026-10-20/PLAN.md) 한 곳이다**(D-118). 요청과 답은 [REQUESTS.md](personal-start/2026-10-20/REQUESTS.md).
 
 ## 목표
 
-연출 없는 평면 화면으로 '오늘 한 편'(사건 → 마음·세부 감정·크기 → 이유 → 칭찬·감사 → 검토 → 완료)을 쓰고, 서버에 임시저장하며, 화면이 통째로 새로 열려도 쓰던 단계와 글로 돌아오게 한다. 완료한 기록을 다시 열어 읽고 고칠 수 있고, 쓰던 글을 지울 수 있다. 관문 `first-slice`를 통과해 `personal-start`(본인 사용 시작)가 이 화면으로 쓰게 한다.
+`harness/work-graph.yaml`의 `personal-start` 노드와 `docs/STATUS.md` §4 6번 — 관문 `personal-start`(`harness/quality-gates.yaml`)를 통과해 본인이 운영 건물에서 매일 실제 일기를 쓴다.
 
-## 범위
+## 넘겨받은 것
 
-- 포함: `docs/STATUS.md` §4 4번과 `harness/work-graph.yaml`의 `first-slice` 노드가 정한 것, 요청서 R-1~R-7과 사용자 답 U-1~U-4, 계획 §2의 에이전트 결정 A-1~A-14.
-- 제외:
-  - 시안의 연출(친구·조약돌·바구니·편지 봉투·장면)과 시안 화면 이식(`direct-journal`)
-  - 완료 취소, 완료한 기록의 영구 삭제(UX_SPEC §7 — `direct-journal`)
-  - 달력·통계·알림, 내보내기·모든 기록 지우기·백업(`data-control`)
-  - 운영 건물(`personal-start`), AI 작성·분석
-  - 서버 변경 — 필요해지면 멈추고 PLAN에 이유를 적는다
-  - 원격 명령은 개발용 건물(`emotion-diary-dev`)에만 쓰고, 올리기 직전에 사용자 확인
+- `first-slice` 휴대폰 확인에서 찾은 결함: 자판이 뜬 동안 작성 흐름의 상단 줄이 상태 막대와 겹친다(`tasks/first-slice/2026-10-16/PLAN.md` 5-12) — 이 작업에 넣었다(U-2).
+- `data-control`에서 넘긴 것: PC 작업 스케줄러 등록·운영 백업 토큰(`tasks/archive/TASK-DATA-02.md`, U-3).
 
 ## 소유권
 
-- Main/Writer: 이 작업을 실행하는 세션 하나. 하위 에이전트는 조사·검토(읽기 전용)만 쓰고 어떤 하위 에이전트도 커밋하지 않는다.
-- 소유 파일: `tasks/first-slice/**`, `tasks/CURRENT_TASK.md`, `tasks/archive/**`, `app/client/**`, `app/shared/**`, `app/test/client/**`, `app/test/e2e/**`, `app/scripts/**`, `playwright.config.ts`, `package.json`, `package-lock.json`, `tsconfig*.json`, `biome.json`, `.gitignore`, `.github/workflows/harness.yml`, `docs/UX_SPEC.md`, `docs/DATA_MODEL.md`, `docs/ARCHITECTURE.md`, `docs/EVAL_PLAN.md`, `docs/TRACEABILITY.md`, `docs/STATUS.md`, `docs/DECISIONS.md`, `docs/RISK_REGISTER.md`, `docs/ROADMAP.md`, `harness/work-graph.yaml`, `harness/loop-state.json`, `harness/quality-gates.yaml`, `harness/runtime-profile.json`
-
-## 인수 조건(검사 목록은 PLAN §6)
-
-- 관문 `first-slice`: F-03·F-04·F-05·F-08·F-24가 화면 시험과 E2E로 PASS, `e2e-reload-restore`(새로고침 복원·연결 끊김 복원·기기 사본 복원)가 실제 브라우저 E2E로 PASS, `mobile-slice`(iPhone 홈 화면 앱 약 10분 — S-02·S-06·S-07·T-03)의 결과가 `docs/EVAL_PLAN.md` §4·§6 표에 있다.
-- 넘겨받은 F-22의 '작성 중 만료 시 입력을 잃지 않음'과 화면 쪽 F-09·F-18·F-28·고친 F-19가 시험으로 PASS.
-- 사용자 결정 U-1~U-3과 에이전트 세부가 D-123과 정본(UX_SPEC·DATA_MODEL·ARCHITECTURE·EVAL)에 있다. 사용자 결정은 사용자가 고른 것만 적는다.
-- 시험이 결함을 잡는지 결함 주입으로 확인했다(PLAN 5-8).
-- 새 맥락 검토자의 마감 검토를 반영했고 `node scripts/verify.mjs --mode full` PASS, E2E가 CI에서 초록(커밋·PR은 사용자 지시 뒤).
-
-## 체크포인트
-
-- 준비(2026-10-16, 이 세션): 요청서·계획서를 쓰고 이 절을 세웠다. 끝난 TASK-DATA-01 절은 `tasks/archive/TASK-DATA-01.md`로 옮겼다. `harness/loop-state.json`을 이 작업으로 바꿨다. 다음: 사용자가 계획을 승인 → PLAN §5의 5-1부터.
-- 짓기(2026-10-16, 같은 세션): PLAN 5-1~5-10 끝 — 화면·저장 줄·기기 사본·E2E·결함 주입·정본 동기화(D-123)·마감 검토 반영, `verify --mode full` PASS(숫자는 STATUS §1). 커밋 없음. 5-11도 끝(사용자 확인 뒤 개발용 건물에 빌드 `20261016064316-47ddd90`, 원격 검사 50/50, 개발용 데이터 비움). 다음: 5-12 휴대폰(사용자, [PHONE-GUIDE.md](first-slice/2026-10-16/PHONE-GUIDE.md)) → 5-13 커밋·PR 뒤 CI.
+- Main/Writer: 이 작업을 실행하는 세션 하나. 하위 에이전트는 커밋하지 않는다. `#/help` 화면은 Sonnet 작업자 하나가 짓고(2026-10-20 끝 — 같은 시간에 쓰는 작업자는 이제 없다) 메인이 다시 재서 합쳤다.
+- 소유 파일: `tasks/personal-start/**`, `tasks/CURRENT_TASK.md`, `tasks/archive/**`, `tasks/first-slice/**`, `app/scripts/**`, `app/client/index.html`, `app/client/src/styles/**`, `app/client/src/dev/**`, `app/client/src/views/**`, `app/client/src/lib/routes.ts`, `app/client/src/main.ts`, `app/test/client/**`, `app/test/e2e/**`, `docs/**`, `harness/**`, `wrangler.jsonc`, `.gitignore`

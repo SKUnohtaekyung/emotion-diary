@@ -6,15 +6,18 @@ import "./styles/base.css";
 import "./styles/components.css";
 import "./styles/scenes.css";
 import "./styles/write.css";
+import "./styles/help.css";
 import { boot, initController } from "./controller";
 import { installErrorHandlers } from "./errors";
 import { installLifecycle } from "./lifecycle";
+import { installViewportInset } from "./lib/viewport";
 import { registerViews } from "./router";
 import { applyTokens } from "./tokens";
 import { renderAuth } from "./views/auth";
 import { renderDeleteAll, renderDeleted } from "./views/deleteAll";
 import { renderDone } from "./views/done";
 import { renderExportData } from "./views/exportData";
+import { renderHelp } from "./views/help";
 import { renderLockSettings } from "./views/lockSettings";
 import { renderName } from "./views/name";
 import { renderPinSetup } from "./views/pinSetup";
@@ -27,6 +30,7 @@ import { installWriteLifecycle } from "./write/lifecycle";
 applyTokens();
 installErrorHandlers();
 installLifecycle();
+installViewportInset();
 installWriteLifecycle();
 initController();
 registerViews({
@@ -39,6 +43,7 @@ registerViews({
   "settings/export": renderExportData,
   "settings/delete": renderDeleteAll,
   "settings/deleted": renderDeleted,
+  help: renderHelp,
   "write/:date": renderWrite,
   "record/:date": renderRecord,
   "done/:date": renderDone

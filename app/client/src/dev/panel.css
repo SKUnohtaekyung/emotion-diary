@@ -100,3 +100,13 @@
   margin: 0;
   overflow-wrap: anywhere;
 }
+
+/* 자판 측정(TASK-PERSONAL-01 A-8, dev/keyboard.ts): 안전 영역 위 값을 읽으려는 보이지 않는 칸 — CSP 때문에 env()를 JS로 직접 읽지 못한다 */
+.dev-safe-probe {
+  position: absolute;
+  width: 0;
+  height: 0;
+  padding-top: env(safe-area-inset-top);
+  overflow: hidden;
+  pointer-events: none;
+}
