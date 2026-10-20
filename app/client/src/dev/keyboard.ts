@@ -35,6 +35,8 @@ export function measure(label: string, counts: { vv: number; win: number }): Sna
       ["vv.height", n(vv?.height)],
       ["innerHeight", n(window.innerHeight)],
       ["자판이 가린 높이", getComputedStyle(document.documentElement).getPropertyValue("--keyboard-inset").trim() || "0"],
+      ["위쪽 보정", getComputedStyle(document.documentElement).getPropertyValue("--viewport-shift").trim() || "0"],
+      ["vv.scale", vv?.scale === undefined ? "없음" : vv.scale.toFixed(2)],
       ["안전 영역 위", (probe && getComputedStyle(probe).paddingTop) || "없음"],
       ["맨 위 줄 top", top ? n(top.getBoundingClientRect().top) : "없음"],
       ["#app scrollTop", n(app?.scrollTop)],

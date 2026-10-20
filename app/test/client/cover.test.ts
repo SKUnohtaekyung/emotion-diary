@@ -153,3 +153,41 @@ describe("덮개", () => {
     expect(app.locked).toBe(true);
   });
 });
+
+// 2026-10-20 iPhone(PLAN 4-9): 앱 전환 화면을 열면 blur와 hidden이 같은 초에 함께 왔고 카드 사진은 덮개보다 먼저였다(RK-039).
+// blur에 덮는 안은 소용이 없어 뺐다 — blur는 기록만, focus는 다시 보인 것으로 확인한다. 덮인 채 화면을 누르면 다시 확인한다.
+describe("덮개 — 창의 blur·focus와 누름", () => {
+  it("blur로는 덮지 않는다(공유 창·전화 확인 창 뒤가 깜빡이지 않게)", () => {
+    const calls = stubFetch(() => session());
+    window.dispatchEvent(new FocusEvent("blur"));
+    expect(cover()).toBeNull();
+    expect(calls).toHaveLength(0);
+  });
+
+  it("숨었다 돌아올 때 focus가 먼저 와도 세션을 확인하고 걷힌다", async () => {
+    const calls = stubFetch(() => session({ locked: false }));
+    hide();
+    setVisibility("visible");
+    window.dispatchEvent(new FocusEvent("focus"));
+    await vi.waitFor(() => expect(cover()).toBeNull());
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toEqual(["GET /api/session"]);
+  });
+
+  it("다시 보였다는 신호가 없어도 덮개를 누르면 다시 확인해 걷힌다(갇히지 않는다)", async () => {
+    stubFetch(() => session({ locked: false }));
+    hide();
+    setVisibility("visible");
+    expect(cover()).not.toBeNull();
+    cover()?.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+    await vi.waitFor(() => expect(cover()).toBeNull());
+  });
+
+  it("숨어 있는 동안 누름으로는 걷히지 않는다", async () => {
+    const calls = stubFetch(() => session());
+    hide();
+    cover()?.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+    await flush(20);
+    expect(cover()).not.toBeNull();
+    expect(calls).toHaveLength(0);
+  });
+});

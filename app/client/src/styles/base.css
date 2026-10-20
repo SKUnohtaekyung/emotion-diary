@@ -33,6 +33,8 @@ body {
   /* 위에 새 버전 띠가 붙어도 화면이 한 장 높이를 넘지 않게: 띠는 제 높이만, 나머지를 #app이 채운다 */
   display: flex;
   flex-direction: column;
+  /* 자판이 뜬 동안 iOS가 보이는 영역을 아래로 옮긴 만큼 위를 비운다(lib/viewport.ts — 위쪽 줄이 상태 막대 자리로 가지 않게) */
+  padding-top: var(--viewport-shift, 0px);
 }
 
 /* 스크롤은 여기서만 한다. 자판이 가린 높이(--keyboard-inset, lib/viewport.ts)만큼 아래를 비워 자판이 떠 있어도 '다음'까지 밀어서 닿는다(U-1) */
