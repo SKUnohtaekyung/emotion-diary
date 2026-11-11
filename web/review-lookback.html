@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>돌아보기 시안 검토 — 안 고르기</title>
+<link rel="icon" href="data:,">
+<!-- 검토용 페이지(TASK-LOOKBACK-01 단계 A). 시안 본체(index.html)와 섞이지 않는 별도 파일이고, 조립본이 승인되면 지운다. 색은 브라우저의 시스템 색만 쓴다. -->
+<style>
+  @font-face{font-family:"Pretendard Variable";src:url("/design/fonts/PretendardVariable.woff2") format("woff2-variations");font-weight:45 920;font-display:swap}
+  *{box-sizing:border-box}
+  body{margin:0;padding:32px 28px 96px;font-family:"Pretendard Variable",system-ui,sans-serif;font-size:15px;line-height:1.6;color:CanvasText;background:Canvas;word-break:keep-all}
+  h1{font-size:28px;margin:0 0 8px;letter-spacing:-.02em}
+  h2{font-size:22px;margin:72px 0 4px;letter-spacing:-.02em}
+  h3{font-size:16px;margin:0 0 2px}
+  p{margin:0 0 8px;max-width:76ch}
+  ul{margin:0 0 8px;padding-left:20px;max-width:76ch}
+  .sub{color:GrayText}
+  .axis{font-weight:700}
+  .row{display:flex;gap:28px;overflow-x:auto;padding:20px 0 12px;align-items:flex-start}
+  .opt{flex:none;width:362px}
+  .opt p{font-size:14px}
+  .frame{display:block;width:362px;height:742px;margin:10px 0;border:1px solid GrayText;border-radius:12px;background:Canvas}
+  .weak{color:GrayText}
+  .pick{display:inline-block;padding:0 8px;border:1px solid CanvasText;border-radius:999px;font-size:12px;font-weight:700;margin-left:6px;vertical-align:middle}
+  .links a{margin-right:12px}
+  table{border-collapse:collapse;margin:8px 0 16px;max-width:900px}
+  td,th{border:1px solid GrayText;padding:6px 10px;text-align:left;vertical-align:top;font-size:14px}
+  .box{border:1px solid GrayText;border-radius:12px;padding:16px 20px;margin:16px 0;max-width:900px}
+</style>
+</head>
+<body>
+<h1>돌아보기 시안 검토</h1>
+<p class="sub">TASK-LOOKBACK-01 단계 A · 2026-11-12 · 전하기 한 줄, 돌아보기, 내 기준, 작은 실험</p>
+
+<div class="box">
+  <h3>읽는 법</h3>
+  <ul>
+    <li>갈림길마다 안이 가로로 나란히 있습니다. 틀 안은 시안 그대로라 그 자리에서 눌러 볼 수 있습니다. 틀 위에 안의 이름과 차이, 아래에 그 안의 약점이 있습니다.</li>
+    <li>순서는 고르는 순서입니다. 근본이 되는 갈림길 2 → 3 → 4를 먼저, 그다음 1, 5, 6입니다.</li>
+    <li><span class="pick">권함</span>은 제가 권하는 안입니다. 이유를 함께 적었고, 정하는 것은 사용자입니다.</li>
+    <li>기록·기준·실험의 문장은 모두 지어낸 예시입니다. 저장되지 않아 새로 고치면 처음으로 돌아갑니다.</li>
+    <li>모양과 흐름은 이 페이지로 확인되지만, 다시 읽으면 기준이 생기는지는 확인되지 않습니다. 휴대폰 실기기 확인도 하지 않았습니다.</li>
+  </ul>
+</div>
+
+<div class="box">
+  <h3>계획 초안에서 달라진 것</h3>
+  <ul>
+    <li>갈림길 2의 셋째 안을 "새 화면을 만들지 않는다"로 분명히 했습니다(통계 친구 상세 안에서 읽습니다).</li>
+    <li>내 기준과 작은 실험의 입구는 어느 안에서나 통계 맨 아래 줄에 두었습니다. 하단 탐색의 네 탭은 건드리지 않았습니다.</li>
+    <li>갈림길 3은 어느 읽기 화면에서나 같은 쪽지 카드에 얹히므로 2A 위에서 보여 드립니다.</li>
+    <li>글로만 후보를 내는 것이 셋입니다(맨 아래): 화면 이름, 실험을 멈추는 말, 전하기 한 줄의 문장.</li>
+    <li>기존 결정과 닿는 곳: 1B는 완료 화면에 요소 하나를 더합니다(D-078은 버튼 둘). 6A는 오늘 화면 날짜 줄에 단추를 더하고(D-076, D-090), 6B는 숲에 팻말을 더합니다(D-062). 고를 때 함께 정해 주세요.</li>
+  </ul>
+</div>
+
+<main id="forks"></main>
+
+<h2>글로만 내는 후보</h2>
+<table>
+  <tr><th>무엇</th><th>시안에 쓴 말</th><th>다른 후보</th><th>메모</th></tr>
+  <tr><td>이어 읽는 화면의 이름</td><td>돌아보기</td><td>다시 읽기 · 이어 읽기</td><td>지금 시안의 화면 어디에도 '돌아보기'라는 말은 없습니다. 문서에서만 달력·통계를 묶어 그렇게 부릅니다. 이 이름을 쓰면 실제 코드 단계에서 문서의 묶음 이름을 바꿔야 합니다. 2C를 고르면 이름이 필요 없습니다.</td></tr>
+  <tr><td>실험을 중간에 끝내는 말</td><td>실험 멈추기 / 멈추기</td><td>여기까지 하기 · 실험 접기</td><td>'그만두기'는 시트를 닫는 말이라(D-107) 쓰지 않았습니다. 확인 시트의 닫는 버튼은 그대로 '그만두기'입니다.</td></tr>
+  <tr><td>전하기 한 줄</td><td>이 이야기를 전하고 싶은 사람이 있나요?</td><td>누군가에게 전하고 싶은 이야기였나요? · 오늘 이야기 중에 누군가와 나누고 싶은 것이 있나요?</td><td>시안의 문장은 사용자가 주신 그대로입니다. 다른 후보는 '사람이 있는지'가 아니라 '이야기'를 묻는 쪽입니다(전할 사람이 없는 사람을 생각한 것).</td></tr>
+  <tr><td>표시 단추</td><td>표시</td><td>표시해 두기 · 중요했던 기록</td><td>누르면 쪽지에 민트 테이프가 붙습니다.</td></tr>
+</table>
+
+<h2>화면에 쓴 원칙</h2>
+<ul>
+  <li>앱은 기준을 제안하거나 고쳐 주지 않습니다. 묻고, 적는 칸을 줄 뿐입니다.</li>
+  <li>기준의 개수, 실험의 횟수·며칠째·달성률을 어디에도 적지 않았습니다. 실험을 날마다 했는지 묻지 않습니다.</li>
+  <li>전하기 한 줄에는 입력 칸, 버튼, 저장이 없습니다.</li>
+  <li>버린 안: 날마다 했는지 누르는 칸, 표시한 기록에서 앱이 기준 문장을 지어 주는 안, 기준의 수를 머리에 크게 적는 안(서비스 WHY §20의 1, 2, 4, 5번 질문에 걸립니다).</li>
+</ul>
+
+<script>
+const F = (name, diff, src, weak, extra = {}) => ({ name, diff, src, weak, ...extra });
+const FORKS = [
+  { id: "2", title: "갈림길 2. 돌아보기의 자리와 읽는 순서", axis: "새 화면인가, 있는 화면의 연장인가", opts: [
+    F("2A 새 화면, 날짜순", "달력의 빈 자리에서 들어가 지난 기록을 날짜순으로 이어 읽습니다.", "lookback?lb=2a.3b", "기록이 많은 30일은 길어서 끝의 물음까지 한참 내려가야 합니다.", { pick: "여러 날을 이어 읽는 것이 이 기능의 전부이고, 달력(하루씩)·통계(수)와 하는 일이 겹치지 않습니다.", links: [["들어가는 곳: 달력", "calendar?lb=2a"], ["들어가는 곳: 통계 아래", "stats?lb=2a"]] }),
+    F("2B 새 화면, 마음별", "같은 화면을 마음별 묶음으로 읽습니다(그날 가장 크게 머문 마음 아래에 한 번).", "lookback?lb=2b.3b&p=30", "기록을 어느 마음 아래에 둘지를 앱이 정합니다. 여러 마음이 섞인 날이 한쪽으로만 읽힙니다.", { links: [["최근 7일", "lookback?lb=2b.3b"]] }),
+    F("2C 새 화면 없음", "통계의 친구 상세 아래에서 그 마음이 머문 날을 이어 읽습니다. 이름이 필요 없습니다.", "stats/sadness?lb=2c.3b", "한 번에 한 마음만 보입니다. 통계를 지나 두 번 들어가야 해서 찾기 어렵습니다.", { scroll: ".lb-inline" })
+  ] },
+  { id: "3", title: "갈림길 3. 표시하고 기준을 적는 순간", axis: "언제 적는가", opts: [
+    F("3A 읽던 자리에서 바로", "표시를 누르면 그 자리에서 한 줄 적는 시트가 뜹니다. 비워 두면 표시만 남습니다.", "lookback?lb=2a.3a", "읽기가 끊깁니다. 기록 하나만 보고 적게 되어 '반복된 것'과 멀어집니다.", { click: ".lb-card:nth-of-type(2) .lb-mark" }),
+    F("3B 다 읽은 뒤 모아서", "읽는 동안은 표시만 합니다. 끝에서 표시한 기록을 모아 보고 적습니다.", "lookback?lb=2a.3b", "끝까지 읽지 않으면 적는 자리를 만나지 못합니다.", { scroll: ".lb-end", pick: "읽기를 끊지 않고, 여러 기록을 함께 보고 적어서 '반복된 것 중'이라는 물음과 맞습니다.", links: [["이어지는 화면: 기준 적기", "lookback/write?lb=3b"]] }),
+    F("3C 기준 노트에서 불러와", "읽을 때는 표시만 합니다. 적는 일은 내 기준 화면에서 표시한 기록을 불러와 합니다.", "lookback/note?lb=3c.4b", "읽기와 적기가 떨어져 있어 표시만 하고 적지 않게 되기 쉽습니다.", { links: [["읽기 화면의 끝", "lookback?lb=2a.3c"], ["기준 적기(불러오기)", "lookback/write?lb=3c"]] })
+  ] },
+  { id: "4", title: "갈림길 4. 기준 노트 목록", axis: "무엇처럼 보이는가", opts: [
+    F("4A 한 줄 목록", "문장만 줄지어 있습니다. 가장 담담합니다.", "lookback/note?lb=4a.3b", "문장이 있었던 일과 떨어져 있어 '나는 늘 이렇다'는 단정으로 읽힐 수 있습니다.", { links: [["스무 개일 때", "lookback/note?lb=4a.3b&lbs=many"]] }),
+    F("4B 기록이 딸린 묶음", "문장 아래에 그 기준이 나온 날이 딸려 있습니다. 날짜를 누르면 그날의 편지가 열립니다.", "lookback/note?lb=4b.3b", "한 화면에 들어가는 기준이 적습니다.", { pick: "문장이 있었던 일에 묶여 있어 자기비난이나 단정으로 덜 흐릅니다.", links: [["스무 개일 때", "lookback/note?lb=4b.3b&lbs=many"]] }),
+    F("4C 쪽지", "크림 종이 쪽지에 한 장씩. 편지·쪽지와 같은 결입니다.", "lookback/note?lb=4c.3b", "많아지면 길어집니다. 한 화면에 테이프가 여러 개라 소품이 많습니다.", { links: [["스무 개일 때", "lookback/note?lb=4c.3b&lbs=many"]] })
+  ] },
+  { id: "1", title: "갈림길 1. 전하기 한 줄", axis: "얼마나 드러나는가", opts: [
+    F("1A 늘 보이는 한 줄", "완료 제목 아래 작은 글씨 한 줄입니다.", "write?s=done&lb=1a", "날마다 같은 자리에 있어 금방 눈에 익어 지나칩니다.", { pick: "가장 조용하고, 완료 화면의 구조(버튼 둘)를 건드리지 않습니다." }),
+    F("1B 잠깐 나타나는 쪽지", "하늘 자리에 쪽지가 올라왔다가 몇 초 뒤 사라집니다.", "write?s=done&lb=1b", "완료 화면에 요소가 하나 늘어납니다(D-078). 친구가 여럿인 날 뒷줄 친구와 겹칠 수 있습니다(확인하지 못했습니다)."),
+    F("1C 가끔만", "1A와 같은 줄이 일주일에 한 번쯤만 나옵니다. 왼쪽은 나오는 날입니다.", "write?s=done&lb=1c", "언제 나오는지 사용자가 알 수 없습니다. 무엇을 기준으로 '가끔'인지 실제 코드 단계에서 정해야 합니다.", { links: [["나오지 않는 날", "write?s=done&lb=1c&lbt=0"]] })
+  ] },
+  { id: "5", title: "갈림길 5. 작은 실험 고르기", axis: "어디서 출발하는가", opts: [
+    F("5A 예시에서", "예시 몇 개에서 고르거나 '직접 적기'로 씁니다.", "lookback/try?lb=5a&lbx=none", "예시가 앱이 권하는 행동으로 읽힐 수 있습니다.", { pick: "빈 칸보다 시작이 쉽고, 예시가 '작고 구체적인 것'이라는 틀을 보여 줍니다." }),
+    F("5B 내 기준에서", "내 기준 하나를 고르고 그 기준으로 해 볼 것을 적습니다.", "lookback/try?lb=5b&lbx=none", "기준이 없으면 이 길이 막힙니다(없을 때는 바로 적게 했습니다). 기준을 '고쳐야 할 것'으로 읽게 만들 수 있습니다."),
+    F("5C 직접 적기", "빈 칸에 바로 적습니다.", "lookback/try?lb=5c&lbx=none", "무엇을 적을지 막막할 수 있습니다.")
+  ] },
+  { id: "6", title: "갈림길 6. 진행 중인 실험이 보이는 자리", axis: "얼마나 눈에 띄는가", opts: [
+    F("6A 날짜 줄의 작은 표식", "'지난 기록' 왼쪽에 작은 유리 단추. 기간이 끝나면 민트 점이 붙습니다.", "today?lb=6a&lbx=active", "너비 320에서 날짜가 두 줄로 꺾입니다(미완). 날짜 줄의 구조 결정(D-076, D-090)을 고쳐야 합니다.", { links: [["기간이 끝난 날", "today?lb=6a&lbx=ended"]] }),
+    F("6B 숲 속의 팻말", "길가에 작은 팻말 하나. 기간이 끝나면 팻말이 밝아지고 불빛이 하나 켜집니다.", "today?lb=6b&lbx=active", "팻말이 무엇인지 처음에는 알기 어렵습니다. 숲에 요소가 하나 늘어납니다(D-062).", { pick: "글자가 없어 재촉하지 않으면서, 알림이 없어도 끝난 것을 오늘 화면에서 알 수 있습니다.", links: [["기간이 끝난 날", "today?lb=6b&lbx=ended"]] }),
+    F("6C 오늘 화면에는 없음", "오늘 화면은 그대로입니다. 통계 아래 줄과 작은 실험 화면에만 보입니다.", "today?lb=6c&lbx=active", "알림이 없어서 기간이 끝난 것을 모르고 지나가기 쉽습니다.", { links: [["통계 아래 줄", "stats?lb=6c&lbx=ended"]] })
+  ] },
+  { id: "x", title: "한 안만 만든 화면", axis: "갈림길이 아닌 화면", opts: [
+    F("돌아보기 · 기록 0편", "", "lookback?lb=2a&lbs=empty", ""), F("돌아보기 · 기록 2편", "", "lookback?lb=2a.3b&lbs=few", "", { scroll: ".lb-end" }),
+    F("기준 적기", "", "lookback/write?lb=3b", ""), F("기준 적기 · 자판 자리", "", "lookback/write?lb=3b&kb=1", "진짜 자판은 실제 기기에서만 확인됩니다."),
+    F("내 기준 · 빈 상태", "", "lookback/note?lb=4b.3b&lbs=empty", ""), F("내 기준 · ⋯ 메뉴", "고치기 · 접어 두기 · 지우기", "lookback/note?lb=4b.3b", "", { click: ".lb-more" }),
+    F("작은 실험 · 해 보는 중", "", "lookback/try?lbx=active", ""), F("작은 실험 · 기간이 끝남", "그 기간의 기록, 그리고 '해 보니 어땠나요?'", "lookback/try?lbx=ended", ""),
+    F("작은 실험 · 멈추기 확인", "", "lookback/try?lbx=active", "", { click: ".lb-stop" }), F("통계 아래의 입구", "", "stats?lb=2a&lbx=active", "", { scroll: ".lb-stats-rows" })
+  ] }
+];
+const url = (src, n) => `index.html?rv=${n}#/${src}`;
+const el = (tag, cls, text) => { const n = document.createElement(tag); if (cls) n.className = cls; if (text) n.textContent = text; return n; };
+let n = 0;
+const host = document.getElementById("forks");
+for (const fork of FORKS) {
+  const sec = el("section");
+  sec.append(el("h2", "", fork.title));
+  const axis = el("p", "axis", `가르는 것: ${fork.axis}`); sec.append(axis);
+  const row = el("div", "row");
+  for (const o of fork.opts) {
+    const box = el("div", "opt");
+    const h = el("h3", "", o.name); if (o.pick) h.append(el("span", "pick", "권함")); box.append(h);
+    if (o.diff) box.append(el("p", "", o.diff));
+    if (o.pick) box.append(el("p", "", `권하는 이유: ${o.pick}`));
+    const frame = el("iframe", "frame"); frame.loading = "lazy"; frame.title = o.name; frame.src = url(o.src, (n += 1));
+    frame.addEventListener("load", () => setTimeout(() => { try {
+      const doc = frame.contentDocument;
+      const to = o.scroll && doc.querySelector(o.scroll); // scrollIntoView는 바깥 페이지까지 움직이므로 틀 안만 직접 옮긴다
+      if (to) frame.contentWindow.scrollTo(0, to.getBoundingClientRect().top + frame.contentWindow.scrollY - 64);
+      if (o.click) doc.querySelector(o.click)?.click();
+    } catch { /* 틀 안을 건드리지 못하면 처음 모습 그대로 둔다 */ } }, 1200));
+    box.append(frame);
+    if (o.weak) box.append(el("p", "weak", `이 안의 약점: ${o.weak}`));
+    const links = el("p", "links"); const a0 = el("a", "", "새 창에서 열기"); a0.href = url(o.src, (n += 1)); a0.target = "_blank"; links.append(a0);
+    for (const [label, src] of o.links ?? []) { const a = el("a", "", label); a.href = url(src, (n += 1)); a.target = "_blank"; links.append(a); }
+    box.append(links); row.append(box);
+  }
+  sec.append(row); host.append(sec);
+}
+</script>
+</body>
+</html>

@@ -28,7 +28,8 @@ export const SHOTS = [
   ["4a-기준-많음", "lookback/note?lb=4a.3b&lbs=many", 1700], ["4b-기준-많음", "lookback/note?lb=4b.3b&lbs=many", 2600], ["4c-기준-많음", "lookback/note?lb=4c.3b&lbs=many", 3600], ["4-기준-빈", "lookback/note?lb=4b.3b&lbs=empty", 740],
   ["5a-실험-예시에서", "lookback/try?lb=5a&lbx=none", 900], ["5b-실험-기준에서", "lookback/try?lb=5b&lbx=none", 1000], ["5c-실험-직접", "lookback/try?lb=5c&lbx=none", 740],
   ["5-실험-진행중", "lookback/try?lbx=active", 1500], ["5-실험-끝", "lookback/try?lbx=ended", 2200],
-  ["6a-오늘-표식", "today?lb=6a&lbx=active", 740], ["6a-오늘-표식-끝남", "today?lb=6a&lbx=ended", 740], ["6b-오늘-팻말", "today?lb=6b&lbx=active", 740], ["6b-오늘-팻말-끝남", "today?lb=6b&lbx=ended", 740], ["6c-오늘-없음", "today?lb=6c&lbx=active", 740]
+  ["6a-오늘-표식", "today?lb=6a&lbx=active", 740], ["6a-오늘-표식-끝남", "today?lb=6a&lbx=ended", 740], ["6b-오늘-팻말", "today?lb=6b&lbx=active", 740], ["6b-오늘-팻말-끝남", "today?lb=6b&lbx=ended", 740], ["6c-오늘-없음", "today?lb=6c&lbx=active", 740],
+  ["9-검토페이지", "/review-lookback.html", 1500, "document.querySelectorAll('h2')[0].scrollIntoView()"] // --w=1240 로 찍는다
 ];
 
 // 헤드리스 Chrome을 띄워 원격 디버깅(CDP)으로 휴대폰 크기를 흉내 낸다 — 창 크기만 줄이면 Windows의 Chrome은 500px 아래로 내려가지 않는다.
@@ -54,8 +55,9 @@ async function main() {
     for (const [name, hash, height, js] of picked) {
       errors.length = 0;
       await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: scale, mobile: true });
-      await send("Page.navigate", { url: `http://localhost:${port}/?shot=${encodeURIComponent(name)}#/${hash}` });
-      await sleep(1300);
+      const whole = hash.startsWith("/"); // "/review-lookback.html"처럼 /로 시작하면 시안 본체가 아니라 그 파일을 연다(검토 페이지)
+      await send("Page.navigate", { url: whole ? `http://localhost:${port}${hash}` : `http://localhost:${port}/?shot=${encodeURIComponent(name)}#/${hash}` });
+      await sleep(whole ? 6000 : 1300);
       if (js) { await send("Runtime.evaluate", { expression: js, awaitPromise: true }); await sleep(500); }
       const shot = await send("Page.captureScreenshot", { format: "png" });
       const file = path.join(out, `${name}${width === 360 ? "" : `-w${width}`}.png`);
