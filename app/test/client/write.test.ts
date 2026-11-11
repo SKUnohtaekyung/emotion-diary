@@ -384,8 +384,11 @@ describe("남기기·고치기·지우기", () => {
     });
     const calls = serve({ entry: full });
     await open(`#/write/${TODAY}?step=letter`);
+    const depthOne = history.length;
     byText("남기기")?.click();
     await vi.waitFor(() => expect(heading()).toBe("오늘의 마음을 남겼어요"), { timeout: 3000 });
+    // 흐름 칸(깊이 1)을 되감은 뒤 완료 칸 하나만 — 쌓으면 뒤로 밀기가 끝난 단계로 돌아간다(F-18, 2026-11-12 결함 주입에서 이 확인이 빠져 있었다)
+    expect(history.length).toBeLessThanOrEqual(depthOne);
     const complete = calls.find((call) => call.path.endsWith("/complete"));
     expect(complete?.body).toEqual({ revision: expect.any(Number) });
     expect(complete?.headers["idempotency-key"]).toBeTruthy();
