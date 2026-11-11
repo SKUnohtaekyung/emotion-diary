@@ -170,7 +170,8 @@ function emergencySection(): HTMLElement {
         h("a", {
           class: "btn btn-primary",
           href: telHref(contact.number),
-          "aria-label": `${contact.number} ${contact.name}에 전화하기`,
+          // 보이는 글("112 경찰")이 이름 안에 그대로 있어야 한다 — 음성으로 누르는 사람이 보이는 대로 말한다(WCAG 2.5.3, axe label-content-name-mismatch)
+          "aria-label": `${contact.number} ${contact.name} 전화하기`,
           text: `${contact.number} ${contact.name}`
         })
       )

@@ -11,6 +11,9 @@ source_of_truth: docs/AGENT_WORKFLOW.md
 # 2026-10-15 TASK-CLEANUP-01(D-116~D-121): 순서를 '오늘 한 편'을 휴대폰까지 먼저로 바꿨다 — data-foundation(저장 핵심) →
 # first-slice·data-control → personal-start(본인 사용 시작 관문) → direct-journal → dashboard-reminder. limited-mvp-release는
 # id를 그대로 두고 뜻을 '공개 출시(공개를 정할 때만)'로 바꿨다(D-117). AI 쓰기는 실사용 30일 뒤, 근거 분석은 60일 뒤 결정(D-120·D-121).
+# 2026-11-11 TASK-REPLAN-01(D-126): 목표를 '다른 사람이 가입해 쓰는 웹앱 공개'로 바꾸고 순서를 다시 세웠다 — personal-start는 대체(blocked로
+# 남김, 더 진행하지 않음), dashboard-reminder(화면 기초 + 돌아보기) → direct-journal(작성 흐름·오늘·설정) → 새 노드 accounts(가입) →
+# limited-mvp-release(공개) → ai-journal·rag-analysis(첫 공개 뒤 다시 결정). 계획은 tasks/replan/2026-11-11/PLAN.md.
 # 이 파일이 노드 상태의 유일한 기록이다(D-118) — 다른 문서는 상태를 옮겨 적지 않고 여기를 가리킨다.
 
 statuses:
@@ -184,8 +187,11 @@ nodes:
     gate: data-control
 
   - id: personal-start
-    status: in_progress
+    status: blocked
     depends_on: [first-slice, data-control]
+    # 2026-11-11 대체됨(D-126) — 사용자가 본인 사용을 하지 않기로 했다. 지은 것(운영 건물 emotion-diary-prod, #/help, 자판 배치 C,
+    # 첫 백업 복원)은 그대로 남고 공개 준비가 이어 쓴다. 남은 휴대폰 확인(배치 C 실기기·mobile-personal·잠금 켜짐 T-03)과 백업 예약은
+    # 하지 않는다. 다른 노드는 이 노드에 기대지 않는다. 기록은 tasks/archive/TASK-PERSONAL-01.md.
     # 2026-10-20 TASK-PERSONAL-01 착수(사용자 답 U-1~U-4 — 운영 건물 미리 승인, 겹침 결함 포함, 계획 승인 없이 진행).
     # 진행·증거는 tasks/personal-start/2026-10-20/PLAN.md 한 곳(D-118).
     # 2026-10-15 새 노드(D-116·D-117): 본인 사용 시작 관문 — 운영 건물·운영 열쇠(만들기 직전 사용자 확인), 위기 안내 '검토 전' 표기로
@@ -231,11 +237,35 @@ nodes:
       - taxonomy v2 with per-item provenance and evidence grade, and the v1-to-v2 migration map keeping emotion_code stable (D-022, D-027)
     gate: taxonomy-evidence
 
+  - id: dashboard-reminder
+    status: verifying
+    depends_on: [first-slice, data-control]
+    # 2026-11-11 verifying(D-130): 코드·시험·E2E·결함 주입·마감 검토 끝, 관문 reflection-core는 mobile-reflection(휴대폰)만 남음 —
+    # 다음 묶음(direct-journal)의 휴대폰 확인과 함께 본다(tasks/reflection/2026-11-11/PHONE-GUIDE.md).
+    # 2026-11-11 TASK-REFLECT-01 착수(D-129 — 계획 승인, 설정 목록 화면도 이번에). 진행·증거는 tasks/reflection/2026-11-11/PLAN.md 한 곳.
+    # 2026-11-11(D-126): 새 순서의 첫 짓기 — ① 화면 기초(시안 토큰·그림·스크롤/움직임 줄이기 도우미·하단 탐색·기본 부품,
+    # tasks/direct-journal/2026-10-20/MAP.md §5 조각 0)와 Preact 도입(D-127 — 사용자 결정, D-114를 교정) ② 돌아보기 — 달력(한 달,
+    # 작은 편지, 지난 임시저장 쪽지)과 통계를 처음부터 시안 모양으로. 서버에 한 달 목록·통계 경로를 더하고, 통계 계산은 app/shared/의
+    # 순수 함수로 둔다. 실사용 2주를 기다리지 않고 개발용에 합성 기록으로 짓는다. 알림(F-13)은 공개 준비에서 정한다(D-126 — 관문에서 뺐다).
+    # 선행이 direct-journal에서 first-slice·data-control로 바뀌었다 — 지금의 평면 작성 흐름이 같은 데이터를 저장한다.
+    # (이력) 2026-10-15(D-116): 시작은 실제 기록이 2주 쌓인 뒤, 기본 통계·달력 먼저였다.
+    owns:
+      - UI foundation ported from the prototype (tokens, art, helpers, bottom navigation, base components)
+      - deterministic statistics
+      - calendar and dashboard UI
+    outputs:
+      - reproducible dashboard and month calendar in the prototype's look
+    gate: reflection-core
+
   - id: direct-journal
-    status: blocked
-    depends_on: [personal-start]
-    # 2026-10-15(D-116): 실사용과 나란히 시안 화면을 하나씩 옮긴다(나머지 작성 단계·연출·달력·기록 상세·설정). 작성 흐름을 먼저 옮기고,
-    # 화면 동기화 코드가 3분의 1을 넘거나 '낡은 화면' 결함이 3건이면 화면 도구(Preact)를 다시 본다(감리 REPORT §5.3).
+    status: ready
+    depends_on: [first-slice, data-control]
+    # 2026-11-11(D-130): 선행을 dashboard-reminder에서 first-slice·data-control로 풀었다 — 화면 기초(Preact·토큰·부품)는 끝났고,
+    # 돌아보기의 휴대폰 확인을 이 노드의 휴대폰 확인과 함께 하기로 했다. 순서(D-126)는 그대로다.
+    # 2026-11-11(D-126): 돌아보기 다음 — 작성 흐름(MAP §5 조각 1~6, 완료 취소 경로 포함)과 오늘·설정(조각 8·9). 들어오는 길·온보딩
+    # (조각 10·11)은 가입과 함께 accounts로 옮겼다. 남았던 질문 Q3·Q4는 D-128(자유 배치 확정 + 격자 자동 전환, 돌을 누르면 읽는 편지).
+    # (이력) 2026-10-15(D-116): 실사용과 나란히 시안 화면을 하나씩 옮긴다. 화면 동기화 코드가 3분의 1을 넘거나 '낡은 화면' 결함이
+    # 3건이면 화면 도구(Preact)를 다시 본다(감리 REPORT §5.3) — 이 판정은 D-126에서 dashboard-reminder 앞으로 옮겼다.
     # 관문의 실기기는 iPhone만(mobile-core-flow-personal) — Android와 화면 낭독기는 공개 관문으로 갔다(D-117).
     owns:
       - direct-entry UI
@@ -245,24 +275,28 @@ nodes:
       - complete direct journal flow
     gate: core-product
 
-  - id: dashboard-reminder
+  - id: accounts
     status: blocked
     depends_on: [direct-journal]
-    # 2026-10-15(D-116): 시작은 실제 기록이 2주 쌓인 뒤. 기본 통계·달력 먼저, 기간 비교·친밀도는 그 뒤. 알림의 기본값(켜짐/꺼짐)은
-    # 이때 사용자와 정한다(감리 REPORT §3.3 6단계).
+    # 2026-11-11 새 노드(D-126): 여러 사람이 쓰기 — 소셜 로그인(카카오·구글), 가입 때 만 14세 이상 확인, 이용약관·개인정보 처리방침·
+    # 건강정보 별도 동의, 회원 탈퇴(모든 기록 지우기 + 계정), 사람별 데이터 분리 재검증, 접근 열쇠 퇴역, 시안의 들어오는 길·온보딩
+    # (MAP §5 조각 10·11). 표는 이미 모든 행에 owner_key가 있다 — 바뀌는 것은 세션 주체(app/worker/src/context.ts의
+    # OWNER_SUBJECT·OWNER_ALLOWLIST). 착수 전에 정한다: 서버가 일기를 읽을 수 있는 구조로 둘지(감리 REPORT 공개 갈림길), 법 검토.
+    # 운영 건물의 창고 구조를 바꾸므로 RK-045 규칙(바꾸기 전 내보내기 + 백업, 바꾼 뒤 복원 확인)을 지킨다.
     owns:
-      - deterministic statistics
-      - dashboard UI
-      - reminder adapter
+      - social login and account lifecycle
+      - consent and policy screens
+      - per-user isolation tests
     outputs:
-      - reproducible dashboard
-      - in-app reminder
-    gate: reflection-core
+      - people other than the owner can sign up, write, export, and leave
+    gate: accounts
 
   - id: limited-mvp-release
     status: blocked
-    depends_on: [direct-journal, dashboard-reminder]
-    # 2026-10-15(D-117): id는 그대로 두고 뜻을 '공개 출시 — 다른 사람에게 열기로 정할 때만'으로 바꿨다. 본인 사용은 personal-start가 연다.
+    depends_on: [direct-journal, dashboard-reminder, accounts]
+    # 2026-11-11(D-126): 이제 목표 노드다 — 웹앱으로 공개(스토어는 그 뒤), AI 없이. 처음 누구에게 여는지는 이 노드 앞에서 정한다(D-126 U-12).
+    # 알림(F-13)을 둘지·기본값도 여기서 정한다. 운영 백업은 여러 사람 기준으로 다시 정한다(본인 PC 백업 D-109는 1명용).
+    # (이력) 2026-10-15(D-117): id는 그대로 두고 뜻을 '공개 출시 — 다른 사람에게 열기로 정할 때만'으로 바꿨다.
     # 관문 limited-release에 public-only(Android Chrome 실기기, 건강정보 별도 동의·처리방침, 위기 연락처 임상 검토·1388 실측,
     # 실제 앱의 S-00~S-12·T-01~T-07 전부, 화면 낭독기)를 더했다. 공개 갈림길 목록은 감리 REPORT §3.3 '공개 갈림길'.
     owns:
@@ -275,8 +309,9 @@ nodes:
 
   - id: ai-journal
     status: blocked
-    depends_on: [direct-journal, model-access-spike]
-    # 2026-10-15(D-120): 지을지는 직접 쓰기 실사용 30일 뒤 사용자가 정한다. 짓게 되면 서버 → Claude API(Max 포함 월 크레딧),
+    depends_on: [direct-journal, model-access-spike, limited-mvp-release]
+    # 2026-11-11(D-126): 첫 공개는 AI 없이 — 지을지는 공개 반응을 보고 다시 정한다(실사용 30일 조건은 없어졌다).
+    # (이력) 2026-10-15(D-120): 짓게 되면 서버 → Claude API(Max 포함 월 크레딧),
     # 크레딧이 없어지면 PC + claude -p로 바꿔 끼울 수 있게(작업 큐 + 처리기). 근거 없는 심리학 문장 0(D-121, SERVICE_WHY §19.9~§19.14).
     owns:
       - journal conversation endpoint and schemas
@@ -304,8 +339,9 @@ nodes:
 
   - id: rag-analysis
     status: blocked
-    depends_on: [dashboard-reminder, evidence-pipeline]
-    # 2026-10-15(D-121): 실사용 60일 뒤 결정. 그 전에는 AI가 심리학 설명을 하지 않는다.
+    depends_on: [dashboard-reminder, evidence-pipeline, limited-mvp-release]
+    # 2026-11-11(D-126): 첫 공개 뒤 다시 결정(실사용 60일 조건은 없어졌다).
+    # (이력) 2026-10-15(D-121): 실사용 60일 뒤 결정. 그 전에는 AI가 심리학 설명을 하지 않는다.
     owns:
       - planner, search, gate, generator
       - verifier and safety validator
@@ -381,15 +417,30 @@ edges:
   - from: data-control
     to: personal-start
     reason: real diaries go in only after export, delete and a restored backup work (D-116)
-  - from: personal-start
-    to: direct-journal
-    reason: the rest of the prototype is ported while the owner already writes daily (D-116)
+  - from: first-slice
+    to: dashboard-reminder
+    reason: the plain writing flow already stores the data the calendar and statistics read (D-126)
+  - from: data-control
+    to: dashboard-reminder
+    reason: reflection screens sit on the finished storage and data-control contract (D-126)
   - from: direct-journal
     to: ai-journal
     reason: AI must degrade to a working direct flow
+  - from: dashboard-reminder
+    to: direct-journal
+    reason: shared prototype components are settled on read-only screens before the input-heavy flow (D-126)
   - from: direct-journal
-    to: dashboard-reminder
-    reason: reflection uses completed records
+    to: accounts
+    reason: sign-up and entry screens come last among the prototype screens (D-126)
+  - from: accounts
+    to: limited-mvp-release
+    reason: other people can only use the app once they can sign up (D-126)
+  - from: limited-mvp-release
+    to: ai-journal
+    reason: the first public release ships without AI (D-126)
+  - from: limited-mvp-release
+    to: rag-analysis
+    reason: the first public release ships without AI (D-126)
   - from: direct-journal
     to: limited-mvp-release
     reason: a public release ships direct journaling first (D-018, D-117)

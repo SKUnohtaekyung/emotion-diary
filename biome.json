@@ -24,5 +24,11 @@
         "useConst": "error"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["app/client/src/styles/calendar.css", "app/client/src/styles/stats.css", "app/client/src/styles/settings.css"],
+      "linter": { "rules": { "complexity": { "noImportantStyles": "off" }, "style": { "noDescendingSpecificity": "off" } } }
+    }
+  ]
 }

@@ -84,6 +84,21 @@ export function isIsoDate(value: unknown): value is string {
   return year >= 1000 && time.getUTCFullYear() === year && time.getUTCMonth() === month - 1 && time.getUTCDate() === day;
 }
 
+const ISO_MONTH = /^(\d{4})-(0[1-9]|1[0-2])$/;
+
+/** 달(YYYY-MM)인가 — 달력 `GET /api/calendar/:month`·`#/calendar?m=`(TASK-REFLECT-01 A-7). 1000~9999년. */
+export function isIsoMonth(value: unknown): value is string {
+  if (typeof value !== "string") return false;
+  const match = ISO_MONTH.exec(value);
+  return Boolean(match) && Number(match?.[1]) >= 1000;
+}
+
+/** YYYY-MM에 달 수를 더한다. */
+export function addMonths(isoMonth: string, months: number): string {
+  const [year = 0, month = 1] = isoMonth.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1 + months, 1)).toISOString().slice(0, 7);
+}
+
 /** YYYY-MM-DD에 날 수를 더한다(달력 날짜 — 시간대와 상관없다). */
 export function addDays(isoDate: string, days: number): string {
   const [year = 0, month = 1, day = 1] = isoDate.split("-").map(Number);
@@ -461,6 +476,19 @@ export interface ImportResult {
   inserted: number;
   skipped: string[];
   settingsRestored: boolean;
+}
+
+/** 달력의 한 칸 — 기록이 있는 날만 온다. 글·감정은 없다(작은 편지는 `GET /api/diaries/:date`). */
+export interface CalendarDay {
+  date: string;
+  status: DiaryStatus;
+}
+
+/** `GET /api/calendar/:month` — 그 달의 기록 상태와 서버가 센 오늘. */
+export interface CalendarMonth {
+  month: string;
+  today: string;
+  days: CalendarDay[];
 }
 
 /** `GET /api/today`. */

@@ -130,8 +130,8 @@ describe("위기 안내 — 접근 이름", () => {
     open();
     const names = links().map((link) => link.getAttribute("aria-label"));
     for (const expected of [
-      "112 경찰에 전화하기",
-      "119 구급에 전화하기",
+      "112 경찰 전화하기",
+      "119 구급 전화하기",
       "자살예방상담전화 109에 전화하기",
       "청소년상담 1388에 전화하기",
       "청소년상담 1388로 문자 보내기",

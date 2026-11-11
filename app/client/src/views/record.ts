@@ -3,6 +3,7 @@
 // 없는·미래 날짜는 '이 날의 편지가 없어요'(D-083 ②). 임시저장이면 이어 쓰기로 보낸다.
 
 import type { DiaryEntryView } from "../../../shared/diary";
+import { CATEGORY_CODES } from "../../../shared/taxonomy";
 import { h } from "../lib/dom";
 import { monthDay } from "../lib/format";
 import { back, navigate, pushFlowStep, syncTitle, type ViewContext } from "../router";
@@ -71,8 +72,15 @@ function letter(entry: DiaryEntryView): HTMLElement[] {
 
 export function renderRecord({ root, route, alive }: ViewContext): () => void {
   const date = route.params.date ?? "";
-  const backButton = h("button", { type: "button", class: "back-button", text: "‹ 오늘로" });
-  backButton.addEventListener("click", () => back("#/today"));
+  // 달력의 작은 편지에서 왔으면 '달력으로' — 돌아가면 그날이 고른 채로 열린다(UX_SPEC §7, TASK-REFLECT-01 A-11)
+  // 통계 친구 상세의 미리보기에서 왔으면 '통계로' — 같은 친구·같은 기간으로 돌아간다(시안 tabs.js renderRecord의 from=stats)
+  const from = route.query.get("from");
+  const statsCategory = route.query.get("cat");
+  const fromStats = from === "stats" && statsCategory !== null && CATEGORY_CODES.includes(statsCategory);
+  const fromCalendar = from === "calendar";
+  const backTo = fromStats ? `#/stats/${statsCategory}?p=${route.query.get("p") === "30" ? 30 : 7}` : fromCalendar ? `#/calendar?d=${date}` : "#/today";
+  const backButton = h("button", { type: "button", class: "back-button", text: fromStats ? "‹ 통계로" : fromCalendar ? "‹ 달력으로" : "‹ 오늘로" });
+  backButton.addEventListener("click", () => back(backTo));
   const title = h("h1", { text: `${monthDay(date)}의 편지` });
   const area = h("div", { class: "record-body", "aria-busy": "true" }, h("p", { class: "note", text: "불러오는 중이에요." }));
   root.append(h("section", { class: "screen record" }, h("div", { class: "screen-top" }, backButton), title, area));

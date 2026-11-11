@@ -176,7 +176,8 @@ describe("오늘 — 아래 작은 줄", () => {
   it("'도움이 필요할 때'는 줄의 맨 앞이고 다른 버튼과 같은 모양이며, 위기 안내로 push한다(TASK-PERSONAL-01 A-1)", async () => {
     await openToday(todayReply());
     const tools = [...document.querySelectorAll<HTMLButtonElement>(".today-tools button")];
-    expect(tools.map((button) => button.textContent)).toEqual(["도움이 필요할 때", "앱 잠금", "내 기록 내보내기", "모든 기록 지우기", "로그아웃"]);
+    // 달력·통계·설정은 위기 안내 다음(TASK-REFLECT-01 A-10) — 위기 안내는 그대로 맨 앞
+    expect(tools.map((button) => button.textContent)).toEqual(["도움이 필요할 때", "달력", "통계", "설정", "앱 잠금", "내 기록 내보내기", "모든 기록 지우기", "로그아웃"]);
     const help = byText("도움이 필요할 때");
     expect(help?.className).toBe("btn btn-quiet btn-small");
     expect(help?.className).toBe(byText("앱 잠금")?.className);

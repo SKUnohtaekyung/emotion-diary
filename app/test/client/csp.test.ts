@@ -21,6 +21,9 @@ describe("CSP를 어기는 코드가 없다", () => {
     ["style 속성 설정", /setAttribute\(\s*["']style["']/],
     ["cssText", /\.cssText\b/],
     ["style 문자열 속성", /\bstyle\s*=\s*["'`]/],
+    // Preact: 객체 style은 CSSOM(el.style[이름])이라 정책 안이지만, 글자 style은 style 속성으로 들어간다
+    ["JSX style 글자", /\bstyle\s*=\s*\{\s*["'`]/],
+    ["dangerouslySetInnerHTML", /dangerouslySetInnerHTML/],
     ["eval", /\beval\s*\(/],
     ["new Function", /new\s+Function\s*\(/],
     ["document.write", /document\.write/],

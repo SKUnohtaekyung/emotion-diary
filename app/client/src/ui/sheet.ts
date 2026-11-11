@@ -7,7 +7,8 @@ import { focusElement, h, inertOutside, setInert } from "../lib/dom";
 
 export interface SheetAction {
   label: string;
-  kind?: "primary" | "quiet";
+  /** danger = 빨간 주 버튼(지우기 같은 되돌릴 수 없는 일 — DESIGN_SYSTEM §6.11 위험 시트) */
+  kind?: "primary" | "quiet" | "danger";
   /** 시트가 닫힌 다음에 부른다. 없으면 닫기만 한다. */
   onClick?: () => void | Promise<void>;
 }
@@ -87,7 +88,7 @@ export function openSheet(options: SheetOptions): void {
   const buttons = options.actions.map((action) => {
     const button = h("button", {
       type: "button",
-      class: `btn ${action.kind === "primary" ? "btn-primary" : "btn-quiet"}`,
+      class: `btn ${action.kind === "primary" ? "btn-primary" : action.kind === "danger" ? "btn-danger" : "btn-quiet"}`,
       text: action.label
     });
     button.addEventListener("click", () => {

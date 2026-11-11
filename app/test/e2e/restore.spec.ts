@@ -132,7 +132,8 @@ test("⑥ 마음 셋·서로 다른 크기·따로 정한 크기가 저장·새�
   await page.getByRole("button", { name: "남기기" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("오늘의 마음을 남겼어요");
 
-  // 고치기: 사랑의 크기를 3으로, 슬픔의 첫 세부 감정을 뺀다
+  // 고치기: 사랑의 크기를 3으로, 슬픔의 첫 세부 감정을 뺀다(완료 화면은 달력·통계 보기라 오늘 화면에서 기록을 연다 — D-078)
+  await page.goto("/#/today");
   await page.getByRole("button", { name: "오늘의 기록 보기" }).click();
   await page.getByRole("button", { name: "슬픔 고치기" }).click();
   await expect(page.locator(".write-banner")).toHaveText("완료된 기록을 수정 중이에요");

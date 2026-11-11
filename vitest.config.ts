@@ -18,9 +18,11 @@ export default defineConfig({
       },
       {
         define: { __APP_ENV__: JSON.stringify("dev"), __APP_BUILD__: JSON.stringify("test-build") },
+        // vite.config.ts와 같은 JSX 변환(Preact, D-127)
+        oxc: { jsx: { runtime: "automatic", importSource: "preact" } },
         test: {
           name: "client",
-          include: ["app/test/client/**/*.test.ts"],
+          include: ["app/test/client/**/*.test.{ts,tsx}"],
           environment: "happy-dom"
         }
       }

@@ -385,5 +385,14 @@ Recall/Precision의 수치는 corpus 주제와 규모 없이 임의로 정하면
 | data-integrity | `data-foundation` 노드 게이트 — **저장 핵심**(D-116): F-01, F-02, F-06, F-07, F-09, F-10, F-17, ci-green. F-14·F-15는 `data-control`로 옮겼다 | D-116 |
 | first-slice | `first-slice` 노드 게이트: F-03, F-04, F-05, F-08, F-24, e2e-reload-restore, mobile-slice | D-116 |
 | data-control | `data-control` 노드 게이트: F-14, F-15, restore-drill, export-cpu-measured | D-116 |
-| personal-start | `personal-start` 노드 게이트 — **본인 사용 시작**: full, F-01, F-02, F-06, F-07, F-09, F-10, F-14, F-15, F-17, F-24, deployment-boundary-review, backup-and-restore-drill, mobile-personal, crisis-help-unreviewed-label. 공개 기준(`public-only`)은 요구하지 않는다 | D-116, D-117 |
+| personal-start | **2026-11-11 대체됨(D-126 — 본인 사용을 하지 않기로 함, 기록으로 남김).** `personal-start` 노드 게이트 — **본인 사용 시작**: full, F-01, F-02, F-06, F-07, F-09, F-10, F-14, F-15, F-17, F-24, deployment-boundary-review, backup-and-restore-drill, mobile-personal, crisis-help-unreviewed-label. 공개 기준(`public-only`)은 요구하지 않는다 | D-116, D-117 |
+| mobile-reflection | 돌아보기(달력·통계)를 iPhone 홈 화면 앱에서 약 20분: 달 넘기기, 날짜 열기와 뒤로 밀기, 작은 편지 넘기기, 통계 요약·친구 상세, 움직임 줄이기 켜고 한 번, 큰 글자, 360 폭 7열. 결과는 §4·§6 표 | §4, §6 |
+| reflection-core | `dashboard-reminder` 노드 게이트 — **화면 기초 + 돌아보기**(D-126): F-11, F-12, F-20, deterministic-statistics, timezone-boundaries, mobile-reflection. 알림 F-13은 공개 준비에서 둘지 정한다(전에는 이 관문) | D-126 |
+| social-login | 카카오·구글 로그인으로 가입·로그인·로그아웃, 홈 화면 앱에서 로그인 유지(S-02와 같은 확인), 접근 열쇠 길 퇴역 | `accounts` PLAN |
+| age-14-check | 가입 때 만 14세 이상인지 확인하고, 아니면 가입하지 않는다(D-126) | `accounts` PLAN |
+| consent-and-policy | 이용약관·개인정보 처리방침·건강정보 별도 동의(`public-only` ②의 흐름)를 가입 흐름에 짓고, 거부했을 때의 동작이 정해져 있다. 법 검토 여부는 `accounts` 착수 때 정한다 | `SAFETY_POLICY` §3, D-093 |
+| account-withdrawal | 회원 탈퇴가 모든 기록·설정·세션과 소셜 계정 연결을 지우고, 탈퇴 뒤 같은 소셜 계정으로 들어오면 빈 상태로 시작한다 | F-15와 같은 방식 |
+| owner-isolation | 시험 계정 둘 이상으로 모든 `/api/*` 경로에서 다른 사람의 기록·설정을 읽거나 바꿀 수 없다(서버 시험 + 개발용 원격 검사) | §9 |
+| mobile-accounts | iPhone 홈 화면 앱에서 가입 → 한 편 쓰기 → 완전히 닫았다 열기 → 탈퇴, 약 20분. 결과는 §4·§6 표 | §4, §6 |
+| accounts | `accounts` 노드 게이트(D-126): full, social-login, age-14-check, consent-and-policy, account-withdrawal, owner-isolation, deployment-boundary-review, mobile-accounts | D-126 |
 

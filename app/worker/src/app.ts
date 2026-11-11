@@ -9,6 +9,7 @@ import { backupConfigured, backupExport, backupImport, deleteAll, exportData } f
 import { getDayStart, putDayStart } from "./routes/dayStart";
 import { completeDiary, deleteDiary, getDiary, getToday, saveDiary } from "./routes/diaries";
 import { getProfile, putProfile } from "./routes/profile";
+import { getCalendarMonth, getStatsMaterial } from "./routes/reflection";
 import { createRouter } from "./router";
 import { heartbeat, login, logout, sessionInfo } from "./routes/session";
 import { clearSessionCookie, loadSession, readCookie, touchSession } from "./session";
@@ -30,6 +31,8 @@ const ROUTES = new Map<string, Handler>([
   [`DELETE ${API.diary}`, deleteDiary],
   [`POST ${API.diaryComplete}`, completeDiary],
   [`GET ${API.export}`, exportData],
+  [`GET ${API.calendar}`, getCalendarMonth],
+  [`GET ${API.stats}`, getStatsMaterial],
   [`DELETE ${API.diaries}`, deleteAll]
 ]);
 

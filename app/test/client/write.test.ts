@@ -673,6 +673,12 @@ describe("기록 보기·완료", () => {
     history.replaceState(null, "", "/#/done/2026-10-15?day=past");
     render();
     expect(heading()).toBe("그날의 마음을 남겼어요");
-    expect(byText("그날의 기록 보기")).toBeDefined();
+    // 아래는 같은 폭 두 버튼 — 달력 보기(그날을 고른 채)·통계 보기(D-078)
+    byText("달력 보기")?.click();
+    expect(location.hash).toBe("#/calendar?d=2026-10-15");
+    history.replaceState(null, "", "/#/done/2026-10-15?day=past");
+    render();
+    byText("통계 보기")?.click();
+    expect(location.hash).toBe("#/stats");
   });
 });

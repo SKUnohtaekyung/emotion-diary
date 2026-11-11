@@ -111,6 +111,7 @@ node_gates:
     requires: [F-03, F-04, F-05, F-08, F-24, e2e-reload-restore, mobile-slice]
   data-control:
     requires: [F-14, F-15, restore-drill, export-cpu-measured]
+  # 2026-11-11 대체됨(D-126) — 노드 personal-start는 더 진행하지 않는다. 정의는 기록으로 남긴다.
   personal-start:
     requires: [full, F-01, F-02, F-06, F-07, F-09, F-10, F-14, F-15, F-17, F-24, deployment-boundary-review, backup-and-restore-drill, mobile-personal, crisis-help-unreviewed-label]
   source-fidelity:
@@ -122,8 +123,12 @@ node_gates:
     requires: [F-03, F-04, F-05, F-07, F-08, F-17, F-18, F-19, F-21, mobile-core-flow-personal, accessibility-core-flow]
   journal-ai:
     requires: [ai-journal-fixed-set, no-fabrication, no-emotion-assertion, direct-entry-fallback, crisis-signal-100, history-forgery-0]
+  # 2026-11-11(D-126): 화면 기초 + 돌아보기(달력·통계). 알림 F-13은 공개 준비에서 둘지 정한다(짓게 되면 limited-release에 더한다).
   reflection-core:
-    requires: [F-11, F-12, F-13, F-20, deterministic-statistics, timezone-boundaries]
+    requires: [F-11, F-12, F-20, deterministic-statistics, timezone-boundaries, mobile-reflection]
+  # 2026-11-11 새 관문(D-126): 여러 사람이 가입해 쓰기.
+  accounts:
+    requires: [full, social-login, age-14-check, consent-and-policy, account-withdrawal, owner-isolation, deployment-boundary-review, mobile-accounts]
   evidence-quality:
     requires: [active-card-schema-valid, source-and-hash-valid, reviewer-approved, retrieval-baseline-frozen]
   ai-safety:

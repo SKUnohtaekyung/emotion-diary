@@ -1,20 +1,20 @@
 // 오늘 `#/today` — 평면 첫 조각(TASK-SLICE-01 PLAN A-8, UX_SPEC §3·§11 '오늘 화면의 상태 여섯 가지').
 // 숲·돌·조약돌이 없는 평면판이라 시작 조작은 큰 버튼 하나다. 상태: 로딩·오류·연결 끊김·기록 없음(+지난 날 글 줄)·이어 쓰기·기록 있음.
 // 오늘 기록을 확인하지 못하면 시작을 막는다 — 확인 없이 새로 시작하면 하루 하나 규칙을 어길 수 있다(D-077 ⑧·D-083 ①).
-// 도움이 필요할 때·앱 잠금·지금 잠그기·내보내기·모든 기록 지우기·로그아웃은 설정 화면이 생길 때까지 아래 작은 줄에 둔다.
+// 도움이 필요할 때·앱 잠금·지금 잠그기·내보내기·모든 기록 지우기·로그아웃은 오늘 숲을 옮길 때까지(4단계) 아래 작은 줄에 둔다.
+// 하단 탐색은 밝은 화면에만 있어 오늘에서 달력·통계·설정으로 가는 길을 같은 줄의 위기 안내 다음에 둔다(TASK-REFLECT-01 A-10).
 // 위기 안내(#/help)로 가는 길은 그 줄의 맨 앞이다 — 줄이 접혀도 먼저 보이고, 지우기 버튼 곁에 놓이지 않는다(TASK-PERSONAL-01 A-1).
 
 import type { TodayInfo } from "../../../shared/diary";
-import { lockNow, logout } from "../controller";
+import { lockNow } from "../controller";
 import { h } from "../lib/dom";
 import { monthDay, monthDayWeekday } from "../lib/format";
 import { navigate, pushFlowStep, type ViewContext } from "../router";
 import { app } from "../state";
-import { openSheet } from "../ui/sheet";
+import { confirmLogout } from "../ui/logout";
 import { fetchToday } from "../write/api";
 import { resumeKey, type StepKey, stepName, stepQuery } from "../write/flow";
 import { sendUnsentInBackground, unsentForToday } from "../write/session";
-import { hasUnsent } from "../write/unsent";
 
 let flowSeq = 0;
 
@@ -30,6 +30,12 @@ export function renderToday({ root, alive }: ViewContext): () => void {
 
   const helpButton = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "도움이 필요할 때" });
   helpButton.addEventListener("click", () => navigate("#/help"));
+  const go = (text: string, hash: string) => {
+    const button = h("button", { type: "button", class: "btn btn-quiet btn-small", text });
+    button.addEventListener("click", () => navigate(hash));
+    return button;
+  };
+  const reflect = [go("달력", "#/calendar"), go("통계", "#/stats"), go("설정", "#/settings")];
   const lockSettings = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "앱 잠금" });
   lockSettings.addEventListener("click", () => navigate("#/settings/lock"));
   const lockNowButton = app.appLock ? h("button", { type: "button", class: "btn btn-quiet btn-small", text: "지금 잠그기" }) : null;
@@ -41,21 +47,7 @@ export function renderToday({ root, alive }: ViewContext): () => void {
   const deleteButton = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "모든 기록 지우기" });
   deleteButton.addEventListener("click", () => navigate("#/settings/delete"));
   const logoutButton = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "로그아웃" });
-  logoutButton.addEventListener("click", () => {
-    const unsent = hasUnsent();
-    openSheet({
-      id: "logout-confirm",
-      title: unsent ? "아직 보내지 못한 글이 있어요" : "로그아웃할까요?",
-      body: unsent
-        ? ["로그아웃하면 이 휴대폰에 남은 글이 지워져요.", "연결된 뒤 저장되면 그때 로그아웃해도 돼요."]
-        : ["다시 들어올 때 열쇠가 필요해요."],
-      actions: [
-        { label: unsent ? "그래도 로그아웃" : "로그아웃", kind: "primary", onClick: () => logout() },
-        { label: "그만두기", kind: "quiet" }
-      ],
-      opener: logoutButton
-    });
-  });
+  logoutButton.addEventListener("click", () => confirmLogout(logoutButton));
 
   root.append(
     h(
@@ -64,7 +56,7 @@ export function renderToday({ root, alive }: ViewContext): () => void {
       dateLine,
       title,
       area,
-      h("div", { class: "today-tools" }, helpButton, lockSettings, lockNowButton, exportButton, deleteButton, logoutButton)
+      h("div", { class: "today-tools" }, helpButton, ...reflect, lockSettings, lockNowButton, exportButton, deleteButton, logoutButton)
     )
   );
 
