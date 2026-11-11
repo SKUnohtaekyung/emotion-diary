@@ -258,7 +258,8 @@ nodes:
     gate: reflection-core
 
   - id: direct-journal
-    status: ready
+    status: in_progress
+    # 2026-11-11(D-131): TASK-JOURNAL-01 착수 — 계획 tasks/direct-journal/2026-11-11/PLAN.md. 설정 하위 화면(조각 8)은 이번에, 들어오는 길·온보딩은 accounts.
     depends_on: [first-slice, data-control]
     # 2026-11-11(D-130): 선행을 dashboard-reminder에서 first-slice·data-control로 풀었다 — 화면 기초(Preact·토큰·부품)는 끝났고,
     # 돌아보기의 휴대폰 확인을 이 노드의 휴대폰 확인과 함께 하기로 했다. 순서(D-126)는 그대로다.

@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
-  "task_id": "TASK-REFLECT-01",
-  "phase": "reflection-verifying-phone-deferred",
+  "task_id": "TASK-JOURNAL-01",
+  "phase": "journal-building",
   "iteration": 1,
-  "status": "verifying",
-  "current_hypothesis": "Preact 11 (pinned) with Vite 8 oxc JSX coexists with the framework-free router (mountPreact), passes CSP source checks extended to .tsx, happy-dom tests and Playwright; then calendar and stats are built in the prototype's look on two new read routes with stats computed by app/shared/stats.ts (tasks/reflection/2026-11-11/PLAN.md, D-129).",
+  "status": "in_progress",
+  "current_hypothesis": "The writing flow moves to Preact first with unchanged behaviour (existing tests as the safety net), then the prototype's look goes on top piece by piece; save/flow code (write/saver, session, unsent, flow, router pushFlowStep/leaveFlow) stays the source of truth; completion undo is one new route with no schema change (tasks/direct-journal/2026-11-11/PLAN.md, D-131).",
   "same_hypothesis_failures": 0,
   "transient_retries": 0,
   "last_verified_commit": "d2ed814",
@@ -24,5 +24,5 @@
     "Phone checks (mobile-reflection now, direct-journal later) need the dev building: this PC has no wrangler login and no work/deploy/dev.* files — the user logs in and decides whether to regenerate the dev secrets.",
     "Before accounts: whether the server may read diaries, and a legal review of consent and policy (tasks/replan/2026-11-11/PLAN.md section 5)."
   ],
-  "last_checkpoint": "2026-11-11 TASK-REFLECT-01 code done and committed (verify full 569/569, e2e 32/32, review 9/9 fixed). Phone check mobile-reflection deferred to the direct-journal phone check (D-130). Next session: direct-journal — writing flow and today screen in the prototype's look (handoff in tasks/CURRENT_TASK.md)."
+  "last_checkpoint": "2026-11-11 TASK-JOURNAL-01 plan approved (D-131: settings sub-screens in, entry/onboarding to accounts). Starting J-1. TASK-REFLECT-01 stays verifying until the shared phone check."
 }

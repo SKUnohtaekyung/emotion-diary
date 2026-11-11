@@ -5,6 +5,7 @@
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
 | [TASK-REPLAN-01](archive/TASK-REPLAN-01.md) 전체 순서 다시 세우기 | 끝(2026-11-11) — 결정 D-126~D-128, 0단계 정본 동기화, `verify full` PASS. 커밋 전(브랜치 `docs/replan`) | [archive/](archive/README.md), 계획은 [replan/2026-11-11/PLAN.md](replan/2026-11-11/PLAN.md) |
+| TASK-JOURNAL-01 일기 쓰기·오늘 화면을 시안 모양으로 | **진행 중(2026-11-11 승인 — D-131)** — 노드 `direct-journal` in_progress | 이 파일 아래, 계획은 [direct-journal/2026-11-11/PLAN.md](direct-journal/2026-11-11/PLAN.md) |
 | TASK-REFLECT-01 화면 기초와 돌아보기(달력 + 통계) | **코드 끝·휴대폰 확인 대기(2026-11-11)** — D-129·D-130. 노드 `dashboard-reminder` verifying, 휴대폰 확인은 다음 묶음과 함께 | 이 파일 아래, 계획은 [reflection/2026-11-11/PLAN.md](reflection/2026-11-11/PLAN.md) |
 | direct-journal 착수 준비(시안 이식 지도) | 준비 끝(2026-10-20). 2026-11-11 D-126으로 순서가 바뀌었다 — MAP의 조각 지도는 새 순서의 화면 기초·작성 흐름·오늘·설정·가입이 그대로 쓰고, 남았던 Q3·Q4는 2026-11-11 D-128로 답했다 | [direct-journal/2026-10-20/](direct-journal/2026-10-20/QUESTIONS.md)(MAP·FACTS·QUESTIONS) |
 | [TASK-PERSONAL-01](archive/TASK-PERSONAL-01.md) personal-start(본인 사용 시작) | 대체됨(2026-11-11, D-126) — 운영 건물 `emotion-diary-prod`·`#/help`·자판 배치 C·첫 백업 복원까지 짓고 `main`에 반영(PR #45·#46). 남은 휴대폰 확인·관문 판정은 하지 않는다 | [archive/](archive/README.md), 요청·계획은 [personal-start/2026-10-20/](personal-start/2026-10-20/PLAN.md) |
@@ -41,12 +42,21 @@
 
 - 관문 `reflection-core`(F-11·F-12·F-20·deterministic-statistics·timezone-boundaries·mobile-reflection)의 증거가 PLAN §6대로 있고 `node scripts/verify.mjs --mode full` PASS, 커밋·PR은 사용자 지시 뒤 CI 초록.
 
-## 다음 세션이 할 일 — 일기 쓰기·오늘 화면을 시안 모양으로(D-130, 노드 `direct-journal`)
+# TASK-JOURNAL-01 — 일기 쓰기·오늘 화면을 시안 모양으로
 
-1. **먼저 읽는다**: `docs/SERVICE_WHY.md` 전문(AGENTS §1), 이 파일, `tasks/replan/2026-11-11/PLAN.md`(새 순서, D-126), `tasks/direct-journal/2026-10-20/MAP.md`(조각 지도 §5, 규칙 R1~R11 §2, 시안 코드가 앱 규칙에 걸리는 곳 §3, 화면별 변경 지도 §4.2·§4.5)와 `FACTS.md`, `tasks/reflection/2026-11-11/PLAN.md`(화면 기초에서 정한 A-1~A-13과 진행 기록 — 어떻게 지었는지의 본보기).
-2. **이미 정해진 것**(다시 묻지 않는다): 화면은 Preact(D-127 — `lib/mount.ts`의 `mountPreact`로 라우터에 끼운다, 옛 화면은 손댈 때 바꾼다), 마음 고르기는 언덕 위 자유 배치 + 큰 글자·겹침이면 3×3 격자(D-066 확정, D-128), 오늘 기록이 있는 날 돌을 누르면 읽는 편지(D-128), 휴대폰 확인은 모아서(D-126 U-7) — 이번 묶음 끝의 휴대폰 확인에 `tasks/reflection/2026-11-11/PHONE-GUIDE.md`(달력·통계)를 함께 넣는다(D-130).
-3. **범위**: MAP §5 조각 1~6(작성 틀 → 마음 고르기·세부 감정 → 크기 → 글 쓰는 단계 → 편지·봉인·완료 → 기록 메뉴, 서버에 **완료 취소** 경로)과 조각 9(오늘 숲·로딩·덮개·잠금). 설정 하위 화면(조각 8)·들어오는 길·온보딩(조각 10·11)은 이번에 넣을지 계획 때 사용자에게 묻는다. 계획은 `tasks/direct-journal/<날짜>/PLAN.md`에 쓰고 사용자 승인 뒤 짓는다.
-4. **이번 묶음에서 쓸 수 있는 것**(TASK-REFLECT-01이 지음): 시안 이름의 CSS 변수(`--bg`·`--fs-body`·`--sp-4`·`--anger-500` …, `tokens.ts` A-13), 공통 부품(`styles/v4.css`, `ui/StatusBlock.tsx`, `ui/icons.tsx`, `ui/MiniLetter.tsx`, 위험 시트 `kind: "danger"`), 그림(`lib/art.ts` — 친구·조약돌·돌), 움직임 줄이기(`lib/motion.ts`), 합성 기록(`app/scripts/synthetic.mjs`, 로컬 넣기 `node app/scripts/seed-dev.mjs local` — 먼저 `make-secrets.mjs local backup`), E2E의 axe(`expectNoSeriousA11y`), 시안 CSS를 거의 그대로 옮기는 방식(`styles/calendar.css`·`stats.css` — Biome의 두 규칙은 `biome.json` overrides).
-5. **지킬 것**: 저장·흐름 코드는 그대로 두고 모양을 입힌다(MAP A-1 — `write/saver`·`session`·`unsent`가 정본), 스크롤은 `#app`만(D-125), 버튼 줄·위 줄을 화면에 고정하지 않는다(D-123), CSP(style 속성·innerHTML 금지 — Preact 객체 style은 허용), 하단 탐색은 밝은 목록 화면에만(오늘·작성 흐름에는 없다), 개발용 '상태' 칸이 화면을 가리지 않는지 E2E로 본다. 시안의 '시안' 띠·예시 태그·AI 줄은 옮기지 않는다.
-6. **휴대폰 확인 전에 사용자에게**: 이 PC에는 Cloudflare 로그인(`npx wrangler login` — 사용자가 직접)과 개발용 파일(`work/deploy/dev.*` — 주소·열쇠·비밀값·백업 토큰)이 없다. 예전 PC에서 옮길지, 새로 만들지(개발용 열쇠가 바뀐다) 묻는다.
-7. 커밋·PR은 사용자 지시 때만(AGENTS §2.1). 이 묶음이 끝나면 `dashboard-reminder`(휴대폰 결과로 관문 `reflection-core` 판정)와 함께 마감한다.
+## 상태
+
+`in_progress`(2026-11-11 — 사용자 승인 "승인. 커밋 먼저 하고 작업해", D-131. 처음: D-130 "일기 쓰기, 오늘 화면 작업할거야"). 브랜치 `journal/direct`(`edb115d`에서). **진행·증거는 [PLAN.md](direct-journal/2026-11-11/PLAN.md) 한 곳이다**(D-118). 휴대폰 확인은 이 묶음 끝에 달력·통계(`tasks/reflection/2026-11-11/PHONE-GUIDE.md`)와 함께 — 그 전에 개발용 건물(이 PC에는 Cloudflare 로그인·`work/deploy/dev.*`가 없다)을 사용자와 정한다(PLAN J-10).
+
+## 범위
+
+- 포함·제외는 PLAN §1. 공정표 노드 `direct-journal`, 관문 `core-product`. 설정 하위 화면은 이번에 넣고, 들어오는 길·온보딩은 `accounts`에서(PLAN §3 U-1·U-2 답).
+
+## 소유권
+
+- Main/Writer: 이 작업을 실행하는 세션 하나. 하위 에이전트는 조사·검토만, 커밋하지 않는다.
+- 소유 파일: `tasks/direct-journal/**`, `tasks/reflection/**`, `tasks/CURRENT_TASK.md`, `app/client/**`, `app/shared/**`, `app/worker/**`, `app/test/**`, `app/scripts/**`, `vite.config.ts`, `vitest.config.ts`, `playwright.config.ts`, `package.json`, `package-lock.json`, `tsconfig*.json`, `biome.json`, `docs/**`, `harness/**`, `design/tokens.json`
+
+## 인수 조건
+
+- PLAN §5의 조각마다 화면 시험·E2E(axe serious/critical 0)·`verify --mode quick` 통과, 끝에 `node scripts/verify.mjs --mode full`·`npm run e2e` 통과, 새 맥락 검토 반영, 휴대폰 확인 결과가 EVAL §4·§6에 있고 관문 `core-product`(PLAN §6)·`reflection-core` 판정. 커밋·PR은 사용자 지시 뒤 CI 초록.
