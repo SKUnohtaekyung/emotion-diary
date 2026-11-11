@@ -82,6 +82,8 @@ async function openToday(reply: FakeReply | "offline" | ((path: string) => FakeR
   history.replaceState(null, "", "/#/today");
   render();
   await flush(10);
+  // 숲은 오늘 기록을 확인한 뒤에야 상태를 그린다(Preact는 다음 차례에 그린다) — 바쁠 때도 확인이 끝날 때까지 기다린다
+  await vi.waitFor(() => expect(document.querySelector(".forest.loading")).toBeNull());
   return calls;
 }
 
@@ -155,7 +157,7 @@ describe("오늘 — 상태", () => {
   it("서버에 없어도 이 휴대폰에 못 보낸 오늘 글이 있으면 이어 쓰기다(U-2)", async () => {
     writeUnsent({ v: 1, date: TODAY, mode: "draft", baseRevision: null, diary: withText(emptyDiary(), "eventText", "가짜"), step: { step: "feelings", category: null }, pending: null, savedAt: 1 });
     await openToday((path) => (path === "/api/today" ? todayReply() : { status: 404, body: { error: "not_found" } }));
-    expect(document.querySelector(".today-chip")?.textContent).toBe("마음 고르기 중 · 이 휴대폰에 잠시 보관 중");
+    await vi.waitFor(() => expect(document.querySelector(".today-chip")?.textContent).toBe("마음 고르기 중 · 이 휴대폰에 잠시 보관 중"));
   });
 });
 

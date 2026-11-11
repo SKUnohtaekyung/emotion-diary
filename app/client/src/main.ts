@@ -31,6 +31,7 @@ import { renderName } from "./views/name";
 import { renderPinSetup } from "./views/pinSetup";
 import { renderRecord } from "./views/record";
 import { renderSettings } from "./views/settings";
+import { renderDayStart, renderNameChange, renderPrivacy, renderProfile } from "./views/settingsSub";
 import { renderFriendDetail, renderStats } from "./views/stats";
 import { renderToday } from "./views/today";
 import { renderWelcome } from "./views/welcome";
@@ -53,6 +54,10 @@ registerViews({
   "stats/:category": renderFriendDetail,
   settings: renderSettings,
   "settings/lock": renderLockSettings,
+  "settings/day": renderDayStart,
+  "settings/privacy": renderPrivacy,
+  "settings/profile": renderProfile,
+  "settings/name": renderNameChange,
   "settings/pin": renderPinSetup,
   "settings/export": renderExportData,
   "settings/delete": renderDeleteAll,

@@ -22,8 +22,16 @@ async function removeLock(currentPin?: string): Promise<ApiResult<unknown>> {
 }
 
 export function renderLockSettings({ root, alive }: ViewContext): () => void {
-  const backButton = h("button", { type: "button", class: "back-button", text: "‹ 뒤로" });
-  backButton.addEventListener("click", () => back("#/today"));
+  // 위 줄은 설정 하위 화면과 같은 ‹ 원형 버튼(시안 settings.js subHead, TASK-JOURNAL-01 J-9)
+  const backButton = h("button", { type: "button", class: "back", "aria-label": "설정으로" });
+  const chevron = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  chevron.setAttribute("viewBox", "0 0 24 24");
+  chevron.setAttribute("aria-hidden", "true");
+  const chevronPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  chevronPath.setAttribute("d", "M14.5 5.5 8 12l6.5 6.5");
+  chevron.append(chevronPath);
+  backButton.append(chevron);
+  backButton.addEventListener("click", () => back("#/settings"));
 
   const labelId = "lock-switch-label";
   const toggle = h("button", { type: "button", class: "switch", role: "switch", "aria-labelledby": labelId });
@@ -77,14 +85,14 @@ export function renderLockSettings({ root, alive }: ViewContext): () => void {
   root.append(
     h(
       "section",
-      { class: "screen" },
-      h("div", { class: "screen-top" }, backButton),
+      { class: "screen settings-sub st-lock" },
+      h("div", { class: "info-top" }, backButton),
       h("h1", { text: "앱 잠금" }),
-      h("div", { class: "switch-row" }, h("span", { id: labelId, text: "비밀번호로 잠그기" }), toggle),
+      h("div", { class: "switch-row st-lock-switch" }, h("span", { id: labelId, text: "비밀번호로 잠그기" }), toggle),
       change,
       lockNowButton,
-      h("p", { class: "help", text: "앱을 켤 때와 5분 넘게 떠났다 돌아올 때 비밀번호를 물어요." }),
-      h("p", { class: "help", text: "비밀번호를 잊으면 열쇠로 다시 들어와 새로 정해요." })
+      h("p", { class: "note st-lock-note", text: "앱을 켤 때와 5분 넘게 떠났다 돌아올 때 비밀번호를 물어요." }),
+      h("p", { class: "note st-lock-note", text: "비밀번호를 잊으면 열쇠로 다시 들어와 새로 정해요." })
     )
   );
 

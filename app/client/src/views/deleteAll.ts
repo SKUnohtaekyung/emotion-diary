@@ -94,7 +94,7 @@ export function renderDeleteAll({ root, alive }: ViewContext): () => void {
   root.append(
     h(
       "section",
-      { class: "screen" },
+      { class: "screen settings-sub" },
       h("div", { class: "screen-top" }, backButton),
       h("h1", { class: "data-danger-title", text: TEXT.title }),
       h("p", { class: "lede", text: TEXT.lede }),
@@ -207,7 +207,7 @@ export function renderDeleted({ root }: ViewContext): () => void {
   root.append(
     h(
       "section",
-      { class: "screen" },
+      { class: "screen settings-sub" },
       h("h1", { text: TEXT.deletedTitle }),
       h("p", { class: "lede", text: TEXT.deletedLead }),
       h("p", { class: "note", text: TEXT.deletedNotice }),

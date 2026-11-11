@@ -223,7 +223,8 @@ describe("앱 잠금 설정", () => {
     expect(change()?.disabled).toBe(true);
     expect(document.body.textContent).toContain("앱을 켤 때와 5분 넘게 떠났다 돌아올 때 비밀번호를 물어요.");
     expect(document.body.textContent).toContain("비밀번호를 잊으면 열쇠로 다시 들어와 새로 정해요.");
-    expect(document.querySelector(".back-button")?.textContent).toContain("뒤로");
+    // 위 줄은 설정 하위 화면과 같은 ‹ 원형 버튼(J-9) — 이름은 '설정으로'
+    expect(document.querySelector(".info-top .back")?.getAttribute("aria-label")).toBe("설정으로");
   });
 
   it("세션을 확인했더니 로그인이 풀려 있으면 열쇠 화면으로 보내고 돌아올 곳을 기억한다", async () => {

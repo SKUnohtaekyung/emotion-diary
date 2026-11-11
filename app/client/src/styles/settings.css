@@ -162,3 +162,17 @@ button.st-row{cursor:pointer}
 :is(button.st-row,.st-delete-row):active::after{opacity:1}
 @media (prefers-reduced-motion:no-preference){:is(button.st-row,.st-delete-row){transition:transform var(--dur-fast) var(--ease)}:is(button.st-row,.st-delete-row)::after{transition:opacity var(--dur-fast) var(--ease)}:is(button.st-row,.st-delete-row):active{transform:scale(var(--press-row))}}
 @media (hover:hover){:is(button.st-row,.st-delete-row):hover::after{opacity:.6}}
+
+/* 하위 화면(TASK-JOURNAL-01 J-9): 버튼은 내용 바로 뒤 — 화면 바닥으로 밀지 않는다(D-123). 내 계정 머리는 누르지 않는 모양 */
+.screen.settings-sub .screen-actions{margin-top:var(--sp-6)}
+.st-me .st-chev{color:var(--muted)}
+.st-me-static{cursor:default}
+.st-profile-note{margin-top:var(--sp-4)}
+.st-name .field{margin-top:var(--sp-2)}
+.st-name-actions{display:flex;flex-direction:column;gap:var(--sp-2);margin-top:var(--sp-6)}
+.st-load-fail{display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-2);margin-top:var(--sp-4)}
+.st-lock .switch-row{min-height:56px;padding:var(--sp-2) 0;font-weight:var(--fw-body-strong)}
+.st-lock .btn-block{margin-top:var(--sp-3)}
+.st-lock-note{margin-top:var(--sp-3)}
+/* 줄을 누를 때의 음영(inset 0 -10px)이 #app 가로 스크롤을 4px 늘렸다(2026-11-12 측정, J-9) — 화면에서 자른다 */
+.screen.settings,.screen.settings-sub{overflow-x:clip}
