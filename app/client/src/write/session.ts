@@ -24,6 +24,8 @@ export interface FlowSession {
   date: string;
   /** 서버가 센 오늘(이 글을 연 때) */
   today: string;
+  /** 처음 완료한 기록의 날(있었던 일 안내 단계, A-7). 모르거나 없으면 null */
+  firstRecordDate: string | null;
   mode: FlowMode;
   /** 서버 기록의 상태(아직 없는 새 글이면 null) */
   status: DiaryStatus | null;
@@ -175,6 +177,7 @@ export async function openSession(date: string): Promise<OpenResult> {
     id: newFlowId(),
     date,
     today,
+    firstRecordDate: todayResult.ok ? (todayResult.data.firstRecordDate ?? null) : null,
     mode: picked.mode,
     status: entry?.status ?? null,
     saver,

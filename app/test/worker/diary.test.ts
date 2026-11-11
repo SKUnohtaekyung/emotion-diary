@@ -208,6 +208,27 @@ describe("F-07 그날만 새로 쓰기, 지난 임시저장은 기한 없이 완
     expect(entry.body).toMatchObject({ entryDate: TODAY, firstCompletedLocalDate: "2026-10-17" });
   });
 
+  it("오늘 화면의 첫 기록일은 처음 완료한 날(있었던 일 안내 단계, A-7) — 완료한 적이 없으면 null", async () => {
+    const cookie = await login(server);
+    await save(cookie, TODAY, draft({ eventText: "시작만 했다" }));
+    expect((await api("GET", "/api/today", { cookie })).body?.firstRecordDate).toBeNull();
+    await save(cookie, TODAY, full({ revision: 1 }));
+    expect((await complete(cookie, TODAY, 2)).status).toBe(200);
+    // 다른 주인의 기록은 세지 않는다
+    const allowlist = server.env.OWNER_ALLOWLIST;
+    server.env.OWNER_ALLOWLIST = "owner,other";
+    try {
+      expect((await api("GET", "/api/today", { cookie: await otherOwnerCookie() })).body?.firstRecordDate).toBeNull();
+    } finally {
+      server.env.OWNER_ALLOWLIST = allowlist;
+    }
+    server.clock.now += days(1);
+    const next = "2026-10-15";
+    await save(cookie, next, full());
+    expect((await complete(cookie, next, 1)).status).toBe(200);
+    expect((await api("GET", "/api/today", { cookie })).body?.firstRecordDate).toBe(TODAY);
+  });
+
   it("없는 날·미래 날짜를 열면 404이고 새 기록을 만들지 않는다", async () => {
     const cookie = await login(server);
     expect((await read(cookie, "2026-10-20")).status).toBe(404);

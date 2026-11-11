@@ -153,7 +153,7 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 | `DELETE /api/session` | 로그아웃 — 이 기기의 로그인 cookie를 지운다 | CSRF |
 | `PUT /api/app-lock`, `DELETE /api/app-lock` | 앱 잠금 비밀번호를 정하기·바꾸기 / 끄기(§6, D-106·D-112) | 비밀번호는 본문으로만. 이미 걸려 있으면 **지금 비밀번호**를 함께 받거나, **이 세션이 접근 열쇠로 로그인한 지 10분 안**이어야 한다(§6 '잊었을 때') |
 | `POST /api/app-lock/unlock`, `POST /api/app-lock/lock` | 이 세션의 잠금 풀기(비밀번호) / 이 세션을 지금 잠그기 | 풀기: 서버가 대조하고 틀린 횟수를 센다. 잠그기: 비밀번호 없이 받는다(더 잠기는 쪽이라 화면의 요청을 믿어도 된다) |
-| `GET /api/today` | 서버가 센 오늘 날짜·시간대·하루 기준 시각, 오늘 기록의 요약(상태·판 번호·고른 계열·쓰던 단계 — 글 없음), 가장 최근의 지난 임시저장(D-122) | `X-Timezone` 필수 |
+| `GET /api/today` | 서버가 센 오늘 날짜·시간대·하루 기준 시각, 오늘 기록의 요약(상태·판 번호·고른 계열·쓰던 단계 — 글 없음), 가장 최근의 지난 임시저장(D-122), 첫 기록일(`firstRecordDate` — 처음 완료한 날의 가장 이른 값, 지금 완료 상태와 무관, 없으면 null. 있었던 일 안내 네 단계, TASK-JOURNAL-01 A-7) | `X-Timezone` 필수 |
 | `GET /api/diaries/:date` | 해당 날짜의 draft/completed 전체(없으면 404 — 없는·미래 날짜도 새로 만들지 않는다) | owner 강제, 날짜 모양 400 |
 | `PUT /api/diaries/:date` | 임시저장(통째로 — 새로 만들기 201 / 고치기 200). 완료된 기록은 완료 조건을 다시 검사한다(D-023) | revision + `Idempotency-Key` + `X-Timezone`, 새로 만들기는 서버가 센 오늘만(422 `not_today`), 본문 160,768바이트(DATA_MODEL §2), 모르는 칸 400 |
 | `POST /api/diaries/:date/complete` | 완료조건 검사 후 상태 전환(본문 `{revision}`) | 조건부 UPDATE 하나 + `Idempotency-Key`, 모자라면 422와 빠진 단계 목록 |

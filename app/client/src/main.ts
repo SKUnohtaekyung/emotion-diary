@@ -7,6 +7,8 @@ import "./styles/components.css";
 import "./styles/v4.css";
 import "./styles/scenes.css";
 import "./styles/write.css";
+import "./styles/paper.css";
+import "./styles/letter.css";
 import "./styles/help.css";
 import "./styles/calendar.css";
 import "./styles/stats.css";

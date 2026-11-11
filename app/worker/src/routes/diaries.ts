@@ -197,21 +197,24 @@ export async function getToday(ctx: Ctx): Promise<Response> {
   if (!timeZone) return fail(400, "invalid_timezone");
   const date = localDayAt(ctx.now, timeZone, session.dayStartHour);
   const db = ctx.env.DB;
-  const [today, past] = await db.batch([
+  const [today, past, first] = await db.batch([
     db.prepare(`SELECT ${SUMMARY_COLUMNS} FROM diary_entries AS d WHERE owner_key = ?1 AND entry_date = ?2`).bind(session.owner, date),
     db
       .prepare(
         `SELECT ${SUMMARY_COLUMNS} FROM diary_entries AS d
           WHERE owner_key = ?1 AND status = 'draft' AND entry_date < ?2 ORDER BY entry_date DESC LIMIT 1`
       )
-      .bind(session.owner, date)
+      .bind(session.owner, date),
+    db.prepare("SELECT MIN(first_completed_local_date) AS first FROM diary_entries WHERE owner_key = ?1").bind(session.owner)
   ]);
+  const firstRow = ((first?.results ?? []) as { first: string | null }[])[0];
   const body: TodayInfo = {
     date,
     timezone: timeZone,
     dayStartHour: session.dayStartHour,
     entry: summary(((today?.results ?? []) as SummaryRow[])[0] ?? null),
-    pastDraft: summary(((past?.results ?? []) as SummaryRow[])[0] ?? null)
+    pastDraft: summary(((past?.results ?? []) as SummaryRow[])[0] ?? null),
+    firstRecordDate: firstRow?.first ?? null
   };
   return json(200, body);
 }

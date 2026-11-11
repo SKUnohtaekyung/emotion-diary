@@ -68,7 +68,7 @@ const EXPORT_PAGE: ExportPage = { ...EXPORT_FILE, next: null };
 
 const todayReply = (): FakeReply => ({
   status: 200,
-  body: { date: "2026-10-16", timezone: "Asia/Seoul", dayStartHour: 4, entry: null, pastDraft: null } satisfies TodayInfo
+  body: { date: "2026-10-16", timezone: "Asia/Seoul", dayStartHour: 4, entry: null, pastDraft: null, firstRecordDate: null } satisfies TodayInfo
 });
 
 /** 오늘 말고 다른 요청(오늘 화면의 배경 보내기가 부르는 그날 기록 조회 등)은 닿지 않게 둔다. */

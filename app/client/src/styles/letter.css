@@ -1,0 +1,1430 @@
+/* 편지(이대로 남길까요·기록 보기)·봉인·완료 — 시안 web/css/write.css 편지 절·letter-scene.css·film.css·land.css·scene.css를 옮겼다(TASK-JOURNAL-01 J-5).
+   이야기: 마음의 숲 속 빈터, 나에게 쓴 편지를 열기 직전. 둥근 나무 실루엣이 둘러싼 빈터에 봉투가 놓이고 부드러운 빛이 시선을 모은다(저자극 — 민트/그린 한 계열).
+   시안과 다른 점: 장면 배경은 main이 아니라 화면(.screen.review·.screen.record)에 둔다 — 스크롤은 #app만 한다(D-125). 위·아래 줄은 고정하지 않는다(D-123).
+   편지 카드의 일반적인 이름(.card·.size·.rule·.q …)은 모두 .letter-stage 아래로 묶어 다른 화면과 섞이지 않게 했다.
+   움직임: 닫힌 봉투의 숨쉬기·빛 알갱이·열림 연출은 no-preference에서만. 움직임 줄이기면 Letter.tsx가 바로 연다. */
+
+/* ── 장면의 상자와 색 ── */
+.screen.write.review,
+.screen.record {
+  --focus: var(--service-ink);
+  --fc-pale: color-mix(in srgb, var(--land-hill-far) 44%, var(--bg));
+  --fc-mid: color-mix(in srgb, var(--land-hill-mid) 58%, var(--bg));
+  --fc-deep: color-mix(in srgb, var(--land-hill-near) 70%, var(--bg));
+  overflow-x: clip;
+  background:
+    radial-gradient(ellipse 42% 30% at 50% 46%, color-mix(in srgb, var(--bg) 90%, var(--service-mint)) 0%, color-mix(in srgb, var(--bg) 55%, var(--service-mint) 8%) 48%, transparent 78%),
+    radial-gradient(ellipse 135% 115% at 50% 48%, transparent 52%, color-mix(in srgb, var(--land-hill-mid) 20%, transparent) 100%),
+    radial-gradient(circle 150px at -4% 66%, var(--fc-deep) 0%, transparent 62%),
+    radial-gradient(circle 158px at 104% 64%, var(--fc-deep) 0%, transparent 62%),
+    radial-gradient(circle 108px at 3% 40%, var(--fc-mid) 0%, transparent 64%),
+    radial-gradient(circle 100px at 98% 38%, var(--fc-mid) 0%, transparent 64%),
+    radial-gradient(circle 78px at 20% 16%, var(--fc-pale) 0%, transparent 66%),
+    radial-gradient(circle 82px at 80% 15%, var(--fc-pale) 0%, transparent 66%),
+    linear-gradient(to bottom, var(--bg) 0%, var(--fc-pale) 26%, var(--fc-mid) 62%, var(--fc-deep) 100%);
+}
+
+.screen.write.review .btn-text {
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+
+.letter-sub {
+  margin: 0;
+  min-height: calc(var(--lh-label) * 2);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--muted);
+}
+
+.record-letter {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+/* ── 편지 틀: 위 글과 아래 버튼 줄 사이 남는 자리 한가운데. 카드 높이는 화면 높이를 따라 376~448px(D-079) ── */
+.letter-stage {
+  margin: auto 0;
+}
+
+.lt-frame {
+  --card-w: 328px;
+  --card-h: clamp(376px, calc(100dvh - 360px), 448px);
+  --frame-h: calc(var(--card-h) + 54px);
+  --lt-shadow-y: 24px;
+  --env-settle: calc(var(--card-h) / 2 - 130px);
+  --env-final: calc(var(--env-settle) + 190px);
+  position: relative;
+  left: 50%;
+  width: 360px;
+  height: var(--frame-h);
+  margin: 0 0 0 -180px;
+}
+
+.lt-scene {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* ── 봉투 ── */
+.envback,
+.envfront,
+.flapwrap {
+  position: absolute;
+  left: 28px;
+  top: calc(var(--frame-h) / 2 - 103px);
+  width: 304px;
+}
+
+.envback {
+  z-index: 2;
+  height: 206px;
+}
+
+.envfront {
+  z-index: 5;
+  height: 206px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.envfront:focus-visible {
+  outline: var(--emphasis) solid var(--service-ink);
+  outline-offset: 4px;
+  border-radius: 16px;
+}
+
+/* 창으로 든 낮 빛이 봉투 왼쪽 위를 비춘다(하얀 면 하나, 그림자 아님) */
+.envfront::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 0 0 16px 16px;
+  pointer-events: none;
+  background: linear-gradient(118deg, color-mix(in srgb, var(--bg) 46%, transparent) 0, color-mix(in srgb, var(--bg) 14%, transparent) 32%, transparent 58%);
+}
+
+.env-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.e-back {
+  fill: var(--envelope-back);
+}
+
+.e-body {
+  fill: var(--envelope-body);
+}
+
+.e-fold {
+  fill: var(--envelope-fold);
+}
+
+.e-fold-light {
+  fill: var(--envelope-fold-light);
+}
+
+.e-to {
+  fill: var(--paper-ink);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.flapwrap {
+  z-index: 6;
+  height: 122px;
+  pointer-events: none;
+}
+
+.flap {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 0;
+  transform-style: preserve-3d;
+}
+
+.f-out,
+.f-in {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
+.f-out {
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+  background: linear-gradient(118deg, color-mix(in srgb, var(--bg) 42%, transparent) 0, transparent 55%), var(--envelope-flap);
+}
+
+.f-in {
+  clip-path: polygon(0 100%, 100% 100%, 50% 0);
+  background: var(--envelope-flap-inner);
+  transform: rotateX(180deg);
+}
+
+.sealw {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 36px;
+  height: 36px;
+  margin: -19px 0 0 -18px;
+  backface-visibility: hidden;
+}
+
+.seal {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--service-mint);
+}
+
+.seal::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  top: 6px;
+  width: 12px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  transform: rotate(-24deg);
+}
+
+.seal::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border: 2px solid var(--service-mint);
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.envcap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--frame-h) / 2 + 123px);
+  z-index: 4;
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-body-strong);
+  color: var(--service-ink);
+}
+
+@media (max-height: 660px) {
+  .envcap {
+    top: calc(var(--frame-h) / 2 + 111px);
+  }
+}
+
+.opening .envcap,
+.opened .envcap {
+  opacity: 0;
+}
+
+/* 열린 뒤에는 봉투 조각을 숨긴다 — 남길 때 봉인 연출(film-sealing)이 다시 꺼낸다 */
+.opened .envback,
+.opened .envfront,
+.opened .flapwrap {
+  display: none;
+}
+
+/* ── 카드 묶음: 한 장만 보인다(옆 카드 엿보기 없음). 카드 폭 328 = 틀 360 − 16 − 16 ── */
+.pagerclip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 3;
+  width: 100%;
+  height: calc(var(--card-h) + var(--lt-shadow-y));
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.opened .pagerclip {
+  height: calc(var(--card-h) + var(--lt-shadow-y) + 64px);
+}
+
+.pager {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 0;
+  display: flex;
+  gap: 8px;
+  height: calc(var(--card-h) + var(--lt-shadow-y));
+  padding: 0;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  pointer-events: auto;
+  visibility: hidden;
+}
+
+.pager::-webkit-scrollbar {
+  display: none;
+}
+
+.opened .pager,
+.opening .pager {
+  visibility: visible;
+}
+
+.pager:focus-visible {
+  outline: var(--emphasis) solid var(--service-ink);
+  outline-offset: -4px;
+  border-radius: 28px;
+}
+
+.letter-stage .card {
+  position: relative;
+  flex: 0 0 var(--card-w);
+  height: var(--card-h);
+  overflow: hidden;
+  border-radius: 28px;
+  color: var(--service-ink);
+  scroll-snap-align: start;
+  box-shadow:
+    0 2px 4px color-mix(in srgb, var(--service-ink) 12%, transparent),
+    0 8px 16px color-mix(in srgb, var(--service-ink) 6%, transparent);
+}
+
+.letter-stage .card p {
+  margin: 0;
+}
+
+/* '고치기' 태그 — 보이는 크기는 34px, 누르는 영역은 44px 이상 */
+.letter-stage .edit-tag {
+  position: absolute;
+  right: 14px;
+  top: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 0 12px 0 10px;
+  border: 1px solid color-mix(in srgb, var(--service-ink) 16%, transparent);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--service-ink);
+  font-size: 0.8125rem;
+  font-weight: 800;
+  transform: rotate(-3deg);
+  cursor: pointer;
+}
+
+.letter-stage .edit-tag::after {
+  content: "";
+  position: absolute;
+  inset: -6px -5px;
+}
+
+.letter-stage .edit-tag svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.letter-stage .edit-tag:focus-visible {
+  outline: var(--emphasis) solid var(--service-ink);
+  outline-offset: 2px;
+}
+
+.letter-stage .tape {
+  position: absolute;
+  left: -9px;
+  top: -7px;
+  display: block;
+  width: 26px;
+  height: 11px;
+  background: color-mix(in srgb, var(--service-mint) 85%, transparent);
+  transform: rotate(-32deg);
+  clip-path: polygon(0 12%, 10% 0, 20% 14%, 30% 0, 100% 0, 100% 100%, 30% 100%, 20% 86%, 10% 100%, 0 88%);
+}
+
+.letter-stage .tape.big {
+  left: 108px;
+  top: -12px;
+  width: 78px;
+  height: 24px;
+  transform: rotate(-3deg);
+}
+
+/* 감정 카드: 그 계열 300 면, 감정 이름, 조약돌, 세부 감정 알약, 크기(숫자·열 점) */
+.letter-stage .t1 {
+  background: var(--tint);
+}
+
+.letter-stage .t1 .lab {
+  position: absolute;
+  left: 22px;
+  top: 24px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  opacity: 0.78;
+}
+
+.letter-stage .t1 .ename {
+  position: absolute;
+  left: 22px;
+  top: 48px;
+  font-size: 3.5rem;
+  line-height: 3.625rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+}
+
+.letter-stage .t1 .pebble-img {
+  position: absolute;
+  right: 8px;
+  top: 100px;
+  width: 170px;
+  height: auto;
+}
+
+.letter-stage .t1:has(.chips.many) .pebble-img {
+  right: 14px;
+  top: 52px;
+  width: 80px;
+}
+
+.letter-stage .t1 .chips {
+  --chip-h: 36px;
+  --chip-fs: 0.9375rem;
+  --chip-pad: 15px;
+  position: absolute;
+  left: 22px;
+  top: calc(var(--card-h) - 261.5px);
+  display: flex;
+  gap: 16px;
+  max-height: 168px;
+  overflow: hidden;
+}
+
+.letter-stage .t1 .chips.many {
+  --chip-h: 32px;
+  --chip-fs: 0.875rem;
+  --chip-pad: 13px;
+  top: calc(var(--card-h) - 239.5px);
+}
+
+.letter-stage .t1 .chip-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.letter-stage .t1 .chips.many .chip-col {
+  gap: 6px;
+}
+
+.letter-stage .t1 .chips span {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: var(--chip-h);
+  padding: 0 var(--chip-pad);
+  border-radius: calc(var(--chip-h) / 2);
+  background: color-mix(in srgb, var(--bg) 72%, transparent);
+  font-size: var(--chip-fs);
+  line-height: 1;
+  font-weight: 700;
+}
+
+.letter-stage .t1 .rule {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: calc(var(--card-h) - 85.5px);
+  height: 1.5px;
+  background: color-mix(in srgb, var(--service-ink) 16%, transparent);
+}
+
+.letter-stage .t1 .size {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: calc(var(--card-h) - 74px);
+  height: 62px;
+  overflow: hidden;
+}
+
+.letter-stage .t1 .size small {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  opacity: 0.78;
+}
+
+.letter-stage .t1 .size .val {
+  position: absolute;
+  left: 0;
+  top: 16px;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.letter-stage .t1 .size b {
+  font-size: 2.5rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.letter-stage .t1 .size em {
+  font-style: normal;
+  font-size: 1rem;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+.letter-stage .t1 .d10 {
+  position: absolute;
+  right: 0;
+  top: 32px;
+  display: flex;
+  gap: 5px;
+}
+
+.letter-stage .t1 .d10 i {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid color-mix(in srgb, var(--service-ink) 40%, transparent);
+  border-radius: 50%;
+}
+
+.letter-stage .t1 .d10 i.f {
+  border-color: var(--service-ink);
+  background: var(--service-ink);
+}
+
+/* 이어지는 카드: 이름·알약을 한 덩어리로 남은 자리 세로 가운데 */
+.letter-stage .t1-more-body {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transform: translateY(-50%);
+}
+
+.letter-stage .t1-more .ename2 {
+  font-size: 1.75rem;
+  line-height: 2.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.letter-stage .t1-more .chips {
+  position: static;
+}
+
+/* 이야기 카드: 줄 노트가 글과 함께 스크롤된다(날짜·테이프는 그대로) */
+.letter-stage .t2 {
+  overflow: visible;
+  background: var(--paper);
+}
+
+.letter-stage .t2 .lab2 {
+  position: absolute;
+  left: 22px;
+  top: 22px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--paper-ink);
+}
+
+.letter-stage .lt-paper {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 46px;
+  bottom: 0;
+  padding: 6px 22px 22px;
+  border-radius: 0 0 28px 28px;
+  background: repeating-linear-gradient(to bottom, transparent 0 29px, var(--paper-rule) 29px 30px) 0 6px repeat-y;
+  background-attachment: local;
+}
+
+.letter-stage .lt-line {
+  position: relative;
+  min-height: 30px;
+}
+
+.letter-stage .t2 .k {
+  font-size: 0.8125rem;
+  line-height: 30px;
+  font-weight: 800;
+  color: var(--paper-ink);
+}
+
+.letter-stage .t2 .v {
+  font-size: 1.125rem;
+  line-height: 30px;
+  font-weight: 600;
+  color: var(--text);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.letter-stage .t2 .v.ev {
+  min-height: 90px;
+}
+
+.letter-stage .lt-paper .edit-tag {
+  right: -8px;
+}
+
+/* 칭찬·감사 카드: 인용문, 서명은 맨 아래(짧을 때) — 길면 함께 스크롤되고 서명은 글 끝에 */
+.letter-stage .t3 {
+  background: var(--service-light);
+}
+
+.letter-stage .t3 .lab3 {
+  position: absolute;
+  left: 22px;
+  top: 24px;
+  font-size: 0.8125rem;
+  font-weight: 800;
+  color: var(--paper-ink);
+}
+
+.letter-stage .lt-body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 56px;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0 24px 22px;
+  border-radius: 0 0 28px 28px;
+}
+
+.letter-stage .t3 .q {
+  margin: 62px 0 0;
+  font-size: 1.6875rem;
+  line-height: 2.4rem;
+  font-weight: 750;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+.letter-stage .t3 .q::before {
+  content: "“";
+  display: block;
+  height: 40px;
+  font-size: 4rem;
+  line-height: 44px;
+  font-weight: 800;
+  color: color-mix(in srgb, var(--service-ink) 14%, transparent);
+}
+
+.letter-stage .t3 .qs {
+  margin: 36px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 1.25rem;
+  line-height: 1.8rem;
+  font-weight: 700;
+}
+
+.letter-stage .t3 .qs li {
+  position: relative;
+  padding: var(--sp-3) 0 var(--sp-3) var(--sp-5);
+  overflow-wrap: anywhere;
+}
+
+.letter-stage .t3 .qs li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 1.2rem;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--service-mint);
+}
+
+.letter-stage .lt-sign {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.letter-stage .lt-sign .sig {
+  margin: 0 0 4px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--paper-ink);
+}
+
+.letter-stage .seal2 {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--service-mint);
+}
+
+/* 카드 안의 글: 넘칠 때만 가는 막대(4px). 넘치는 칸만 키보드로 닿는다(Letter.tsx tabindex) */
+.letter-stage .lt-scroll {
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.letter-stage .lt-scroll:focus-visible {
+  outline: var(--emphasis) solid var(--focus);
+  outline-offset: -4px;
+}
+
+.letter-stage .lt-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.letter-stage .lt-scroll::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--service-ink) 28%, transparent);
+}
+
+/* ── 넘기기: 화살표·점(10장까지)·숫자. 닫힌 동안은 초점을 받지 않는다 ── */
+.letter-nav {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--card-h) + 18px);
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  height: 44px;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.opened .letter-nav {
+  visibility: visible;
+  opacity: 1;
+}
+
+.letter-nav .dd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.letter-nav .dd i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--service-ink) 50%, transparent);
+}
+
+.letter-nav .dd i.on {
+  width: 20px;
+  background: var(--service-ink);
+}
+
+.letter-nav .dd.count {
+  justify-content: center;
+  gap: 4px;
+  min-width: 4.5rem;
+  font-size: var(--fs-label);
+  color: var(--service-ink);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.letter-nav .dd.count b {
+  font-weight: 800;
+}
+
+.letter-nav .ar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-soft);
+  color: var(--service-ink);
+  cursor: pointer;
+}
+
+.letter-nav .ar[aria-disabled="true"] {
+  color: color-mix(in srgb, var(--service-ink) var(--dis-content, 50%), var(--bg));
+  cursor: default;
+}
+
+.letter-nav .ar svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ── 빈터 바닥·빛·빛 알갱이·조약돌(장식) ── */
+.lt-floor {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--frame-h) / 2 + 40px);
+  width: 300px;
+  height: 160px;
+  margin-left: -150px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse closest-side, color-mix(in srgb, var(--land-hill-near) 26%, var(--bg)) 0%, transparent 80%);
+}
+
+.lt-glow {
+  position: absolute;
+  left: -60px;
+  top: -140px;
+  width: 320px;
+  height: 320px;
+  opacity: 0.7;
+}
+
+.lt-glow > i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, color-mix(in srgb, var(--service-light) 58%, transparent) 0, color-mix(in srgb, var(--service-light) 20%, transparent) 46%, transparent 100%);
+}
+
+.opening .lt-glow,
+.opened .lt-glow {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+.lt-burst {
+  position: absolute;
+  left: -20px;
+  top: -10px;
+  width: 400px;
+  height: 300px;
+  opacity: 0;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--bg) 62%, transparent) 0, color-mix(in srgb, var(--service-light) 40%, transparent) 46%, transparent 100%);
+}
+
+.lt-halo {
+  position: absolute;
+  left: -30px;
+  top: -40px;
+  width: 420px;
+  height: 470px;
+  opacity: 0;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--bg) 46%, transparent) 0, color-mix(in srgb, var(--service-light) 22%, transparent) 62%, transparent 100%);
+}
+
+.opening .lt-halo,
+.opened .lt-halo {
+  opacity: 1;
+}
+
+.lt-mote {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--s);
+  height: var(--s);
+  margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
+  border-radius: 50%;
+  opacity: 0.85;
+  background: radial-gradient(circle closest-side, var(--bg) 0, var(--bg) 24%, color-mix(in srgb, var(--bg) 44%, transparent) 48%, transparent 100%);
+}
+
+.lt-rp-wrap {
+  position: absolute;
+  left: calc(50% + var(--dx));
+  top: calc(var(--frame-h) / 2 + 103px + var(--dy));
+  z-index: 1;
+  transform: translate(-50%, -50%);
+}
+
+.lt-rp {
+  position: relative;
+  display: block;
+  height: auto;
+  transform: rotate(var(--r));
+  filter: saturate(0.6) brightness(0.95) contrast(0.92);
+}
+
+.lt-rp-shadow {
+  position: absolute;
+  left: 50%;
+  top: 75%;
+  width: 78%;
+  height: 22%;
+  margin-left: -39%;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--land-hill-near) 40%, transparent);
+  filter: blur(1.5px);
+}
+
+/* 강제 색상(고대비): 장식 장면은 빼고 글자·부품만 */
+@media (forced-colors: active) {
+  .lt-scene {
+    display: none;
+  }
+}
+
+/* ── 열림 연출: 0~0.7초 뚜껑, 1~1.85초 카드, 1.8~2.3초 봉투가 내려간다 ── */
+@media (prefers-reduced-motion: no-preference) {
+  .closed .envback,
+  .closed .envfront,
+  .closed .flapwrap {
+    animation: bobenv 3s ease-in-out infinite;
+  }
+  .closed .seal::after {
+    animation: sealp 2.2s ease-out infinite;
+  }
+  .lt-glow {
+    transition:
+      opacity 900ms var(--ease),
+      transform 1400ms var(--ease);
+  }
+  .lt-glow > i {
+    animation: lt-breathe 7s ease-in-out infinite;
+  }
+  .lt-halo {
+    transition: opacity 1200ms var(--ease) 900ms;
+  }
+  .lt-mote {
+    animation:
+      lt-drift var(--t) ease-in-out var(--d) infinite,
+      lt-blink calc(var(--t) * 0.5) ease-in-out var(--d) infinite;
+  }
+  .envcap,
+  .letter-nav {
+    transition: opacity 0.4s;
+  }
+  .opening .flap {
+    animation: flapopen 700ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  .opening .flapwrap,
+  .opening .envback,
+  .opening .envfront {
+    animation:
+      envmove 2320ms linear both,
+      flapz 1ms linear 350ms both;
+    pointer-events: none;
+  }
+  .opening .pager {
+    opacity: 0;
+    animation: rise 850ms cubic-bezier(0.2, 0.85, 0.25, 1) 1000ms forwards;
+  }
+  .opening .pager .card:not(:first-child) {
+    visibility: hidden;
+  }
+  .opening .lt-burst {
+    animation: lt-burst 1500ms ease-out 300ms both;
+  }
+}
+
+@keyframes flapopen {
+  from {
+    transform: perspective(900px) rotateX(0);
+  }
+  to {
+    transform: perspective(900px) rotateX(180deg);
+  }
+}
+
+@keyframes flapz {
+  from {
+    z-index: 6;
+  }
+  to {
+    z-index: 1;
+  }
+}
+
+@keyframes envmove {
+  0% {
+    transform: translateY(0);
+    opacity: 1;
+    animation-timing-function: ease-out;
+  }
+  22% {
+    transform: translateY(var(--env-settle));
+    opacity: 1;
+  }
+  77.5% {
+    transform: translateY(var(--env-settle));
+    opacity: 1;
+    animation-timing-function: cubic-bezier(0.5, 0, 0.8, 0.4);
+  }
+  100% {
+    transform: translateY(var(--env-final));
+    opacity: 0;
+  }
+}
+
+/* 카드는 늘 150px만 남기고 클립 아래에 숨어 있다가 올라온다 */
+@keyframes rise {
+  0% {
+    transform: translateY(calc(var(--card-h) - 150px));
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+@keyframes bobenv {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes sealp {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@keyframes lt-breathe {
+  0%,
+  100% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes lt-burst {
+  0% {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.25);
+  }
+}
+
+@keyframes lt-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  34% {
+    transform: translate(var(--ax), var(--ay));
+  }
+  68% {
+    transform: translate(var(--bx), var(--by));
+  }
+}
+
+@keyframes lt-blink {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── '남기기' 뒤 봉인(D-084, seal.ts): 카드가 작아지며 내려가고 → 뚜껑이 닫히고 → 인장이 눌리고 → 봉투가 흰빛 속으로 ── */
+.letter-stage.film-sealing .envback,
+.letter-stage.film-sealing .envfront,
+.letter-stage.film-sealing .flapwrap {
+  display: block;
+}
+
+.letter-stage.film-sealing .flap {
+  transform: perspective(900px) rotateX(180deg);
+}
+
+.film-cards-in {
+  transform: scale(0.12) translateY(130px);
+  opacity: 0;
+  transition:
+    transform 380ms var(--ease),
+    opacity 380ms var(--ease);
+}
+
+.letter-stage.film-sealing .flap.film-flap-close {
+  animation: film-flap-close 250ms var(--ease) both;
+}
+
+.film-seal-press {
+  animation: film-seal-press 280ms var(--ease) both;
+}
+
+.film-envelope-out {
+  transform: translateY(-20px);
+  opacity: 0;
+  transition:
+    transform 330ms var(--ease),
+    opacity 330ms var(--ease);
+}
+
+.film-whiteout {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: var(--bg);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 380ms var(--ease);
+}
+
+.film-whiteout.film-show {
+  opacity: 1;
+}
+
+.film-whiteout.film-hide {
+  opacity: 0;
+}
+
+@keyframes film-flap-close {
+  from {
+    transform: perspective(900px) rotateX(180deg);
+  }
+  to {
+    transform: perspective(900px) rotateX(0deg);
+  }
+}
+
+@keyframes film-seal-press {
+  0% {
+    transform: scale(1);
+  }
+  55% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ═══ 완료 — 흰 하늘·색 언덕·흰 길, 그날의 친구와 조약돌(D-061) ═══ */
+.screen.done {
+  padding: calc(var(--sp-5) + env(safe-area-inset-top)) 0 0;
+  gap: 0;
+  overflow: hidden;
+  /* 아래 160px은 가까운 언덕 색 — 버튼 줄 아래 남는 자리까지 땅이 이어진다 */
+  background: linear-gradient(to top, var(--land-hill-near) 160px, var(--bg) 160px);
+}
+
+.done-head {
+  padding: 0 var(--sp-4);
+}
+
+.done-date {
+  margin: 0 0 var(--sp-1);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-body-strong);
+  color: var(--muted);
+}
+
+.screen.done .hero {
+  margin: 0 0 var(--sp-2);
+  font-size: clamp(1.6rem, 8.6vw, 2.1rem);
+  line-height: 1.2;
+}
+
+.done-land {
+  position: relative;
+  flex: 1;
+  min-height: 24rem;
+  /* 아래 -1px: 언덕 그림의 반올림으로 버튼 줄과의 사이에 실선이 비치지 않게 겹친다 */
+  margin: var(--sp-2) 0 -1px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.screen.done .done-bar {
+  margin: 0;
+  padding: var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom));
+  background: var(--land-hill-near);
+}
+
+.screen.done .done-bar .btn-quiet {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+}
+
+.screen.done .done-bar :focus-visible {
+  outline: 3px solid var(--service-ink);
+  outline-offset: 3px;
+}
+
+.land-fit {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  container-type: size;
+}
+
+.land-fit .land {
+  position: relative;
+  flex: none;
+  width: min(100cqw, calc(100cqh * 360 / 590));
+  aspect-ratio: 360 / 590;
+}
+
+.land-art,
+.land-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.land .hill-far {
+  fill: var(--land-hill-far);
+}
+
+.land .hill-mid {
+  fill: var(--land-hill-mid);
+}
+
+.land .hill-near {
+  fill: var(--land-hill-near);
+}
+
+.land .road {
+  fill: var(--bg);
+  stroke: var(--bg);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.land .sun {
+  fill: var(--land-sun);
+}
+
+.land .sun-ring {
+  fill: none;
+  stroke: var(--land-sun-ring);
+  stroke-width: 2.5;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.land .sun-ring.thin {
+  stroke-width: 2;
+}
+
+.land-cell {
+  display: contents;
+}
+
+.land-friend,
+.land-pebble {
+  position: absolute;
+  display: block;
+  height: auto;
+}
+
+/* 기울기는 개별 속성 rotate — 입장·숨쉬기의 transform과 서로 안 덮어쓴다(D-078) */
+.land-friend {
+  bottom: var(--bt);
+  transform-origin: 50% 100%;
+  rotate: var(--tilt, 0deg);
+}
+
+.land-pebble {
+  transform: rotate(var(--r, 0deg));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .screen.done {
+    animation: film-rise-in 420ms var(--ease) both;
+  }
+  .land-friend {
+    animation:
+      lfin 0.6s var(--ease) both,
+      lfbob 5.4s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * 110ms), calc(var(--i, 0) * 110ms + 600ms);
+  }
+  .land .sun-ring {
+    animation: sunpulse 7s ease-in-out infinite;
+  }
+  .land .sun-ring.thin {
+    animation-delay: -3.5s;
+  }
+}
+
+@keyframes film-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lfin {
+  0% {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes lfbob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1.6%);
+  }
+}
+
+@keyframes sunpulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.045);
+  }
+}
+
+/* 큰 글자 격자(D-083 ③): 3열, 기울기 0, 조약돌은 친구 발치. 언덕은 격자 뒤 배경으로 남기고 해만 숨긴다. 1~3명은 가운데 한 줄 */
+.done-land:has(.land.fl-grid),
+.screen.done:has(.land.fl-grid) {
+  overflow: visible;
+}
+
+.land-fit:has(.land.fl-grid) {
+  display: block;
+}
+
+.land.fl-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-6) var(--sp-2);
+  width: 100%;
+  min-height: 100%;
+  padding: var(--sp-5) var(--sp-3);
+  aspect-ratio: auto;
+}
+
+.land.fl-grid .land-art {
+  z-index: 0;
+  pointer-events: none;
+}
+
+.land.fl-grid .sun-g {
+  display: none;
+}
+
+.land.fl-grid .land-cell {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.land.fl-grid .land-friend {
+  position: static;
+  width: var(--fw-px) !important;
+  max-width: 100%;
+  rotate: 0deg;
+  animation: none;
+}
+
+.land.fl-grid .land-pebble {
+  position: static;
+  width: 32px !important;
+  transform: none;
+}
+
+.land.fl-grid[data-n="1"],
+.land.fl-grid[data-n="2"],
+.land.fl-grid[data-n="3"] {
+  grid-template-columns: none;
+  grid-template-rows: 40fr auto 60fr;
+  grid-auto-columns: max-content;
+  grid-auto-flow: column;
+  justify-content: center;
+  column-gap: var(--sp-5);
+}
+
+.land.fl-grid[data-n="1"] .land-cell,
+.land.fl-grid[data-n="2"] .land-cell,
+.land.fl-grid[data-n="3"] .land-cell {
+  grid-row: 2;
+}
+
+.land.fl-grid[data-n="1"] .land-friend {
+  max-width: 55vw;
+}
+
+.land.fl-grid[data-n="2"] .land-friend {
+  max-width: 40vw;
+}
+
+.land.fl-grid[data-n="3"] .land-friend {
+  max-width: 27vw;
+}
+
+/* 움직임 줄이기: 봉인은 즉시(seal.ts가 건너뛴다), 흰 막도 곧바로 */
+@media (prefers-reduced-motion: reduce) {
+  .film-cards-in,
+  .film-envelope-out,
+  .film-whiteout {
+    transition-duration: 1ms;
+  }
+}

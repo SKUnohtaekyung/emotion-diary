@@ -24,5 +24,5 @@
     "Phone checks (mobile-reflection now, direct-journal later) need the dev building: this PC has no wrangler login and no work/deploy/dev.* files — the user logs in and decides whether to regenerate the dev secrets.",
     "Before accounts: whether the server may read diaries, and a legal review of consent and policy (tasks/replan/2026-11-11/PLAN.md section 5)."
   ],
-  "last_checkpoint": "2026-11-11 TASK-JOURNAL-01 plan approved (D-131: settings sub-screens in, entry/onboarding to accounts). Starting J-1. TASK-REFLECT-01 stays verifying until the shared phone check."
+  "last_checkpoint": "2026-11-11 TASK-JOURNAL-01 J-0..J-4 done (plan committed 9b774a4; J-1..J-4 uncommitted): writing flow on Preact with prototype frame, meadow, detail basket, path-slider intensity, paper scenes for event/reason/praise/gratitude, GET /api/today firstRecordDate. vitest client 400/400, e2e 32/32, verify quick PASS. Next: J-5 letter/seal/done."
 }

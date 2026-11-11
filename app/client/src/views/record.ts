@@ -1,14 +1,17 @@
-// 기록 보기 `#/record/<날짜>` — 편지의 읽기 모드, 평면판(UX_SPEC §7, TASK-SLICE-01 사용자 결정 U-3).
+// 기록 보기 `#/record/<날짜>` — 편지의 읽기 모드(UX_SPEC §7). 2026-11-12 작성 흐름의 편지 카드를 그대로 쓴다(TASK-JOURNAL-01 J-5, 봉투 연출 없음).
 // 부분마다 '고치기'가 그 단계로 고치기 흐름을 연다(D-100 ②). 완료 취소·지우기는 이 조각에 없다(direct-journal).
 // 없는·미래 날짜는 '이 날의 편지가 없어요'(D-083 ②). 임시저장이면 이어 쓰기로 보낸다.
 
 import type { DiaryEntryView } from "../../../shared/diary";
 import { CATEGORY_CODES } from "../../../shared/taxonomy";
+import { createElement } from "preact";
 import { h } from "../lib/dom";
+import { mountPreact } from "../lib/mount";
+import { Letter } from "./write/Letter";
 import { monthDay } from "../lib/format";
 import { back, navigate, pushFlowStep, syncTitle, type ViewContext } from "../router";
-import { fetchDiary } from "../write/api";
-import { categoryLabel, emotionLabel, fromEntry, type StepKey, stepQuery } from "../write/flow";
+import { fetchDiary, fetchToday } from "../write/api";
+import { fromEntry, type StepKey, stepQuery } from "../write/flow";
 import { readUnsent } from "../write/unsent";
 
 let flowSeq = 0;
@@ -18,56 +21,20 @@ function editFrom(date: string, step: StepKey): void {
   pushFlowStep(`#/write/${date}?${stepQuery(step)}`, `r${Date.now().toString(36)}${flowSeq}`);
 }
 
-function letter(entry: DiaryEntryView): HTMLElement[] {
-  const diary = fromEntry(entry);
-  const edit = (label: string, step: StepKey) => {
-    const button = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "고치기", "aria-label": `${label} 고치기` });
-    button.addEventListener("click", () => editFrom(entry.entryDate, step));
-    return button;
-  };
-  const cards: HTMLElement[] = [];
-  for (const category of diary.categories) {
-    const label = categoryLabel(category.code);
-    cards.push(
-      h(
-        "section",
-        { class: "letter-card", "data-category": category.code },
-        h("div", { class: "letter-head" }, h("h2", {}, h("span", { class: "choice-mark", "aria-hidden": "true" }), label), edit(label, { step: "details", category: category.code })),
-        h("p", { class: "letter-size", text: `크기 ${category.intensity ?? "–"}` }),
-        h(
-          "ul",
-          { class: "letter-pills" },
-          ...diary.emotions
-            .filter((item) => item.category === category.code)
-            .map((item) => h("li", { text: item.own !== null ? `${emotionLabel(item.code)} (크기 ${item.own})` : emotionLabel(item.code) }))
-        )
-      )
-    );
-  }
-  const text = (heading: string, value: string, step: StepKey) =>
-    h(
-      "section",
-      { class: "letter-card" },
-      h("div", { class: "letter-head" }, h("h2", { text: heading }), edit(heading, step)),
-      h("p", { class: "letter-text", text: value })
-    );
-  cards.push(text("있었던 일", diary.eventText, { step: "event", category: null }), text("이유", diary.reasonText, { step: "reason", category: null }));
-  for (const [kind, heading, step] of [
-    ["praises", "칭찬", "praise"],
-    ["gratitudes", "감사", "gratitude"]
-  ] as const) {
-    const filled = diary[kind].filter((value) => value.trim() !== "");
-    if (!filled.length) continue;
-    cards.push(
-      h(
-        "section",
-        { class: "letter-card" },
-        h("div", { class: "letter-head" }, h("h2", { text: heading }), edit(heading, { step, category: null })),
-        h("ul", { class: "letter-list" }, ...filled.map((value) => h("li", { text: value })))
-      )
-    );
-  }
-  return cards;
+/** 편지의 읽기 모드 — 작성 흐름과 같은 카드(Letter.tsx), 봉투 연출 없이 열린 채. 부분마다 '고치기'가 그 단계로 고치기 흐름(D-100 ②) */
+function letter(entry: DiaryEntryView, today: boolean): { nodes: HTMLElement[]; unmount: () => void } {
+  const host = h("div", { class: "record-letter" });
+  const unmount = mountPreact(
+    host,
+    createElement(Letter, {
+      diary: fromEntry(entry),
+      date: entry.entryDate,
+      day: today ? "오늘" : "그날",
+      mode: "read",
+      onEdit: (step: StepKey) => editFrom(entry.entryDate, step)
+    })
+  );
+  return { nodes: [h("p", { class: "letter-sub", text: "옆으로 넘겨서 다시 읽어요." }), host], unmount };
 }
 
 export function renderRecord({ root, route, alive }: ViewContext): () => void {
@@ -83,11 +50,14 @@ export function renderRecord({ root, route, alive }: ViewContext): () => void {
   backButton.addEventListener("click", () => back(backTo));
   const title = h("h1", { text: `${monthDay(date)}의 편지` });
   const area = h("div", { class: "record-body", "aria-busy": "true" }, h("p", { class: "note", text: "불러오는 중이에요." }));
+  let unmountLetter = (): void => {};
   root.append(h("section", { class: "screen record" }, h("div", { class: "screen-top" }, backButton), title, area));
 
   const load = async (): Promise<void> => {
     area.setAttribute("aria-busy", "true");
-    const result = await fetchDiary(date);
+    // 오늘의 편지면 '오늘', 지난 날이면 '그날' — 오늘은 서버가 센다(못 읽으면 '그날')
+    const [result, todayResult] = await Promise.all([fetchDiary(date), fetchToday()]);
+    const today = todayResult.ok ? todayResult.data.date : null;
     if (!alive()) return;
     area.removeAttribute("aria-busy");
     if (result.ok && result.data.status === "draft") {
@@ -96,7 +66,10 @@ export function renderRecord({ root, route, alive }: ViewContext): () => void {
       return;
     }
     if (result.ok) {
-      const nodes = letter(result.data);
+      unmountLetter();
+      const shown = letter(result.data, today !== null && result.data.entryDate >= today);
+      unmountLetter = shown.unmount;
+      const nodes = shown.nodes;
       // 이 휴대폰에 남은 사본 — 고치던 내용이든, 다른 곳에서 완료되기 전에 쓰던 임시저장이든 — 으로 가는 길(PR #40 리뷰).
       // 들어가면 흐름이 서버 기록과 비교해 덮지 않고 묻는다.
       const copy = readUnsent(date);
@@ -125,5 +98,5 @@ export function renderRecord({ root, route, alive }: ViewContext): () => void {
     area.replaceChildren(h("p", { text: result.offline ? "연결이 끊겼어요 · 연결되면 볼 수 있어요" : "불러오지 못했어요 · 잠시 뒤 다시 시도해 주세요" }), retry);
   };
   void load();
-  return () => {};
+  return () => unmountLetter();
 }

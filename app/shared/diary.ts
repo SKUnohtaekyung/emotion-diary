@@ -500,4 +500,6 @@ export interface TodayInfo {
   entry: DiarySummary | null;
   /** 가장 최근의 지난 임시저장(오늘 화면의 '어제 쓰던 글이 있어요') */
   pastDraft: DiarySummary | null;
+  /** 처음 완료한 기록의 날(`first_completed_local_date`의 가장 이른 값, 지금 완료 상태와 무관). 없으면 null — 있었던 일 안내 네 단계(TASK-JOURNAL-01 A-7) */
+  firstRecordDate: string | null;
 }
