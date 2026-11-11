@@ -4,6 +4,9 @@
 import { state, toISO } from "../state.js";
 import { dayStatus, sampleRecord, effectiveToday } from "../sample.js";
 
+// 초안 바꾸기(QA): ?lb=2b.4c 처럼 붙인다 — 2 돌아보기(a 쪽지 묶음·b 길 따라·c 한 장씩) · 4 내 기준(a 눌러 둔 쪽지·b 노트 한 장·c 큰 글자) · 5 해 보는 길 정하기(a 칸·b 문장) · 6 오늘 화면 팻말(a 등불·b 반딧불·c 글 한 줄).
+export const choice = { read: "c", note: "b", path: "b", sign: "c" }; // 기본값은 3판에서 권하는 초안이다
+const KEYS = { 2: "read", 4: "note", 5: "path", 6: "sign" };
 export const qa = { amount: "normal", tell: null, keyboard: false };
 
 const addDays = (iso, n) => { const [y, m, d] = iso.split("-").map(Number); return toISO(new Date(y, m - 1, d + n)); };
@@ -57,6 +60,7 @@ export const pathDays = (x = lb.path) => Array.from({ length: x.days }, (_, k) =
 let seeded = false;
 export function readParams(params) {
   let reseed = !seeded;
+  for (const part of (params.get("lb") ?? "").split(/[.,]/)) { const m = /^([2456])([abc])$/.exec(part); if (m) choice[KEYS[m[1]]] = m[2]; }
   const amount = params.get("lbs");
   if (amount in AMOUNT && amount !== qa.amount) { qa.amount = amount; reseed = true; }
   if (params.has("lbt")) qa.tell = params.get("lbt");

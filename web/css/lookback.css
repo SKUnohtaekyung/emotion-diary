@@ -161,3 +161,109 @@ main:has(.lb-kb) .step-footer{bottom:290px}
   .lb-slip,.lb-again-pill{transition:none}
   .lb-slip:active,.lb-again-pill:active{transform:none}
 }
+
+/* ════════ 3판: 고친 것과 더 지은 초안들 ════════ */
+/* 소품은 한 화면에 세 곳 안팎(BRAND_STORY §6) — 눌러 둔 쪽지의 테이프는 첫 장에만 붙인다 */
+.lb-slips li:not(:first-child) .lb-slip::before{display:none}
+/* 길의 날들은 달력의 날짜 모양(.day.mini)을 그대로 쓴다 */
+.lb-trail .day.mini{width:26px;height:26px;min-height:26px}
+.lb-ref{position:relative}
+.lb-ref::after{content:"";position:absolute;inset:-4px 0}
+.lb-from{margin-top:var(--sp-4)}
+
+/* ── 돌아보기 b: 길 따라 읽기 ── */
+.lb-way{list-style:none;margin:var(--sp-6) 0 0 14px;padding:0 0 var(--sp-2) 30px;border-left:4px solid var(--land-hill-far)}
+.lb-way li{position:relative;padding-bottom:var(--sp-8)}
+.lb-way-peb{position:absolute;left:-48px;top:0;width:30px;height:auto}
+.lb-way-date{margin:0 0 var(--sp-2);font-size:var(--fs-label);line-height:2.25rem;color:var(--muted)}
+.lb-way-date b{font-size:1.75rem;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+.lb-way .is-marked .lb-way-date b{background:linear-gradient(to top,var(--service-mint) 42%,transparent 42%)}
+.lb-way-event{margin:0;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:600}
+.lb-way-reason{margin:var(--sp-1) 0 0;color:var(--muted)}
+.lb-way-sizes{margin:var(--sp-3) 0 0}
+.lb-way .sxd-peek-chips{margin-top:var(--sp-2)}
+.lb-way-foot{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-top:var(--sp-2)}
+.lb-mark-plain{background:var(--surface-soft)}
+
+/* ── 돌아보기 c: 한 장씩 넘겨 읽기 ── */
+/* 화면 높이에 꼭 맞춘다 — 한 장이 한 화면이고 넘김 줄이 늘 아래에 보인다. 높이가 모자라면 언덕이 먼저 줄고, 그래도 넘치면 그 장 안에서만 스크롤된다 */
+.screen.lb-pages{flex:none;display:flex;flex-direction:column;padding-bottom:var(--sp-4);height:calc(100dvh - var(--banner-h,2rem));overflow:hidden}
+.lb-pages-top{display:grid;grid-template-columns:var(--touch) 1fr;align-items:center;column-gap:var(--sp-1);margin:calc(var(--sp-2) * -1) 0 0 calc(var(--sp-2) * -1)}
+.lb-pages-top .back{display:grid;place-items:center;width:var(--touch);height:var(--touch);border:0;background:none;color:var(--service-ink)}
+.lb-pages-top .back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lb-pages-top h1{margin:0;font-size:var(--fs-title);line-height:var(--lh-title)}
+.lb-pages-top .segmented{grid-column:1 / -1;margin:var(--sp-2) 0 0 var(--sp-2)}
+.lb-pages-host{flex:1;display:flex;flex-direction:column;min-height:0;margin-top:var(--sp-3)}
+.lb-pager{flex:1;min-height:0;border-radius:var(--radius-card)}
+.lb-page{flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.lb-page-land{position:relative;flex:1 1 150px;min-height:130px;max-height:260px;border-radius:var(--radius-card);overflow:hidden;background:var(--bg)}
+.lb-page-text{position:relative;padding:var(--sp-4) var(--sp-1) 0}
+.lb-page-tape{left:auto;right:var(--sp-4);margin:0;top:-12px}
+.lb-page-date{margin:0;font-size:var(--fs-label);line-height:2.5rem;color:var(--muted)}
+.lb-page-date b{font-size:2rem;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+.lb-page-text .caption{margin:0}
+.lb-page .sxd-peek-lines{margin-top:var(--sp-2)}
+.lb-page .sxd-peek-chips{margin-top:var(--sp-2)}
+.lb-page-end{padding:0 var(--sp-1)}
+.lb-page-end .lb-end{margin-top:var(--sp-2)}
+.lb-page-end .lb-end-hill{display:none}
+.lb-pager-nav{display:flex;align-items:center;justify-content:space-between;margin-top:var(--sp-3)}
+.lb-pager-nav .cal-arrow svg{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lb-pager-count{margin:0;font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--muted);font-variant-numeric:tabular-nums}
+
+/* ── 내 기준 b·c: 줄 수에 따라 글자가 달라진다 ── */
+.lb-lines{list-style:none;margin:0;padding:0}
+.lb-line{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-3);width:100%;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
+.lb-line:active{transform:scale(var(--press-row))}
+.lb-line-text{flex:1;min-width:0;overflow-wrap:anywhere;font-size:var(--lb-fs);line-height:var(--lb-lh);font-weight:var(--lb-fw);letter-spacing:var(--lb-ls)}
+.lb-line-pebs{display:flex;flex:none;align-items:center;height:var(--lb-lh)}
+.lb-line-pebs img{width:22px;height:auto}
+.lb-line-pebs img+img{margin-left:-8px}
+.lb-lines.few{--lb-fs:1.75rem;--lb-lh:2.75rem;--lb-fw:800;--lb-ls:-.03em}
+.lb-lines.some{--lb-fs:1.25rem;--lb-lh:2.25rem;--lb-fw:700;--lb-ls:-.02em}
+.lb-lines.many{--lb-fs:1rem;--lb-lh:2rem;--lb-fw:600;--lb-ls:0}
+/* b 노트 한 장: 줄 노트(줄 간격 = 글 줄 높이), 한 문장 뒤에 한 줄을 비운다 */
+.lb-notepage{position:relative;margin-top:var(--sp-8);padding:var(--sp-5) var(--sp-5) var(--sp-4);border-radius:0 var(--radius-card) var(--radius-card) var(--radius-card);background:var(--service-light);color:var(--paper-ink)}
+.lb-notepage::before{content:"";position:absolute;left:-.7rem;top:-.35rem;width:2.5rem;height:.95rem;background:color-mix(in srgb,var(--service-mint) 72%,transparent);transform:rotate(-32deg)}
+.lb-notepage .lb-paper-stone{left:auto;right:var(--sp-4);top:-26px;width:56px}
+.lb-lines.on-paper{background:linear-gradient(to bottom,transparent calc(var(--lb-lh) - 1px),var(--paper-rule) calc(var(--lb-lh) - 1px)) 0 0 / 100% var(--lb-lh) repeat-y}
+.lb-lines.on-paper li{padding-bottom:var(--lb-lh)}
+.lb-lines.on-paper.many li,.lb-lines.on-paper li:last-child{padding-bottom:0}
+.lb-notepage.is-empty .lb-empty-line{margin:var(--sp-6) 0 var(--sp-4);text-align:left}
+/* c 큰 글자: 흰 바탕, 줄 사이 옅은 선 */
+.lb-lines.on-white{margin-top:var(--sp-6)}
+.lb-lines.on-white li{padding:var(--sp-4) 0;border-top:var(--hairline) solid var(--border)}
+.lb-lines.on-white li:first-child{border-top:0}
+.lb-lines.on-white.many li{padding:var(--sp-2) 0}
+.lb-lines.lb-folded{margin-top:var(--sp-2)}
+.lb-lines.lb-folded .lb-line-text{color:var(--muted)}
+.lb-lines.on-paper.lb-folded{padding:var(--sp-3) var(--sp-5);border-radius:var(--radius-card);background-color:var(--service-light)}
+
+/* ── 해 보는 길 b: 문장으로 정하기 ── */
+.lb-poster .lb-poster-h1{margin:0;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);letter-spacing:0;color:var(--muted)}
+.lb-madlib{display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-1);margin-top:var(--sp-4)}
+.lb-blank{display:block;width:100%;padding:0;border:0;border-bottom:var(--emphasis) dashed var(--border-strong);border-radius:0;background:none;resize:none;overflow:hidden;color:var(--text);letter-spacing:-.03em}
+.lb-blank:not(:placeholder-shown){border-bottom-style:solid;border-bottom-color:var(--service-mint)}
+.lb-blank:focus-visible{outline:none;border-bottom-color:var(--service-ink);border-bottom-style:solid}
+.lb-blank.when{font-size:1.25rem;line-height:2.25rem;font-weight:700}
+.lb-blank.what{font-size:clamp(1.75rem,9vw,2.25rem);line-height:1.35;font-weight:800}
+.lb-madlib-tail{margin:var(--sp-2) 0 0;font-size:1.25rem;line-height:2rem;font-weight:700}
+.lb-madlib-tail b{font-weight:800;background:linear-gradient(to top,var(--service-mint) 42%,transparent 42%)}
+.lb-poster-days{margin-top:var(--sp-3)}
+.lb-poster .lb-scene{margin-top:var(--sp-6)}
+
+/* ── 오늘 화면 팻말의 초안: b 반딧불, c 글 한 줄 ── */
+.lb-fly{position:absolute;width:9%;aspect-ratio:1;border-radius:50%;background:var(--service-mint);animation:twinkle 5s ease-in-out infinite}
+.lb-fly.f0{left:-30%;top:8%}
+.lb-fly.f1{left:112%;top:-6%;animation-delay:-1.2s}
+.lb-fly.f2{left:96%;top:52%;width:7%;animation-delay:-2.3s}
+.lb-fly.f3{left:-44%;top:60%;width:7%;animation-delay:-3.1s}
+.lb-fly.f4{left:40%;top:-26%;width:6%;animation-delay:-4s}
+.lb-forest-sign.is-ended .lb-fly{background:var(--bg)}
+.lb-yline{top:86.5%}
+
+@media (prefers-reduced-motion:reduce){
+  .lb-fly{animation:none}
+  .lb-line{transition:none}
+  .lb-line:active{transform:none}
+}
