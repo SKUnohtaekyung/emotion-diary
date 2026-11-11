@@ -48,7 +48,7 @@ function road() {
 // day는 장면 설명 줄의 날 이름이다 — 지난 날 쓰던 글을 마무리할 때는 '그날'이다.
 // 이 단계는 감정을 고르기 전이라 친구도 조약돌도 세우지 않는다(cats가 있어도 쓰지 않는다).
 const EVENT = { far: { l: -70, r: -30, ry: 3.5 }, mid: { l: -20, r: -60, ry: 3 }, near: { l: -30, r: -40, ry: 2 } };
-export function renderEventScene({ eventField, day = "오늘" }) {
+export function renderEventScene({ eventField, day = "오늘", story = `${day} 하루를 돌아보는 길이에요` }) { // story: 장면 설명 줄을 바꿔 쓴다(내 기준 적기, TASK-LOOKBACK-01 시안)
   const sheet = el("div", { class: "nt-sheet" }, el("div", { class: "nt-paper" }, eventField)); // 날짜 탭(dateField)은 D-082 이후 쓰지 않아 지웠다(D-099 native-picker C1)
   const land = el("div", { class: "nt-land", style: { "--rx": `${ROAD_X0.toFixed(2)}%` } }, // 길의 들머리 중심(%) — 돌과 설명 줄이 이 자리를 따른다
     el("i", { class: "nt-haze", "aria-hidden": "true" }),
@@ -56,7 +56,7 @@ export function renderEventScene({ eventField, day = "오늘" }) {
     hill("far", EVENT.far), tree(12, 6.5, EVENT.far), tree(19, 4.5, EVENT.far), tree(91, 5, EVENT.far),
     hill("mid", EVENT.mid),
     road(),
-    el("p", { class: "nt-story", text: `${day} 하루를 돌아보는 길이에요` }), // 장면을 설명하는 한 줄이다. 판단·평가·격려의 말이 아니다. 보이는 길과 지금 하는 일을 그대로 말한다(2026-10-13 QA R9)
+    el("p", { class: "nt-story", text: story }), // 장면을 설명하는 한 줄이다. 판단·평가·격려의 말이 아니다. 보이는 길과 지금 하는 일을 그대로 말한다(2026-10-13 QA R9)
     el("span", { class: "nt-stone", "aria-hidden": "true" }, stoneImg("rest")));
   return el("div", { class: "nt-scene nt-event" }, sheet, land, base(EVENT.near));
 }

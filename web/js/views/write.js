@@ -447,7 +447,7 @@ export function renderDone(main, navigate) {
   const footer = el("div", { class: "done-bar" },
     el("button", { type: "button", class: "btn big secondary", text: "달력 보기", onclick: go("calendar") }),
     el("button", { type: "button", class: "btn big primary", text: "통계 보기", onclick: go("stats") }));
-  tellLine(screen); // 전하기 한 줄(TASK-LOOKBACK-01 시안)
+  tellLine(screen, entry); // 전하기 한 줄(TASK-LOOKBACK-01 시안)
   main.replaceChildren(screen, footer);
   document.title = `${day}의 마음을 남겼어요 — 감정일기 화면 시안`;
   window.scrollTo(0, 0);

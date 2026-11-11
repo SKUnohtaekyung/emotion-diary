@@ -16,20 +16,31 @@ const CLICK = (sel) => `document.querySelector(${JSON.stringify(sel)})?.click()`
 
 // [이름, 주소(# 뒤), 높이]
 export const SHOTS = [
-  ["0-기존-완료", "write?s=done&lb=1c&lbt=0", 740], ["0-기존-오늘", "today?lb=6c", 740], ["0-기존-달력", "calendar?lb=2c", 740], ["0-기존-통계상세", "stats/sadness?lb=2b", 1500], ["0-기존-설정", "settings", 740],
-  ["1a-전하기-늘보임", "write?s=done&lb=1a", 740], ["1b-전하기-쪽지", "write?s=done&lb=1b", 740], ["1c-전하기-가끔-나오는날", "write?s=done&lb=1c", 740], ["1c-전하기-가끔-안나오는날", "write?s=done&lb=1c&lbt=0", 740],
-  ["2a-돌아보기-날짜순", "lookback?lb=2a.3b", 740], ["2a-돌아보기-날짜순-전체", "lookback?lb=2a.3b", 2700], ["2a-입구-달력", "calendar?lb=2a", 740],
-  ["2b-돌아보기-마음별", "lookback?lb=2b.3b&p=30", 740], ["2b-돌아보기-마음별-전체", "lookback?lb=2b.3b&p=30", 3600],
-  ["2c-통계상세-이어읽기", "stats/sadness?lb=2c.3b", 2900], ["2-입구-통계아래", "stats?lb=2a", 1900],
-  ["2-빈-0편", "lookback?lb=2a&lbs=empty", 740], ["2-적음-2편", "lookback?lb=2a.3b&lbs=few", 1500],
-  ["3a-읽던자리-끝", "lookback?lb=2a.3a", 2700], ["3b-모아서-끝", "lookback?lb=2a.3b", 2700], ["3c-노트에서-끝", "lookback?lb=2a.3c", 2700],
-  ["3b-기준적기", "lookback/write?lb=3b", 1400], ["3c-기준적기", "lookback/write?lb=3c", 740], ["3c-기준노트-표시모음", "lookback/note?lb=3c.4b", 900], ["3-기준적기-자판", "lookback/write?lb=3c&kb=1", 740],
-  ["4a-기준-한줄", "lookback/note?lb=4a.3b", 740], ["4b-기준-묶음", "lookback/note?lb=4b.3b", 740], ["4c-기준-쪽지", "lookback/note?lb=4c.3b", 900],
-  ["4a-기준-많음", "lookback/note?lb=4a.3b&lbs=many", 1700], ["4b-기준-많음", "lookback/note?lb=4b.3b&lbs=many", 2600], ["4c-기준-많음", "lookback/note?lb=4c.3b&lbs=many", 3600], ["4-기준-빈", "lookback/note?lb=4b.3b&lbs=empty", 740],
-  ["5a-실험-예시에서", "lookback/try?lb=5a&lbx=none", 900], ["5b-실험-기준에서", "lookback/try?lb=5b&lbx=none", 1000], ["5c-실험-직접", "lookback/try?lb=5c&lbx=none", 740],
-  ["5-실험-진행중", "lookback/try?lbx=active", 1500], ["5-실험-끝", "lookback/try?lbx=ended", 2200],
-  ["6a-오늘-표식", "today?lb=6a&lbx=active", 740], ["6a-오늘-표식-끝남", "today?lb=6a&lbx=ended", 740], ["6b-오늘-팻말", "today?lb=6b&lbx=active", 740], ["6b-오늘-팻말-끝남", "today?lb=6b&lbx=ended", 740], ["6c-오늘-없음", "today?lb=6c&lbx=active", 740],
-  ["9-검토페이지", "/review-lookback.html", 1500, "document.querySelectorAll('h2')[0].scrollIntoView()"] // --w=1240 로 찍는다
+  ["r2-돌아보기","lookback",740],
+  ["r2-돌아보기-끝","lookback",740,"document.querySelector(\".lb-end\").scrollIntoView()"],
+  ["r2-돌아보기-나온말","lookback",740,"document.querySelector(\".lb-again-pill\").click()"],
+  ["r2-기준-1장","lookback/note?lbs=one",740],
+  ["r2-기준-3장","lookback/note?lbs=normal",860],
+  ["r2-기준-5장","lookback/note?lbs=some",900],
+  ["r2-기준-20장","lookback/note?lbs=many",1500],
+  ["r2-기준-빈","lookback/note?lbs=empty",740],
+  ["r2-기준-시트","lookback/note?lbs=normal",740,"document.querySelector(\".lb-slip\").click()"],
+  ["r2-한줄적기","lookback/write",740],
+  ["r2-한줄적기-자판","lookback/write?kb=1",740],
+  ["r2-길-정하기","lookback/try?lbx=none",980],
+  ["r2-길-정하기-채움","lookback/try?lbx=none",740,"document.querySelector(\".lb-fill-pill\").click()"],
+  ["r2-길-걷는중","lookback/try?lbx=active",1500],
+  ["r2-길-끝","lookback/try?lbx=ended",2300],
+  ["r2-오늘-팻말","today?lbx=active",740],
+  ["r2-오늘-팻말-끝","today?lbx=ended",740],
+  ["r2-완료-길묻기","write?s=done&lbx=active",740],
+  ["r2-완료-전하기-감사","write?s=done&lbx=none&lbt=thanks",740],
+  ["r2-완료-전하기-기쁨","write?s=done&lbx=none&lbt=joy",740],
+  ["r2-완료-전하기-큰마음","write?s=done&lbx=none&lbt=big",740],
+  ["r2-완료-안나옴","write?s=done&lbx=none&lbt=none",740],
+  ["r2-통계아래","stats?lbx=active",740,"document.querySelector(\".lb-stats-rows\").scrollIntoView()"],
+  ["r2-달력입구","calendar",740],
+  ["9-검토페이지","/review-lookback.html",1500,"document.querySelectorAll(\"h2\")[0].scrollIntoView()"]
 ];
 
 // 헤드리스 Chrome을 띄워 원격 디버깅(CDP)으로 휴대폰 크기를 흉내 낸다 — 창 크기만 줄이면 Windows의 Chrome은 500px 아래로 내려가지 않는다.
