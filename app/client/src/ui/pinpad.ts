@@ -72,7 +72,15 @@ export function createPinPad(options: PinPadOptions): PinPad {
     button.addEventListener("click", () => press(digit));
     return button;
   };
-  const eraseButton = h("button", { type: "button", class: "pin-key pin-erase", text: "지우기" });
+  // 지우기는 아이콘(시안 lock.js) — 이름은 숨은 글로 그대로 '지우기'
+  const eraseButton = h("button", { type: "button", class: "pin-key pin-erase" });
+  const eraseSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  eraseSvg.setAttribute("viewBox", "0 0 24 24");
+  eraseSvg.setAttribute("aria-hidden", "true");
+  const erasePath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+  erasePath.setAttribute("d", "M9 5h11v14H9l-6-7zM12.5 9.5l5 5M17.5 9.5l-5 5");
+  eraseSvg.append(erasePath);
+  eraseButton.append(eraseSvg, h("span", { class: "sr-only", text: "지우기" }));
   eraseButton.addEventListener("click", erase);
   keys.append(...DIGITS.map(key), h("span", { "aria-hidden": "true" }), key("0"), eraseButton);
 

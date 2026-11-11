@@ -12,7 +12,7 @@ import { resume } from "./controller";
 import { stopHeartbeat } from "./heartbeat";
 import { type LifecycleKind, emit } from "./lib/probe";
 import { KEYS, writeStored } from "./lib/storage";
-import { isCovered, showCover } from "./ui/cover";
+import { isCovered, prepareCover, showCover } from "./ui/cover";
 
 function onHide(kind: "hidden" | "pagehide"): void {
   showCover();
@@ -29,6 +29,7 @@ function onShow(kind: LifecycleKind, persisted: boolean): void {
 
 /** 처리기를 달고, 떼는 함수를 돌려준다(시험에서 쓴다). */
 export function installLifecycle(): () => void {
+  prepareCover(); // 떠나는 순간에는 보이게만 한다 — 미리 그려 둔다(A-9)
   const onVisibility = (): void => {
     if (document.visibilityState === "hidden") onHide("hidden");
     else onShow("visible", false);

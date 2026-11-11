@@ -371,11 +371,29 @@
 }
 
 /* 덮개(D-113 ①): 앱을 떠나는 순간 숲 색으로 덮는다. 모든 것 위에 있다. */
-.cover {
+/* 덮개(ui/cover.ts): 숨은 채로 미리 그려 두고 .cover만 붙였다 뗀다(A-9) — display:none이 아니라 visibility라 그림이 이미 준비돼 있다 */
+.cover-layer {
   position: fixed;
   inset: 0;
   z-index: 100;
+  overflow: hidden;
   background: var(--forest-sky);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.cover-layer.cover {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.cover-art {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: max(100%, calc(100dvh * 360 / 744));
+  height: auto;
+  transform: translateX(-50%);
 }
 
 /* 내보내기·모든 기록 지우기(data-control) — 박스 없이 글 묶음과 목록으로만 나눈다 */

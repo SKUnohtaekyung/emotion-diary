@@ -738,3 +738,72 @@
     opacity: 1;
   }
 }
+
+/* ── 앱 시작 로딩 화면(D-092 ④, ui/splash.ts) — 오늘 화면의 빈 숲과 가운데 돌 하나. 300ms 동안은 투명하다(그 안에 준비되면 보이기 전에 걷는다) ── */
+.splash {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 150;
+  width: min(100%, 480px);
+  overflow: hidden;
+  container-type: size;
+  background: var(--forest-sky, #0b1228);
+  opacity: 0;
+  transform: translateX(-50%);
+  animation: splash-in 0.16s linear 0.3s forwards;
+}
+
+.splash-box {
+  position: absolute;
+  bottom: 0;
+  left: calc((100cqw - max(100cqw, calc(100cqh * 360 / 744))) / 2);
+  width: max(100cqw, calc(100cqh * 360 / 744));
+  aspect-ratio: 360 / 744;
+  transform-origin: 0 0;
+}
+
+.splash-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.splash-stone {
+  position: absolute;
+  left: 31.667%;
+  top: 60.75%;
+  width: 36.667%;
+  aspect-ratio: 132 / 108;
+}
+
+.splash-stone img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform-origin: 50% 90%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .splash-stone img {
+    animation: splash-breathe 3.8s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes splash-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes splash-breathe {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.025, 1.04);
+  }
+}

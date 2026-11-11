@@ -13,6 +13,9 @@
     <title>감정일기</title>
   </head>
   <body>
+    <!-- 앱 시작 로딩 화면(D-092 ④): 스크립트보다 먼저 그려지는 빈 숲(splash.svg — scripts/splash.mjs가 오늘 숲과 같은 계산으로 굳힘)과 돌 하나.
+         300ms 안에 준비되면 보이지 않는다. 걷는 일은 src/ui/splash.ts -->
+    <div class="splash" id="splash" aria-hidden="true"><div class="splash-box"><img class="splash-art" src="/splash.svg" alt="" /><span class="splash-stone"><img src="/splash-stone.png" alt="" /></span></div></div>
     <div id="banner" role="status"></div>
     <main id="app" aria-busy="true">
       <p class="boot-note">불러오는 중…</p>
