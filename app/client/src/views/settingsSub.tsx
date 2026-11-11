@@ -69,6 +69,7 @@ function DayStart() {
     const delta = event.key === "ArrowRight" || event.key === "ArrowDown" ? 1 : event.key === "ArrowLeft" || event.key === "ArrowUp" ? -1 : 0;
     if (!delta) return;
     event.preventDefault();
+    if (busy.current || hour === null) return; // 저장 중 — 선택과 초점이 어긋나지 않게 아무것도 옮기지 않는다(마감 검토 3)
     const next = (h + delta + 7) % 7;
     void pick(next);
     requestAnimationFrame(() => group.current?.querySelectorAll<HTMLButtonElement>(".st-pill")[next]?.focus());

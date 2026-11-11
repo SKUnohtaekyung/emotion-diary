@@ -24,5 +24,5 @@
     "Phone checks (mobile-reflection now, direct-journal later) need the dev building: this PC has no wrangler login and no work/deploy/dev.* files — the user logs in and decides whether to regenerate the dev secrets.",
     "Before accounts: whether the server may read diaries, and a legal review of consent and policy (tasks/replan/2026-11-11/PLAN.md section 5)."
   ],
-  "last_checkpoint": "2026-11-12 TASK-JOURNAL-01 J-0..J-9 done and committed per step (e22360d J-1..5, 4355c68 J-6, d9e4fd8 J-7, 9413adf J-8, J-9 next commit): writing flow, letter/seal/done, record menu + uncomplete API, today forest, splash/cover/lock forest, settings sub-screens. client 408, e2e 32/32, verify full PASS. Next: J-10 (fresh-context review, ask user about dev deploy files before phone check)."
+  "last_checkpoint": "2026-11-12 TASK-JOURNAL-01 J-0..J-9 committed; J-10 up to phone check done: dev rebuilt with new secrets on this PC (remote-check 58/58, 62 synthetic diaries), fault injection 3/3, fresh review 4 findings fixed (uncomplete keeps device copy, stone/leave, day-start keys, meadow label), verify full PASS 596, e2e 32/32, redeployed. Next: user phone check with tasks/direct-journal/2026-11-11/PHONE-GUIDE.md → record EVAL §4·§6 + PLAN → gate verdict → clear dev data. Then commit/PR only when user says."
 }

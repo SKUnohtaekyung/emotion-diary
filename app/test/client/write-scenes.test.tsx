@@ -39,6 +39,9 @@ describe("마음 고르기 — 언덕 위 친구 아홉(D-066·D-128)", () => {
     // 그림은 장식(옆에 이름 글자가 있다), 묶음 이름은 여러 개 고르기
     expect([...root.querySelectorAll(".ff img")].every((img) => img.getAttribute("alt") === "")).toBe(true);
     expect(root.querySelector('[role="group"]')?.getAttribute("aria-label")).toBe("오늘 머문 마음, 여러 개 선택");
+    // 지난 날 흐름에서는 '그날'(D-082 — 마감 검토 4)
+    render(<Meadow day="그날" picked={new Set()} onToggle={() => {}} />, root);
+    expect(root.querySelector('[role="group"]')?.getAttribute("aria-label")).toBe("그날 머문 마음, 여러 개 선택");
   });
 
   it("모든 친구가 같은 크기의 자리를 쓴다 — 자리는 위치·기울기만 다르다", () => {

@@ -162,12 +162,13 @@ function EventStep({ session, diary, day, change, ctl }: StepProps) {
   );
 }
 
-function FeelingsStep({ session, change, ctl }: StepProps) {
+function FeelingsStep({ session, day, change, ctl }: StepProps) {
   const diary = session.saver.diary;
   const picked = new Set(diary.categories.map((item) => item.code));
   ctl.focusFirst = () => focusElement(document.querySelector<HTMLElement>(".meadow .ff"));
   return (
     <Meadow
+      day={day}
       picked={picked}
       onToggle={(code, pic) => {
         change(toggleCategory(session.saver.diary, code));

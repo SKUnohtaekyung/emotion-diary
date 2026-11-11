@@ -68,7 +68,11 @@ function Today() {
         busy.current = false;
         return;
       }
-      spreadLight(stone, go);
+      spreadLight(stone, () => {
+        // 덮이는 순간에도 이 화면이 살아 있을 때만 간다(그 사이 뒤로 가기·다른 화면 — 마감 검토 2)
+        if (alive.current && stone.isConnected) go();
+        busy.current = false;
+      });
     };
     if (prefersReducedMotion() || !forest.current) spread();
     else {

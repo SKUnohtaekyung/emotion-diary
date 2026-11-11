@@ -48,7 +48,7 @@ const Tree = ({ x, y, r }: { x: number; y: number; r: number }) => (
   </>
 );
 
-export function Meadow({ picked, onToggle }: { picked: ReadonlySet<string>; onToggle: (code: string, pic: HTMLElement) => void }) {
+export function Meadow({ picked, onToggle, day = "오늘" }: { picked: ReadonlySet<string>; onToggle: (code: string, pic: HTMLElement) => void; day?: "오늘" | "그날" }) {
   const scene = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
     const root = scene.current;
@@ -63,7 +63,7 @@ export function Meadow({ picked, onToggle }: { picked: ReadonlySet<string>; onTo
     <div ref={scene} class="pick-scene">
       <div class="meadow-fit">
         {/* biome-ignore lint/a11y/useSemanticElements: 시안과 같은 토글 버튼 묶음 — fieldset은 자유 배치 상자의 크기 계산을 흐트러뜨린다 */}
-        <div class="meadow" role="group" aria-label="오늘 머문 마음, 여러 개 선택">
+        <div class="meadow" role="group" aria-label={`${day} 머문 마음, 여러 개 선택`}>
           <div class="meadow-art-wrap">
             <svg class="meadow-art" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" aria-hidden="true" focusable="false">
               <path class="fh1" d={`M-720 128L0 128C50 104 120 100 190 116C250 130 310 110 360 118L1080 118L1080 ${H}L-720 ${H}Z`} />

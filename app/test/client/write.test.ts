@@ -694,6 +694,8 @@ describe("기록 보기·완료", () => {
 
   it("기록 ⋯ 메뉴 — 완료 취소는 확인 뒤 본 판 번호로 보내고 달력의 그날로, 지우기는 두 번 묻는다(A-5·A-6)", async () => {
     const calls = serve({ entry: entry({ status: "completed", revision: 5, reasonText: "가짜 이유" }) });
+    // 고치다 못 보낸 사본이 이 휴대폰에 있다 — 완료 취소는 그것을 지우지 않는다('쓴 내용은 지워지지 않아요', 2026-11-12 마감 검토 1)
+    writeUnsent({ v: 1, date: TODAY, mode: "edit", baseRevision: 5, diary: withText(emptyDiary(), "eventText", "가짜 고치던 글"), step: { step: "reason", category: null }, pending: null, savedAt: 1 });
     history.replaceState(null, "", `/#/record/${TODAY}`);
     render();
     await flush(20);
@@ -708,6 +710,7 @@ describe("기록 보기·완료", () => {
     const sent = calls.find((call) => call.path.endsWith("/uncomplete"));
     expect(sent?.body).toEqual({ revision: 5 });
     expect(sent?.headers["idempotency-key"]).toBeTruthy();
+    expect(readUnsent(TODAY)?.diary.eventText).toBe("가짜 고치던 글");
 
     history.replaceState(null, "", `/#/record/${TODAY}`);
     render();

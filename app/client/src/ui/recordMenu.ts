@@ -6,7 +6,7 @@ import type { DiaryEntryView } from "../../../shared/diary";
 import { announce } from "../lib/dom";
 import { monthDay, monthDayWeekday } from "../lib/format";
 import { deleteDiaryRequest, newRequestKey, uncompleteDiaryRequest } from "../write/api";
-import { dropSession } from "../write/session";
+import { closeSession, dropSession } from "../write/session";
 import { openSheet } from "./sheet";
 import { showToast } from "./toast";
 
@@ -39,7 +39,9 @@ export function openRecordMenu(options: RecordMenuOptions): void {
     const result = await uncompleteDiaryRequest(date, entry.revision, keyFor("uncomplete", date));
     if (result.ok || (result.status === 409 && result.code === "not_completed")) {
       keys.delete(`uncomplete:${date}`);
-      dropSession(date);
+      // 이 휴대폰에 남은 사본(고치던 내용)은 지우지 않는다 — 확인 창이 '쓴 내용은 지워지지 않아요'라고 했다. 판 번호가 올라가
+      // 다시 열면 사본과 서버 기록을 비교해 묻는다(2026-11-12 마감 검토 1). 열려 있던 세션만 닫는다
+      closeSession(date);
       announce("완료를 취소했어요. 임시저장 상태예요.");
       showToast("완료를 취소했어요. 임시저장 상태예요");
       options.onUncompleted();
