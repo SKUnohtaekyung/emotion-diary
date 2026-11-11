@@ -1428,3 +1428,17 @@
     transition-duration: 1ms;
   }
 }
+
+/* 기록 보기 위 줄: ‹ 뒤로 · ⋯ 기록 메뉴(A-6) */
+.screen.record .screen-top {
+  justify-content: space-between;
+}
+
+.record-more[hidden] {
+  display: none;
+}
+
+.record-more .dots3 {
+  fill: currentColor;
+  stroke: none;
+}

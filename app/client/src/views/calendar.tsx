@@ -4,7 +4,7 @@
 // ("달력은 기록의 지도이지 좋은 날의 지도가 아니다" — §6.7). 날짜를 골라도 한 달은 그대로이고 달 아래에 작은 편지 또는 쪽지가 온다.
 // 처음 고를 때만 기록 한 칸을 쌓고(?d=, 뒤로 가기 = 닫기 — ×도 같은 칸을 되감는다), 다른 날로 바꿀 때는 바꿔친다(UX_SPEC §7·§17).
 // 보이는 달은 주소의 ?m=에 둔다 — 뒤로 가서 새로 그려져도 같은 달이다.
-// 기록 메뉴(⋯ — 고치기·완료 취소·지우기)는 3단계(direct-journal 조각 6)에서 단다. 작은 편지의 '고치기' 태그와 '편지 열기'는 지금 있다.
+// 완료한 날은 날짜 줄 ⋯에 기록 메뉴(고치기·완료 취소·지우기 — 기록 보기와 같은 ui/recordMenu.ts, TASK-JOURNAL-01 A-6).
 
 import type { ComponentChild, ComponentChildren } from "preact";
 import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
@@ -14,8 +14,9 @@ import { announce } from "../lib/dom";
 import { monthDay } from "../lib/format";
 import { mountPreact } from "../lib/mount";
 import { navigate, pushFlowStep, type ViewContext } from "../router";
-import { ChevronLeft, ChevronRight, CloseIcon, HomeGlyph, PencilGlyph } from "../ui/icons";
+import { ChevronLeft, ChevronRight, CloseIcon, DotsIcon, HomeGlyph, PencilGlyph } from "../ui/icons";
 import { type EditTarget, MiniLetter } from "../ui/MiniLetter";
+import { openRecordMenu } from "../ui/recordMenu";
 import { openSheet } from "../ui/sheet";
 import { StatusBlock } from "../ui/StatusBlock";
 import { showToast } from "../ui/toast";
@@ -314,6 +315,8 @@ function Calendar({ initialDate, initialMonth }: { initialDate: string | null; i
     );
   }
 
+  const selectedLoad = selected ? entries.get(selected) : undefined;
+  const selectedEntry = selectedLoad?.kind === "ok" ? selectedLoad.data : null;
   let panelBody: ComponentChild = null;
   if (!selected) {
     panelBody = (
@@ -394,6 +397,42 @@ function Calendar({ initialDate, initialMonth }: { initialDate: string | null; i
               <div class="cal-unfold-title">
                 <span class="cal-unfold-name">{selected ? `${monthDay(selected)} (${weekdayOf(selected)})` : ""}</span>
               </div>
+              {selected && selectedState === "completed" && selectedEntry ? (
+                <div class="cal-unfold-more">
+                <button
+                  type="button"
+                  class="cal-arrow cal-more-btn"
+                  aria-label="더보기"
+                  aria-haspopup="dialog"
+                  onClick={(event) => {
+                    const day = selected;
+                    openRecordMenu({
+                      entry: selectedEntry,
+                      opener: event.currentTarget,
+                      onEdit: () => pushFlowStep(`#/write/${day}?step=letter`, `c${Date.now().toString(36)}`),
+                      onUncompleted: () => {
+                        setEntries((previous) => {
+                          const next = new Map(previous);
+                          next.delete(day);
+                          return next;
+                        });
+                        void loadMonth(shownMonth.current, true);
+                      },
+                      onDeleted: () => {
+                        setEntries((previous) => {
+                          const next = new Map(previous);
+                          next.delete(day);
+                          return next;
+                        });
+                        void loadMonth(shownMonth.current, true);
+                      }
+                    });
+                  }}
+                >
+                  <DotsIcon />
+                </button>
+              </div>
+              ) : null}
             </div>
             <section class="cal-letter-panel" ref={panel} tabIndex={-1} aria-label={selected ? monthDay(selected) : "그날의 편지"}>
               {panelBody}

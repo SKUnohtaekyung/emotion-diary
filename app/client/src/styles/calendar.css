@@ -102,7 +102,8 @@
    min-width:0은 그래도 남겨 아주 좁은 화면에서는 여전히 줄어들며 말줄임될 수 있게 한다. */
 .cal-unfold-name{flex:0 1 auto;min-width:0;margin:0;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:800;color:var(--service-ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .cal-unfold-tag-slot{flex:none}
-.cal-unfold-more{flex:none;display:flex} /* 오른쪽 끝 ⋯(완료한 날, D-096) — 닫기 ✕와 같은 44px 원형(.cal-arrow) */
+.cal-unfold-more{flex:none;display:flex}
+.cal-unfold-more .dots3{fill:currentColor;stroke:none} /* 오른쪽 끝 ⋯(완료한 날, D-096) — 닫기 ✕와 같은 44px 원형(.cal-arrow) */
 .cal-more-btn .dots3{fill:currentColor;stroke:none}
 /* tabs.css .proto-tag{margin-left:var(--sp-1)}(달력 밖 다른 화면을 위한 전역 규칙, 그 파일 소유가 아니라 여기서만 0으로 되돌린다)가 8px gap 위에 4px을 더 얹어
    날짜와 태그가 12px 떨어져 보였다(2배 확대 실측) — 이 줄에서만 지운다. */

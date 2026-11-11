@@ -254,7 +254,7 @@ draft/completed ──사용자 확인──> hard deleted
 completed ──revision 변경──> 기존 analysis stale
 ```
 
-completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편집 저장은 완료조건을 다시 검사하며 미충족이면 저장을 거부하고 상태를 바꾸지 않는다. draft로 돌아가는 유일한 경로는 사용자의 명시적 "완료 취소"이며, 자동 저장이나 편집 중 상태로는 draft가 되지 않는다. 완료 취소를 허용하더라도 `first_completed_at/local_date`는 지우지 않는다. 삭제 후 같은 날짜에 새 일기를 만들 수 있지만(그날이 오늘일 때) 새 ID를 가진다. 감사 기록(audit) 표는 두지 않는다 — 언제 쓰고 지웠는지도 사용자에 대한 기록이라 모으지 않는다(D-122, ARCHITECTURE §8).
+completed 기록을 편집해도 상태는 completed로 유지한다(D-023). 편집 저장은 완료조건을 다시 검사하며 미충족이면 저장을 거부하고 상태를 바꾸지 않는다. draft로 돌아가는 유일한 경로는 사용자의 명시적 "완료 취소"이며, 자동 저장이나 편집 중 상태로는 draft가 되지 않는다. 완료 취소를 허용하더라도 `first_completed_at/local_date`는 지우지 않는다 — 경로는 `POST /api/diaries/:date/uncomplete`(판 번호 확인·영수증 열쇠·조건부 UPDATE 하나, `completed_at`만 비우고 쓰던 단계를 편지로, 구조 변경 없음 — ARCHITECTURE §5, 시험 `diary.test.ts` '완료 취소'). 삭제 후 같은 날짜에 새 일기를 만들 수 있지만(그날이 오늘일 때) 새 ID를 가진다. 감사 기록(audit) 표는 두지 않는다 — 언제 쓰고 지웠는지도 사용자에 대한 기록이라 모으지 않는다(D-122, ARCHITECTURE §8).
 
 ## 6. 임시저장과 AI 대화
 

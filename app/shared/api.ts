@@ -63,6 +63,8 @@ export const API = {
   /** 경로 표의 열쇠 — 실제 주소는 diaryPath(날짜) */
   diary: "/api/diaries/:date",
   diaryComplete: "/api/diaries/:date/complete",
+  /** 완료 취소(completed → draft, TASK-JOURNAL-01 A-4) */
+  diaryUncomplete: "/api/diaries/:date/uncomplete",
   /** 모든 기록 지우기(DELETE) — D-112 ⑩, DATA_MODEL §8 */
   diaries: "/api/diaries",
   /** 내보내기(GET, 로그인 cookie) — 화면이 받아 공유 창으로 넘긴다(ARCHITECTURE §4.1) */
@@ -81,6 +83,7 @@ export const DELETE_ALL_CONFIRM = "모든 기록 삭제";
 
 export const diaryPath = (date: string) => `/api/diaries/${encodeURIComponent(date)}`;
 export const diaryCompletePath = (date: string) => `${diaryPath(date)}/complete`;
+export const diaryUncompletePath = (date: string) => `${diaryPath(date)}/uncomplete`;
 export const calendarPath = (month: string) => `/api/calendar/${encodeURIComponent(month)}`;
 export const statsPath = (days: number) => `/api/stats/${days}`;
 
@@ -139,6 +142,7 @@ export type ErrorCode =
   | "incomplete" // 422 — 완료 조건이 모자란다(missing)
   | "revision_conflict" // 409 — 판 번호가 지금 것과 다르다(currentRevision)
   | "not_draft" // 409 — 이미 완료된 기록이다
+  | "not_completed" // 409 — 완료 취소할 기록이 임시저장이다
   | "idempotency_mismatch" // 409 — 같은 영수증 열쇠로 다른 요청을 보냈다
   | "confirm_mismatch" // 422 — 모든 기록 지우기의 확인 문구가 다르다
   | "invalid_import" // 422 — 다시 넣을 기록의 모양이 틀렸다(field)

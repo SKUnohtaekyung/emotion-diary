@@ -469,6 +469,62 @@ export async function completeDiary(ctx: Ctx): Promise<Response> {
   return fail(422, "incomplete", { missing });
 }
 
+// ── POST /api/diaries/:date/uncomplete ────────────────────────────
+
+/**
+ * 완료 취소(DATA_MODEL §5, TASK-JOURNAL-01 A-4) — 사용자의 명시적 요청으로만 completed → draft. 판 번호 +1, completed_at을 비우고
+ * first_completed_*는 그대로 둔다(streak·첫 기록일을 되돌리지 않는다). 다시 이어 쓰면 편지 단계부터. 조건부 UPDATE 하나와 영수증 — 완료와 같은 모양.
+ */
+export async function uncompleteDiary(ctx: Ctx): Promise<Response> {
+  const session = ctx.session as Session;
+  const date = dateParam(ctx);
+  if (!date) return fail(400, "invalid_date");
+  const read = await readJsonText(ctx.request);
+  if (read instanceof Response) return read;
+  const receipt = await receiptFor(ctx, "diary.uncomplete", read.text);
+  if (!receipt) return fail(400, "idempotency_key_required");
+  const revision = ONLY_REVISION(read.body);
+  if (revision === null) return fail(400, "invalid_body", { field: "revision" });
+  const head = await loadHead(ctx, session.owner, date);
+  const replayed = await replay(ctx, session, receipt);
+  if (replayed) return replayed;
+  if (!head) return fail(404, "not_found");
+  if (head.revision !== revision) return conflict(head.revision);
+  if (head.status !== "completed") return fail(409, "not_completed");
+
+  const db = ctx.env.DB;
+  const now = iso(ctx.now);
+  const token = crypto.randomUUID();
+  const body = meta({
+    id: head.id,
+    entryDate: date,
+    status: "draft",
+    revision: head.revision + 1,
+    updatedAt: now,
+    completedAt: null,
+    firstCompletedLocalDate: head.first_completed_local_date
+  });
+  const results = await db.batch([
+    db
+      .prepare(
+        `UPDATE diary_entries SET status = 'draft', revision = revision + 1, write_token = ?4, completed_at = NULL, updated_at = ?5,
+                resume_step = 'letter', resume_category = NULL
+          WHERE id = ?1 AND owner_key = ?2 AND revision = ?3 AND status = 'completed'
+          RETURNING revision`
+      )
+      .bind(head.id, session.owner, head.revision, token, now),
+    ...receiptStatements(ctx, session, receipt, { status: 200, body }, { sql: "EXISTS (SELECT 1 FROM diary_entries WHERE id = ?9 AND write_token = ?10)", params: [head.id, token] })
+  ]);
+  if (results[0]?.results?.length) return json(200, body);
+  // 반영되지 않았다: 같은 열쇠가 먼저 끝냈거나, 그사이 다른 기기가 바꿨다
+  const replayedLate = await replay(ctx, session, receipt);
+  if (replayedLate) return replayedLate;
+  const now2 = await loadHead(ctx, session.owner, date);
+  if (!now2) return fail(404, "not_found");
+  if (now2.revision !== revision) return conflict(now2.revision);
+  return fail(409, "not_completed");
+}
+
 // ── DELETE /api/diaries/:date ─────────────────────────────────────
 
 /**

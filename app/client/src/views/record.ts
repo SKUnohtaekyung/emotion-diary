@@ -7,7 +7,25 @@ import { CATEGORY_CODES } from "../../../shared/taxonomy";
 import { createElement } from "preact";
 import { h } from "../lib/dom";
 import { mountPreact } from "../lib/mount";
+import { openRecordMenu } from "../ui/recordMenu";
 import { Letter } from "./write/Letter";
+
+const SVG = "http://www.w3.org/2000/svg";
+/** ⋯ 아이콘 — 채운 점 셋(ui/icons.tsx DotsIcon과 같은 모양, 이 화면은 Preact 밖) */
+function dotsIcon(): SVGSVGElement {
+  const svg = document.createElementNS(SVG, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("class", "dots3");
+  for (const cx of ["5", "12", "19"]) {
+    const dot = document.createElementNS(SVG, "circle");
+    dot.setAttribute("cx", cx);
+    dot.setAttribute("cy", "12");
+    dot.setAttribute("r", "1.7");
+    svg.append(dot);
+  }
+  return svg;
+}
 import { monthDay } from "../lib/format";
 import { back, navigate, pushFlowStep, syncTitle, type ViewContext } from "../router";
 import { fetchDiary, fetchToday } from "../write/api";
@@ -51,7 +69,10 @@ export function renderRecord({ root, route, alive }: ViewContext): () => void {
   const title = h("h1", { text: `${monthDay(date)}의 편지` });
   const area = h("div", { class: "record-body", "aria-busy": "true" }, h("p", { class: "note", text: "불러오는 중이에요." }));
   let unmountLetter = (): void => {};
-  root.append(h("section", { class: "screen record" }, h("div", { class: "screen-top" }, backButton), title, area));
+  // ⋯ 기록 메뉴(고치기·완료 취소·지우기, A-6) — 기록을 읽은 뒤에만 보인다
+  const more = h("button", { type: "button", class: "icon-btn plain record-more", "aria-label": "더보기", "aria-haspopup": "dialog", hidden: true });
+  more.append(dotsIcon());
+  root.append(h("section", { class: "screen record" }, h("div", { class: "screen-top" }, backButton, more), title, area));
 
   const load = async (): Promise<void> => {
     area.setAttribute("aria-busy", "true");
@@ -69,6 +90,17 @@ export function renderRecord({ root, route, alive }: ViewContext): () => void {
       unmountLetter();
       const shown = letter(result.data, today !== null && result.data.entryDate >= today);
       unmountLetter = shown.unmount;
+      const entry = result.data;
+      more.hidden = false;
+      more.onclick = () =>
+        openRecordMenu({
+          entry,
+          opener: more,
+          onEdit: () => editFrom(date, { step: "letter", category: null }),
+          // 완료 취소 뒤에는 달력의 그날(쓰던 글 쪽지)로(시안 tabs.js) — 지운 뒤에는 달력으로
+          onUncompleted: () => navigate(`#/calendar?d=${date}`, { replace: true }),
+          onDeleted: () => navigate("#/calendar", { replace: true })
+        });
       const nodes = shown.nodes;
       // 이 휴대폰에 남은 사본 — 고치던 내용이든, 다른 곳에서 완료되기 전에 쓰던 임시저장이든 — 으로 가는 길(PR #40 리뷰).
       // 들어가면 흐름이 서버 기록과 비교해 덮지 않고 묻는다.

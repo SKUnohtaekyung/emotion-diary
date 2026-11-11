@@ -71,6 +71,7 @@ interface Server {
   first?: string | null;
   put?: (request: FakeRequest) => FakeReply | "offline";
   complete?: (request: FakeRequest) => FakeReply | "offline";
+  uncomplete?: (request: FakeRequest) => FakeReply | "offline";
   del?: (request: FakeRequest) => FakeReply | "offline";
   /** 그날 기록 조회를 대신한다(없으면 entry로 200·404) */
   get?: (request: FakeRequest) => FakeReply | "offline";
@@ -81,6 +82,7 @@ function serve(server: Server): FakeRequest[] {
     if (request.path === "/api/today") {
       return { status: 200, body: { date: server.today ?? TODAY, timezone: "Asia/Seoul", dayStartHour: 4, entry: null, pastDraft: null, firstRecordDate: server.first ?? null } };
     }
+    if (request.path.endsWith("/uncomplete")) return server.uncomplete?.(request) ?? meta((server.entry?.revision ?? 0) + 1);
     if (request.path.endsWith("/complete")) return server.complete?.(request) ?? meta((server.entry?.revision ?? 0) + 1, "completed");
     if (request.path.startsWith("/api/diaries/")) {
       if (request.method === "GET") {
@@ -685,6 +687,40 @@ describe("기록 보기·완료", () => {
     expect(document.body.textContent).not.toContain("칭찬");
     document.querySelector<HTMLButtonElement>('[aria-label="이유 고치기"]')?.click();
     expect(location.hash).toBe(`#/write/${TODAY}?step=reason`);
+  });
+
+  it("기록 ⋯ 메뉴 — 완료 취소는 확인 뒤 본 판 번호로 보내고 달력의 그날로, 지우기는 두 번 묻는다(A-5·A-6)", async () => {
+    const calls = serve({ entry: entry({ status: "completed", revision: 5, reasonText: "가짜 이유" }) });
+    history.replaceState(null, "", `/#/record/${TODAY}`);
+    render();
+    await flush(20);
+    document.querySelector<HTMLButtonElement>('.record-more[aria-label="더보기"]')?.click();
+    await flush();
+    expect(document.querySelector(".sheet")?.textContent).toContain("10월 16일의 편지");
+    sheetButton("완료 취소")?.click();
+    await flush();
+    expect(document.querySelector(".sheet")?.textContent).toContain("통계에서 빠져요. 쓴 내용은 지워지지 않아요.");
+    sheetButton("완료 취소")?.click();
+    await vi.waitFor(() => expect(location.hash).toBe(`#/calendar?d=${TODAY}`));
+    const sent = calls.find((call) => call.path.endsWith("/uncomplete"));
+    expect(sent?.body).toEqual({ revision: 5 });
+    expect(sent?.headers["idempotency-key"]).toBeTruthy();
+
+    history.replaceState(null, "", `/#/record/${TODAY}`);
+    render();
+    await flush(20);
+    document.querySelector<HTMLButtonElement>(".record-more")?.click();
+    await flush();
+    sheetButton("지우기")?.click();
+    await flush();
+    expect(document.querySelector(".sheet")?.textContent).toContain("기록을 지울까요?");
+    sheetButton("지우기")?.click();
+    await flush();
+    expect(document.querySelector(".sheet")?.textContent).toContain("정말 지울까요?");
+    expect(calls.some((call) => call.method === "DELETE")).toBe(false);
+    sheetButton("지우기")?.click();
+    await vi.waitFor(() => expect(location.hash).toBe("#/calendar"));
+    expect(calls.find((call) => call.method === "DELETE")?.body).toEqual({ revision: 5 });
   });
 
   it("없는 날짜의 편지는 안내, 임시저장이면 이어 쓰기로", async () => {
