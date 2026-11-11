@@ -3,7 +3,7 @@
 // 비밀번호가 맞는지는 서버가 정한다(D-112 ③). 이 화면은 숫자를 서버로 보내는 길만 낸다.
 
 import { API } from "../../../shared/api";
-import { enterLock, handleUnauthorized } from "../controller";
+import { enterLock, handleUnauthorized, lockNow } from "../controller";
 import { type ApiResult, request } from "../lib/api";
 import { h } from "../lib/dom";
 import { back, navigate, type ViewContext } from "../router";
@@ -29,10 +29,16 @@ export function renderLockSettings({ root, alive }: ViewContext): () => void {
   const toggle = h("button", { type: "button", class: "switch", role: "switch", "aria-labelledby": labelId });
   toggle.append(h("span", { class: "switch-knob", "aria-hidden": "true" }));
   const change = h("button", { type: "button", class: "btn btn-block", text: "비밀번호 바꾸기" });
+  // 지금 잠그기 — 오늘 화면 아래 줄에서 옮겨 왔다(TASK-JOURNAL-01 A-10). 잠금을 켰을 때만 보인다
+  const lockNowButton = h("button", { type: "button", class: "btn btn-block", text: "지금 잠그기" });
+  lockNowButton.addEventListener("click", () => {
+    void lockNow();
+  });
 
   const paint = (): void => {
     toggle.setAttribute("aria-checked", String(app.appLock));
     change.disabled = !app.appLock;
+    lockNowButton.hidden = !app.appLock;
   };
   paint();
 
@@ -76,6 +82,7 @@ export function renderLockSettings({ root, alive }: ViewContext): () => void {
       h("h1", { text: "앱 잠금" }),
       h("div", { class: "switch-row" }, h("span", { id: labelId, text: "비밀번호로 잠그기" }), toggle),
       change,
+      lockNowButton,
       h("p", { class: "help", text: "앱을 켤 때와 5분 넘게 떠났다 돌아올 때 비밀번호를 물어요." }),
       h("p", { class: "help", text: "비밀번호를 잊으면 열쇠로 다시 들어와 새로 정해요." })
     )

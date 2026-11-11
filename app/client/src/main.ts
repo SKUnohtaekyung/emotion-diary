@@ -9,6 +9,7 @@ import "./styles/scenes.css";
 import "./styles/write.css";
 import "./styles/paper.css";
 import "./styles/letter.css";
+import "./styles/forest.css";
 import "./styles/help.css";
 import "./styles/calendar.css";
 import "./styles/stats.css";

@@ -6,7 +6,8 @@ import { enterApp, expectNoSeriousA11y } from "./helpers";
 test("오늘 화면과 위기 안내에 axe serious·critical 위반이 없다", async ({ page }) => {
   await enterApp(page);
   await expectNoSeriousA11y(page);
-  await page.getByRole("button", { name: "도움이 필요할 때" }).click();
+  await page.goto("/#/settings");
+  await page.getByRole("button", { name: /도움이 필요할 때/ }).click();
   await expect(page).toHaveURL(/#\/help$/);
   await expectNoSeriousA11y(page);
 });

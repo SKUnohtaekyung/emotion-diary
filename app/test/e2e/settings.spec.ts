@@ -4,7 +4,8 @@ import { enterApp, expectNoSeriousA11y } from "./helpers";
 
 test("하단 탐색: 달력 → 통계 → 설정 → 앱 잠금 → 뒤로 → 오늘(탐색 없음)", async ({ page }) => {
   await enterApp(page);
-  await page.getByRole("button", { name: "달력", exact: true }).click();
+  // 오늘에서 달력으로는 날짜 줄의 '지난 기록' 알약(D-090 ③, 아래 줄은 걷었다 — TASK-JOURNAL-01 A-10)
+  await page.getByRole("link", { name: "지난 기록" }).click();
   // 달력은 보이는 달을 주소에 둔다(?m=) — 그리기 직후에 붙는다
   await expect(page).toHaveURL(/#\/calendar(\?m=\d{4}-\d{2})?$/);
   const nav = page.getByRole("navigation", { name: "주요 화면" });

@@ -1,11 +1,12 @@
-// 도움이 필요할 때(위기 안내) `#/help` — 실제 브라우저에서 오늘 화면의 버튼으로 들어가 ‹로 돌아온다
+// 도움이 필요할 때(위기 안내) `#/help` — 실제 브라우저에서 설정의 줄로 들어가 ‹로 돌아온다(오늘 화면 아래 줄은 걷었다, TASK-JOURNAL-01 A-10)
 // (TASK-PERSONAL-01 A-1~A-4, EVAL_PLAN §14 crisis-help-unreviewed-label). 전화 링크는 누르지 않고 주소만 본다.
 import { expect, test } from "@playwright/test";
 import { enterApp } from "./helpers";
 
 test("도움이 필요할 때 → 위기 안내(검토 전·112 전화 링크, 가로 스크롤 없음) → ‹ 뒤로 → 오늘", async ({ page }) => {
   await enterApp(page);
-  await page.getByRole("button", { name: "도움이 필요할 때" }).click();
+  await page.goto("/#/settings");
+  await page.getByRole("button", { name: /도움이 필요할 때/ }).click();
 
   await expect(page).toHaveURL(/#\/help$/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("혼자 견디지 않아도 돼요");
@@ -25,6 +26,5 @@ test("도움이 필요할 때 → 위기 안내(검토 전·112 전화 링크, �
   expect(appScroll, `#app 가로 넘침 ${appScroll} > ${appClient}`).toBeLessThanOrEqual(appClient);
 
   await page.getByRole("button", { name: "뒤로" }).click();
-  await expect(page).toHaveURL(/#\/today$/);
-  await expect(page.locator("section.today")).toBeVisible();
+  await expect(page).toHaveURL(/#\/settings$/);
 });

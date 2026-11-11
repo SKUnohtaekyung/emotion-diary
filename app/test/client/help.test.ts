@@ -3,7 +3,7 @@
 // 연락처는 묶음에 든 data/crisis-resources/kr.json이고, 시험은 자원 값을 바꿔 넣을 수 있게 createHelpView에 직접 넘긴다. 서버는 가짜 fetch다.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import crisis from "../../../data/crisis-resources/kr.json";
-import { registerViews, render, resetRouterForTest, startRouter, type ViewContext } from "../../client/src/router";
+import { navigate, registerViews, render, resetRouterForTest, startRouter, type ViewContext } from "../../client/src/router";
 import { app } from "../../client/src/state";
 import { hideLockLayer } from "../../client/src/ui/lockLayer";
 import { resetSheetsForTest } from "../../client/src/ui/sheet";
@@ -345,12 +345,12 @@ describe("위기 안내 — 돌아가기 (UX_SPEC §17)", () => {
     expect(document.querySelector(".screen-top .back-button")).not.toBeNull();
   });
 
-  it("오늘 화면에서 '도움이 필요할 때'로 들어오면 ‹ 뒤로는 밀어서 뒤로와 같이 오늘로 돌아간다", async () => {
+  it("앱 안에서(설정의 줄처럼 push로) 들어오면 ‹ 뒤로는 밀어서 뒤로와 같이 앞 화면으로 돌아간다", async () => {
     stubFetch((request) => (request.path === "/api/today" ? todayReply() : { status: 204 }));
     history.replaceState(null, "", "/#/today");
     render();
     await flush(10);
-    byText("도움이 필요할 때")?.click();
+    navigate("#/help");
     expect(location.hash).toBe("#/help");
     expect(document.querySelector("h1")?.textContent).toBe("혼자 견디지 않아도 돼요");
     const length = history.length;
