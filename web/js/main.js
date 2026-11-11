@@ -15,6 +15,8 @@ import { renderWelcome } from "./views/welcome.js";
 import { renderAuth } from "./views/auth.js";
 import { finishSplash, dropSplash } from "./splash.js";
 import { showLock, watchAway, lock } from "./lock.js";
+import { renderLookback, countRender } from "./views/lookback.js";
+import { readParams as readLookbackParams } from "./lookback/store.js";
 
 const main = document.getElementById("main");
 const navRail = document.querySelector(".bottom-nav-rail");
@@ -29,7 +31,8 @@ const ROUTES = {
   record: { view: renderRecord, tab: "calendar", fullscreen: true },
   welcome: { view: renderWelcome, tab: "today", fullscreen: true },
   auth: { view: renderAuth, tab: "today", fullscreen: true }, // 로그인·가입(공개 서비스 시안, D-104)
-  help: { view: renderHelp, tab: "settings", fullscreen: true }
+  help: { view: renderHelp, tab: "settings", fullscreen: true },
+  lookback: { view: renderLookback, tab: "stats", fullscreen: true } // 돌아보기·내 기준·작은 실험(TASK-LOOKBACK-01 시안)
 };
 const navigate = (route) => { if (location.hash === `#/${route}`) render(); else location.hash = `#/${route}`; };
 
@@ -45,6 +48,7 @@ function render() {
   const fullscreen = typeof route.fullscreen === "function" ? route.fullscreen(rest) : route.fullscreen;
   if (fullscreen) document.body.dataset.fullscreen = ""; else document.body.removeAttribute("data-fullscreen");
   if (route.scene) document.body.dataset.scene = route.scene; else document.body.removeAttribute("data-scene");
+  readLookbackParams(new URLSearchParams(query)); countRender(); // 돌아보기 시안의 안·상태 바꾸기(?lb= ?lbs= ?lbx=)는 어느 화면의 주소에서나 읽는다
   route.view(main, navigate, new URLSearchParams(query), rest);
   const tab = route.tab;
   for (const a of document.querySelectorAll(".bottom-nav a")) {

@@ -4,6 +4,7 @@ import { el, svgEl, announce, renderStatus, reducedMotion } from "../dom.js";
 import { data, friendImg, pebbleImg, stoneImg, FRIENDS, category } from "../data.js";
 import { state, toISO } from "../state.js";
 import { effectiveToday, sampleRecord } from "../sample.js";
+import { statsRows, statsDetailReader } from "./lookback.js";
 import { periodDates, periodSummary, currentStreak, topWords, topWordsForCategory, valuesByIndex, compare, buildSample, buildFewSample, addDays, MIN_DAYS, MIN_N_FOR_MEAN } from "../stats-calc.js";
 
 const CAT_ORDER = () => data.categories.map((c) => c.code);
@@ -113,7 +114,7 @@ function renderStatsList(main, navigate, params, sample, todayIso, few, sParam) 
     const enough = s.recorded >= MIN_DAYS;
     body.replaceChildren(summary, enough
       ? el("div", {}, friendshipSection(periodLen, sample, todayIso, animate, few), wordsSection(periodLen, sample, todayIso))
-      : fewEmpty(`기록이 ${MIN_DAYS}일 이상 쌓이면 친구와 얼마나 가까웠는지, 자주 머문 말도 보여 드려요.`));
+      : fewEmpty(`기록이 ${MIN_DAYS}일 이상 쌓이면 친구와 얼마나 가까웠는지, 자주 머문 말도 보여 드려요.`), statsRows(navigate));
     history.replaceState(null, "", `#/stats?p=${periodLen}${few ? "&s=few" : ""}`); // 친구 상세에서 ‹로 돌아왔을 때 기간이 이어지도록 주소도 맞춘다(D-091 ①, 쌓지 않음)
   }
 
@@ -364,7 +365,7 @@ function renderFriendDetail(main, navigate, params, code, sample, todayIso, few)
     } else if (cur.n === 0) {
       bodyNode = el("div", { class: "sx-empty" }, el("p", { class: "sx-headline", text: "이번 기간에는 오지 않았어요" }));
     } else {
-      bodyNode = el("div", {}, sizeTrendDetail(code, cur, prev, dates, sample, periodLen, todayIso), wordsDetail(code, sample, dates));
+      bodyNode = el("div", {}, sizeTrendDetail(code, cur, prev, dates, sample, periodLen, todayIso), wordsDetail(code, sample, dates), statsDetailReader(code, dates, navigate));
     }
     const sub = enough ? `${category(code).label} · 최근 ${periodLen}일 중 ${cur.n}일 함께했어요` : category(code).label;
 

@@ -5,6 +5,7 @@
 import { el, reducedMotion, renderStatus } from "../dom.js";
 import { state, todayISO, formatDate, hasDraftContent, editCompleted, resetDraft, setNow, now, DAY_START_HOUR } from "../state.js";
 import { renderForest, spreadLight, igniteAll } from "../components/forest.js";
+import { todayMark } from "./lookback.js";
 
 const STEP_PHRASE = { date: "오늘 있었던 일을 쓰던 중", cats: "마음을 고르던 중", intensity: "크기를 정하던 중", reason: "이유를 쓰던 중", praise: "칭찬을 쓰던 중", thanks: "감사를 쓰던 중", review: "편지를 읽던 중" };
 const stepPhrase = (step) => step.startsWith("detail:") ? "세부 감정을 고르던 중" : STEP_PHRASE[step] ?? "쓰던 중";
@@ -96,6 +97,7 @@ export function renderToday(main, navigate, params) {
   const head = el("div", { class: `today-head${force === "loading" ? " skel" : ""}` },
     el("div", { class: "today-row" }, el("p", { class: "today-date", text: formatDate(today) }), past),
     el("h1", { class: "hero", tabindex: "-1" }, el("span", { class: "ty1", text: "오늘은 어떤" }), " ", el("span", { class: "ty2" }, "마음", el("small", { text: "이" })), " ", el("span", { class: "ty3", text: "머물렀나요?" })));
+  if (!failed && force !== "loading") todayMark(box, head); // 진행 중인 작은 실험의 표식(TASK-LOOKBACK-01 시안)
   const screen = el("div", { class: "screen today" }, forest.node, head);
   // 숲은 스크린리더에게 장식이다. 돌(button)이 유일한 조작이고 이름은 '오늘의 마음 기록 시작하기'다. 상태는 돌 아래 문구가 말한다.
   main.replaceChildren(screen);

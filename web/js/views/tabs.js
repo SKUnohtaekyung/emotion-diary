@@ -8,6 +8,7 @@ import { dayCell } from "../components/day.js";
 import { renderLetter } from "../components/letter.js";
 import { renderMiniLetter } from "../components/mini-letter.js";
 import { openSheet } from "../components/sheet.js";
+import { calendarEntry } from "./lookback.js";
 
 const recordOf = (iso) => state.completed?.date === iso ? state.completed : sampleRecord(iso);
 const shortDay = (iso) => `${Number(iso.slice(5, 7))}월 ${Number(iso.slice(8, 10))}일`;
@@ -190,7 +191,7 @@ export function renderCalendar(main, navigate, params) {
       unfoldRow.hidden = !selectedIso; // 날짜를 고른 동안은 늘 보인다(닫기·날짜 줄) — 완료·임시저장·오늘·기록 없음 모두 같다(2026-09-25)
       if (!selectedIso) { // 아무 날도 고르지 않음(D-088 ②): 빈 칸 대신 조용한 안내 한 줄
         panel.removeAttribute("role"); panel.removeAttribute("aria-label");
-        panel.replaceChildren(el("div", { class: "cal-pv-empty" }, el("p", { class: "cal-pv-hint", text: "날짜를 누르면 그날의 편지를 볼 수 있어요" })));
+        panel.replaceChildren(el("div", { class: "cal-pv-empty" }, el("p", { class: "cal-pv-hint", text: "날짜를 누르면 그날의 편지를 볼 수 있어요" }), calendarEntry()));
         unfoldName.textContent = ""; unfoldTagSlot.replaceChildren(); unfoldMoreSlot.replaceChildren();
         opts.onDone?.(); return;
       }
@@ -338,9 +339,9 @@ export function renderRecord(main, navigate, params, rest) {
   const from = params?.get("from");
   const statsCat = data.categories.some((c) => c.code === params?.get("cat")) ? params.get("cat") : null;
   const statsBack = `stats${statsCat ? `/${statsCat}` : ""}?p=${params?.get("p") === "30" ? 30 : 7}`;
-  const backLabel = from === "stats" ? "통계로" : "달력으로";
+  const backLabel = from === "stats" ? "통계로" : from === "lookback" ? "뒤로" : "달력으로";
   const backToCalendar = () => {
-    if ((from === "calendar" || from === "stats") && history.length > 1) history.back();
+    if ((from === "calendar" || from === "stats" || from === "lookback") && history.length > 1) history.back();
     else navigate(from === "stats" ? statsBack : `calendar?d=${iso}`);
   };
 
