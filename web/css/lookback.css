@@ -1,7 +1,7 @@
-/* 돌아보기 · 내 기준 · 해 보는 길 · 전하기 한 줄(TASK-LOOKBACK-01 단계 A 시안, 2판). 클래스 접두어는 lb-.
-   새 모양을 만들지 않는다 — 종이는 통계의 작은 편지(.sxd-peek)와 일기의 줄 노트(.nt-paper), 줄은 설정 목록(.st-row), 언덕은 통계 친구 상세(.sxd-scene),
-   이름표는 가입의 이름 칸(.au-tag), 글 칸은 .au-input이다. 여기에는 그것들을 새 자리에 앉히는 간격과 기존에 없던 몇 가지
-   (표시 알약·기록 알약·눌러 둔 쪽지·길의 날들·팻말)만 있다. 색은 전부 토큰 변수다. */
+/* 돌아보기 · 내 기준 · 며칠 살아 보기 · 전하기 한 줄(TASK-LOOKBACK-01 단계 A 시안, 4판). 클래스 접두어는 lb-.
+   새 모양을 되도록 만들지 않는다 — 언덕은 통계 친구 상세(.sxd-scene)와 완료 화면(.land), 종이는 일기의 줄 노트(.nt-paper)와 편지의 크림 종이,
+   줄은 설정 목록(.st-row), 날짜 모양은 달력(.day), 넘김 점은 달력의 작은 편지(.ml-dots), 안내 줄은 오늘 화면(.yline)이다.
+   여기에는 그것들을 새 자리에 앉히는 간격과 기존에 없던 것(길 마디·하루 한 줄·모아 두기·쪽지·빈칸 문장·팻말)만 있다. 색은 전부 토큰 변수다. */
 
 /* ── 낮의 언덕 장면: 언덕 둘과 흰 길, 길 끝의 나의 돌. 나무는 일기 장면(.nt-tree)과 같은 둥근 나무다 ── */
 .lb-scene{height:150px}
@@ -12,126 +12,218 @@
 .lb-scene-tree::after{content:"";position:absolute;left:0;top:0;width:100%;aspect-ratio:1;border-radius:50%;background:var(--land-hill-near)}
 .lb-scene-tree.t1{--r:7px;left:13%;bottom:108px}
 .lb-scene-tree.t2{--r:5px;left:20%;bottom:111px}
-/* 돌 아래 눌러 둔 쪽지(내 기준): 크림 종이 조각이 돌 밑에서 조금씩 비져나온다. 장 수를 세어 보이지 않는다 — 세 장까지만 그린다 */
-.lb-scene-slip{position:absolute;bottom:44px;width:38px;height:24px;border-radius:4px;background:var(--service-light)}
-.lb-scene-slip.s1{left:calc(59.5% - 44px);transform:rotate(-9deg)}
-.lb-scene-slip.s2{left:calc(59.5% + 2px);bottom:42px;transform:rotate(7deg)}
-.lb-scene-slip.s3{left:calc(59.5% - 22px);bottom:40px;transform:rotate(-2deg)}
-/* 팻말과 그 글(해 보는 길): 팻말은 길 들머리에 서고, 적는 대로 이름표의 글이 바뀐다 */
 .lb-scene-sign{position:absolute;left:43%;bottom:58px;width:30px;height:auto}
 .lb-sign-post{fill:var(--land-hill-near)}
 .lb-sign-board{fill:var(--bg)}
-.lb-scene .lb-scene-tag{top:auto;bottom:6px;max-width:calc(100% - var(--sp-5) * 2)}
 
-/* ── 이어 읽기 ── */
-.lb-reader h1{margin-bottom:var(--sp-1)}
-.lb-reader .proto-note{margin:var(--sp-3) 0 0}
-.lb-reader .segmented{margin-top:var(--sp-3)}
-.lb-count{margin:var(--sp-5) 0 0}
-.lb-roll{display:flex;flex-direction:column;gap:var(--sp-6);margin-top:var(--sp-5)}
-.lb-roll-tight{margin-top:var(--sp-4)}
-.lb-card .sxd-peek-size{display:block}
-.lb-seals{display:flex;flex:none}
-.lb-seals .sxd-peek-seal+.sxd-peek-seal{margin-left:-10px}
-.lb-ln{margin:0;line-height:30px;overflow-wrap:anywhere}
-.lb-ln b{margin-right:var(--sp-2);font-size:var(--fs-caption);font-weight:var(--fw-body-strong)}
-/* 표시 알약: 여럿 고르기 알약(.choice)을 종이 위에 맞게 줄인 것. 보이는 높이 36px, 누르는 자리 44px */
-.lb-mark{position:relative;min-height:36px;margin-left:calc(var(--sp-1) * -1);padding-right:var(--sp-3);font-size:var(--fs-label);line-height:var(--lh-label)}
-.lb-mark::after{content:"";position:absolute;inset:-4px 0}
-.lb-mark .ck{width:20px;height:20px;font-size:12px}
-
-/* 다 읽은 자리: 옅은 띠로 끊고(설정 묶음 사이의 띠와 같다) 물음, 여러 날에 나온 말, 표시한 기록, 한 줄 적기 */
-.lb-end{margin-top:var(--sp-10)}
-.lb-end-hill{height:12px;margin:0 calc(var(--sp-5) * -1) var(--sp-8);background:var(--surface-soft)}
-.lb-end .sx-headline{text-wrap:balance}
-.lb-again{margin-top:var(--sp-6)}
-.lb-again .sx-pillrow{margin-top:0}
-.lb-again-pill{border:0;font:inherit;font-weight:var(--fw-body-strong);color:var(--text);cursor:pointer;min-height:var(--touch);transition:transform var(--dur-fast) var(--ease)}
-.lb-again-pill:active{transform:scale(var(--press-pill))}
-.lb-again .caption{margin:var(--sp-2) 0 0}
-.lb-marked{margin-top:var(--sp-6)}
-.lb-marked .caption{margin:0}
-.lb-rows{margin-top:var(--sp-8)}
-.lb-rows .st-row-name,.lb-stats-rows .st-row-name,.lb-try-rows .st-row-name{font-size:1.0625rem;font-weight:700;letter-spacing:-.01em}
-.lb-rows .st-row,.lb-stats-rows .st-row{min-height:60px}
-.lb-stats-rows .st-rows{margin-top:var(--sp-1)}
+/* ── 한눈에 보기: 옅은 길 한 줄을 따라 네 마디 ── */
+.lb-hub h1{margin-bottom:var(--sp-1)}
+.lb-hub .lede{margin:0}
+.lb-knots{list-style:none;margin:var(--sp-8) 0 0 9px;padding:0 0 0 26px;border-left:4px solid var(--land-hill-far)}
+.lb-knot{position:relative;padding-bottom:var(--sp-10)}
+.lb-knot:last-child{padding-bottom:var(--sp-2)}
+.lb-knot::before{content:"";position:absolute;left:-39px;top:4px;width:22px;height:20px;border-radius:var(--radius-blob);background:var(--service-ink)}
+.lb-knot:nth-child(even)::before{transform:scaleX(-1)}
+.lb-knot-title{margin:0 0 var(--sp-3);font-size:1.5rem;line-height:1.75rem;font-weight:800;letter-spacing:-.025em}
+.lb-knot .note{margin:0}
+.lb-knot .lb-refs+.note{margin-top:var(--sp-3)}
+.lb-knot-btn{margin-top:var(--sp-3)}
+.lb-knot .st-pill-link{margin-top:var(--sp-2)}
+.lb-readcards{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3)}
+.lb-readcard{position:relative;display:flex;flex-direction:column;gap:2px;min-height:112px;padding:var(--sp-4);border-radius:var(--radius-card);background:var(--surface-soft);color:var(--text);text-decoration:none;transition:transform var(--dur-fast) var(--ease)}
+.lb-readcard:active{transform:scale(var(--press-row))}
+.lb-readcard b{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800;letter-spacing:-.02em}
+.lb-readcard span{font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
+.lb-readcard em{margin-top:auto;font-style:normal;font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:var(--fw-body-strong);color:var(--service-ink)}
+.lb-readcard .sx-chev{position:absolute;right:var(--sp-3);bottom:var(--sp-3);width:16px;height:16px;fill:none;stroke:var(--service-ink);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.lb-hub-slips{margin-top:0}
+.lb-knot .lb-try-title{text-align:left}
+.lb-knot .lb-trail{justify-content:flex-start;margin-top:var(--sp-3)}
+.lb-knot .lb-walk-btn{margin-top:var(--sp-3)}
 
 /* 기록 하나를 가리키는 알약 */
 .lb-refs{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
-.lb-ref{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 var(--sp-3) 0 var(--sp-2);border-radius:var(--radius-chip);background:var(--surface-soft);color:var(--service-ink);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-decoration:none;white-space:nowrap}
+.lb-ref{position:relative;display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 var(--sp-3) 0 var(--sp-2);border-radius:var(--radius-chip);background:var(--surface-soft);color:var(--service-ink);font-size:var(--fs-label);font-weight:var(--fw-body-strong);text-decoration:none;white-space:nowrap}
+.lb-ref::after{content:"";position:absolute;inset:-4px 0}
 .lb-ref img{width:22px;height:auto}
+.lb-tray .lb-ref{background:var(--bg)}
 .lb-quote{margin:0 0 var(--sp-3);padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-card);background:var(--service-light);color:var(--paper-ink);font-weight:var(--fw-body-strong)}
 .lb-sheet-refs{margin:var(--sp-4) 0 var(--sp-2)}
 
-/* ── 내 기준: 나의 돌로 눌러 둔 쪽지 ── */
-.lb-note h1{margin-bottom:var(--sp-1)}
+/* 모아 두기 알약: 여럿 고르기 알약(.choice)을 줄인 것. 보이는 높이 36px, 누르는 자리 44px */
+.lb-mark{position:relative;min-height:36px;margin-left:calc(var(--sp-1) * -1);padding-right:var(--sp-3);background:var(--surface-soft);font-size:var(--fs-label);line-height:var(--lh-label)}
+.lb-mark::after{content:"";position:absolute;inset:-4px 0}
+.lb-mark .ck{width:20px;height:20px;font-size:12px}
+.lb-day-foot{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-top:var(--sp-2)}
+
+/* ── 최근 7일: 한 장씩. 화면 높이에 꼭 맞춘다 — 넘김 줄이 늘 아래에 보이고, 높이가 모자라면 언덕이 먼저 준다 ── */
+.screen.lb-pages{flex:none;display:flex;flex-direction:column;padding-bottom:var(--sp-4);height:calc(100dvh - var(--banner-h,2rem));overflow:hidden}
+.lb-pages-top{display:grid;grid-template-columns:var(--touch) 1fr auto;align-items:center;column-gap:var(--sp-1);margin:calc(var(--sp-2) * -1) 0 0 calc(var(--sp-2) * -1)}
+.lb-pages-top .back{display:grid;place-items:center;width:var(--touch);height:var(--touch);border:0;background:none;color:var(--service-ink)}
+.lb-pages-top .back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.lb-pages-top h1{margin:0;font-size:var(--fs-title);line-height:var(--lh-title)}
+.lb-traychip{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 var(--sp-3) 0 var(--sp-2);border:0;border-radius:var(--radius-chip);background:var(--service-ink);color:var(--bg);font-size:var(--fs-label);font-weight:var(--fw-body-strong);white-space:nowrap}
+.lb-traychip-pebs{display:flex}
+.lb-traychip-pebs img{width:22px;height:auto}
+.lb-traychip-pebs img+img{margin-left:-9px}
+.lb-pages-host{flex:1;display:flex;flex-direction:column;min-height:0;margin-top:var(--sp-3)}
+.lb-pager{flex:1;min-height:0;border-radius:var(--radius-card)}
+.lb-page{flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
+.lb-page-land{position:relative;flex:1 1 150px;min-height:130px;max-height:260px;border-radius:var(--radius-card);overflow:hidden}
+.lb-page-text{padding:var(--sp-4) var(--sp-1) 0}
+.lb-page-date{margin:0 0 var(--sp-1);font-size:var(--fs-label);line-height:2.5rem;color:var(--muted)}
+.lb-page-date b{font-size:2rem;font-weight:800;letter-spacing:-.03em;color:var(--text)}
+.lb-page-event{margin:0;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:600}
+.lb-page-reason{margin:var(--sp-1) 0 0;color:var(--muted)}
+.lb-page .sxd-peek-chips{margin-top:var(--sp-3)}
+.lb-coach{margin:var(--sp-1) 0 0}
+/* 모아 둔 날은 날짜 아래 민트 띠 — 민트는 '지금 고른 것'의 색이다(D-088) */
+:is(.lb-page,.lb-day).is-marked :is(.lb-page-date,.lb-day-date) b{background:linear-gradient(to top,var(--service-mint) 42%,transparent 42%)}
+.lb-page-end{padding:0 var(--sp-1)}
+.lb-page-end .lb-end{margin-top:var(--sp-2)}
+.lb-pager-nav{display:flex;align-items:center;justify-content:space-between;margin-top:var(--sp-3)}
+.lb-pager-nav .cal-arrow svg{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+
+/* ── 최근 30일: 훑어보기. 주마다 묶은 하루 한 줄, 누르면 그 자리에서 펼쳐진다 ── */
+.lb-monthscreen h1{margin-bottom:var(--sp-1)}
+.lb-monthscreen .lede{margin:0}
+.lb-filter{margin-top:var(--sp-5)}
+.lb-again .sx-pillrow{margin-top:0}
+.lb-again-pill{border:0;font:inherit;font-weight:var(--fw-body-strong);color:var(--text);cursor:pointer;min-height:var(--touch);transition:transform var(--dur-fast) var(--ease)}
+.lb-again-pill:active{transform:scale(var(--press-pill))}
+.lb-again-pill[aria-pressed="true"]{background:var(--service-ink);color:var(--bg)}
+.lb-again-pill[aria-pressed="true"] em{color:var(--bg)}
+.lb-again .caption{margin:var(--sp-2) 0 0}
+.lb-week{margin-top:var(--sp-8)}
+.lb-week .sx-eyebrow{margin:0}
+.lb-days{list-style:none;margin:0;padding:0}
+.lb-day{border-bottom:var(--hairline) solid var(--border)}
+.lb-day-head{display:grid;grid-template-columns:44px 1fr 20px;align-items:center;column-gap:var(--sp-2);width:100%;min-height:64px;padding:var(--sp-2) 0;border:0;background:none;color:var(--text);font:inherit;text-align:left;cursor:pointer}
+.lb-day-pebs{display:flex;align-items:center}
+.lb-day-pebs img{width:26px;height:auto}
+.lb-day-pebs img+img{margin-left:-10px}
+.lb-day-main{display:flex;flex-direction:column;min-width:0}
+.lb-day-date{font-size:var(--fs-label);line-height:var(--lh-label);color:var(--muted)}
+.lb-day-date b{font-weight:800;color:var(--text)}
+.lb-day-event{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lb-day.is-open .lb-day-event{white-space:normal}
+.lb-day-chev{width:18px;height:18px;fill:none;stroke:var(--muted);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;transition:transform var(--dur-fast) var(--ease)}
+.lb-day.is-open .lb-day-chev{transform:rotate(180deg)}
+.lb-day-more{padding:0 0 var(--sp-3) 52px}
+.lb-day-reason{margin:0;color:var(--muted)}
+.lb-day-more .sxd-peek-chips{margin-top:var(--sp-3)}
+.sheet .lb-days{margin-top:var(--sp-2)}
+/* 모아 둔 기록 띠: 하나라도 모아 두면 아래에 붙어 따라온다(무엇이 쌓이고 어디로 이어지는지 늘 보인다) */
+.lb-traybar{position:sticky;bottom:0;z-index:var(--z-sticky);display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-3) var(--sp-5) calc(var(--sp-4) + env(safe-area-inset-bottom));background:var(--service-light);color:var(--paper-ink)}
+.lb-traybar p{display:flex;flex-direction:column;margin:0;font-size:var(--fs-label);line-height:var(--lh-label)}
+.lb-traybar b{font-size:var(--fs-body);line-height:var(--lh-body);font-weight:800}
+
+/* 다 읽은 자리 */
+.lb-end{margin-top:var(--sp-10)}
+.lb-end .sx-headline{text-wrap:balance}
+.lb-end .lb-again{margin-top:var(--sp-6)}
+.lb-marked{margin-top:var(--sp-6)}
+.lb-marked .caption{margin:var(--sp-2) 0 0}
+
+/* ── 내 기준: 쪽지 ── */
+.lb-note-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-3)}
+.lb-note-head h1{margin-bottom:var(--sp-1)}
+.lb-edit-toggle{margin-right:calc(var(--sp-2) * -1)}
 .lb-note .lede{margin:0}
+.lb-edit-hint{margin:var(--sp-3) 0 0}
 .lb-slips{list-style:none;margin:var(--sp-8) 0 0;padding:0}
-.lb-slip{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:var(--sp-3);width:100%;border:0;border-radius:16px;background:var(--service-light);color:var(--paper-ink);font:inherit;text-align:left;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
-.lb-slip:active{transform:scale(var(--press-row))}
-.lb-slip:not(.line)::before{content:"";position:absolute;top:-8px;left:var(--sp-5);width:46px;height:16px;background:color-mix(in srgb,var(--service-mint) 85%,transparent);transform:rotate(-4deg)}
-.lb-slips li:nth-child(even) .lb-slip:not(.line)::before{left:auto;right:var(--sp-5);transform:rotate(5deg)}
-.lb-slip-text{overflow-wrap:anywhere}
-.lb-slip-date{font-size:var(--fs-caption);line-height:var(--lh-caption)}
-.lb-slip-refs{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
-.lb-slip .lb-ref{background:var(--bg)}
-/* 1~2장: 큰 쪽지 한 장씩 */
 .lb-slips.big{display:flex;flex-direction:column;gap:var(--sp-6)}
-.lb-slip.big{padding:var(--sp-6) var(--sp-5) var(--sp-4)}
-.lb-slip.big .lb-slip-text{font-size:1.375rem;line-height:2rem;font-weight:800;letter-spacing:-.02em}
-/* 3~6장: 두 줄로 놓은 작은 쪽지(글 길이만큼의 높이라 어긋나게 놓인다) */
-.lb-slips.grid{columns:2;column-gap:var(--sp-3)}
-.lb-slips.grid li{break-inside:avoid;padding-top:var(--sp-2);margin-bottom:var(--sp-4)}
-.lb-slip.small{padding:var(--sp-5) var(--sp-4) var(--sp-3);gap:var(--sp-2)}
+.lb-slips.grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5) var(--sp-3);align-items:start}
+.lb-slips li{position:relative}
+/* 쪽지 한 장: 크림 종이, 오른쪽 아래 모서리가 접혀 있고, 위 모서리에는 그 문장이 나온 날의 조약돌이 얹혀 있다. 기울이지 않는다(D-090) */
+.lb-slip{position:relative;display:block;width:100%;border:0;border-radius:14px 14px 0 14px;background:var(--service-light);color:var(--paper-ink);font:inherit;text-align:left;text-decoration:none;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
+.lb-slip:active{transform:scale(var(--press-row))}
+.lb-slip-text{display:block;overflow-wrap:anywhere}
+.lb-slip-fold{position:absolute;right:0;bottom:0;width:20px;height:20px;border-radius:6px 0 0 0;background:linear-gradient(135deg,var(--paper-rule) 50%,var(--bg) 50%)}
+.lb-slip-pebs{position:absolute;right:12px;top:-11px;display:flex}
+.lb-slip-pebs img{width:26px;height:auto}
+.lb-slip-pebs img+img{margin-left:-9px}
+.lb-slip.big{padding:var(--sp-6) var(--sp-5)}
+.lb-slip.big .lb-slip-text{font-size:1.5rem;line-height:2.125rem;font-weight:800;letter-spacing:-.025em}
+.lb-slip.big .lb-slip-pebs img{width:32px}
+.lb-slip.small{min-height:104px;padding:var(--sp-5) var(--sp-4) var(--sp-5)}
 .lb-slip.small .lb-slip-text{font-size:var(--fs-body);line-height:1.5rem;font-weight:700}
-.lb-slip.small::before{left:var(--sp-4);width:36px;height:14px}
-/* 7장부터: 줄 노트 한 장에 한 줄씩 */
-.lb-slips.sheet{padding:var(--sp-2) var(--sp-4);border-radius:var(--radius-card);background:var(--service-light)}
-.lb-slip.line{min-height:var(--touch);padding:10px 0;border-radius:0;background:none;border-bottom:var(--hairline) solid var(--paper-rule)}
-.lb-slips.sheet li:last-child .lb-slip.line{border-bottom:0}
-.lb-slip.line .lb-slip-text{font-size:var(--fs-body);line-height:1.5rem;font-weight:600}
-.lb-fold-toggle{align-self:flex-start;margin:var(--sp-4) 0 0 calc(var(--sp-2) * -1)}
-.lb-slips.lb-folded{margin-top:var(--sp-2)}
-.lb-empty-line{margin:var(--sp-8) 0 0;text-align:center;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:var(--fw-body-strong)}
+/* 순서 바꾸기: 쪽지가 가볍게 흔들리고, 끄는 쪽지는 조금 커져 손가락을 따라온다 */
+.lb-slips.is-editing{touch-action:none;-webkit-user-select:none;user-select:none}
+.lb-slips.is-editing .lb-slip{animation:lb-jiggle .3s ease-in-out infinite alternate;cursor:grab}
+.lb-slips.is-editing li:nth-child(even) .lb-slip{animation-direction:alternate-reverse;animation-delay:-.12s}
+.lb-slips li.is-dragging{z-index:5}
+.lb-slips li.is-dragging .lb-slip{animation:none;cursor:grabbing}
+@keyframes lb-jiggle{from{transform:rotate(-1.1deg)}to{transform:rotate(1.1deg)}}
+.lb-fold-toggle{align-self:flex-start;margin:var(--sp-5) 0 0 calc(var(--sp-2) * -1)}
+.lb-slips.lb-folded{margin-top:var(--sp-3)}
+.lb-folded .lb-slip-text{color:var(--muted)}
+.lb-tray{margin-top:var(--sp-8);padding:var(--sp-4);border-radius:var(--radius-card);background:var(--surface-soft)}
+.lb-tray .caption{margin:var(--sp-3) 0 0}
+/* 빈 상태: 쪽지가 어떻게 생기는지 세 마디로 */
+.lb-how{list-style:none;counter-reset:how;margin:var(--sp-8) 0 0;padding:0;display:flex;flex-direction:column;gap:var(--sp-5)}
+.lb-how li{position:relative;display:flex;flex-direction:column;padding-left:44px;counter-increment:how}
+.lb-how li::before{content:counter(how);position:absolute;left:0;top:0;display:grid;place-items:center;width:30px;height:28px;border-radius:var(--radius-blob);background:var(--surface-soft);font-size:var(--fs-label);font-weight:800;color:var(--service-ink)}
+.lb-how b{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800}
+.lb-how span{color:var(--muted)}
 .lb .sd-actions{padding-top:var(--sp-6)}
 
 /* ── 한 줄 적기: 일기 첫 단계의 종이·언덕 장면을 그대로 쓴다 ── */
 .lb-write-refs{margin:0 0 var(--sp-2)}
+.lb-write-refs .caption{margin:var(--sp-2) 0 0}
 .lb-write .blocked-hint{margin:0}
-/* 자판이 올라온 자리(QA ?kb=1): 진짜 자판은 실제 기기에서만 확인된다 — 여기서는 버튼 줄이 자판 위에 남는지만 본다 */
+/* 자판이 올라온 자리(QA ?kb=1): 진짜 자판은 실제 기기에서만 확인된다 */
 .lb-kb{position:fixed;left:50%;bottom:0;z-index:var(--z-sheet);translate:-50% 0;width:min(100%,var(--content-max));height:290px;display:grid;place-content:center;background:var(--border);color:var(--muted);font-size:var(--fs-label)}
 .lb-kb-on{padding-bottom:290px}
 main:has(.lb-kb) .step-footer{bottom:290px}
 
-/* ── 해 보는 길 ── */
-.lb-field{margin-top:var(--sp-4)}
-.lb-input{resize:none;overflow:hidden;padding:13px var(--sp-4);line-height:var(--lh-heading)}
-.lb-fill{margin-top:var(--sp-5)}
+/* ── 며칠 살아 보기: 큰 글자의 빈칸 문장 ── */
+.lb-poster .lb-poster-h1{margin:0;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);letter-spacing:0;color:var(--muted)}
+.lb-from-slot{margin-top:var(--sp-2)}
+.lb-from{margin:var(--sp-2) 0 0}
+.lb-madlib{display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-1);margin-top:var(--sp-5)}
+.lb-blank{display:block;width:100%;padding:0;border:0;border-bottom:var(--emphasis) dashed var(--border-strong);border-radius:0;background:none;resize:none;overflow:hidden;color:var(--text);letter-spacing:-.03em}
+.lb-blank:not(:placeholder-shown){border-bottom-style:solid;border-bottom-color:var(--service-mint)}
+.lb-blank:focus-visible{outline:none;border-bottom-color:var(--service-ink);border-bottom-style:solid}
+.lb-blank.when{font-size:1.25rem;line-height:2.25rem;font-weight:700}
+.lb-blank.what{font-size:clamp(1.75rem,9vw,2.25rem);line-height:1.35;font-weight:800}
+.lb-madlib-tail{margin:var(--sp-2) 0 0;font-size:1.25rem;line-height:2rem;font-weight:700}
+.lb-madlib-tail b{font-weight:800;background:linear-gradient(to top,var(--service-mint) 42%,transparent 42%)}
+.lb-madlib-note{margin:var(--sp-1) 0 var(--sp-4)}
+.lb-stepper{display:flex;align-items:center;gap:var(--sp-4);margin-top:var(--sp-3)}
+.lb-stepper b{min-width:3.5rem;text-align:center;font-size:var(--fs-title);line-height:var(--lh-title);font-weight:800;font-variant-numeric:tabular-nums}
+.lb-fill{margin-top:var(--sp-8)}
 .lb-fill .caption{margin:var(--sp-2) 0 0}
+.lb-sugs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp-2)}
+.lb-sug{display:flex;flex-direction:column;gap:2px;width:100%;min-height:56px;padding:var(--sp-3) var(--sp-4);border:0;border-radius:var(--radius-card);background:var(--surface-soft);color:var(--text);font:inherit;text-align:left;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
+.lb-sug:active{transform:scale(var(--press-row))}
+.lb-sug-text{font-weight:700}
+.lb-sug small{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted)}
+.lb-poster .lb-scene{margin-top:var(--sp-6)}
 .lb-center{text-align:center}
 .lb-try .sx-eyebrow.lb-center{margin-top:var(--sp-1)}
-.lb-try .lb-try-title{margin:0;text-align:center;text-wrap:balance}
+.lb-try-title{margin:0;text-align:center;text-wrap:balance;font-size:var(--fs-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.03em}
 .lb-try-title small{display:block;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:600;letter-spacing:0;color:var(--muted)}
-/* 길의 날들: 걸어 본 날만 민트 돌이 놓인다. 오늘은 고리, 아직 오지 않은 날은 옅은 윤곽. 수·비율·이어짐을 적지 않는다 */
+.lb-try .caption.lb-center{margin:var(--sp-1) 0 0}
+/* 이 기간의 날들: 달력의 날짜 모양(.day.mini). 해 본 날만 채워진다 */
 .lb-walk{display:flex;flex-direction:column;align-items:center;gap:var(--sp-3);margin-top:var(--sp-6)}
-.lb-walk .caption{margin:0;text-align:center}
+.lb-walk .caption,.lb-walk .note{margin:0;text-align:center}
 .lb-trail{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2) var(--sp-3);margin:0;padding:0}
 .lb-trail li{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted)}
-.lb-trail i{display:block;width:24px;height:22px;border-radius:var(--radius-blob);border:var(--hairline) solid var(--border-strong)}
-.lb-trail li:nth-child(even) i{transform:scaleX(-1)}
-.lb-trail .on i{border-color:transparent;background:var(--service-mint)}
-.lb-trail .today i{outline:var(--emphasis) solid var(--service-ink);outline-offset:2px}
+.lb-trail .day.mini{width:26px;height:26px;min-height:26px}
 .lb-trail .today{color:var(--text);font-weight:var(--fw-body-strong)}
-.lb-trail .later i{border-color:var(--border)}
 .lb-walk-btn{background:var(--surface-soft)}
 .lb-try-rows{margin-top:var(--sp-6)}
+.lb-try-rows .st-row-name,.lb-stats-rows .st-row-name{font-size:1.0625rem;font-weight:700;letter-spacing:-.01em}
+.lb-stats-rows .st-row{min-height:60px}
+.lb-stats-rows .st-rows{margin-top:var(--sp-1)}
 .lb-try-note{margin:0 0 0 52px}
 .lb-stop{margin-top:var(--sp-10);color:var(--text)}
 .lb-stop .st-chev{color:var(--muted)}
 .lb-after{margin-top:var(--sp-8)}
-.lb-past{list-style:none;margin:var(--sp-3) 0 0;padding:0;display:flex;flex-direction:column;gap:var(--sp-3)}
-.lb-past-text{margin:0;font-weight:700}
-.lb-past .caption{margin:2px 0 0}
+.lb-input{resize:none;padding:13px var(--sp-4);line-height:var(--lh-heading)}
+.lb-sheet-path{padding-bottom:var(--sp-2)}
+.lb-sheet-path .lb-walk{margin-top:var(--sp-5)}
 
 /* ── 완료 화면 제목 아래의 한 줄 자리 ── */
 .lb-tell{margin:var(--sp-2) 0 0}
@@ -140,130 +232,24 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 .lb-done-ask-btns{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
 .lb-done-ask .st-pill{min-height:40px;color:var(--service-ink);font-weight:var(--fw-body-strong)}
 
-/* ── 오늘 화면의 팻말: 숲길 가에 서고 등불 하나가 비춘다(조약돌의 빛무리와 같은 방식). 정한 날이 지나면 등불과 팻말이 밝아진다 ── */
+/* ── 오늘 화면: 숲길 가의 팻말과 돌 아래 한 줄 ── */
 .lb-forest-sign{position:absolute;left:66.5%;top:47.5%;z-index:9;display:block;width:13%}
 .lb-forest-sign::after{content:"";position:absolute;inset:-8px}
 .lb-forest-sign-svg{position:relative;display:block;width:100%;height:auto}
 .lb-forest-sign-svg .lb-sign-post{fill:var(--forest-tree-edge)}
 .lb-forest-sign-svg .lb-sign-board{fill:color-mix(in srgb,var(--forest-tree-mid) 45%,var(--service-mint))}
-.lb-forest-halo{position:absolute;left:50%;top:26%;width:330%;aspect-ratio:1;translate:-50% -50%;border-radius:50%;background:radial-gradient(circle closest-side,color-mix(in srgb,var(--service-mint) 46%,transparent) 0,color-mix(in srgb,var(--service-mint) 14%,transparent) 44%,transparent 100%);mix-blend-mode:screen;pointer-events:none}
-.lb-forest-light{position:absolute;left:66%;top:38%;width:17%;aspect-ratio:1;border-radius:50%;background:var(--service-mint);animation:twinkle 5s ease-in-out infinite}
-.lb-forest-sign:focus-visible{outline:var(--emphasis) solid var(--service-mint);outline-offset:4px;border-radius:var(--radius)}
 .lb-forest-sign.is-ended .lb-sign-board{fill:color-mix(in srgb,var(--forest-tree-mid) 12%,var(--service-mint))}
-.lb-forest-sign.is-ended .lb-forest-halo{width:460%;background:radial-gradient(circle closest-side,color-mix(in srgb,var(--bg) 60%,transparent) 0,color-mix(in srgb,var(--service-mint) 26%,transparent) 40%,transparent 100%)}
-.lb-forest-sign.is-ended .lb-forest-light{background:var(--bg)}
+.lb-forest-sign:focus-visible{outline:var(--emphasis) solid var(--service-mint);outline-offset:4px;border-radius:var(--radius)}
+.lb-yline{top:86.5%}
 
 /* ── 달력의 입구 ── */
 .cal-pv-empty:has(.lb-cal-entry){flex-direction:column;gap:var(--sp-1)}
 
 @media (prefers-reduced-motion:reduce){
-  .lb-forest-light{animation:none}
-  .lb-slip,.lb-again-pill{transition:none}
-  .lb-slip:active,.lb-again-pill:active{transform:none}
+  .lb-slip,.lb-again-pill,.lb-readcard,.lb-sug,.lb-day-chev{transition:none}
+  .lb-slip:active,.lb-again-pill:active,.lb-readcard:active,.lb-sug:active{transform:none}
+  .lb-slips.is-editing .lb-slip{animation:none}
 }
 
-/* ════════ 3판: 고친 것과 더 지은 초안들 ════════ */
-/* 소품은 한 화면에 세 곳 안팎(BRAND_STORY §6) — 눌러 둔 쪽지의 테이프는 첫 장에만 붙인다 */
-.lb-slips li:not(:first-child) .lb-slip::before{display:none}
-/* 길의 날들은 달력의 날짜 모양(.day.mini)을 그대로 쓴다 */
-.lb-trail .day.mini{width:26px;height:26px;min-height:26px}
-.lb-ref{position:relative}
-.lb-ref::after{content:"";position:absolute;inset:-4px 0}
-.lb-from{margin-top:var(--sp-4)}
-
-/* ── 돌아보기 b: 길 따라 읽기 ── */
-.lb-way{list-style:none;margin:var(--sp-6) 0 0 14px;padding:0 0 var(--sp-2) 30px;border-left:4px solid var(--land-hill-far)}
-.lb-way li{position:relative;padding-bottom:var(--sp-8)}
-.lb-way-peb{position:absolute;left:-48px;top:0;width:30px;height:auto}
-.lb-way-date{margin:0 0 var(--sp-2);font-size:var(--fs-label);line-height:2.25rem;color:var(--muted)}
-.lb-way-date b{font-size:1.75rem;font-weight:800;letter-spacing:-.03em;color:var(--text)}
-.lb-way .is-marked .lb-way-date b{background:linear-gradient(to top,var(--service-mint) 42%,transparent 42%)}
-.lb-way-event{margin:0;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:600}
-.lb-way-reason{margin:var(--sp-1) 0 0;color:var(--muted)}
-.lb-way-sizes{margin:var(--sp-3) 0 0}
-.lb-way .sxd-peek-chips{margin-top:var(--sp-2)}
-.lb-way-foot{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-top:var(--sp-2)}
-.lb-mark-plain{background:var(--surface-soft)}
-
-/* ── 돌아보기 c: 한 장씩 넘겨 읽기 ── */
-/* 화면 높이에 꼭 맞춘다 — 한 장이 한 화면이고 넘김 줄이 늘 아래에 보인다. 높이가 모자라면 언덕이 먼저 줄고, 그래도 넘치면 그 장 안에서만 스크롤된다 */
-.screen.lb-pages{flex:none;display:flex;flex-direction:column;padding-bottom:var(--sp-4);height:calc(100dvh - var(--banner-h,2rem));overflow:hidden}
-.lb-pages-top{display:grid;grid-template-columns:var(--touch) 1fr;align-items:center;column-gap:var(--sp-1);margin:calc(var(--sp-2) * -1) 0 0 calc(var(--sp-2) * -1)}
-.lb-pages-top .back{display:grid;place-items:center;width:var(--touch);height:var(--touch);border:0;background:none;color:var(--service-ink)}
-.lb-pages-top .back svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.lb-pages-top h1{margin:0;font-size:var(--fs-title);line-height:var(--lh-title)}
-.lb-pages-top .segmented{grid-column:1 / -1;margin:var(--sp-2) 0 0 var(--sp-2)}
-.lb-pages-host{flex:1;display:flex;flex-direction:column;min-height:0;margin-top:var(--sp-3)}
-.lb-pager{flex:1;min-height:0;border-radius:var(--radius-card)}
-.lb-page{flex:0 0 100%;scroll-snap-align:start;display:flex;flex-direction:column;min-width:0;overflow-y:auto}
-.lb-page-land{position:relative;flex:1 1 150px;min-height:130px;max-height:260px;border-radius:var(--radius-card);overflow:hidden;background:var(--bg)}
-.lb-page-text{position:relative;padding:var(--sp-4) var(--sp-1) 0}
-.lb-page-tape{left:auto;right:var(--sp-4);margin:0;top:-12px}
-.lb-page-date{margin:0;font-size:var(--fs-label);line-height:2.5rem;color:var(--muted)}
-.lb-page-date b{font-size:2rem;font-weight:800;letter-spacing:-.03em;color:var(--text)}
-.lb-page-text .caption{margin:0}
-.lb-page .sxd-peek-lines{margin-top:var(--sp-2)}
-.lb-page .sxd-peek-chips{margin-top:var(--sp-2)}
-.lb-page-end{padding:0 var(--sp-1)}
-.lb-page-end .lb-end{margin-top:var(--sp-2)}
-.lb-page-end .lb-end-hill{display:none}
-.lb-pager-nav{display:flex;align-items:center;justify-content:space-between;margin-top:var(--sp-3)}
-.lb-pager-nav .cal-arrow svg{fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.lb-pager-count{margin:0;font-size:var(--fs-label);font-weight:var(--fw-body-strong);color:var(--muted);font-variant-numeric:tabular-nums}
-
-/* ── 내 기준 b·c: 줄 수에 따라 글자가 달라진다 ── */
-.lb-lines{list-style:none;margin:0;padding:0}
-.lb-line{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--sp-3);width:100%;padding:0;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
-.lb-line:active{transform:scale(var(--press-row))}
-.lb-line-text{flex:1;min-width:0;overflow-wrap:anywhere;font-size:var(--lb-fs);line-height:var(--lb-lh);font-weight:var(--lb-fw);letter-spacing:var(--lb-ls)}
-.lb-line-pebs{display:flex;flex:none;align-items:center;height:var(--lb-lh)}
-.lb-line-pebs img{width:22px;height:auto}
-.lb-line-pebs img+img{margin-left:-8px}
-.lb-lines.few{--lb-fs:1.75rem;--lb-lh:2.75rem;--lb-fw:800;--lb-ls:-.03em}
-.lb-lines.some{--lb-fs:1.25rem;--lb-lh:2.25rem;--lb-fw:700;--lb-ls:-.02em}
-.lb-lines.many{--lb-fs:1rem;--lb-lh:2rem;--lb-fw:600;--lb-ls:0}
-/* b 노트 한 장: 줄 노트(줄 간격 = 글 줄 높이), 한 문장 뒤에 한 줄을 비운다 */
-.lb-notepage{position:relative;margin-top:var(--sp-8);padding:var(--sp-5) var(--sp-5) var(--sp-4);border-radius:0 var(--radius-card) var(--radius-card) var(--radius-card);background:var(--service-light);color:var(--paper-ink)}
-.lb-notepage::before{content:"";position:absolute;left:-.7rem;top:-.35rem;width:2.5rem;height:.95rem;background:color-mix(in srgb,var(--service-mint) 72%,transparent);transform:rotate(-32deg)}
-.lb-notepage .lb-paper-stone{left:auto;right:var(--sp-4);top:-26px;width:56px}
-.lb-lines.on-paper{background:linear-gradient(to bottom,transparent calc(var(--lb-lh) - 1px),var(--paper-rule) calc(var(--lb-lh) - 1px)) 0 0 / 100% var(--lb-lh) repeat-y}
-.lb-lines.on-paper li{padding-bottom:var(--lb-lh)}
-.lb-lines.on-paper.many li,.lb-lines.on-paper li:last-child{padding-bottom:0}
-.lb-notepage.is-empty .lb-empty-line{margin:var(--sp-6) 0 var(--sp-4);text-align:left}
-/* c 큰 글자: 흰 바탕, 줄 사이 옅은 선 */
-.lb-lines.on-white{margin-top:var(--sp-6)}
-.lb-lines.on-white li{padding:var(--sp-4) 0;border-top:var(--hairline) solid var(--border)}
-.lb-lines.on-white li:first-child{border-top:0}
-.lb-lines.on-white.many li{padding:var(--sp-2) 0}
-.lb-lines.lb-folded{margin-top:var(--sp-2)}
-.lb-lines.lb-folded .lb-line-text{color:var(--muted)}
-.lb-lines.on-paper.lb-folded{padding:var(--sp-3) var(--sp-5);border-radius:var(--radius-card);background-color:var(--service-light)}
-
-/* ── 해 보는 길 b: 문장으로 정하기 ── */
-.lb-poster .lb-poster-h1{margin:0;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);letter-spacing:0;color:var(--muted)}
-.lb-madlib{display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-1);margin-top:var(--sp-4)}
-.lb-blank{display:block;width:100%;padding:0;border:0;border-bottom:var(--emphasis) dashed var(--border-strong);border-radius:0;background:none;resize:none;overflow:hidden;color:var(--text);letter-spacing:-.03em}
-.lb-blank:not(:placeholder-shown){border-bottom-style:solid;border-bottom-color:var(--service-mint)}
-.lb-blank:focus-visible{outline:none;border-bottom-color:var(--service-ink);border-bottom-style:solid}
-.lb-blank.when{font-size:1.25rem;line-height:2.25rem;font-weight:700}
-.lb-blank.what{font-size:clamp(1.75rem,9vw,2.25rem);line-height:1.35;font-weight:800}
-.lb-madlib-tail{margin:var(--sp-2) 0 0;font-size:1.25rem;line-height:2rem;font-weight:700}
-.lb-madlib-tail b{font-weight:800;background:linear-gradient(to top,var(--service-mint) 42%,transparent 42%)}
-.lb-poster-days{margin-top:var(--sp-3)}
-.lb-poster .lb-scene{margin-top:var(--sp-6)}
-
-/* ── 오늘 화면 팻말의 초안: b 반딧불, c 글 한 줄 ── */
-.lb-fly{position:absolute;width:9%;aspect-ratio:1;border-radius:50%;background:var(--service-mint);animation:twinkle 5s ease-in-out infinite}
-.lb-fly.f0{left:-30%;top:8%}
-.lb-fly.f1{left:112%;top:-6%;animation-delay:-1.2s}
-.lb-fly.f2{left:96%;top:52%;width:7%;animation-delay:-2.3s}
-.lb-fly.f3{left:-44%;top:60%;width:7%;animation-delay:-3.1s}
-.lb-fly.f4{left:40%;top:-26%;width:6%;animation-delay:-4s}
-.lb-forest-sign.is-ended .lb-fly{background:var(--bg)}
-.lb-yline{top:86.5%}
-
-@media (prefers-reduced-motion:reduce){
-  .lb-fly{animation:none}
-  .lb-line{transition:none}
-  .lb-line:active{transform:none}
-}
+/* 단추로 쓴 알약 링크(문장 고르기): 브라우저 기본 단추 모양을 걷는다 */
+button.st-pill-link{padding:0;border:0;background:none;font:inherit;cursor:pointer}

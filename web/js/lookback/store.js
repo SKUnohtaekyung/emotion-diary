@@ -4,9 +4,6 @@
 import { state, toISO } from "../state.js";
 import { dayStatus, sampleRecord, effectiveToday } from "../sample.js";
 
-// 초안 바꾸기(QA): ?lb=2b.4c 처럼 붙인다 — 2 돌아보기(a 쪽지 묶음·b 길 따라·c 한 장씩) · 4 내 기준(a 눌러 둔 쪽지·b 노트 한 장·c 큰 글자) · 5 해 보는 길 정하기(a 칸·b 문장) · 6 오늘 화면 팻말(a 등불·b 반딧불·c 글 한 줄).
-export const choice = { read: "c", note: "b", path: "b", sign: "c" }; // 기본값은 3판에서 권하는 초안이다
-const KEYS = { 2: "read", 4: "note", 5: "path", 6: "sign" };
 export const qa = { amount: "normal", tell: null, keyboard: false };
 
 const addDays = (iso, n) => { const [y, m, d] = iso.split("-").map(Number); return toISO(new Date(y, m - 1, d + n)); };
@@ -60,7 +57,6 @@ export const pathDays = (x = lb.path) => Array.from({ length: x.days }, (_, k) =
 let seeded = false;
 export function readParams(params) {
   let reseed = !seeded;
-  for (const part of (params.get("lb") ?? "").split(/[.,]/)) { const m = /^([2456])([abc])$/.exec(part); if (m) choice[KEYS[m[1]]] = m[2]; }
   const amount = params.get("lbs");
   if (amount in AMOUNT && amount !== qa.amount) { qa.amount = amount; reseed = true; }
   if (params.has("lbt")) qa.tell = params.get("lbt");
@@ -79,13 +75,16 @@ export function saveStandard({ id, text, from = [] }) {
   return made;
 }
 export const removeStandard = (id) => { lb.standards = lb.standards.filter((s) => s.id !== id); };
+// 쪽지의 순서: 사용자가 끌어 옮긴 대로다(펼쳐 둔 것들의 id 순서를 받아 그대로 놓고, 접어 둔 것은 뒤에 둔다).
+export function orderStandards(ids) { const by = new Map(lb.standards.map((x) => [x.id, x])); lb.standards = [...ids.map((id) => by.get(id)).filter(Boolean), ...lb.standards.filter((x) => !ids.includes(x.id))]; }
+export function moveStandard(id, delta) { const open = lb.standards.filter((x) => !x.folded).map((x) => x.id), i = open.indexOf(id), j = i + delta; if (i < 0 || j < 0 || j >= open.length) return false; [open[i], open[j]] = [open[j], open[i]]; orderStandards(open); return true; }
 export const EXAMPLES = [["서운한 마음이 들 때", "하루 뒤에 말하기"], ["잠자리에 들기 30분 전", "화면 끄기"], ["답하기 전에", "한 박자 쉬기"], ["궁금한 곳이 생기면", "글 말고 직접 가 보기"]];
 export const DAY_CHOICES = [3, 5, 7, 14];
 
 // ── 여러 날에 나온 말(기계적으로 센 것이다 — 뜻을 풀거나 까닭을 대지 않는다). 고른 말은 그대로 세고, 적은 글은 낱말 끝의 조사를 한 번 떼어 센다.
 // 시안의 셈은 거칠다: 실제 코드에서는 형태소 분석이 필요하다(검토 페이지의 '기술 계획').
 const JOSA = /(으로|에서|에게|한테|까지|부터|처럼|이나|이|가|을|를|은|는|에|의|도|와|과|로|만)$/;
-const SKIP = new Set(["오늘", "그날", "계속", "같았다", "같아", "것", "게", "내", "나", "나만", "너무", "조금", "오래", "하루", "종일", "거의", "했다", "됐다", "있었다", "없었다", "느낌", "마음", "시간", "말", "일"]);
+const SKIP = new Set(["오늘", "그날", "계속", "같았다", "같아", "것", "게", "내", "나", "나만", "너무", "조금", "오래", "하루", "종일", "거의", "했다", "됐다", "있었다", "없었다", "느낌", "마음", "시간", "말", "일", "생각", "이유", "자리"]);
 export function repeated(days) {
   const words = new Map(), picks = new Map();
   const add = (map, key, iso) => { if (!map.has(key)) map.set(key, new Set()); map.get(key).add(iso); };
@@ -108,4 +107,21 @@ export function tellReason(entry) {
   const top = cats.reduce((a, c) => (entry.repr[c] > (entry.repr[a] ?? 0) ? c : a), cats[0]);
   if (!top || entry.repr[top] < 7) return null;
   return WARM.includes(top) ? "joy" : "big";
+}
+
+// ── '며칠 살아 보기'의 예시(검토 페이지의 '기술 계획'). 사람이 미리 써 둔 목록에서 규칙으로 고른다 — 앱이 문장을 지어내지 않는다.
+// 고르는 까닭을 함께 보인다: ① 시작한 문장(내 기준)에 든 말 ② 최근 30일에 여러 날 나온 말 ③ 그 밖에는 흔한 예시.
+// 처방이 아니다 — '이렇게 해 보세요'가 아니라 채워 볼 수 있는 틀이고, 누르면 빈칸이 채워질 뿐 사용자가 고쳐 쓴다.
+const HINTS = [
+  { key: "약속", when: "약속이 바뀌었을 때", what: "이유를 먼저 물어보기" }, { key: "친구", when: "친구에게 서운할 때", what: "하루 뒤에 말하기" },
+  { key: "혼자", when: "혼자 있는 저녁에", what: "20분 걷기" }, { key: "저녁", when: "혼자 있는 저녁에", what: "20분 걷기" },
+  { key: "연락", when: "답장이 늦을 때", what: "기다리는 동안 다른 일 하기" }, { key: "부탁", when: "부탁을 받았을 때", what: "하루 생각하고 답하기" },
+  { key: "화", when: "화가 올라올 때", what: "답하기 전에 한 박자 쉬기" }, { key: "사람", when: "사람이 많은 자리에서", what: "10분 먼저 나오기" }];
+export function suggestions(std) {
+  const out = [], seen = new Set();
+  const push = (h, why) => { if (!seen.has(h.what)) { seen.add(h.what); out.push({ when: h.when, what: h.what, why }); } };
+  if (std) for (const h of HINTS) if (std.text.includes(h.key)) push(h, `고른 문장에 '${h.key}'${(h.key.charCodeAt(h.key.length - 1) - 0xac00) % 28 ? "이" : "가"} 있어서`);
+  for (const item of repeated(recordedDays(30))) for (const h of HINTS) if (item.kind === "word" && item.word.includes(h.key)) push(h, `'${item.word}'${(item.word.charCodeAt(item.word.length - 1) - 0xac00) % 28 ? "이" : "가"} ${item.days.length}일 나와서`);
+  for (const [when, what] of EXAMPLES) push({ when, what }, "자주 쓰는 예시");
+  return out;
 }
