@@ -42,6 +42,7 @@ function seed() {
   lb.standards = LINES.slice(0, n).map((text, i) => ({ id: i + 1, text, folded: false, at: addDays(t, -(2 + i * 3)),
     from: i === 0 ? [pick(4), pick(1)].filter(Boolean) : i === 1 ? [pick(7)].filter(Boolean) : i % 4 === 0 ? [pick(i)].filter(Boolean) : [] }));
   if (qa.amount === "normal") lb.standards.push({ id: 9, text: LINES[3], folded: true, at: addDays(t, -20), from: [] });
+  if (qa.amount === "some") lb.standards.push({ id: 31, text: LINES[5], folded: true, at: addDays(t, -24), from: [] }, { id: 32, text: LINES[6], folded: true, at: addDays(t, -27), from: [] }); // 접어 둔 기준 칸(7판)
   if (n >= 20) lb.standards[2].text = "애쓴 일은 누가 알아주지 않아도 끝까지 해 보고 싶고, 그러다 지치면 하루쯤은 아무것도 하지 않고 쉬어도 된다고 나에게 말해 주고 싶다";
 }
 export function seedPath(kind) {

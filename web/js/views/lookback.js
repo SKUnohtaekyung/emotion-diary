@@ -6,9 +6,8 @@
 import { el, svgEl, announce, toast, reducedMotion } from "../dom.js";
 import { pebbleImg, stoneImg } from "../data.js";
 import { openSheet } from "../components/sheet.js";
-import { renderEventScene } from "../components/notes.js";
-import { renderLand } from "../components/land.js";
 import { dayCell } from "../components/day.js";
+import { scape } from "../lookback/scape.js";
 import { renderRead, renderList, daySheet } from "./lookback-read.js";
 import { qa, lb, recordOf, recordedDays, todayIso, shiftDay, monthDay, weekday, saveStandard, removeStandard, orderStandards, moveStandard,
   pathState, pathEnd, pathDays, DAY_CHOICES, suggestions, tellReason } from "../lookback/store.js";
@@ -19,8 +18,10 @@ export const backIcon = () => path("M14.5 5.5 8 12l6.5 6.5");
 export const chev = (cls = "st-chev") => path("M9.5 5.5 16 12l-6.5 6.5", cls);
 const closeIcon = () => path("M6 6l12 12M18 6 6 18");
 const dotsIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "dots3" }, [5, 12, 19].map((cx) => svgEl("circle", { cx, cy: "12", r: "1.7" })));
+// 팻말: 둥근 판 하나(7판 — 6판의 화살 모양은 뾰족한 모서리라 걷었다). 장면(scape.js)의 팻말과 같은 모양이다.
 const signPost = (cls) => svgEl("svg", { viewBox: "0 0 24 30", "aria-hidden": "true", class: cls },
-  svgEl("path", { class: "lb-sign-post", d: "M10.8 9h2.4v20.2h-2.4z" }), svgEl("path", { class: "lb-sign-board", d: "M4 2.6h12.6l4.4 4.6-4.4 4.6H4z" }));
+  svgEl("path", { class: "lb-sign-post", d: "M10.6 11h2.8v18.2h-2.8z" }), svgEl("rect", { class: "lb-sign-board", x: "2", y: "2", width: "20", height: "11", rx: "4" }));
+const paper = (field) => el("div", { class: "nt-sheet lb-sheet" }, el("div", { class: "nt-paper" }, field)); // 일기 첫 단계와 같은 줄 노트(notes.css)
 
 let navCount = 0; // 이 문서 안에서 화면을 몇 번 그렸는지 — 처음 연 화면의 ‹는 돌아갈 곳이 없어 정해 둔 화면으로 간다
 export const countRender = () => { navCount += 1; };
@@ -54,12 +55,6 @@ export function scene({ cats = [] } = {}) {
   return el("div", { class: "sxd-scene lb-scene", "aria-hidden": "true" }, svg, el("i", { class: "lb-scene-tree t1" }), el("i", { class: "lb-scene-tree t2" }),
     cats.slice(0, SPOTS.length).map((cat, i) => { const [x, y, s] = SPOTS[i]; const p = pebbleImg(cat, { size: s }); p.classList.add("lb-scene-peb");
       p.style.left = `${(x / 340 * 100).toFixed(1)}%`; p.style.bottom = `${150 - y - s / 2}px`; p.style.width = `${s}px`; return p; }), stone);
-}
-// ── 팻말이 선 길(실천해 보기): 완료 화면과 같은 언덕·흰 길(land.js)에 나의 돌과 팻말을 놓는다. 화면 아래에 폭 끝까지 깔린다 ──
-function pathLand(story) {
-  const fit = renderLand({ sun: true });
-  fit.querySelector(".land")?.append(signPost("lb-land-sign"), Object.assign(stoneImg("rest"), { className: "stone-img rest lb-land-stone" }));
-  return el("div", { class: "lb-land", "aria-hidden": story ? null : "true" }, fit, story ? el("p", { class: "lb-land-story", text: story }) : null);
 }
 
 // 기록 하나를 가리키는 작은 알약(날짜 + 그날 첫 마음의 조약돌). 누르면 그 기록이 시트로 올라온다(보던 화면을 떠나지 않는다).
@@ -95,6 +90,12 @@ function standardSheet(item, navigate, redraw) {
     row(item.folded ? "다시 꺼내기" : "접어 두기", item.folded ? "목록에 다시 보여요." : "지우지 않고 넣어 둬요.", () => { item.folded = !item.folded; toast(item.folded ? "접어 뒀어요" : "다시 꺼냈어요"); redraw(); }),
     row("지우기", "되돌릴 수 없어요.", del, "danger")] });
 }
+// 접어 둔 기준: 시트에 한 줄씩 놓는다. 누르면 그 기준의 시트(다시 꺼내기·고치기·지우기)로 넘어간다.
+function foldedSheet(folded, navigate, redraw) {
+  const sh = openSheet({ title: "접어 둔 기준", secondary: { text: "닫기" }, body: [
+    el("p", { class: "note", text: "지우지 않고 넣어 둔 것들이에요. 누르면 다시 꺼낼 수 있어요." }),
+    el("ul", { class: "lb-folded" }, folded.map((s) => el("li", {}, el("button", { type: "button", class: "lb-slip", "aria-haspopup": "dialog", onclick: () => { sh.close(); standardSheet(s, navigate, redraw); } }, slipNode(s)))))] });
+}
 // 끌어서 자리 바꾸기(홈 화면의 앱을 옮기듯): 고치는 중에는 쪽지가 가볍게 흔들리고, 끄는 쪽지가 지나가면 다른 쪽지들이 자리를 내준다. 움직임 줄이기에서는 흔들림·미끄러짐이 없다.
 function reorderable(ul, { isEditing, enter, onOrder }) {
   let drag = null, press = null, timer = 0;
@@ -105,7 +106,7 @@ function reorderable(ul, { isEditing, enter, onOrder }) {
   const place = (ev) => { const li = drag.li; li.style.transform = ""; const r = li.getBoundingClientRect(); li.style.transform = `translate(${ev.clientX - drag.ox - r.left}px,${ev.clientY - drag.oy - r.top}px) scale(1.04)`; };
   const start = (li, ev) => { const r = li.getBoundingClientRect(); drag = { li, ox: ev.clientX - r.left, oy: ev.clientY - r.top }; li.classList.add("is-dragging"); try { ul.setPointerCapture(ev.pointerId); } catch { /* 없어도 된다 */ } place(ev); };
   ul.addEventListener("pointerdown", (ev) => {
-    const li = ev.target.closest("li"); if (!li || li.parentNode !== ul) return;
+    const li = ev.target.closest("li"); if (!li || li.parentNode !== ul || !li.dataset.id) return; // 접어 둔 묶음 칸은 옮기지 않는다
     if (isEditing()) { ev.preventDefault(); start(li, ev); return; }
     press = { x: ev.clientX, y: ev.clientY };
     timer = setTimeout(() => { press = null; enter(); start(li, ev); }, 450);
@@ -114,9 +115,9 @@ function reorderable(ul, { isEditing, enter, onOrder }) {
     if (!drag) { if (press && Math.hypot(ev.clientX - press.x, ev.clientY - press.y) > 8) { clearTimeout(timer); press = null; } return; }
     place(ev);
     drag.li.style.pointerEvents = "none"; const over = document.elementFromPoint(ev.clientX, ev.clientY)?.closest("li"); drag.li.style.pointerEvents = "";
-    if (over && over !== drag.li && over.parentNode === ul) { const all = lis(); flip(() => { if (all.indexOf(over) > all.indexOf(drag.li)) over.after(drag.li); else over.before(drag.li); }); place(ev); }
+    if (over && over !== drag.li && over.parentNode === ul && over.dataset.id) { const all = lis(); flip(() => { if (all.indexOf(over) > all.indexOf(drag.li)) over.after(drag.li); else over.before(drag.li); }); place(ev); }
   });
-  const end = () => { clearTimeout(timer); press = null; if (!drag) return; const li = drag.li; drag = null; li.classList.remove("is-dragging"); li.style.transform = ""; onOrder(lis().map((n) => Number(n.dataset.id))); };
+  const end = () => { clearTimeout(timer); press = null; if (!drag) return; const li = drag.li; drag = null; li.classList.remove("is-dragging"); li.style.transform = ""; onOrder(lis().filter((n) => n.dataset.id).map((n) => Number(n.dataset.id))); };
   ul.addEventListener("pointerup", end); ul.addEventListener("pointercancel", end);
 }
 function renderHome(main, navigate) {
@@ -125,29 +126,27 @@ function renderHome(main, navigate) {
   function draw() {
     const open = lb.standards.filter((s) => !s.folded), folded = lb.standards.filter((s) => s.folded), marks = lb.marks.size, st = pathState(), few = open.length <= 2;
     const slip = (s) => el("li", { "data-id": s.id }, el("button", { type: "button", class: `lb-slip ${few ? "mid" : "small"}`, "aria-haspopup": "dialog", onclick: () => { if (!editing) standardSheet(s, navigate, draw); } }, slipNode(s)));
-    const list = open.length ? el("ul", { class: `lb-slips ${few ? "few" : "grid"}${editing ? " is-editing" : ""}` }, open.map(slip)) : null;
+    const foldCell = folded.length ? el("li", { class: "lb-fold-cell" }, el("button", { type: "button", class: "lb-fold", "aria-haspopup": "dialog", onclick: () => { if (!editing) foldedSheet(folded, navigate, draw); } },
+      el("i", { class: "lb-fold-stack", "aria-hidden": "true" }), el("span", { text: `접어 둔 기준 ${folded.length}장` }), chev())) : null;
+    const list = open.length || folded.length ? el("ul", { class: `lb-slips ${few ? "few" : "grid"}${editing ? " is-editing" : ""}` }, open.map(slip), foldCell) : null;
     const editBtn = open.length > 1 ? el("button", { type: "button", class: "link lb-edit-toggle", "aria-pressed": String(editing), text: editing ? "완료" : "순서 바꾸기", onclick: () => { editing = !editing; draw(); screen.querySelector(".lb-edit-toggle")?.focus(); } }) : null;
     const hint = el("p", { class: "caption lb-edit-hint", hidden: !editing, text: "끌어서 자리를 바꿔요." });
     if (list) reorderable(list, { isEditing: () => editing, enter: () => { editing = true; list.classList.add("is-editing"); if (editBtn) { editBtn.textContent = "완료"; editBtn.setAttribute("aria-pressed", "true"); } hint.hidden = false; announce("끌어서 자리를 바꿀 수 있어요"); },
       onOrder: (ids) => { orderStandards(ids); announce("자리를 바꿨어요"); } });
-    const foldedList = el("ul", { class: "lb-slips grid lb-folded", id: "lbFolded", hidden: true }, folded.map((s) => el("li", {}, el("button", { type: "button", class: "lb-slip small", "aria-haspopup": "dialog", onclick: () => standardSheet(s, navigate, draw) }, slipNode(s)))));
-    const foldedBtn = folded.length ? el("button", { type: "button", class: "link lb-fold-toggle", "aria-expanded": "false", "aria-controls": "lbFolded", text: "접어 둔 기준 보기" }) : null;
-    foldedBtn?.addEventListener("click", () => { const on = foldedList.hidden; foldedList.hidden = !on; foldedBtn.setAttribute("aria-expanded", String(on)); foldedBtn.textContent = on ? "접어 둔 기준 넣기" : "접어 둔 기준 보기"; });
     const strip = st === "none" ? null : el("a", { class: "lb-strip", href: "#/lookback/try" },
       el("span", { class: "lb-strip-text" }, el("small", { text: st === "ended" ? "정한 기간이 끝났어요" : "실천하는 중" }), el("b", { text: lb.path.what })), chev());
     const read = () => navigate("lookback/read?p=7"), write = () => navigate("lookback/write");
-    put(screen, el("div", { class: "lb-note-land", "aria-hidden": "true" }, el("i", { class: "lb-note-sun" }), el("i", { class: "far" }), el("i", { class: "lb-scene-tree t1" }), el("i", { class: "lb-scene-tree t2" }), el("i", { class: "mid" })),
+    put(screen, el("div", { class: "lb-note-land", "aria-hidden": "true" }, el("i", { class: "far" }), el("i", { class: "lb-scene-tree t1" }), el("i", { class: "lb-scene-tree t2" }), el("i", { class: "mid" })),
       el("div", { class: "lb-note-head" }, el("h1", { tabindex: "-1", text: "내 기준" }), editBtn),
       el("p", { class: "lede", text: lb.standards.length ? "다시 읽다가 써 둔, 나에게 중요한 것들이에요." : "나에게 중요한 것을 한 줄씩 써 두는 곳이에요." }),
       hint, strip,
       lb.standards.length ? null : el("div", { class: "lb-empty" }, el("p", { class: "lb-empty-title", text: "아직 쓴 기준이 없어요" }),
         el("p", { class: "note", text: "지난 기록을 다시 읽다 보면 '나는 이럴 때 이렇구나' 싶은 순간이 있어요. 그때 한 줄 써 두면 여기에 쪽지로 남아요." })),
-      list, list ? el("div", { class: "lb-note-stonerow", "aria-hidden": "true" }, Object.assign(stoneImg("rest"), { className: "stone-img rest lb-note-stone" })) : null,
-      foldedBtn, folded.length ? foldedList : null,
+      list,
       el("div", { class: "sd-actions lb-home-actions" },
         marks ? el("p", { class: "lb-home-marks", text: `모아 둔 기록 ${marks}편이 있어요` }) : null,
-        marks ? [el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: write }), el("button", { type: "button", class: "btn text big", text: "지난 기록 다시 읽기", onclick: read })]
-          : [el("button", { type: "button", class: "btn primary big", text: "지난 기록 다시 읽기", onclick: read }), el("button", { type: "button", class: "btn text big", text: "바로 쓰기", onclick: write })]));
+        el("div", { class: "lb-home-btns" }, marks ? [el("button", { type: "button", class: "btn secondary big", text: "다시 읽기", onclick: read }), el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: write })]
+          : [el("button", { type: "button", class: "btn secondary big", text: "바로 쓰기", onclick: write }), el("button", { type: "button", class: "btn primary big", text: "다시 읽기", onclick: read })])));
   }
   put(main, screen); draw();
 }
@@ -176,8 +175,7 @@ function renderWrite(main, navigate, params) {
     el("h1", { tabindex: "-1", text: editing ? "기준 고치기" : "나에게 중요한 것은 무엇인가요?" }),
     el("p", { class: "paper-guide", text: "한 줄이면 돼요. 정답은 없고, 나중에 고칠 수 있어요." }),
     refs.length ? el("div", { class: "lb-write-refs" }, el("p", { class: "st-block-label", text: editing ? "이 기준이 나온 기록" : "모아 둔 기록 · 누르면 다시 볼 수 있어요" }), refRow(refs)) : null,
-    hint, renderEventScene({ eventField: field, story: "다시 읽고 남기는 한 줄이에요" })),
-    el("div", { class: "step-footer solo" }, save),
+    hint, paper(field), scape({ compact: true, foot: el("div", { class: "step-footer solo lb-foot" }, save) })),
     qa.keyboard ? el("div", { class: "lb-kb", "aria-hidden": "true", text: "자판이 올라온 자리(시안)" }) : null);
   sync();
 }
@@ -210,10 +208,10 @@ function renderPick(main, navigate, params) {
     drawDays();
     put(main, el("div", { class: "screen write lb-flow" }, flowTop("2 / 2", 1, leave),
       el("h1", { tabindex: "-1", text: "며칠 동안 해 볼까요?" }),
-      el("p", { class: "lb-quote", text: [draft.when, draft.what].filter(Boolean).join(" · ") }), body, pathLand("여기에 팻말을 세워요")),
-      el("div", { class: "step-footer lb-read-foot" }, el("button", { type: "button", class: "btn text", text: "이전", onclick: () => navigate("lookback/try") }),
+      el("p", { class: "lb-quote", text: [draft.when, draft.what].filter(Boolean).join(" · ") }), body,
+      scape({ sign: true, story: "여기에 팻말을 세워요", foot: el("div", { class: "step-footer lb-foot" }, el("button", { type: "button", class: "btn text", text: "이전", onclick: () => navigate("lookback/try") }),
         el("button", { type: "button", class: "btn primary big", text: "시작하기", onclick: () => { lb.path = { when: clean(draft.when), what: clean(draft.what), days: draft.days, start: todayIso(), walked: new Set(), from: draft.from, alarm: draft.alarm };
-          Object.assign(draft, { when: "", what: "", days: 7, from: null }); navigate("lookback/try"); toast("오늘부터 시작해요"); } })));
+          Object.assign(draft, { when: "", what: "", days: 7, from: null }); navigate("lookback/try"); toast("오늘부터 시작해요"); } })) })));
     return;
   }
   // ── ① 무엇을 ──
@@ -229,13 +227,12 @@ function renderPick(main, navigate, params) {
   put(main, el("div", { class: "screen write lb-flow" }, flowTop("1 / 2", 0.5, leave),
     el("h1", { tabindex: "-1", text: "며칠만, 이렇게 해 볼까요?" }),
     el("p", { class: "paper-guide", text: std ? `'${std.text}'에서 시작해요. 해 볼 것 하나를 내 말로 써요.` : "해 볼 것 하나를 내 말로 써요. '어떤 때'는 비워 둬도 돼요." }),
-    hint, renderEventScene({ eventField: field, story: "여기서부터 며칠 가 보는 길이에요" })),
-    el("div", { class: "step-footer solo" }, next));
+    hint, paper(field), scape({ compact: true, foot: el("div", { class: "step-footer solo lb-foot" }, next) })));
   requestAnimationFrame(() => { when.grow(); what.grow(); }); sync();
 }
 function renderActive(main, navigate) {
   const x = lb.path, t = todayIso();
-  const screen = el("div", { class: "screen write lb-flow lb-doing" }), foot = el("div", { class: "step-footer lb-read-foot" });
+  const screen = el("div", { class: "screen write lb-flow lb-doing" }), foot = el("div", { class: "step-footer lb-foot" });
   const menu = () => { const sh = openSheet({ title: "실천해 보기", secondary: { text: "닫기" }, body: [
     el("button", { type: "button", class: "menu-row", onclick: () => { sh.close(); navigate("lookback/read?p=x"); } }, el("span", {}, "이 기간의 기록 읽기", el("small", { text: "실천하는 동안 남긴 기록을 다시 읽어요." }))),
     el("button", { type: "button", class: "menu-row", onclick: () => { sh.close(); x.alarm = x.alarm === false; toast(x.alarm ? "끝나는 날에 알려 드려요" : "알리지 않아요"); } }, el("span", {}, x.alarm === false ? "끝나는 날 알림 켜기" : "끝나는 날 알림 끄기", el("small", { text: `${monthDay(pathEnd(x))}에 한 번만 알려요.` }))),
@@ -246,12 +243,12 @@ function renderActive(main, navigate) {
     put(screen, el("div", { class: "write-top" }, el("button", { type: "button", class: "back", "aria-label": "뒤로", onclick: goBack(navigate, "lookback") }, backIcon()), el("span", { class: "step-count", text: "실천하는 중" }),
       el("button", { type: "button", class: "back", "aria-label": "더보기", "aria-haspopup": "dialog", onclick: menu }, dotsIcon())),
       pathTitle(x), el("p", { class: "sxd-sub lb-center", text: rangeText(x) }), trail(pathDays(x), x.walked),
-      el("p", { class: "caption lb-center", text: "해 본 날만 표시돼요. 안 한 날은 세지 않아요." }), pathLand());
+      el("p", { class: "caption lb-center", text: "해 본 날만 표시돼요. 안 한 날은 세지 않아요." }), scape({ sign: true, foot }));
     put(foot, did ? [el("p", { class: "lb-did", role: "status", text: "오늘은 해 본 날로 남겼어요" }), el("button", { type: "button", class: "btn text lb-did-btn", text: "지우기", onclick: () => { x.walked.delete(t); draw(".lb-did-btn"); } })]
       : el("button", { type: "button", class: "btn primary big lb-did-btn", text: "오늘 해 봤어요", onclick: () => { x.walked.add(t); announce("오늘을 해 본 날로 남겼어요"); draw(".lb-did-btn"); } }));
     if (focusSel) foot.querySelector(focusSel)?.focus();
   }
-  draw(); put(main, screen, foot);
+  draw(); put(main, screen);
 }
 function renderEnded(main, navigate) {
   const x = lb.path;
@@ -266,8 +263,8 @@ function renderEnded(main, navigate) {
     el("h1", { tabindex: "-1", text: "해 보니 어땠나요?" }),
     el("p", { class: "lb-quote", text: [x.when, x.what].filter(Boolean).join(" · ") }), trail(pathDays(x), x.walked),
     input, el("p", { class: "caption", text: "좋았는지 아닌지는 내가 정해요. 비워 둬도 돼요." }),
-    el("a", { class: "link lb-read-open", href: "#/lookback/read?p=x", text: "이 기간의 기록 읽기" }), pathLand()),
-    el("div", { class: "step-footer lb-read-foot" }, el("button", { type: "button", class: "btn text", text: "한 번 더", onclick: finish(true) }), el("button", { type: "button", class: "btn primary big", text: "마치기", onclick: finish(false) })));
+    el("a", { class: "link lb-read-open", href: "#/lookback/read?p=x", text: "이 기간의 기록 읽기" }),
+    scape({ sign: true, foot: el("div", { class: "step-footer lb-foot" }, el("button", { type: "button", class: "btn text", text: "한 번 더", onclick: finish(true) }), el("button", { type: "button", class: "btn primary big", text: "마치기", onclick: finish(false) })) })));
 }
 
 export function renderLookback(main, navigate, params, rest = []) {

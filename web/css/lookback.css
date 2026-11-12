@@ -7,18 +7,40 @@
 .bottom-nav-rail{grid-template-columns:repeat(5,1fr)}
 
 /* ── 흐름 화면의 공통 뼈대(다시 읽기 · 실천해 보기): 글은 위, 언덕은 아래에 폭 끝까지, 버튼 줄은 가까운 언덕 색 ── */
-.screen.lb-read,.screen.lb-flow{display:flex;flex-direction:column;padding-bottom:0}
+.screen.lb-read,.screen.lb-flow,.screen.lb-write{display:flex;flex-direction:column;padding-bottom:0}
 .lb-top-gap{display:block;width:var(--touch)}
 .write-top a.back{text-decoration:none}
-.lb-land{position:relative;flex:1 0 auto;min-height:17rem;margin:var(--sp-6) calc(var(--sp-5) * -1) 0;overflow:hidden}
-.lb-read-foot{--state-bg:var(--land-hill-near);align-items:center;background:var(--land-hill-near)}
-.lb-read-foot :focus-visible{outline:3px solid var(--service-ink);outline-offset:3px}
-.lb-read-foot .btn.text{flex:0 0 auto;min-width:0}
-.lb-land .lb-land-stone{left:32%;top:43%;width:27%}
-.lb-land-sign{position:absolute;left:60%;top:29%;width:14%;height:auto}
-.lb-sign-post{fill:color-mix(in srgb,var(--land-hill-near) 68%,var(--service-ink))}
+/* 7판: 장면(.lb-scape)이 화면 아래 남은 자리를 채우고, 버튼 줄(.lb-foot)은 그 장면 안에 들어가 가까운 언덕 위에 얹힌다 — 완료 화면(.done-bar)과 같다.
+   6판은 버튼 줄이 장면 밖의 납작한 초록 띠라 길이 띠에서 잘려 보였고, 글이 길면 띠만 흰 글 위에 떠 있었다. 이제 띠가 없다.
+   버튼 줄은 장면 안에서만 붙어 다닌다(sticky) — 장면이 화면에 들어오면 늘 언덕 위에 있고, 글이 길어 장면이 아래에 있으면 글을 다 읽은 뒤에 나온다. */
+.lb-scape{position:relative;flex:1 0 20rem;display:flex;flex-direction:column;justify-content:flex-end;margin:var(--sp-5) calc(var(--sp-5) * -1) 0;container-type:size;overflow:clip} /* clip: hidden은 스크롤 상자가 되어 안의 버튼 줄이 붙어 다니지 못한다 */
+.lb-scape.compact{flex-basis:14rem}
+.lb-scape.lb-dayland{flex-basis:18rem}
+/* 다시 읽기는 버튼 줄이 붙어 다니지 않는다 — 글이 길면 다 읽고 내려와 장면 위의 버튼을 누른다(6판처럼 흰 글 위에 버튼만 떠 있지 않게) */
+.lb-read .lb-foot{position:static}
+.lbs-holder{position:absolute;inset:0;pointer-events:none}
+.lbs-art{position:absolute;inset:0;width:100%;height:100%;display:block;overflow:visible}
+.lbs-far{fill:var(--land-hill-far)}
+.lbs-mid,.lbs-treeline{fill:var(--land-hill-mid)}
+.lbs-near{fill:var(--land-hill-near)}
+.lbs-road{fill:var(--bg)}
+.lbs-disc{fill:var(--land-sun)}
+.lbs-ring{fill:none;stroke:var(--land-sun-ring);stroke-width:2.5}
+.lbs-pond{fill:var(--bg)}
+.lbs-glint{fill:var(--land-sun)}
+.lbs-ripple{fill:none;stroke:var(--land-hill-mid);stroke-width:1.6;stroke-linecap:round}
+.lbs-canopy{fill:color-mix(in srgb,var(--land-hill-near) 80%,var(--service-ink))}
+.lbs-trunk,.lb-sign-post{fill:color-mix(in srgb,var(--land-hill-near) 60%,var(--service-ink))}
+.lbs-shade{fill:color-mix(in srgb,var(--land-hill-near) 86%,var(--service-ink))}
 .lb-sign-board{fill:var(--bg)}
-.lb-land-story{position:absolute;left:var(--sp-5);top:0;margin:0;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);color:var(--text)}
+.lbs-cloud{fill:color-mix(in srgb,var(--land-hill-far) 38%,var(--bg));animation:lbs-drift 38s ease-in-out calc(var(--d) * -19s) infinite alternate}
+@keyframes lbs-drift{to{transform:translateX(16px)}}
+/* 장면 설명 줄: 하늘에, 큰 나무와 해 사이(설계 상자 x 112~250, 위에서 14). 상자가 줄고 늘어나는 비율(--s)을 따라 자리만 옮긴다 */
+.lbs-story{--s:min(100cqw / 360,100cqh / 420);position:absolute;left:calc(50% - 68 * var(--s));top:calc(100% - 400 * var(--s));width:calc(138 * var(--s));margin:0;text-wrap:balance;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong);color:var(--service-ink)}
+.lb-foot{--state-bg:var(--land-hill-near);position:sticky;bottom:0;z-index:2;margin:0;align-items:center;background:transparent}
+.lb-foot :focus-visible{outline:3px solid var(--service-ink);outline-offset:3px}
+.lb-foot .btn.text{flex:0 0 auto;min-width:0}
+.lb-foot .btn.big:not(.text),.lb-foot .lb-mark{flex:1 1 0;min-width:max-content}
 
 /* ── 다시 읽기: 하루 한 화면. 글이 주인공이고, 길이에 따라 글자가 세 단계로 준다 ── */
 .lb-read-date{margin:var(--sp-2) 0 var(--sp-2)}
@@ -31,8 +53,8 @@
 .lb-read-open{align-self:flex-start;margin:var(--sp-3) 0 0 calc(var(--sp-2) * -1)}
 .lb-ask{text-wrap:balance}
 /* 모아 두기: 여럿 고르기 알약(.choice)을 언덕 위에 얹은 것 */
-.lb-mark{flex:none;min-height:var(--touch);background:var(--bg);font-size:var(--fs-label);line-height:var(--lh-label)}
-.lb-mark .ck{width:22px;height:22px;font-size:13px}
+.lb-mark{justify-content:center;min-height:56px;padding:0 var(--sp-4);background:var(--surface-soft);font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:var(--fw-label)}
+.lb-mark .ck{width:24px;height:24px;font-size:14px}
 
 /* ── 지난 30일의 목록: 주마다 묶은 하루 한 줄. 누르면 그날로 간다 ── */
 .lb-listscreen h1{margin-bottom:var(--sp-1)}
@@ -128,13 +150,26 @@
 .lb-slips li.is-dragging{z-index:5}
 .lb-slips li.is-dragging .lb-slip{animation:none;cursor:grabbing}
 @keyframes lb-jiggle{from{transform:rotate(-1.1deg)}to{transform:rotate(1.1deg)}}
-.lb-fold-toggle{align-self:flex-start;margin:var(--sp-5) 0 0 calc(var(--sp-2) * -1)}
-.lb-slips.lb-folded{margin-top:var(--sp-3)}
-.lb-folded .lb-slip-text{color:var(--muted)}
-/* 아래 버튼 둘은 가까운 언덕 위에 얹힌다(탭의 첫 화면이라 붙박지 않는다 — 그 아래에 하단 탐색이 있다) */
-.lb-home>.lb-home-actions{position:relative;bottom:auto;margin-top:auto;padding-top:var(--sp-10);background:transparent}
+/* 접어 둔 기준(7판): 6판은 쪽지 아래 왼쪽의 글자 링크였고 누르면 그 자리에 펼쳐져 아래 버튼이 밀렸다. 이제 쪽지 목록의 마지막 칸에 놓인
+   '접힌 쪽지 묶음'이고 누르면 시트로 연다 — 쪽지 칸과 같은 격자를 따르므로 너비가 바뀌어도 자리가 어긋나지 않는다. 끌어서 옮기는 대상이 아니다. */
+.lb-fold-cell{display:flex}
+.lb-slips.few .lb-fold-cell{width:auto;align-self:flex-start}
+.lb-fold{position:relative;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);width:100%;min-height:104px;padding:var(--sp-4);border:0;border-radius:14px;background:color-mix(in srgb,var(--service-light) 55%,var(--bg));color:var(--paper-ink);font:inherit;font-weight:700;text-align:left;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
+.lb-slips.few .lb-fold{min-height:var(--touch);padding:var(--sp-2) var(--sp-4)}
+.lb-fold:active{transform:scale(var(--press-row))}
+.lb-fold-stack{position:absolute;right:10px;top:-6px;width:28px;height:10px;border-radius:4px 4px 0 0;background:var(--service-light)} /* 묶음 뒤로 비죽 나온 다른 쪽지 한 장 */
+.lb-fold .st-chev{flex:none;color:var(--paper-ink)}
+.lb-folded{list-style:none;margin:var(--sp-2) 0 0;padding:0;display:flex;flex-direction:column;gap:var(--sp-3)}
+.lb-folded .lb-slip{min-height:0;padding:var(--sp-4)}
+.lb-folded .lb-slip-text{font-weight:700}
+/* 아래 버튼 둘은 가까운 언덕 위에 얹힌다(탭의 첫 화면이라 붙박지 않는다 — 그 아래에 하단 탐색이 있다).
+   7판: 완료 화면처럼 같은 폭 둘을 나란히(옅은 것 · 짙은 것) 두고, 언덕이 하단 탐색 뒤까지 이어진다(6판은 탐색 위에서 흰색으로 바래 언덕이 끊겼다). */
+.lb-home>.lb-home-actions{position:relative;bottom:auto;margin-top:auto;padding:var(--sp-10) 0 var(--sp-4);background:transparent}
 .lb-home-actions::before{content:"";position:absolute;z-index:-1;left:calc(var(--sp-5) * -1.6);right:calc(var(--sp-5) * -1.6);top:var(--sp-4);bottom:0;border-radius:50% 50% 0 0/2rem 2rem 0 0;background:var(--land-hill-mid)}
+.lb-home-btns{display:flex;flex-wrap:wrap-reverse;gap:var(--sp-3)}
+.lb-home-btns .btn{flex:1 1 0;min-width:max-content}
 .lb-home-marks{margin:0;text-align:center;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong)}
+body:has(.lb-home) .bottom-nav{background:var(--land-hill-mid)}
 
 /* ── 기준 쓰기: 일기 첫 단계의 종이·언덕 장면을 그대로 쓴다 ── */
 .lb-write-refs{margin:0 0 var(--sp-2)}
@@ -216,7 +251,8 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 .lb-calcard .st-chev{color:var(--service-ink)}
 
 @media (prefers-reduced-motion:reduce){
-  .lb-slip,.lb-word,.lb-sug,.lb-strip,.lb-calcard{transition:none}
-  .lb-slip:active,.lb-word:active,.lb-sug:active,.lb-strip:active,.lb-calcard:active{transform:none}
+  .lb-slip,.lb-word,.lb-sug,.lb-strip,.lb-calcard,.lb-fold{transition:none}
+  .lb-slip:active,.lb-word:active,.lb-sug:active,.lb-strip:active,.lb-calcard:active,.lb-fold:active{transform:none}
+  .lbs-cloud{animation:none}
   .lb-slips.is-editing .lb-slip{animation:none}
 }

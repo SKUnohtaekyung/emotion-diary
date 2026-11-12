@@ -9,6 +9,7 @@ import { el, svgEl, announce, toast } from "../dom.js";
 import { pebbleImg, stoneImg } from "../data.js";
 import { renderLand, doneLayout } from "../components/land.js";
 import { openSheet } from "../components/sheet.js";
+import { scape } from "../lookback/scape.js";
 import { lb, recordOf, recordedDays, recordedBetween, todayIso, monthDay, weekday, toggleMark, repeated, pathEnd } from "../lookback/store.js";
 import { chev, head, catsOf, put, goBack, iGa } from "./lookback.js";
 
@@ -40,7 +41,7 @@ export function renderRead(main, navigate, params) {
   let i = Math.max(0, days.indexOf(params.get("d")));
   const leave = goBack(navigate, p === "x" ? "lookback/try" : "lookback");
   const screen = el("div", { class: "screen write lb-read" });
-  const foot = el("div", { class: "step-footer lb-read-foot" });
+  const foot = el("div", { class: "step-footer lb-foot" }); // 장면(scape) 안 가까운 언덕 위에 얹힌다
   const recAt = (k) => { const rec = recordOf(days[k]); return long && k === 0 ? { ...rec, event: LONG[0], reason: LONG[1] } : rec; };
   const top = (label, ratio) => [el("div", { class: "write-top" },
     el("button", { type: "button", class: "back", "aria-label": "다시 읽기 닫기", onclick: leave }, closeIcon()),
@@ -52,16 +53,15 @@ export function renderRead(main, navigate, params) {
   function draw() {
     if (!days.length) { // 읽을 기록이 없다
       put(screen, top("", 0), el("h1", { tabindex: "-1", class: "lb-read-event s", text: "아직 다시 읽을 기록이 없어요" }),
-        el("p", { class: "lede", text: "오늘 화면에서 마음을 남기면 여기에서 다시 읽을 수 있어요." }), el("div", { class: "lb-land", "aria-hidden": "true" }, renderLand({ sun: true })));
+        el("p", { class: "lede", text: "오늘 화면에서 마음을 남기면 여기에서 다시 읽을 수 있어요." }), scape({ pond: false, foot }));
       put(foot, el("button", { type: "button", class: "btn primary big", text: "오늘 화면으로", onclick: () => navigate("today") }));
       return;
     }
     if (i >= days.length) { // 다 읽은 자리: 물음 하나
-      const n = lb.marks.size;
-      const fit = renderLand({ sun: true }); fit.querySelector(".land")?.append(Object.assign(stoneImg("rest"), { className: "stone-img rest lb-land-stone" }));
+      const n = lb.marks.size; // 장면: 큰 나무 그늘에서 지나온 길과 물가를 내려다본다(길 끝에서 돌아본 자리)
       put(screen, top("다 읽었어요", 1),
         el("h1", { tabindex: "-1", class: "lb-ask", text: "되풀이된 것 중에 나에게 중요한 것이 있었나요?" }),
-        el("p", { class: "lede", text: n ? `모아 둔 기록 ${n}편을 한데 놓고 보며 쓸 수 있어요.` : "없었다면 여기서 닫아도 돼요." }), el("div", { class: "lb-land", "aria-hidden": "true" }, fit));
+        el("p", { class: "lede", text: n ? `모아 둔 기록 ${n}편을 한데 놓고 보며 쓸 수 있어요.` : "없었다면 여기서 닫아도 돼요." }), scape({ foot }));
       put(foot, el("button", { type: "button", class: "btn text", text: "닫기", onclick: leave }),
         el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: () => navigate("lookback/write") }));
       return;
@@ -72,7 +72,7 @@ export function renderRead(main, navigate, params) {
       el("h1", { tabindex: "-1", class: `lb-read-event ${sizeClass(rec.event)}`, text: rec.event }),
       rec.reason?.trim() ? el("p", { class: `lb-read-reason ${sizeClass(rec.event)}`, text: rec.reason }) : null,
       el("a", { class: "link lb-read-open", href: `#/record/${iso}?from=lookback`, text: "편지 전체 보기" }),
-      el("div", { class: "lb-land" }, renderLand(doneLayout(catsOf(rec)))));
+      scape({ land: renderLand(doneLayout(catsOf(rec))), foot, cls: "lb-dayland" }));
     const mark = el("button", { type: "button", class: "choice lb-mark", "aria-pressed": String(marked) }, el("span", { class: "ck", "aria-hidden": "true", text: "✓" }), el("span", { text: "모아 두기" }));
     mark.addEventListener("click", () => { const on = toggleMark(iso); mark.setAttribute("aria-pressed", String(on));
       if (on && !taught) { taught = true; toast("모아 뒀어요. 다 읽고 나서 한데 놓고 볼 수 있어요"); } else announce(on ? "모아 뒀어요" : "뺐어요"); });
@@ -80,7 +80,7 @@ export function renderRead(main, navigate, params) {
       el("button", { type: "button", class: "btn primary big", text: i === days.length - 1 ? "다 읽었어요" : "다음", onclick: () => go(i + 1) }));
   }
   draw();
-  put(main, screen, foot);
+  put(main, screen);
   main.querySelector("h1")?.focus({ preventScroll: true });
 }
 
