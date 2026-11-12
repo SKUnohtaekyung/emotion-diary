@@ -9,30 +9,45 @@
 import { el } from "../dom.js";
 
 const W = 360, H = 420;
-function road() { // 아래(가까운 곳)는 넓고 물가(먼 곳)로 갈수록 좁아지는 흰 길
+// 흰 길(7판 보강): 6판·7판 첫 손질은 길이 한 줄의 띠로 모든 언덕 위에 얹혀, 먼 끝이 언덕 한가운데서 뾰족하게 끝나 지느러미처럼 보였다.
+// 이제 두 구간이다 — ① 가까운 길은 가까운 언덕 위에서 넓게 굽어 올라가 그 언덕 마루 너머로 넘어간다(마루에서 잘린다)
+// ② 먼 길은 가까운 언덕 뒤에서 다시 나와 가운데 언덕 위를 좁게 굽어 물가에 닿는다(물이 없으면 가운데 언덕 마루 너머로 넘어간다).
+// 폭은 가까울수록 넓다(원근). 마루에서 두 구간의 폭이 같아야 한 길로 읽힌다(가까운 길은 마루 가까이에서 이미 먼 길만큼 좁다).
+// 가까운 길의 시작은 설계 상자 아래(446) 밖이라 끝이 비스듬히 잘린 모양이 보이지 않는다. 각 구간은 2차 곡선을 따라 폭을 바꿔 가며 그린 띠다.
+function ribbon([x0, y0], [x1, y1], [x2, y2], w0, w2, k = 1) { // k: 폭이 줄어드는 휨 — 클수록 가까운 쪽에서만 넓다
   const l = [], r = [];
-  for (let i = 0; i <= 24; i += 1) {
-    const t = i / 24, y = H - t * 134, cx = 190 + 22 * Math.sin(t * Math.PI * 1.2 + 0.4) * (1 - 0.5 * t), w = 92 * (1 - t) ** 1.3 + 3;
-    l.push(`${(cx - w / 2).toFixed(1)} ${y.toFixed(1)}`); r.push(`${(cx + w / 2).toFixed(1)} ${y.toFixed(1)}`);
+  for (let i = 0; i <= 28; i += 1) {
+    const t = i / 28, u = 1 - t;
+    const x = u * u * x0 + 2 * u * t * x1 + t * t * x2, y = u * u * y0 + 2 * u * t * y1 + t * t * y2;
+    const dx = 2 * u * (x1 - x0) + 2 * t * (x2 - x1), dy = 2 * u * (y1 - y0) + 2 * t * (y2 - y1), len = Math.hypot(dx, dy) || 1;
+    const w = (w2 + (w0 - w2) * (1 - t) ** k) / 2, nx = -dy / len * w, ny = dx / len * w;
+    l.push(`${(x + nx).toFixed(1)} ${(y + ny).toFixed(1)}`); r.push(`${(x - nx).toFixed(1)} ${(y - ny).toFixed(1)}`);
   }
   return `M${l.join("L")}L${r.reverse().join("L")}Z`;
 }
+const MID = `M-400 275L0 275C90 250 200 250 360 272L760 272L760 ${H}L-400 ${H}Z`;
+const NEAR = `M-400 322L0 322C110 302 240 306 360 326L760 326L760 ${H}L-400 ${H}Z`;
+const ROAD_NEAR = ribbon([150, 446], [204, 368], [170, 302], 140, 12, 1.7); // 끝(302)은 가까운 언덕 마루(x 170 부근 y 308) 바로 위. 먼 길은 같은 자리에서 같은 방향(위)으로 이어 나온다. 마루에 비스듬히 아니라 가파르게 닿아야 마루가 길을 가로로 자른다(옆으로 길게 잘리면 넓은 띠로 보인다)
+const ROAD_FAR = (pond) => (pond ? ribbon([168, 320], [164, 294], [206, 291], 12, 3) : ribbon([168, 320], [162, 270], [196, 236], 12, 2)); // 시작은 가까운 언덕 뒤에 숨는다
+let clipSeq = 0; // 한 문서에 장면이 여럿 그려져도 잘라 내기 id가 겹치지 않게
 const circles = (cls, list) => list.map(([cx, cy, rr]) => `<circle class="${cls}" cx="${cx}" cy="${cy}" r="${rr}"/>`).join("");
 const cloud = (x, y, k) => `<g class="lbs-cloud" style="--d:${k}">${circles("", [[x - 16, y + 4, 10], [x, y - 3, 14], [x + 17, y + 3, 11]])}<rect x="${x - 26}" y="${y + 2}" width="54" height="12" rx="6"/></g>`;
-const ROAD = road();
 
 // compact: 노트가 있는 화면(기준 쓰기·실천 ①)은 아래쪽 땅만 잘라 보인다(설계 상자 y 196~420). 해는 틀 밖 위에 있고, 나무는 잘리지 않게 조금 먼 곳의 작은 나무로 선다.
 function art({ tree, pond, sign, compact }) {
+  const id = `lbs${(clipSeq += 1)}`;
   return `<svg class="lbs-art" viewBox="0 ${compact ? 196 : 0} ${W} ${compact ? H - 196 : H}" preserveAspectRatio="xMidYMax meet" aria-hidden="true" focusable="false">
 <g class="lbs-sun"><circle class="lbs-ring" cx="292" cy="70" r="36" style="stroke-width:2"/><circle class="lbs-ring" cx="292" cy="70" r="27"/><circle class="lbs-disc" cx="292" cy="70" r="19"/></g>
 ${cloud(156, 120, 0)}${cloud(232, 160, 1)}
 <path class="lbs-far" d="M-400 230L0 230C60 212 130 208 200 220C260 230 320 218 360 212L760 212L760 ${H}L-400 ${H}Z"/>
 ${circles("lbs-treeline", [[300, 220, 5], [312, 217, 7], [325, 214, 9], [339, 215, 6], [351, 212, 8], [366, 211, 7]])}
-<path class="lbs-mid" d="M-400 275L0 275C90 250 200 250 360 272L760 272L760 ${H}L-400 ${H}Z"/>
-${pond ? `<ellipse class="lbs-pond" cx="250" cy="290" rx="52" ry="8.5"/><ellipse class="lbs-glint" cx="291" cy="289.5" rx="9" ry="2"/><path class="lbs-ripple" d="M216 293.5h16M256 287h12"/>` : ""}
-${sign ? `<path class="lb-sign-post" d="M151.6 278h2.8v29h-2.8z"/><rect class="lb-sign-board" x="139" y="267" width="28" height="15" rx="5"/>` : ""}
-<path class="lbs-near" d="M-400 322L0 322C110 302 240 306 360 326L760 326L760 ${H}L-400 ${H}Z"/>
-<path class="lbs-road" d="${ROAD}"/>
+<defs><clipPath id="${id}m"><path d="${MID}"/></clipPath><clipPath id="${id}n"><path d="${NEAR}"/></clipPath></defs>
+<path class="lbs-mid" d="${MID}"/>
+<path class="lbs-road" clip-path="url(#${id}m)" d="${ROAD_FAR(pond)}"/>
+${pond ? `<ellipse class="lbs-pond" cx="250" cy="290" rx="52" ry="8.5"/><ellipse class="lbs-glint" cx="291" cy="289.5" rx="9" ry="2"/><path class="lbs-ripple" d="M220 293.5h14M256 287h12"/>` : ""}
+${sign ? `<path class="lb-sign-post" d="M110.6 281h2.8v30h-2.8z"/><rect class="lb-sign-board" x="98" y="270" width="28" height="15" rx="5"/>` : ""}
+<path class="lbs-near" d="${NEAR}"/>
+<path class="lbs-road" clip-path="url(#${id}n)" d="${ROAD_NEAR}"/>
 ${tree ? `<g${compact ? ` transform="translate(42 344) scale(.6) translate(-42 -344)"` : ""}><ellipse class="lbs-shade" cx="44" cy="343" rx="54" ry="8"/><path class="lbs-trunk" d="M32 344C36 300 37 262 37 226L47 226C47 262 48 300 52 344Z"/><path class="lbs-trunk" d="M44 262C54 248 64 240 76 234L78 239C67 245 58 252 47 268Z"/>
 ${circles("lbs-canopy", [[-22, 206, 18], [-12, 232, 30], [8, 204, 34], [40, 218, 40], [74, 228, 22], [92, 212, 13], [70, 198, 28], [34, 176, 30], [58, 168, 16], [10, 168, 18]])}</g>` : ""}
 </svg>`;

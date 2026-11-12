@@ -209,7 +209,7 @@ function renderPick(main, navigate, params) {
     put(main, el("div", { class: "screen write lb-flow" }, flowTop("2 / 2", 1, leave),
       el("h1", { tabindex: "-1", text: "며칠 동안 해 볼까요?" }),
       el("p", { class: "lb-quote", text: [draft.when, draft.what].filter(Boolean).join(" · ") }), body,
-      scape({ sign: true, story: "여기에 팻말을 세워요", foot: el("div", { class: "step-footer lb-foot" }, el("button", { type: "button", class: "btn text", text: "이전", onclick: () => navigate("lookback/try") }),
+      scape({ sign: true, compact: true, foot: el("div", { class: "step-footer lb-foot" }, el("button", { type: "button", class: "btn text", text: "이전", onclick: () => navigate("lookback/try") }),
         el("button", { type: "button", class: "btn primary big", text: "시작하기", onclick: () => { lb.path = { when: clean(draft.when), what: clean(draft.what), days: draft.days, start: todayIso(), walked: new Set(), from: draft.from, alarm: draft.alarm };
           Object.assign(draft, { when: "", what: "", days: 7, from: null }); navigate("lookback/try"); toast("오늘부터 시작해요"); } })) })));
     return;
@@ -264,7 +264,7 @@ function renderEnded(main, navigate) {
     el("p", { class: "lb-quote", text: [x.when, x.what].filter(Boolean).join(" · ") }), trail(pathDays(x), x.walked),
     input, el("p", { class: "caption", text: "좋았는지 아닌지는 내가 정해요. 비워 둬도 돼요." }),
     el("a", { class: "link lb-read-open", href: "#/lookback/read?p=x", text: "이 기간의 기록 읽기" }),
-    scape({ sign: true, foot: el("div", { class: "step-footer lb-foot" }, el("button", { type: "button", class: "btn text", text: "한 번 더", onclick: finish(true) }), el("button", { type: "button", class: "btn primary big", text: "마치기", onclick: finish(false) })) })));
+    scape({ sign: true, compact: true, foot: el("div", { class: "step-footer lb-foot" }, el("button", { type: "button", class: "btn text", text: "한 번 더", onclick: finish(true) }), el("button", { type: "button", class: "btn primary big", text: "마치기", onclick: finish(false) })) })));
 }
 
 export function renderLookback(main, navigate, params, rest = []) {
