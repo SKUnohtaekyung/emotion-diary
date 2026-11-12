@@ -209,7 +209,6 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 .lb-endpick-sum b{font-size:var(--fs-title);line-height:var(--lh-title);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
 .lb-endgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px 4px;justify-items:center}
 .lb-endhead span{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted)}
-.lb-endhead span:first-child{color:var(--text);font-weight:var(--fw-body-strong)}
 .lb-endday{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;width:min(100%,var(--touch));aspect-ratio:1;padding:0;border:0;border-radius:50%;background:var(--surface-soft);color:var(--text);font:inherit;font-size:var(--fs-label);font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
 .lb-endday:active{transform:scale(var(--press-pill))}
 .lb-endday.in{background:color-mix(in srgb,var(--service-mint) 32%,var(--bg))}
@@ -282,3 +281,10 @@ button.st-pill-link:focus-visible .st-pill-link-face{outline:var(--emphasis) sol
 /* 줄 나눔(7판 다섯째 보강): 문장 하나가 한 줄 단위이고(.lb-ln), 제목·안내 줄은 줄 길이를 고르게 나눈다 — 마지막 줄에 낱말 하나만 남지 않게 */
 .lb-ln{display:block}
 :is(.lb-read,.lb-flow,.lb-write,.lb-home,.lb-listscreen) :is(h1:not(.lb-read-event),.lede,.paper-guide,.caption,.note,.lb-empty-title),.sheet .lb-ln{text-wrap:balance}
+/* 직접 정하기 달력(7판 여섯째 보강): 달 이름과 ‹ › · 일~토 · 날짜. 앞의 빈 칸과 고를 수 없는 날은 바탕 없이 옅게 */
+.lb-endnav{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-top:var(--sp-1)}
+.lb-endnav b{font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:800}
+.lb-endnav .cal-arrow[aria-disabled="true"]{color:color-mix(in srgb,var(--service-ink) 30%,var(--surface-soft));cursor:default}
+.lb-endday.blank{visibility:hidden}
+.lb-endday.off{background:transparent;color:var(--subtle);cursor:default}
+.lb-endday.off:active{transform:none}

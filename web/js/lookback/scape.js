@@ -14,7 +14,7 @@ const W = 360, H = 420;
 // ② 먼 길은 가까운 언덕 뒤에서 다시 나와 가운데 언덕 위를 좁게 굽어 물가에 닿는다(물이 없으면 가운데 언덕 마루 너머로 넘어간다).
 // 폭은 가까울수록 넓다(원근). 마루에서 두 구간의 폭이 같아야 한 길로 읽힌다(가까운 길은 마루 가까이에서 이미 먼 길만큼 좁다).
 // 가까운 길의 시작은 설계 상자 아래(446) 밖이라 끝이 비스듬히 잘린 모양이 보이지 않는다. 각 구간은 2차 곡선을 따라 폭을 바꿔 가며 그린 띠다.
-function ribbon([x0, y0], [x1, y1], [x2, y2], w0, w2, k = 1) { // k: 폭이 줄어드는 휨 — 클수록 가까운 쪽에서만 넓다
+export function ribbon([x0, y0], [x1, y1], [x2, y2], w0, w2, k = 1) { // k: 폭이 줄어드는 휨 — 클수록 가까운 쪽에서만 넓다
   const l = [], r = [];
   for (let i = 0; i <= 28; i += 1) {
     const t = i / 28, u = 1 - t;
@@ -63,4 +63,22 @@ export function scape({ tree = true, pond = true, sign = false, compact = false,
   if (story && !compact) box.append(el("p", { class: "lbs-story", text: story }));
   if (foot) box.append(foot);
   return box;
+}
+
+// 다시 읽기의 장면(완료 화면의 언덕, land.js)에도 같은 길을 놓는다(7판 여섯째 보강). land.js의 길은 가까운 언덕 위에서 끝이 실처럼 가늘어져
+// 마루에서 뾰족하게 끝났다(지느러미). 완료 화면(일기 쓰기)의 그림은 건드리지 않고, 이 화면에서만 그 길을 걷고 세 구간의 길로 바꾼다 —
+// 가까운 언덕 → 가운데 언덕 → 먼 언덕, 구간마다 그 언덕의 마루에서 잘려 넘어가고 다음 구간이 같은 자리에서 이어 나온다. 좌표는 land.js의 360×590.
+export function overRoad(fit) {
+  const svg = fit.querySelector(".land-svg"), far = svg?.querySelector(".hill-far"), mid = svg?.querySelector(".hill-mid"), near = svg?.querySelector(".hill-near");
+  if (!far || !mid || !near) return fit;
+  svg.querySelector(".road")?.remove();
+  const NS = "http://www.w3.org/2000/svg", id = `lbr${(clipSeq += 1)}`;
+  const mk = (tag, attrs) => { const n = document.createElementNS(NS, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; };
+  const defs = mk("defs", {});
+  for (const [k, h] of [["f", far], ["m", mid], ["n", near]]) { const c = mk("clipPath", { id: id + k }); c.append(mk("path", { d: h.getAttribute("d") })); defs.append(c); }
+  svg.prepend(defs);
+  far.after(mk("path", { class: "road", "clip-path": `url(#${id}f)`, d: ribbon([202, 214], [206, 170], [222, 128], 7, 3) }));
+  mid.after(mk("path", { class: "road", "clip-path": `url(#${id}m)`, d: ribbon([180, 330], [166, 258], [202, 186], 15, 7) }));
+  near.after(mk("path", { class: "road", "clip-path": `url(#${id}n)`, d: ribbon([196, 620], [262, 430], [176, 298], 230, 15, 1.7) }));
+  return fit;
 }

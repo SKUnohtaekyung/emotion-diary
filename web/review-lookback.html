@@ -159,7 +159,7 @@ const FLOW = [
     F("① 무엇을", "노트 위의 큰 글자 빈칸 둘. 예시는 '예시 보기'로 미뤘습니다.", "lookback/try?lbx=none", ""),
     F("예시 보기", "내 기록에 여러 날 나온 말에 맞춰 고르고, 고른 까닭을 적습니다.", "lookback/try?lbx=none", "예시가 앱이 권하는 행동으로 읽힐 수 있습니다.", { click: ".lb-example-btn" }),
     F("② 며칠 동안", "기간을 고르면 그만큼의 날이 놓입니다. 직접 정할 수 있습니다.", "lookback/try?lbx=none", "", { run: "doc.querySelector('.lb-example-btn').click(); doc.querySelector('.lb-sug').click(); [...doc.querySelectorAll('.step-footer .btn.primary')].pop().click()" }),
-    F("② 직접 정하기", "앞으로 30일이 이레씩 줄 지어 놓이고 끝나는 날을 바로 누릅니다. 같은 세로줄은 같은 요일입니다.", "lookback/try?lbx=none", "", { run: "doc.querySelector('.lb-example-btn').click(); doc.querySelector('.lb-sug').click(); [...doc.querySelectorAll('.step-footer .btn.primary')].pop().click(); setTimeout(() => { [...doc.querySelectorAll('.st-pill')].pop().click(); doc.querySelectorAll('.lb-endday')[19].click(); }, 200)" }),
+    F("② 직접 정하기", "앞으로 30일이 이레씩 줄 지어 놓이고 끝나는 날을 바로 누릅니다. 같은 세로줄은 같은 요일입니다.", "lookback/try?lbx=none", "", { run: "doc.querySelector('.lb-example-btn').click(); doc.querySelector('.lb-sug').click(); [...doc.querySelectorAll('.step-footer .btn.primary')].pop().click(); setTimeout(() => { [...doc.querySelectorAll('.st-pill')].pop().click(); doc.querySelectorAll('.lb-endday:not(.off):not(.blank)')[15].click(); }, 200)" }),
     F("③ 실천하는 중", "주된 일은 하나: 오늘 해 봤는지 남긴다. 기록 읽기·알림·멈추기는 ⋯에 있습니다.", "lookback/try?lbx=active", "알림은 자리만 있습니다."),
     F("④ 기간이 끝났을 때", "물음 하나.", "lookback/try?lbx=ended", "")
   ] },

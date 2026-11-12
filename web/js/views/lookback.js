@@ -16,6 +16,7 @@ import { qa, lb, recordOf, recordedDays, todayIso, shiftDay, monthDay, weekday, 
 const path = (d, cls) => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: cls }, svgEl("path", { d }));
 export const backIcon = () => path("M14.5 5.5 8 12l6.5 6.5");
 export const chev = (cls = "st-chev") => path("M9.5 5.5 16 12l-6.5 6.5", cls);
+const chevArrow = (dir) => path(dir < 0 ? "M14.5 5.5 8 12l6.5 6.5" : "M9.5 5.5 16 12l-6.5 6.5"); // 달력 탭의 ‹ ›(.cal-arrow)와 같은 선
 const closeIcon = () => path("M6 6l12 12M18 6 6 18");
 const dotsIcon = () => svgEl("svg", { viewBox: "0 0 24 24", "aria-hidden": "true", class: "dots3" }, [5, 12, 19].map((cx) => svgEl("circle", { cx, cy: "12", r: "1.7" })));
 // 팻말: 둥근 판 하나(7판 — 6판의 화살 모양은 뾰족한 모서리라 걷었다). 장면(scape.js)의 팻말과 같은 모양이다.
@@ -200,28 +201,43 @@ function renderPick(main, navigate, params) {
   const hint = el("p", { class: "blocked-hint", id: "lbTryHint", hidden: true, role: "status" });
   if (params?.get("step") === "2" && clean(draft.what)) { // ── ② 며칠 동안 ──
     const body = el("div", { class: "lb-days-pick" });
-    // 직접 정하기(7판 넷째 보강): −/+로 하루씩 늘리면 긴 기간이 번거로워, 앞으로 30일을 이레씩 줄 지어 놓고 끝나는 날을 바로 누른다.
-    // 한 줄이 이레라 같은 세로줄은 같은 요일이다(맨 위에 요일). 오늘부터 고른 날까지 옅은 민트, 끝나는 날은 짙게. 방향키: ← → 하루, ↑ ↓ 이레.
-    const MAX = 30;
+    // 직접 정하기(7판 여섯째 보강): 달력 한 달을 펴 놓고 끝나는 날을 누른다. ‹ ›로 다음 달까지 넘겨 석 달(90일) 안에서 고른다.
+    // (넷째 보강의 '30일을 이레씩 줄 지운 판'은 30일 밖을 고를 수 없고 요일 칸이 진짜 달력과 달라 불편했다. 그 전의 −/+는 긴 기간이 번거로웠다.)
+    // 달력 탭과 같은 짜임(일~토 요일 줄, ‹ › 둥근 단추). 오늘~끝 = 옅은 민트, 끝나는 날 = ink, 오늘 앞·90일 뒤는 누를 수 없다. 방향키 ← → 하루, ↑ ↓ 이레(달을 넘으면 달도 넘어간다).
+    const MAX = 90;
+    let view = null; // 보고 있는 달 { y, m } — '직접 정하기'를 처음 열면 끝나는 날의 달
+    const isoOf = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
     const endPick = () => {
-      const t = todayIso(), cells = Array.from({ length: MAX }, (_, k) => shiftDay(t, k));
-      const buttons = cells.map((iso, k) => el("button", { type: "button", role: "radio", class: `lb-endday${k < draft.days ? " in" : ""}${k === 0 ? " today" : ""}`,
-        "aria-checked": String(k === draft.days - 1), tabindex: k === draft.days - 1 ? "0" : "-1", "aria-label": `${monthDay(iso)} ${weekday(iso)}요일까지, ${k + 1}일`,
-        text: null }, iso.slice(8) === "01" && k ? el("small", { text: `${Number(iso.slice(5, 7))}월` }) : null, el("span", { text: String(Number(iso.slice(8))) })));
-      const choose = (k) => { draft.days = k + 1; drawDays(true); body.querySelectorAll(".lb-endday")[k]?.focus(); };
-      buttons.forEach((b, k) => {
-        b.addEventListener("click", () => choose(k));
-        b.addEventListener("keydown", (ev) => { const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 7, ArrowUp: -7 }[ev.key]; if (d) { ev.preventDefault(); choose(Math.max(0, Math.min(MAX - 1, k + d))); } });
-      });
+      const t = todayIso(), diff = (iso) => Math.round((Date.parse(iso) - Date.parse(t)) / 864e5), endIso = shiftDay(t, draft.days - 1), lastIso = shiftDay(t, MAX - 1);
+      if (!view) view = { y: Number(endIso.slice(0, 4)), m: Number(endIso.slice(5, 7)) - 1 };
+      const monthKey = (iso) => iso.slice(0, 7), viewKey = isoOf(view.y, view.m, 1).slice(0, 7);
+      const go = (iso, focus) => { const k = Math.max(0, Math.min(MAX - 1, diff(iso))), to = shiftDay(t, k); draft.days = k + 1; view = { y: Number(to.slice(0, 4)), m: Number(to.slice(5, 7)) - 1 }; drawDays(true); if (focus) body.querySelector(`[data-iso="${to}"]`)?.focus(); };
+      const first = new Date(view.y, view.m, 1).getDay(), n = new Date(view.y, view.m + 1, 0).getDate();
+      const cells = Array.from({ length: first }, () => el("span", { class: "lb-endday blank", "aria-hidden": "true" }));
+      const inView = monthKey(endIso) === viewKey;
+      for (let d = 1; d <= n; d += 1) {
+        const iso = isoOf(view.y, view.m, d), k = diff(iso), off = k < 0 || k >= MAX, end = k === draft.days - 1;
+        const firstOn = !inView && !off && (d === 1 || k === 0);
+        const b = el("button", { type: "button", role: "radio", class: `lb-endday${!off && k < draft.days ? " in" : ""}${k === 0 ? " today" : ""}${off ? " off" : ""}`, "data-iso": iso,
+          "aria-checked": String(end), "aria-disabled": off ? "true" : null, tabindex: end || firstOn ? "0" : "-1",
+          "aria-label": `${monthDay(iso)} ${weekday(iso)}요일${k === 0 ? ", 오늘" : ""}${off ? ", 고를 수 없어요" : `까지 ${k + 1}일`}` },
+          k === 0 ? el("small", { text: "오늘" }) : null, el("span", { text: String(d) }));
+        b.addEventListener("click", () => { if (!off) go(iso, true); });
+        b.addEventListener("keydown", (ev) => { const step = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 7, ArrowUp: -7 }[ev.key]; if (step) { ev.preventDefault(); go(shiftDay(iso, step), true); } });
+        cells.push(b);
+      }
+      const arrow = (dir, label, offArrow) => el("button", { type: "button", class: "cal-arrow", "aria-label": label, "aria-disabled": offArrow ? "true" : null,
+        onclick: () => { if (offArrow) return; view = { y: view.y + (view.m + dir < 0 ? -1 : view.m + dir > 11 ? 1 : 0), m: (view.m + dir + 12) % 12 }; drawDays(true); body.querySelector(`[aria-label="${label}"]`)?.focus(); } }, chevArrow(dir));
       return el("div", { class: "lb-endpick" },
-        el("p", { class: "lb-endpick-sum", "aria-live": "polite" }, el("b", { text: `${draft.days}일` }), ` · ${monthDay(shiftDay(t, draft.days - 1))}까지`),
-        el("div", { class: "lb-endgrid lb-endhead", "aria-hidden": "true" }, cells.slice(0, 7).map((iso, k) => el("span", { text: k === 0 ? "오늘" : weekday(iso) }))),
-        el("div", { class: "lb-endgrid", role: "radiogroup", "aria-label": "끝나는 날" }, buttons));
+        el("p", { class: "lb-endpick-sum", "aria-live": "polite" }, el("b", { text: `${draft.days}일` }), ` · ${monthDay(endIso)}까지`),
+        el("div", { class: "lb-endnav" }, arrow(-1, "이전 달", viewKey <= monthKey(t)), el("b", { text: `${view.y}년 ${view.m + 1}월` }), arrow(1, "다음 달", viewKey >= monthKey(lastIso))),
+        el("div", { class: "lb-endgrid lb-endhead", "aria-hidden": "true" }, ["일", "월", "화", "수", "목", "금", "토"].map((w) => el("span", { text: w }))),
+        el("div", { class: "lb-endgrid", role: "radiogroup", "aria-label": `끝나는 날, ${view.y}년 ${view.m + 1}월` }, cells));
     };
     const drawDays = (custom = !DAY_CHOICES.includes(draft.days)) => {
-      put(body, radios("st-pills", "st-pill", "기간", [...DAY_CHOICES.map((d) => [d, `${d}일`]), [0, "직접 정하기"]], custom ? 0 : draft.days, (d) => { if (d) draft.days = d; drawDays(d === 0); }),
+      put(body, radios("st-pills", "st-pill", "기간", [...DAY_CHOICES.map((d) => [d, `${d}일`]), [0, "직접 정하기"]], custom ? 0 : draft.days, (d) => { if (d) draft.days = d; view = null; drawDays(d === 0); }),
         custom ? endPick() : trail(Array.from({ length: draft.days }, (_, k) => shiftDay(todayIso(), k))),
-        el("p", { class: "caption" }, lines(custom ? "끝나는 날을 눌러요." : `오늘부터 ${monthDay(shiftDay(todayIso(), draft.days - 1))}까지예요.`, "끝나는 날에 한 번만 알려 드려요.")));
+        el("p", { class: "caption" }, lines(custom ? "끝나는 날을 눌러요. 석 달 안에서 고를 수 있어요." : `오늘부터 ${monthDay(shiftDay(todayIso(), draft.days - 1))}까지예요.`, "끝나는 날에 한 번만 알려 드려요.")));
     };
     drawDays();
     put(main, el("div", { class: "screen write lb-flow" }, flowTop("2 / 2", 1, leave),

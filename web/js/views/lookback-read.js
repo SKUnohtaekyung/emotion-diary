@@ -9,7 +9,7 @@ import { el, svgEl, announce, toast } from "../dom.js";
 import { pebbleImg, stoneImg } from "../data.js";
 import { renderLand, doneLayout } from "../components/land.js";
 import { openSheet } from "../components/sheet.js";
-import { scape } from "../lookback/scape.js";
+import { scape, overRoad } from "../lookback/scape.js";
 import { lb, recordOf, recordedDays, recordedBetween, todayIso, monthDay, weekday, toggleMark, repeated, pathEnd } from "../lookback/store.js";
 import { chev, head, catsOf, put, goBack, iGa, lines } from "./lookback.js";
 
@@ -72,7 +72,7 @@ export function renderRead(main, navigate, params) {
       el("h1", { tabindex: "-1", class: `lb-read-event ${sizeClass(rec.event)}`, text: rec.event }),
       rec.reason?.trim() ? el("p", { class: `lb-read-reason ${sizeClass(rec.event)}`, text: rec.reason }) : null,
       el("a", { class: "link lb-read-open", href: `#/record/${iso}?from=lookback`, text: "편지 전체 보기" }),
-      scape({ land: renderLand(doneLayout(catsOf(rec))), foot, cls: "lb-dayland" }));
+      scape({ land: overRoad(renderLand(doneLayout(catsOf(rec)))), foot, cls: "lb-dayland" }));
     const mark = el("button", { type: "button", class: "choice lb-mark", "aria-pressed": String(marked) }, el("span", { class: "ck", "aria-hidden": "true", text: "✓" }), el("span", { text: "모아 두기" }));
     mark.addEventListener("click", () => { const on = toggleMark(iso); mark.setAttribute("aria-pressed", String(on));
       if (on && !taught) { taught = true; toast("모아 뒀어요. 다 읽고 나서 한데 놓고 볼 수 있어요"); } else announce(on ? "모아 뒀어요" : "뺐어요"); });
