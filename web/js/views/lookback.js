@@ -4,7 +4,7 @@
 // 달력·통계는 보는 곳이고, 이 탭은 내가 쓴 것이 쌓이는 곳이다. 앱은 기준을 제안하거나 고쳐 주지 않고 실천을 판정하지 않는다(서비스 WHY §12·§20).
 // 문구는 두 갈래다 — 제목·물음·장면 설명 줄은 묻고 그리는 말, 버튼·상태·확인은 동사로 짧고 곧은 말(ROUND6.md).
 import { el, svgEl, announce, toast, reducedMotion } from "../dom.js";
-import { pebbleImg, stoneImg } from "../data.js";
+import { pebbleImg } from "../data.js";
 import { openSheet } from "../components/sheet.js";
 import { dayCell } from "../components/day.js";
 import { scape } from "../lookback/scape.js";
@@ -30,7 +30,6 @@ export const goBack = (navigate, fallback) => () => { if (navCount > 1 && histor
 export const head = (navigate, fallback, label) => el("div", { class: "info-top" }, el("button", { type: "button", class: "back", "aria-label": label, onclick: goBack(navigate, fallback) }, backIcon()));
 export const catsOf = (rec) => rec.cats.filter((c) => rec.emotions.some((e) => e.cat === c));
 export const iGa = (w) => ((w.charCodeAt(w.length - 1) - 0xac00) % 28 ? "이" : "가"); // 받침에 따라 이/가
-const eulReul = (w) => ((w.charCodeAt(w.length - 1) - 0xac00) % 28 ? "을" : "를");
 export const put = (node, ...kids) => node.replaceChildren(...kids.flat(3).filter((k) => k != null && k !== false)); // 빈 자리(null)를 글자로 찍지 않는다
 const clean = (v) => v.replace(/\s+/g, " ").trim();
 // 문장마다 줄을 나눈다(7판 다섯째 보강): 두 문장을 한 덩어리로 흘리면 좁은 화면에서 '비워 / 둬도'처럼 말뜻의 가운데에서 꺾였다. 문장 하나가 한 줄 단위다.
@@ -47,18 +46,6 @@ function radios(cls, itemCls, label, items, current, onPick) {
   return el("div", { class: cls, role: "radiogroup", "aria-label": label }, buttons);
 }
 
-// ── 길 끝에서 돌아본 언덕(다 읽은 자리): 먼 언덕과 흰 길, 길 끝에 나의 돌, 길 위에 그 기간의 조약돌 ──
-const SPOTS = [[170, 112, 24], [146, 124, 22], [120, 132, 26], [188, 101, 18], [96, 138, 20]];
-export function scene({ cats = [] } = {}) {
-  const svg = svgEl("svg", { viewBox: "0 0 340 150", preserveAspectRatio: "none", class: "sxd-scene-svg", "aria-hidden": "true", focusable: "false" },
-    svgEl("path", { class: "sxd-scene-hill-far", d: "M0,52 C57,32 113,27 170,36 C227,45 283,36 340,24 L340,150 L0,150 Z" }),
-    svgEl("path", { class: "sxd-scene-hill-mid", d: "M0,80 C57,60 113,53 170,62 C227,71 283,60 340,47 L340,150 L0,150 Z" }),
-    svgEl("path", { class: "sxd-scene-road", d: "M54,150 C92,132 176,128 196,92 L208,94 C204,128 150,138 132,150 Z" }));
-  const stone = stoneImg("rest"); stone.classList.add("lb-scene-stone");
-  return el("div", { class: "sxd-scene lb-scene", "aria-hidden": "true" }, svg, el("i", { class: "lb-scene-tree t1" }), el("i", { class: "lb-scene-tree t2" }),
-    cats.slice(0, SPOTS.length).map((cat, i) => { const [x, y, s] = SPOTS[i]; const p = pebbleImg(cat, { size: s }); p.classList.add("lb-scene-peb");
-      p.style.left = `${(x / 340 * 100).toFixed(1)}%`; p.style.bottom = `${150 - y - s / 2}px`; p.style.width = `${s}px`; return p; }), stone);
-}
 
 // 기록 하나를 가리키는 작은 알약(날짜 + 그날 첫 마음의 조약돌). 누르면 그 기록이 시트로 올라온다(보던 화면을 떠나지 않는다).
 const refRow = (isos) => el("div", { class: "lb-refs" }, [...isos].sort().map((iso) => { const c = catsOf(recordOf(iso))[0];
@@ -70,20 +57,10 @@ const slipNode = (s) => [el("span", { class: "lb-slip-text", text: s.text }), s.
 // 쪽지의 두 칸(8판): 알게 된 것 + 그래서 나에게 필요한 것(둘째는 비어 있을 수 있다)
 const quoteOf = (item) => el("p", { class: "lb-quote" }, item.text, item.need ? el("span", { class: "lb-quote-need", text: item.need }) : null);
 
-// ── 해 본 날들(7판의 날 줄 — 지금은 ?lbe=gap 비교용으로만 쓴다. 이레를 넘으면 점 격자) ──
 const rangeText = (x) => `${monthDay(x.start)}부터 ${monthDay(pathEnd(x))}까지`;
-function trail(days, walked = new Set()) {
-  const t = todayIso();
-  // 기간이 이레를 넘으면(7판 일곱째 보강) 요일 글자 없이 작은 점으로만 줄 짓는다 — 90일이 동그라미 아흔 개·열 줄이 되어 화면을 밀어내지 않게. 수는 여전히 적지 않는다.
-  return el("ol", { class: `lb-trail${days.length > 14 ? " dense" : ""}`, "aria-label": "이 기간의 날들" }, days.map((iso) => el("li", { class: iso === t ? "today" : "" },
-    dayCell({ tag: "span", mini: true, status: walked.has(iso) ? "completed" : "none", today: iso === t, "aria-hidden": "true" }), el("span", { text: iso === t ? "오늘" : weekday(iso) }),
-    el("span", { class: "sr", text: `${monthDay(iso)} ${walked.has(iso) ? "해 본 날" : iso > t ? "아직 오지 않은 날" : "표시 없음"}` }))));
-}
 // 해 보는 기간의 길(8판): 빈 칸을 그리지 않는다. 기간은 한 줄의 길이고, 해 본 날에만 표시가 놓이며 오늘 자리에 민트 점이 선다.
 // 빈 점이 '끊긴 날'로 읽히지 않게 하려는 것이다(끊긴 연속 기록 연구에서 옮긴 추론 — RESEARCH-FLOW.md §2.2). 수·비율·이어짐을 적지 않는다.
-// ?lbe=gap 이면 7판처럼 빈 칸까지 그린다 — 두 모양을 나란히 보고 고르게 한다.
 function pathLine(x) {
-  if (qa.gaps) return trail(pathDays(x), x.walked);
   const days = pathDays(x), t = todayIso(), pos = (iso) => `${(((days.indexOf(iso) + 0.5) / days.length) * 100).toFixed(2)}%`;
   const done = days.filter((iso) => x.walked.has(iso));
   return el("div", { class: "lb-path", role: "img", "aria-label": `${monthDay(days[0])}부터 ${monthDay(days[days.length - 1])}까지. ${done.length ? `해 본 날: ${done.map(monthDay).join(", ")}` : "아직 남긴 날이 없어요"}` },
@@ -156,7 +133,7 @@ function renderHome(main, navigate) {
   const screen = el("div", { class: "screen lb lb-note lb-home" });
   let editing = false;
   function draw() {
-    const open = lb.standards.filter((s) => !s.folded), folded = lb.standards.filter((s) => s.folded), marks = lb.marks.size, st = pathState(), few = open.length <= 2;
+    const open = lb.standards.filter((s) => !s.folded), folded = lb.standards.filter((s) => s.folded), st = pathState(), few = open.length <= 2;
     const slip = (s) => el("li", { "data-id": s.id }, el("button", { type: "button", class: `lb-slip ${few ? "mid" : "small"}`, "aria-haspopup": "dialog", onclick: () => { if (!editing) standardSheet(s, navigate, draw); } }, slipNode(s)));
     const foldCell = folded.length ? el("li", { class: "lb-fold-cell" }, el("button", { type: "button", class: "lb-fold", "aria-haspopup": "dialog", onclick: () => { if (!editing) foldedSheet(folded, navigate, draw); } },
       el("i", { class: "lb-fold-stack", "aria-hidden": "true" }), el("span", { text: `접어 둔 기준 ${folded.length}장` }), chev())) : null;
@@ -179,9 +156,8 @@ function renderHome(main, navigate) {
         el("p", { class: "note" }, lines("다시 읽다가 '나는 이럴 때 이렇구나'", "싶은 순간에 한 줄 써 두면", "여기에 쪽지로 남아요."))),
       list,
       el("div", { class: "sd-actions lb-home-actions" },
-        marks ? el("p", { class: "lb-home-marks", text: `모아 둔 기록 ${marks}편이 있어요` }) : null,
-        el("div", { class: "lb-home-btns" }, marks ? [el("button", { type: "button", class: "btn secondary big", text: "다시 읽기", onclick: read }), el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: write })]
-          : [el("button", { type: "button", class: "btn secondary big", text: "바로 쓰기", onclick: write }), el("button", { type: "button", class: "btn primary big", text: "다시 읽기", onclick: read })])));
+        // 모아 둔 날의 수는 여기에 보이지 않는다(8판 확정 — 다시 읽기만 하는 사람에게 '모아 둔 기록 9편'이 숙제처럼 남지 않게). 모아 둔 날은 다 읽은 자리와 기준 쓰기에서만 나온다
+        el("div", { class: "lb-home-btns" }, el("button", { type: "button", class: "btn secondary big", text: "바로 쓰기", onclick: write }), el("button", { type: "button", class: "btn primary big", text: "다시 읽기", onclick: read }))));
   }
   put(main, screen); draw();
 }
@@ -202,8 +178,8 @@ function renderWrite(main, navigate, params) {
     const text = clean(input.value);
     if (!text) { hint.textContent = "알게 된 것을 한 줄 써 주세요."; hint.hidden = false; input.focus(); return; }
     const made = saveStandard({ id: editing?.id, text, need: clean(need.value), from: refs });
-    if (!editing) lb.marks.clear(); // 모아 둔 기록은 이 기준에 붙어 남고, 모아 두는 자리는 비운다
-    navigate("lookback"); toast(editing ? "고쳤어요" : "내 기준에 남겼어요");
+    if (!editing) lb.marks.clear(); // 모아 둔 날은 이 쪽지에 붙어 남고(쪽지 모서리의 조약돌·'이 기준이 나온 기록'), 모아 두는 자리는 비운다
+    navigate("lookback"); toast(editing ? "고쳤어요" : refs.length ? "쪽지로 남겼어요. 모아 둔 날도 함께 붙었어요" : "내 기준에 남겼어요");
     // 한 번만 묻는 초대(8판): 처음 쪽지를 남긴 직후, 해 보는 것이 없을 때. 닫으면 다시 묻지 않는다(반복하면 무시를 배우게 한다 — NN/g).
     if (!editing && pathState() === "none" && !lb.invited.has("try")) { lb.invited.add("try");
       setTimeout(() => openSheet({ title: "이 쪽지로 며칠 해 볼까요?", body: [quoteOf(made), el("p", { class: "note" }, lines("해 볼 것 하나를 정해 며칠 해 보는 거예요.", "지금 정하지 않아도 돼요."))],
@@ -215,7 +191,7 @@ function renderWrite(main, navigate, params) {
     el("div", { class: "write-top" }, el("button", { type: "button", class: "back", "aria-label": "닫기", onclick: goBack(navigate, "lookback") }, closeIcon())),
     el("h1", { tabindex: "-1", text: editing ? "기준 고치기" : "무엇을 알게 됐나요?" }),
     el("p", { class: "paper-guide" }, lines("한 줄이면 충분해요.", "한 걸음 떨어져 적어도 좋아요.")),
-    refs.length ? el("div", { class: "lb-write-refs" }, el("p", { class: "st-block-label", text: editing ? "이 기준이 나온 기록" : "모아 둔 기록 · 누르면 다시 볼 수 있어요" }), refRow(refs)) : null,
+    refs.length ? el("div", { class: "lb-write-refs" }, el("p", { class: "st-block-label", text: editing ? "이 기준이 나온 기록" : "모아 둔 날 · 이 쪽지에 함께 붙어요" }), refRow(refs)) : null,
     hint, paper(field), scape({ compact: true, foot: el("div", { class: "step-footer solo lb-foot" }, save) })),
     qa.keyboard ? el("div", { class: "lb-kb", "aria-hidden": "true", text: "자판이 올라온 자리(시안)" }) : null);
   sync();
@@ -420,4 +396,3 @@ export function calendarEntry() {
     el("span", { class: "lb-calcard-pebs", "aria-hidden": "true" }, cats.slice(0, 4).map((c) => pebbleImg(c, { size: 26 }))),
     el("span", { class: "lb-calcard-text" }, el("b", { text: "최근 7일 다시 읽기" }), el("span", { text: `기록 ${days.length}편을 하루씩` })), chev());
 }
-export const statsDetailReader = () => null; // 1판의 2C안(통계 친구 상세에서 이어 읽기)은 고르지 않았다 — stats.js의 자리만 남긴다

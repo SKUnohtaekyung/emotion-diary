@@ -44,7 +44,6 @@ export const SHOTS = [
   ["r8-오늘-시트-60일","today?lbx=active&lbd=60",740,"document.querySelector(\".lb-yline a\").click()"],
   ["r8-실천-더보기","lookback/try?lbx=active",740,"document.querySelectorAll('.write-top .back')[1].click()"],
   ["r8-실천-끝","lookback/try?lbx=ended",740],
-  ["r8-실천하는중-빈칸비교","lookback/try?lbx=active&lbe=gap",740],
   ["r8-실천-지난날","lookback/try?lbx=active",740,"document.querySelector('.lb-past-btn').click()"],
   ["r8-실천-끝-안한날","lookback/try?lbx=ended",740,"document.querySelectorAll('.lb-endtabs .st-pill')[1].click()"],
   ["r8-실천-끝-답","lookback/try?lbx=ended",740,"document.querySelector('.step-footer .btn.primary').click()"],
@@ -53,9 +52,8 @@ export const SHOTS = [
   ["r8-완료-초대","write?s=done&lbx=none&lbt=week",740],
   ["r8-오늘","today?lbx=active",740],
   ["r8-오늘-시트","today?lbx=active",740,"document.querySelector(\".lb-yline a\").click()"],
-  ["r8-완료-묻기","write?s=done&lbx=active",740],
+  ["r8-완료","write?s=done&lbx=active",740],
   ["r8-달력","calendar",740],
-  ["r8-검토페이지","/review-lookback.html",1500,"document.querySelectorAll('h2')[0].scrollIntoView()"]
 ];
 
 // 헤드리스 Chrome을 띄워 원격 디버깅(CDP)으로 휴대폰 크기를 흉내 낸다 — 창 크기만 줄이면 Windows의 Chrome은 500px 아래로 내려가지 않는다.

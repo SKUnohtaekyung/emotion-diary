@@ -4,7 +4,6 @@ import { el, svgEl, announce, renderStatus, reducedMotion } from "../dom.js";
 import { data, friendImg, pebbleImg, stoneImg, FRIENDS, category } from "../data.js";
 import { state, toISO } from "../state.js";
 import { effectiveToday, sampleRecord } from "../sample.js";
-import { statsDetailReader } from "./lookback.js";
 import { periodDates, periodSummary, currentStreak, topWords, topWordsForCategory, valuesByIndex, compare, buildSample, buildFewSample, addDays, MIN_DAYS, MIN_N_FOR_MEAN } from "../stats-calc.js";
 
 const CAT_ORDER = () => data.categories.map((c) => c.code);
@@ -365,7 +364,7 @@ function renderFriendDetail(main, navigate, params, code, sample, todayIso, few)
     } else if (cur.n === 0) {
       bodyNode = el("div", { class: "sx-empty" }, el("p", { class: "sx-headline", text: "이번 기간에는 오지 않았어요" }));
     } else {
-      bodyNode = el("div", {}, sizeTrendDetail(code, cur, prev, dates, sample, periodLen, todayIso), wordsDetail(code, sample, dates), statsDetailReader(code, dates, navigate));
+      bodyNode = el("div", {}, sizeTrendDetail(code, cur, prev, dates, sample, periodLen, todayIso), wordsDetail(code, sample, dates));
     }
     const sub = enough ? `${category(code).label} · 최근 ${periodLen}일 중 ${cur.n}일 함께했어요` : category(code).label;
 

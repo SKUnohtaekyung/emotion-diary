@@ -1,11 +1,11 @@
 // 돌아보기·내 기준·해 보는 길 시안의 상태(TASK-LOOKBACK-01 단계 A, 2판). 저장하지 않는다 — 이 모듈의 변수에만 있고 새로 고치면 처음으로 돌아간다.
 // 기준과 길의 문장은 모두 지어낸 예시다(실제 일기 아님, AGENTS §3).
-// 상태 바꾸기(QA): ?lbs=empty|few|one|some|many(기록·기준의 양), ?lbx=none|active|ended(해 보는 길), ?lbd=날 수, ?lbe=gap(7판의 빈 칸 날 줄),
+// 상태 바꾸기(QA): ?lbs=empty|few|one|some|many(기록·기준의 양), ?lbx=none|active|ended(해 보는 길), ?lbd=날 수, ?lbm=0(모아 둔 날 없음),
 //   ?lbt=thanks|joy|big|none|week(완료 화면 한 줄 — week는 새 주의 첫 일기에 나오는 다시 읽기 초대), ?kb=1.
 import { state, toISO } from "../state.js";
 import { dayStatus, sampleRecord, effectiveToday } from "../sample.js";
 
-export const qa = { amount: "normal", tell: null, keyboard: false, gaps: false }; // gaps: 해 보는 중의 날 줄을 7판처럼 빈 칸까지 그린다(?lbe=gap, 8판 비교용)
+export const qa = { amount: "normal", tell: null, keyboard: false };
 
 const addDays = (iso, n) => { const [y, m, d] = iso.split("-").map(Number); return toISO(new Date(y, m - 1, d + n)); };
 export const todayIso = () => toISO(effectiveToday());
@@ -64,7 +64,6 @@ export function readParams(params) {
   if (amount in AMOUNT && amount !== qa.amount) { qa.amount = amount; reseed = true; }
   if (params.has("lbt")) qa.tell = params.get("lbt");
   if (params.has("kb")) qa.keyboard = params.get("kb") === "1";
-  if (params.has("lbe")) qa.gaps = params.get("lbe") === "gap";
   if (reseed) { seed(); if (!seeded) seedPath("active"); seeded = true; }
   const x = params.get("lbx");
   if (["none", "active", "ended"].includes(x)) seedPath(x);

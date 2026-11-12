@@ -70,7 +70,8 @@ export function renderRead(main, navigate, params) {
         el("p", { class: "lede" }, lines(marked.length ? "모아 둔 날을 나란히 놓았어요." : "없었다면 여기서 닫아도 돼요.", "친구의 일기를 읽듯 한 걸음 떨어져 봐도 좋아요.")),
         marked.length ? el("ul", { class: "lb-days lb-marked" }, marked.map(row)) : null,
         scape({ compact: marked.length > 0, foot }));
-      put(foot, el("button", { type: "button", class: "btn text", text: marked.length ? "아직 모르겠어요" : "읽기만 할게요", onclick: leave }),
+      // 쓰지 않고 닫아도 모아 둔 날은 그대로 둔다 — 그렇다는 것을 닫을 때 한 번 말한다(8판 확정)
+      put(foot, el("button", { type: "button", class: "btn text", text: marked.length ? "아직 모르겠어요" : "읽기만 할게요", onclick: () => { leave(); if (marked.length) toast("모아 둔 날은 다음에 쓸 때 다시 볼 수 있어요"); } }),
         el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: () => navigate("lookback/write") }));
       return;
     }
@@ -116,7 +117,7 @@ export function renderList(main, navigate, params) {
         : words.length ? el("button", { type: "button", class: "st-pill-link", onclick: findSheet }, el("span", { class: "st-pill-link-face" }, "말로 찾기", chev())) : null,
       [...groups.entries()].map(([name, isos]) => el("section", { class: "lb-week" }, el("h2", { class: "sx-eyebrow", text: name }), el("ul", { class: "lb-days" }, isos.map(row)))));
     tray.hidden = !lb.marks.size;
-    put(tray, el("b", { text: `모아 둔 기록 ${lb.marks.size}편` }), el("button", { type: "button", class: "btn primary", text: "기준 쓰기", onclick: () => navigate("lookback/write") }));
+    put(tray, el("b", { text: `모아 둔 날 ${lb.marks.size}일` }), el("button", { type: "button", class: "btn primary", text: "기준 쓰기", onclick: () => navigate("lookback/write") }));
   }
   draw();
   put(main, screen, tray);

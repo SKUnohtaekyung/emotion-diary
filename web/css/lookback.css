@@ -102,8 +102,6 @@
 .lb-scene-tree::after{content:"";position:absolute;left:0;top:0;width:100%;aspect-ratio:1;border-radius:50%;background:var(--land-hill-near)}
 .lb-scene-tree.t1{--r:7px;left:84%;top:-12px}
 .lb-scene-tree.t2{--r:5px;left:91%;top:-4px}
-.lb-note-sun{position:absolute;left:58%;top:-.9rem;width:2rem;height:2rem;border-radius:50%;background:var(--land-sun)}
-.lb-note-sun::before{content:"";position:absolute;inset:-.55rem;border-radius:50%;border:2.5px solid var(--land-sun-ring)}
 .lb-note-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--sp-3)}
 .lb-note-head h1{margin-bottom:var(--sp-1)}
 .lb-edit-toggle{margin-right:calc(var(--sp-2) * -1)}
@@ -140,10 +138,7 @@
 .lb-slip.mid{min-height:124px;padding:var(--sp-6) var(--sp-5)}
 .lb-slip.mid .lb-slip-text{font-size:1.125rem;line-height:1.75rem;font-weight:700;letter-spacing:-.01em}
 .lb-slip.mid .lb-slip-pebs img{width:30px}
-.lb-note-stonerow{display:flex;justify-content:flex-end;height:44px;margin:var(--sp-3) var(--sp-6) 0 0}
-.lb-note-stonerow .lb-note-stone{position:static;width:60px;height:auto}
-.lb-slips.few+.lb-note-stonerow{justify-content:flex-start;margin:calc(var(--sp-2) * -1) 0 0 var(--sp-6)}
-/* 순서 바꾸기: 쪽지가 가볍게 흔들리고, 끄는 쪽지는 조금 커져 손가락을 따라온다 */
+.lb-slips.few+/* 순서 바꾸기: 쪽지가 가볍게 흔들리고, 끄는 쪽지는 조금 커져 손가락을 따라온다 */
 .lb-slips.is-editing{touch-action:none;-webkit-user-select:none;user-select:none}
 .lb-slips.is-editing .lb-slip{animation:lb-jiggle .3s ease-in-out infinite alternate;cursor:grab}
 .lb-slips.is-editing li:nth-child(even) .lb-slip{animation-direction:alternate-reverse;animation-delay:-.12s}
@@ -169,7 +164,6 @@
 .lb-home-actions::before{content:"";position:absolute;z-index:-1;left:calc(var(--sp-5) * -1.6);right:calc(var(--sp-5) * -1.6);top:0;bottom:0;border-radius:50% 50% 0 0/2rem 2rem 0 0;background:var(--land-hill-mid)}
 .lb-home-btns{display:flex;flex-wrap:wrap-reverse;gap:var(--sp-3)}
 .lb-home-btns .btn{flex:1 1 0;min-width:max-content}
-.lb-home-marks{margin:0;text-align:center;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong)}
 /* 하단 탐색 위의 바래는 띠는 기본(투명 → 흰색)과 같은 짜임으로 투명 → 언덕색이다. 7판 첫 손질의 단색은 그 띠가 버튼 아랫단을 덮었다 */
 body:has(.lb-home) .bottom-nav{background:linear-gradient(to bottom,color-mix(in srgb,var(--land-hill-mid) 0%,transparent) 0,color-mix(in srgb,var(--land-hill-mid) 82%,transparent) calc(var(--nav-fade) * .6),var(--land-hill-mid) var(--nav-fade))}
 
@@ -201,7 +195,6 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 /* ② 며칠 동안 */
 .lb-flow .lb-quote{margin:0}
 .lb-days-pick{display:flex;flex-direction:column;gap:var(--sp-4);margin-top:var(--sp-5)}
-.lb-days-pick .lb-trail{justify-content:flex-start}
 .lb-days-pick .caption{margin:0}
 /* 직접 정하기: 앞으로 30일을 이레씩 줄 지어 놓고 끝나는 날을 누른다. 한 세로줄 = 같은 요일. 오늘~끝 = 옅은 민트(지금 고른 것, D-088), 끝나는 날 = ink */
 .lb-endpick{display:flex;flex-direction:column;gap:var(--sp-2)}
@@ -216,33 +209,21 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 .lb-endday[aria-checked="true"]{background:var(--service-ink);color:var(--bg);font-weight:800}
 .lb-endday:focus-visible{outline:var(--emphasis) solid var(--service-ink);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.lb-endday{transition:none}.lb-endday:active{transform:none}}
-/* 이 기간의 날들: 달력의 날짜 모양(.day.mini). 해 본 날만 채워진다 */
-.lb-trail{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2) var(--sp-3);margin:0;padding:0}
-.lb-trail li{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted)}
-.lb-trail .day.mini{width:26px;height:26px;min-height:26px}
-.lb-trail .today{color:var(--text);font-weight:var(--fw-body-strong)}
 /* 실천하는 중 · 기간이 끝남 */
 .lb-center{text-align:center}
 .lb-try-title{margin:var(--sp-4) 0 0;text-align:center;text-wrap:balance;font-size:var(--fs-display);line-height:var(--lh-display);font-weight:800;letter-spacing:-.03em}
 .lb-try-title small{display:block;font-size:var(--fs-heading);line-height:var(--lh-heading);font-weight:600;letter-spacing:0;color:var(--muted)}
-.lb-doing .lb-trail{margin-top:var(--sp-5)}
-.lb-doing .caption.lb-center{margin:var(--sp-3) 0 0}
+.lb-doing .lb-doing .caption.lb-center{margin:var(--sp-3) 0 0}
 .lb-doing .lb-quote{margin:0 0 var(--sp-4)}
-.lb-doing .lb-quote+.lb-trail{justify-content:flex-start;margin-top:0}
-.lb-input{margin-top:var(--sp-5);resize:none;padding:13px var(--sp-4);line-height:var(--lh-heading)}
+.lb-doing .lb-quote+.lb-input{margin-top:var(--sp-5);resize:none;padding:13px var(--sp-4);line-height:var(--lh-heading)}
 .lb-doing .lb-input+.caption{margin:var(--sp-2) 0 0}
 .lb-did{flex:1 1 auto;margin:0;font-weight:var(--fw-body-strong)}
 .lb-sheet-path{padding-bottom:var(--sp-2)}
 .lb-sheet-path .lb-try-title{margin-top:0}
-.lb-sheet-path .lb-trail{margin-top:var(--sp-5)}
-.lb-sheet-did{width:100%;margin-top:var(--sp-5)}
+.lb-sheet-path .lb-sheet-did{width:100%;margin-top:var(--sp-5)}
 
 /* ── 완료 화면 제목 아래의 한 줄 자리 ── */
 .lb-tell{margin:var(--sp-2) 0 0}
-.lb-done-ask{margin-top:var(--sp-2)}
-.lb-done-ask .note{margin:0 0 var(--sp-2)}
-.lb-done-ask-btns{display:flex;flex-wrap:wrap;gap:var(--sp-2)}
-.lb-done-ask .st-pill{min-height:40px;color:var(--service-ink);font-weight:var(--fw-body-strong)}
 
 /* ── 오늘 화면: 숲길 가의 팻말과 돌 아래 한 줄 ── */
 .lb-forest-sign{position:absolute;left:66.5%;top:47.5%;z-index:9;display:block;width:13%}
@@ -288,10 +269,6 @@ button.st-pill-link:focus-visible .st-pill-link-face{outline:var(--emphasis) sol
 .lb-endday.blank{visibility:hidden}
 .lb-endday.off{background:transparent;color:var(--subtle);cursor:default}
 .lb-endday.off:active{transform:none}
-/* 긴 기간의 날 줄: 요일 글자 없이 작은 점(14px)으로 줄 짓는다. 오늘은 민트 칸 그대로, 해 본 날은 채운 돌 그대로 */
-.lb-trail.dense{display:grid;grid-template-columns:repeat(auto-fill,14px);gap:6px;justify-content:center} /* 줄마다 같은 칸에 맞추고 묶음째 가운데 — 마지막 줄만 가운데로 몰리지 않게 */
-.lb-trail.dense li>span:not(.sr):not(.day){display:none}
-.lb-trail.dense .day.mini{width:14px;height:14px;min-height:14px}
 
 /* ── 8판 ── 근거는 tasks/lookback/2026-11-12/RESEARCH-FLOW.md */
 /* 쪽지의 둘째 칸(그래서 나에게 필요한 것): 같은 종이 위에 한 단 작게 */
