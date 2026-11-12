@@ -203,8 +203,20 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 .lb-days-pick{display:flex;flex-direction:column;gap:var(--sp-4);margin-top:var(--sp-5)}
 .lb-days-pick .lb-trail{justify-content:flex-start}
 .lb-days-pick .caption{margin:0}
-.lb-stepper{display:flex;align-items:center;gap:var(--sp-4)}
-.lb-stepper b{min-width:3.5rem;text-align:center;font-size:var(--fs-title);line-height:var(--lh-title);font-weight:800;font-variant-numeric:tabular-nums}
+/* 직접 정하기: 앞으로 30일을 이레씩 줄 지어 놓고 끝나는 날을 누른다. 한 세로줄 = 같은 요일. 오늘~끝 = 옅은 민트(지금 고른 것, D-088), 끝나는 날 = ink */
+.lb-endpick{display:flex;flex-direction:column;gap:var(--sp-2)}
+.lb-endpick-sum{margin:0 0 var(--sp-1);font-size:var(--fs-heading);line-height:var(--lh-heading);color:var(--muted)}
+.lb-endpick-sum b{font-size:var(--fs-title);line-height:var(--lh-title);font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.lb-endgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px 4px;justify-items:center}
+.lb-endhead span{font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted)}
+.lb-endhead span:first-child{color:var(--text);font-weight:var(--fw-body-strong)}
+.lb-endday{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;width:min(100%,var(--touch));aspect-ratio:1;padding:0;border:0;border-radius:50%;background:var(--surface-soft);color:var(--text);font:inherit;font-size:var(--fs-label);font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
+.lb-endday:active{transform:scale(var(--press-pill))}
+.lb-endday.in{background:color-mix(in srgb,var(--service-mint) 32%,var(--bg))}
+.lb-endday.today{font-weight:800}
+.lb-endday[aria-checked="true"]{background:var(--service-ink);color:var(--bg);font-weight:800}
+.lb-endday:focus-visible{outline:var(--emphasis) solid var(--service-ink);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.lb-endday{transition:none}.lb-endday:active{transform:none}}
 /* 이 기간의 날들: 달력의 날짜 모양(.day.mini). 해 본 날만 채워진다 */
 .lb-trail{list-style:none;display:flex;flex-wrap:wrap;justify-content:center;gap:var(--sp-2) var(--sp-3);margin:0;padding:0}
 .lb-trail li{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:var(--fs-caption);line-height:var(--lh-caption);color:var(--muted)}
@@ -266,3 +278,7 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 button.st-pill-link{padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer}
 button.st-pill-link:focus-visible{outline:none}
 button.st-pill-link:focus-visible .st-pill-link-face{outline:var(--emphasis) solid var(--service-ink);outline-offset:2px}
+.lb-endday small{font-size:9px;line-height:1;font-weight:700;margin-bottom:1px} /* 달이 바뀌는 날: 숫자 위에 'n월' */
+/* 줄 나눔(7판 다섯째 보강): 문장 하나가 한 줄 단위이고(.lb-ln), 제목·안내 줄은 줄 길이를 고르게 나눈다 — 마지막 줄에 낱말 하나만 남지 않게 */
+.lb-ln{display:block}
+:is(.lb-read,.lb-flow,.lb-write,.lb-home,.lb-listscreen) :is(h1:not(.lb-read-event),.lede,.paper-guide,.caption,.note,.lb-empty-title),.sheet .lb-ln{text-wrap:balance}

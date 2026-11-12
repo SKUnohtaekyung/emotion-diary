@@ -32,6 +32,8 @@ export const iGa = (w) => ((w.charCodeAt(w.length - 1) - 0xac00) % 28 ? "이" : 
 const eulReul = (w) => ((w.charCodeAt(w.length - 1) - 0xac00) % 28 ? "을" : "를");
 export const put = (node, ...kids) => node.replaceChildren(...kids.flat(3).filter((k) => k != null && k !== false)); // 빈 자리(null)를 글자로 찍지 않는다
 const clean = (v) => v.replace(/\s+/g, " ").trim();
+// 문장마다 줄을 나눈다(7판 다섯째 보강): 두 문장을 한 덩어리로 흘리면 좁은 화면에서 '비워 / 둬도'처럼 말뜻의 가운데에서 꺾였다. 문장 하나가 한 줄 단위다.
+export const lines = (...texts) => texts.filter(Boolean).map((t) => el("span", { class: "lb-ln", text: t }));
 
 // 고르기 알약 한 벌(radiogroup): 고른 것만 Tab 순서에 들고 ← →로 옮긴다(설정·통계의 고르기와 같은 관행).
 function radios(cls, itemCls, label, items, current, onPick) {
@@ -93,7 +95,7 @@ function standardSheet(item, navigate, redraw) {
 // 접어 둔 기준: 시트에 한 줄씩 놓는다. 누르면 그 기준의 시트(다시 꺼내기·고치기·지우기)로 넘어간다.
 function foldedSheet(folded, navigate, redraw) {
   const sh = openSheet({ title: "접어 둔 기준", secondary: { text: "닫기" }, body: [
-    el("p", { class: "note", text: "지우지 않고 넣어 둔 것들이에요. 누르면 다시 꺼낼 수 있어요." }),
+    el("p", { class: "note" }, lines("지우지 않고 넣어 둔 기준이에요.", "누르면 다시 꺼낼 수 있어요.")),
     el("ul", { class: "lb-folded" }, folded.map((s) => el("li", {}, el("button", { type: "button", class: "lb-slip", "aria-haspopup": "dialog", onclick: () => { sh.close(); standardSheet(s, navigate, redraw); } }, slipNode(s)))))] });
 }
 // 끌어서 자리 바꾸기(홈 화면의 앱을 옮기듯): 고치는 중에는 쪽지가 가볍게 흔들리고, 끄는 쪽지가 지나가면 다른 쪽지들이 자리를 내준다. 움직임 줄이기에서는 흔들림·미끄러짐이 없다.
@@ -138,10 +140,10 @@ function renderHome(main, navigate) {
     const read = () => navigate("lookback/read?p=7"), write = () => navigate("lookback/write");
     put(screen, el("div", { class: "lb-note-land", "aria-hidden": "true" }, el("i", { class: "far" }), el("i", { class: "lb-scene-tree t1" }), el("i", { class: "lb-scene-tree t2" }), el("i", { class: "mid" })),
       el("div", { class: "lb-note-head" }, el("h1", { tabindex: "-1", text: "내 기준" }), editBtn),
-      el("p", { class: "lede", text: lb.standards.length ? "다시 읽다가 써 둔, 나에게 중요한 것들이에요." : "나에게 중요한 것을 한 줄씩 써 두는 곳이에요." }),
+      el("p", { class: "lede", text: lb.standards.length ? "다시 읽다가 써 둔 나의 기준이에요." : "나에게 중요한 것을 써 두는 곳이에요." }),
       hint, strip,
       lb.standards.length ? null : el("div", { class: "lb-empty" }, el("p", { class: "lb-empty-title", text: "아직 쓴 기준이 없어요" }),
-        el("p", { class: "note", text: "지난 기록을 다시 읽다 보면 '나는 이럴 때 이렇구나' 싶은 순간이 있어요. 그때 한 줄 써 두면 여기에 쪽지로 남아요." })),
+        el("p", { class: "note" }, lines("다시 읽다가 '나는 이럴 때 이렇구나'", "싶은 순간에 한 줄 써 두면", "여기에 쪽지로 남아요."))),
       list,
       el("div", { class: "sd-actions lb-home-actions" },
         marks ? el("p", { class: "lb-home-marks", text: `모아 둔 기록 ${marks}편이 있어요` }) : null,
@@ -173,7 +175,7 @@ function renderWrite(main, navigate, params) {
   put(main, el("div", { class: `screen write lb-write${qa.keyboard ? " lb-kb-on" : ""}` },
     el("div", { class: "write-top" }, el("button", { type: "button", class: "back", "aria-label": "닫기", onclick: goBack(navigate, "lookback") }, closeIcon())),
     el("h1", { tabindex: "-1", text: editing ? "기준 고치기" : "나에게 중요한 것은 무엇인가요?" }),
-    el("p", { class: "paper-guide", text: "한 줄이면 돼요. 정답은 없고, 나중에 고칠 수 있어요." }),
+    el("p", { class: "paper-guide" }, lines("한 줄이면 충분해요.", "정답은 없고, 나중에 고칠 수 있어요.")),
     refs.length ? el("div", { class: "lb-write-refs" }, el("p", { class: "st-block-label", text: editing ? "이 기준이 나온 기록" : "모아 둔 기록 · 누르면 다시 볼 수 있어요" }), refRow(refs)) : null,
     hint, paper(field), scape({ compact: true, foot: el("div", { class: "step-footer solo lb-foot" }, save) })),
     qa.keyboard ? el("div", { class: "lb-kb", "aria-hidden": "true", text: "자판이 올라온 자리(시안)" }) : null);
@@ -188,7 +190,7 @@ const flowTop = (label, ratio, onClose) => [el("div", { class: "write-top" }, el
   el("div", { class: "progress", "aria-hidden": "true" }, el("i", { style: { width: `${ratio * 100}%` } }))];
 function exampleSheet(std, fill) {
   const sh = openSheet({ title: "예시", secondary: { text: "닫기" }, body: [
-    el("p", { class: "note", text: "내 기록에 자주 나온 말로 고른 예시예요. 고른 뒤에 내 말로 고쳐 쓰면 돼요." }),
+    el("p", { class: "note" }, lines("내 기록에 자주 나온 말로 고른 예시예요.", "고른 뒤에 내 말로 고쳐 써요.")),
     el("ul", { class: "lb-sugs" }, suggestions(std).slice(0, 5).map((g) => el("li", {}, el("button", { type: "button", class: "lb-sug", onclick: () => { sh.close(); fill(g); } },
       el("span", { class: "lb-sug-text", text: `${g.when} · ${g.what}` }), el("small", { text: g.why })))))] });
 }
@@ -198,12 +200,28 @@ function renderPick(main, navigate, params) {
   const hint = el("p", { class: "blocked-hint", id: "lbTryHint", hidden: true, role: "status" });
   if (params?.get("step") === "2" && clean(draft.what)) { // ── ② 며칠 동안 ──
     const body = el("div", { class: "lb-days-pick" });
+    // 직접 정하기(7판 넷째 보강): −/+로 하루씩 늘리면 긴 기간이 번거로워, 앞으로 30일을 이레씩 줄 지어 놓고 끝나는 날을 바로 누른다.
+    // 한 줄이 이레라 같은 세로줄은 같은 요일이다(맨 위에 요일). 오늘부터 고른 날까지 옅은 민트, 끝나는 날은 짙게. 방향키: ← → 하루, ↑ ↓ 이레.
+    const MAX = 30;
+    const endPick = () => {
+      const t = todayIso(), cells = Array.from({ length: MAX }, (_, k) => shiftDay(t, k));
+      const buttons = cells.map((iso, k) => el("button", { type: "button", role: "radio", class: `lb-endday${k < draft.days ? " in" : ""}${k === 0 ? " today" : ""}`,
+        "aria-checked": String(k === draft.days - 1), tabindex: k === draft.days - 1 ? "0" : "-1", "aria-label": `${monthDay(iso)} ${weekday(iso)}요일까지, ${k + 1}일`,
+        text: null }, iso.slice(8) === "01" && k ? el("small", { text: `${Number(iso.slice(5, 7))}월` }) : null, el("span", { text: String(Number(iso.slice(8))) })));
+      const choose = (k) => { draft.days = k + 1; drawDays(true); body.querySelectorAll(".lb-endday")[k]?.focus(); };
+      buttons.forEach((b, k) => {
+        b.addEventListener("click", () => choose(k));
+        b.addEventListener("keydown", (ev) => { const d = { ArrowRight: 1, ArrowLeft: -1, ArrowDown: 7, ArrowUp: -7 }[ev.key]; if (d) { ev.preventDefault(); choose(Math.max(0, Math.min(MAX - 1, k + d))); } });
+      });
+      return el("div", { class: "lb-endpick" },
+        el("p", { class: "lb-endpick-sum", "aria-live": "polite" }, el("b", { text: `${draft.days}일` }), ` · ${monthDay(shiftDay(t, draft.days - 1))}까지`),
+        el("div", { class: "lb-endgrid lb-endhead", "aria-hidden": "true" }, cells.slice(0, 7).map((iso, k) => el("span", { text: k === 0 ? "오늘" : weekday(iso) }))),
+        el("div", { class: "lb-endgrid", role: "radiogroup", "aria-label": "끝나는 날" }, buttons));
+    };
     const drawDays = (custom = !DAY_CHOICES.includes(draft.days)) => {
-      const step = (delta, label) => el("button", { type: "button", class: "step", "aria-label": label, text: delta < 0 ? "−" : "+", onclick: () => { draft.days = Math.max(1, Math.min(30, draft.days + delta)); drawDays(true); body.querySelector(`[aria-label="${label}"]`)?.focus(); } });
       put(body, radios("st-pills", "st-pill", "기간", [...DAY_CHOICES.map((d) => [d, `${d}일`]), [0, "직접 정하기"]], custom ? 0 : draft.days, (d) => { if (d) draft.days = d; drawDays(d === 0); }),
-        custom ? el("div", { class: "lb-stepper", role: "group", "aria-label": "기간 직접 정하기" }, step(-1, "하루 줄이기"), el("b", { "aria-live": "polite", text: `${draft.days}일` }), step(1, "하루 늘리기")) : null,
-        trail(Array.from({ length: draft.days }, (_, k) => shiftDay(todayIso(), k))),
-        el("p", { class: "caption", text: `오늘부터 ${monthDay(shiftDay(todayIso(), draft.days - 1))}까지예요. 끝나는 날에 한 번만 알려 드려요.` }));
+        custom ? endPick() : trail(Array.from({ length: draft.days }, (_, k) => shiftDay(todayIso(), k))),
+        el("p", { class: "caption" }, lines(custom ? "끝나는 날을 눌러요." : `오늘부터 ${monthDay(shiftDay(todayIso(), draft.days - 1))}까지예요.`, "끝나는 날에 한 번만 알려 드려요.")));
     };
     drawDays();
     put(main, el("div", { class: "screen write lb-flow" }, flowTop("2 / 2", 1, leave),
@@ -225,8 +243,8 @@ function renderPick(main, navigate, params) {
   const field = el("div", { class: "field lb-madlib" }, when, what,
     el("button", { type: "button", class: "link lb-example-btn", text: "예시 보기", onclick: () => exampleSheet(std, (g) => { when.value = g.when; what.value = g.what; draft.when = g.when; draft.what = g.what; when.grow(); what.grow(); sync(); what.focus(); }) }));
   put(main, el("div", { class: "screen write lb-flow" }, flowTop("1 / 2", 0.5, leave),
-    el("h1", { tabindex: "-1", text: "며칠만, 이렇게 해 볼까요?" }),
-    el("p", { class: "paper-guide", text: std ? `'${std.text}'에서 시작해요. 해 볼 것 하나를 내 말로 써요.` : "해 볼 것 하나를 내 말로 써요. '어떤 때'는 비워 둬도 돼요." }),
+    el("h1", { tabindex: "-1", text: "무엇을 해 볼까요?" }),
+    el("p", { class: "paper-guide" }, lines(std ? `'${std.text}'에서 시작해요.` : null, "며칠 동안 해 볼 것 하나를 적어요.", std ? null : "'어떤 때'는 비워 둬도 돼요.")),
     hint, paper(field), scape({ compact: true, foot: el("div", { class: "step-footer solo lb-foot" }, next) })));
   requestAnimationFrame(() => { when.grow(); what.grow(); }); sync();
 }
@@ -243,7 +261,7 @@ function renderActive(main, navigate) {
     put(screen, el("div", { class: "write-top" }, el("button", { type: "button", class: "back", "aria-label": "뒤로", onclick: goBack(navigate, "lookback") }, backIcon()), el("span", { class: "step-count", text: "실천하는 중" }),
       el("button", { type: "button", class: "back", "aria-label": "더보기", "aria-haspopup": "dialog", onclick: menu }, dotsIcon())),
       pathTitle(x), el("p", { class: "sxd-sub lb-center", text: rangeText(x) }), trail(pathDays(x), x.walked),
-      el("p", { class: "caption lb-center", text: "해 본 날만 표시돼요. 안 한 날은 세지 않아요." }), scape({ sign: true, foot }));
+      el("p", { class: "caption lb-center" }, lines("해 본 날만 표시돼요.", "안 한 날은 세지 않아요.")), scape({ sign: true, foot }));
     put(foot, did ? [el("p", { class: "lb-did", role: "status", text: "오늘은 해 본 날로 남겼어요" }), el("button", { type: "button", class: "btn text lb-did-btn", text: "지우기", onclick: () => { x.walked.delete(t); draw(".lb-did-btn"); } })]
       : el("button", { type: "button", class: "btn primary big lb-did-btn", text: "오늘 해 봤어요", onclick: () => { x.walked.add(t); announce("오늘을 해 본 날로 남겼어요"); draw(".lb-did-btn"); } }));
     if (focusSel) foot.querySelector(focusSel)?.focus();
@@ -262,7 +280,7 @@ function renderEnded(main, navigate) {
     el("div", { class: "write-top" }, el("button", { type: "button", class: "back", "aria-label": "뒤로", onclick: goBack(navigate, "lookback") }, backIcon()), el("span", { class: "step-count", text: "정한 기간이 끝났어요" }), el("span", { class: "lb-top-gap" })),
     el("h1", { tabindex: "-1", text: "해 보니 어땠나요?" }),
     el("p", { class: "lb-quote", text: [x.when, x.what].filter(Boolean).join(" · ") }), trail(pathDays(x), x.walked),
-    input, el("p", { class: "caption", text: "좋았는지 아닌지는 내가 정해요. 비워 둬도 돼요." }),
+    input, el("p", { class: "caption" }, lines("좋았는지 아닌지는 내가 정해요.", "비워 둬도 돼요.")),
     el("a", { class: "link lb-read-open", href: "#/lookback/read?p=x", text: "이 기간의 기록 읽기" }),
     scape({ sign: true, compact: true, foot: el("div", { class: "step-footer lb-foot" }, el("button", { type: "button", class: "btn text", text: "한 번 더", onclick: finish(true) }), el("button", { type: "button", class: "btn primary big", text: "마치기", onclick: finish(false) })) })));
 }

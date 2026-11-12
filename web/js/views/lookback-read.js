@@ -11,7 +11,7 @@ import { renderLand, doneLayout } from "../components/land.js";
 import { openSheet } from "../components/sheet.js";
 import { scape } from "../lookback/scape.js";
 import { lb, recordOf, recordedDays, recordedBetween, todayIso, monthDay, weekday, toggleMark, repeated, pathEnd } from "../lookback/store.js";
-import { chev, head, catsOf, put, goBack, iGa } from "./lookback.js";
+import { chev, head, catsOf, put, goBack, iGa, lines } from "./lookback.js";
 
 const LONG = ["오랜만에 대학 동기들을 만나기로 한 날이었다. 한 달 전부터 날짜를 맞췄고 나는 일부러 저녁 약속을 하나 미뤘다. 그런데 출발하려는데 단체 대화방에 한 명씩 못 온다는 말이 올라오더니, 결국 다음에 보자는 말로 끝났다. 이미 옷까지 갈아입은 뒤였다. 혼자 동네를 한 바퀴 걷고 편의점에서 김밥을 사 들고 집에 왔다.",
   "화가 났다기보다 내 시간이 아무것도 아닌 것처럼 다뤄진 느낌이 오래 남았다. 다들 사정이 있었겠지만, 나는 이 약속을 꽤 기다렸다는 걸 아무도 모르는 것 같았다. 그리고 그 말을 대화방에 쓰지 못한 나에게도 조금 실망했다."];
@@ -53,15 +53,15 @@ export function renderRead(main, navigate, params) {
   function draw() {
     if (!days.length) { // 읽을 기록이 없다
       put(screen, top("", 0), el("h1", { tabindex: "-1", class: "lb-read-event s", text: "아직 다시 읽을 기록이 없어요" }),
-        el("p", { class: "lede", text: "오늘 화면에서 마음을 남기면 여기에서 다시 읽을 수 있어요." }), scape({ pond: false, foot }));
+        el("p", { class: "lede" }, lines("오늘 화면에서 마음을 남기면", "여기에서 다시 읽을 수 있어요.")), scape({ pond: false, foot }));
       put(foot, el("button", { type: "button", class: "btn primary big", text: "오늘 화면으로", onclick: () => navigate("today") }));
       return;
     }
     if (i >= days.length) { // 다 읽은 자리: 물음 하나
       const n = lb.marks.size; // 장면: 큰 나무 그늘에서 지나온 길과 물가를 내려다본다(길 끝에서 돌아본 자리)
       put(screen, top("다 읽었어요", 1),
-        el("h1", { tabindex: "-1", class: "lb-ask", text: "되풀이된 것 중에 나에게 중요한 것이 있었나요?" }),
-        el("p", { class: "lede", text: n ? `모아 둔 기록 ${n}편을 한데 놓고 보며 쓸 수 있어요.` : "없었다면 여기서 닫아도 돼요." }), scape({ foot }));
+        el("h1", { tabindex: "-1", class: "lb-ask", text: "중요한 것이 보였나요?" }),
+        el("p", { class: "lede" }, lines(n ? `모아 둔 기록 ${n}편을 보며 한 줄로 써 봐요.` : "없었다면 여기서 닫아도 돼요.")), scape({ foot }));
       put(foot, el("button", { type: "button", class: "btn text", text: "닫기", onclick: leave }),
         el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: () => navigate("lookback/write") }));
       return;
