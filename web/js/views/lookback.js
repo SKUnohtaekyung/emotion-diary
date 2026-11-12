@@ -1,5 +1,5 @@
-// 돌아보기 · 내 기준 · 며칠 살아 보기 · 전하기 한 줄(TASK-LOOKBACK-01 단계 A 시안, 4판). 무엇을 왜 만드는지는 tasks/lookback/2026-11-12/CONCEPT.md, 판마다 바뀐 것은 같은 폴더의 ROUND2~4.md.
-// 화면: #/lookback(한눈에 보기) · #/lookback/read?p=7|30(다시 읽기, lookback-read.js) · #/lookback/note(내 기준) · #/lookback/write(한 줄 적기) · #/lookback/try(며칠 살아 보기).
+// 돌아보기 · 내 기준 · 실천해 보기 · 전하기 한 줄(TASK-LOOKBACK-01 단계 A 시안, 4판). 무엇을 왜 만드는지는 tasks/lookback/2026-11-12/CONCEPT.md, 판마다 바뀐 것은 같은 폴더의 ROUND2~4.md.
+// 화면: #/lookback(한눈에 보기) · #/lookback/read?p=7|30(다시 읽기, lookback-read.js) · #/lookback/note(내 기준) · #/lookback/write(기준 쓰기) · #/lookback/try(실천해 보기).
 // 줄기: 다시 읽는다 → 마음에 남는 기록을 모아 둔다 → 모아 둔 기록을 보며 한 줄 적는다(내 기준) → 그 문장으로 며칠 살아 본다. 첫 화면이 이 줄기를 한 장에 보인다.
 // 통계와 다른 점: 통계는 수(얼마나 머물렀나)이고 여기는 글(무슨 일이 있었고 나에게 무엇이 중요한가)이다. 이 화면들에는 크기·평균·비교가 없다.
 // 앱은 기준을 제안하거나 고쳐 주지 않고, 살아 본 것을 판정하지 않는다 — 문장은 묻거나 있는 것을 말할 뿐이다(서비스 WHY §12·§20).
@@ -86,7 +86,7 @@ function todayToggle(x, redraw) {
 }
 
 // ══════════════════════ 0. 한눈에 보기 #/lookback ══════════════════════
-// 길 하나를 따라 네 마디가 놓인다: 다시 읽기 → 모아 둔 기록 → 내 기준 → 며칠 살아 보기. 마디마다 지금 있는 것과 다음에 할 수 있는 것 하나를 보인다.
+// 길 하나를 따라 네 마디가 놓인다: 다시 읽기 → 모아 둔 기록 → 내 기준 → 실천해 보기. 마디마다 지금 있는 것과 다음에 할 수 있는 것 하나를 보인다.
 function renderHub(main, navigate) {
   const week = recordedDays(7), month = recordedDays(30), marks = [...lb.marks], open = lb.standards.filter((s) => !s.folded), st = pathState(), x = lb.path;
   const screen = el("div", { class: "screen lb lb-hub tb-rise" });
@@ -94,22 +94,22 @@ function renderHub(main, navigate) {
   const readCard = (p, big, small, n) => el("a", { class: "lb-readcard", href: `#/lookback/read?p=${p}`, "aria-label": `${big}, ${small}, 기록 ${n}편` },
     el("b", { text: big }), el("span", { text: small }), el("em", { text: n ? `기록 ${n}편` : "기록 없음" }), chev("sx-chev"));
   function draw(focusSel) {
-    put(screen, head(navigate, "calendar", "달력으로"), scene({ cats: [...new Set(week.flatMap((iso) => catsOf(recordOf(iso))))] }),
+    put(screen, scene({ cats: [...new Set(week.flatMap((iso) => catsOf(recordOf(iso))))] }),
       el("h1", { tabindex: "-1", text: "돌아보기" }),
       el("p", { class: "lede", text: "통계가 얼마나 머물렀는지를 센다면, 여기는 그날 무슨 일이 있었는지를 글로 다시 읽는 곳이에요." }),
       el("ol", { class: "lb-knots" },
         knot("다시 읽기", el("div", { class: "lb-readcards" }, readCard(7, "최근 7일", "한 장씩 넘겨 읽기", week.length), readCard(30, "최근 30일", "한눈에 훑어보기", month.length))),
         knot("모아 둔 기록", marks.length
-          ? [refRow(marks), el("p", { class: "note", text: "이 기록들을 한데 놓고 보며 나에게 중요한 것을 한 줄 적어요." }), el("button", { type: "button", class: "btn secondary lb-knot-btn", text: "한 줄 적기", onclick: () => navigate("lookback/write") })]
+          ? [refRow(marks), el("p", { class: "note", text: "이 기록들을 한데 놓고 보며 나에게 중요한 것을 한 줄 적어요." }), el("button", { type: "button", class: "btn secondary lb-knot-btn", text: "기준 쓰기", onclick: () => navigate("lookback/write") })]
           : el("p", { class: "note", text: "다시 읽다가 마음에 남는 기록을 모아 둘 수 있어요. 모아 둔 기록은 여기에 놓여요." })),
         knot("내 기준", open.length
           ? [el("ul", { class: "lb-slips grid lb-hub-slips" }, open.slice(0, 2).map((s) => el("li", {}, el("a", { class: "lb-slip small", href: "#/lookback/note" }, slipNode(s))))),
             el("a", { class: "st-pill-link", href: "#/lookback/note" }, el("span", { class: "st-pill-link-face" }, "쪽지 모두 보기", chev()))]
           : el("p", { class: "note", text: "모아 둔 기록을 보며 적은 한 줄이 쪽지로 남아요. 아직 적은 쪽지가 없어요." })),
-        knot("며칠 살아 보기", st === "active"
+        knot("실천해 보기", st === "active"
           ? [pathTitle(x, "p"), trail(x), todayToggle(x, draw), el("a", { class: "st-pill-link", href: "#/lookback/try" }, el("span", { class: "st-pill-link-face" }, "자세히 보기", chev()))]
           : st === "ended" ? [pathTitle(x, "p"), el("p", { class: "note", text: "정한 기간이 끝났어요. 해 보니 어땠는지 돌아볼 수 있어요." }), el("button", { type: "button", class: "btn secondary lb-knot-btn", text: "돌아보기", onclick: () => navigate("lookback/try") })]
-          : [el("p", { class: "note", text: "내 기준 하나를 골라 며칠 그렇게 살아 봐요. 어땠는지는 해 본 내가 정해요." }), el("button", { type: "button", class: "btn secondary lb-knot-btn", text: "정해 보기", onclick: () => navigate("lookback/try") })])));
+          : [el("p", { class: "note", text: "내 기준 하나를 골라 며칠 실천해 봐요. 어땠는지는 해 본 내가 정해요." }), el("button", { type: "button", class: "btn secondary lb-knot-btn", text: "정해 보기", onclick: () => navigate("lookback/try") })])));
     if (focusSel) screen.querySelector(focusSel)?.focus();
   }
   put(main, screen); draw();
@@ -126,7 +126,7 @@ function standardSheet(item, navigate, redraw) {
   const sh = openSheet({ title: `${monthDay(item.at)}에 적은 쪽지`, secondary: { text: "닫기" }, body: [
     el("p", { class: "lb-quote", text: item.text }),
     item.from.length ? el("div", { class: "lb-sheet-refs" }, el("p", { class: "st-block-label", text: "이 문장이 나온 기록" }), refRow(item.from)) : el("p", { class: "caption", text: "기록을 모아 두지 않고 적은 문장이에요." }),
-    pathState() === "none" && !item.folded ? row("이 문장으로 며칠 살아 보기", "해 볼 것 하나를 정해요.", () => navigate(`lookback/try?from=${item.id}`)) : null,
+    pathState() === "none" && !item.folded ? row("이 문장으로 실천해 보기", "해 볼 것 하나를 정해요.", () => navigate(`lookback/try?from=${item.id}`)) : null,
     row("고치기", "지금의 나에게 맞게 고쳐요.", () => navigate(`lookback/write?id=${item.id}`)),
     item.folded ? null : row("앞으로 옮기기", "쪽지를 한 칸 앞에 놓아요. 끌어서 옮길 수도 있어요.", () => { if (moveStandard(item.id, -1)) redraw(); else toast("맨 앞에 있어요"); }),
     row(item.folded ? "다시 꺼내 놓기" : "접어 두기", item.folded ? "쪽지를 다시 꺼내 놓아요." : "지우지 않고 잠시 넣어 둬요.", () => { item.folded = !item.folded; toast(item.folded ? "접어 뒀어요" : "다시 꺼내 놓았어요"); redraw(); }),
@@ -162,8 +162,8 @@ function renderNote(main, navigate) {
   function draw() {
     const open = lb.standards.filter((s) => !s.folded), folded = lb.standards.filter((s) => s.folded), marks = [...lb.marks];
     const big = open.length <= 2;
-    const slip = (s) => el("li", { "data-id": s.id }, el("button", { type: "button", class: `lb-slip ${big ? "big" : "small"}`, "aria-haspopup": "dialog", onclick: () => { if (!editing) standardSheet(s, navigate, draw); } }, slipNode(s)));
-    const list = open.length ? el("ul", { class: `lb-slips ${big ? "big" : "grid"}${editing ? " is-editing" : ""}` }, open.map(slip)) : null;
+    const slip = (s) => el("li", { "data-id": s.id }, el("button", { type: "button", class: `lb-slip ${big ? "mid" : "small"}`, "aria-haspopup": "dialog", onclick: () => { if (!editing) standardSheet(s, navigate, draw); } }, slipNode(s)));
+    const list = open.length ? el("ul", { class: `lb-slips ${big ? "few" : "grid"}${editing ? " is-editing" : ""}` }, open.map(slip)) : null;
     const editBtn = open.length > 1 ? el("button", { type: "button", class: "link lb-edit-toggle", "aria-pressed": String(editing), text: editing ? "완료" : "순서 바꾸기", onclick: () => { editing = !editing; draw(); screen.querySelector(".lb-edit-toggle")?.focus(); } }) : null;
     if (list) reorderable(list, { isEditing: () => editing, enter: () => { editing = true; list.classList.add("is-editing"); if (editBtn) { editBtn.textContent = "완료"; editBtn.setAttribute("aria-pressed", "true"); } hint.hidden = false; announce("쪽지를 끌어서 자리를 바꿀 수 있어요"); },
       onOrder: (ids) => { orderStandards(ids); announce("쪽지 자리를 바꿨어요"); } });
@@ -174,20 +174,22 @@ function renderNote(main, navigate) {
     const how = !lb.standards.length ? el("ol", { class: "lb-how" },
       el("li", {}, el("b", { text: "다시 읽기" }), el("span", { text: "지난 기록을 다시 읽어요." })),
       el("li", {}, el("b", { text: "모아 두기" }), el("span", { text: "마음에 남는 기록을 모아 둬요." })),
-      el("li", {}, el("b", { text: "한 줄 적기" }), el("span", { text: "모아 둔 기록을 보며 나에게 중요한 것을 적어요. 그 한 줄이 여기에 쪽지로 남아요." }))) : null;
-    put(screen, head(navigate, "lookback", "돌아보기로"),
+      el("li", {}, el("b", { text: "기준 쓰기" }), el("span", { text: "모아 둔 기록을 보며 나에게 중요한 것을 적어요. 그 한 줄이 여기에 쪽지로 남아요." }))) : null;
+    put(screen, el("div", { class: "lb-note-land", "aria-hidden": "true" }, el("i", { class: "lb-note-sun" }), el("i", { class: "far" }), el("i", { class: "lb-scene-tree t1" }), el("i", { class: "lb-scene-tree t2" }), el("i", { class: "mid" })),
+      head(navigate, "lookback", "돌아보기로"),
       el("div", { class: "lb-note-head" }, el("h1", { tabindex: "-1", text: "내 기준" }), editBtn),
-      el("p", { class: "lede", text: lb.standards.length ? "기록을 다시 읽다가 '나는 이럴 때 이렇구나' 싶어 적어 둔 한 줄이에요. 쪽지 위 조약돌은 그 문장이 나온 날이에요." : "기록을 다시 읽다가 '나는 이럴 때 이렇구나' 싶을 때 적어 두는 한 줄이에요." }),
+      el("p", { class: "lede", text: lb.standards.length ? "다시 읽다가 적어 둔 내 기준이에요. 쪽지 위 조약돌은 그 문장이 나온 날이에요." : "기록을 다시 읽다가 '나는 이럴 때 이렇구나' 싶을 때 적어 두는 문장이에요." }),
       hint, how, list,
+      list ? el("div", { class: "lb-note-stonerow", "aria-hidden": "true" }, Object.assign(stoneImg("rest"), { className: "stone-img rest lb-note-stone" })) : null, // 쪽지 곁에 앉은 나의 돌(장식)
       marks.length ? el("div", { class: "lb-tray" }, el("p", { class: "st-block-label", text: "모아 둔 기록" }), refRow(marks), el("p", { class: "caption", text: "이 기록들을 보며 한 줄 적으면, 그 쪽지에 함께 남아요." })) : null,
       foldedBtn, folded.length ? foldedList : null,
       el("div", { class: "sd-actions" }, lb.standards.length ? null : el("button", { type: "button", class: "btn text big", text: "다시 읽으러 가기", onclick: () => navigate("lookback") }),
-        el("button", { type: "button", class: "btn primary big", text: "한 줄 적기", onclick: () => navigate("lookback/write") })));
+        el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: () => navigate("lookback/write") })));
   }
   put(main, screen); draw();
 }
 
-// ══════════════════════ 3. 한 줄 적기·고치기 #/lookback/write(?id=) ══════════════════════
+// ══════════════════════ 3. 기준 쓰기·고치기 #/lookback/write(?id=) ══════════════════════
 // 일기의 첫 단계('오늘 있었던 일')와 같은 종이·언덕 장면이다. 모아 둔 기록이 위에 놓이고, 적은 한 줄 뒤에 그 기록들이 함께 남는다는 것을 그 자리에서 말한다.
 function renderWrite(main, navigate, params) {
   const editing = lb.standards.find((s) => s.id === Number(params.get("id")));
@@ -208,7 +210,7 @@ function renderWrite(main, navigate, params) {
   const field = el("div", { class: "field" }, el("label", { for: "lbLine", class: "field-label", text: "나에게 중요한 것" }), input);
   put(main, el("div", { class: `screen write lb-write${qa.keyboard ? " lb-kb-on" : ""}` },
     el("div", { class: "write-top" }, el("button", { type: "button", class: "back", "aria-label": "뒤로", onclick: goBack(navigate, "lookback/note") }, backIcon())),
-    el("h1", { tabindex: "-1", text: editing ? "쪽지 고치기" : "한 줄 적기" }),
+    el("h1", { tabindex: "-1", text: editing ? "쪽지 고치기" : "기준 쓰기" }),
     el("p", { class: "paper-guide", text: "어떤 때 어떤 마음이 드는지 적어 볼 수 있어요. 정답은 없고, 나중에 고쳐도 돼요." }),
     refs.length ? el("div", { class: "lb-write-refs" }, el("p", { class: "st-block-label", text: editing ? "이 문장이 나온 기록" : "모아 둔 기록" }), refRow(refs),
       editing ? null : el("p", { class: "caption", text: "눌러서 다시 읽어 볼 수 있어요. 적은 한 줄 뒤에 이 기록들이 함께 남아요." })) : null,
@@ -218,7 +220,7 @@ function renderWrite(main, navigate, params) {
   sync();
 }
 
-// ══════════════════════ 4. 며칠 살아 보기 #/lookback/try ══════════════════════
+// ══════════════════════ 4. 실천해 보기 #/lookback/try ══════════════════════
 // 큰 글자의 문장 하나를 완성한다: [어떤 때] [이렇게] N일 동안 살아 볼래요. 정하는 것은 모두 사용자다 — 어느 문장에서 시작할지, 어떤 때를 적을지 말지, 며칠인지(직접 정할 수도 있다).
 // 예시는 사람이 써 둔 목록에서 규칙으로 고르고(store.js suggestions) 고른 까닭을 함께 보인다. 누르면 빈칸이 채워질 뿐이고 고쳐 쓴다.
 function renderPick(main, navigate, params) {
@@ -263,8 +265,8 @@ function renderPick(main, navigate, params) {
   }
   drawFrom(); drawDays(); drawSug();
   put(screen, head(navigate, "lookback", "돌아보기로"),
-    el("h1", { class: "lb-poster-h1", tabindex: "-1", text: "며칠 살아 보기" }), fromSlot,
-    el("div", { class: "lb-madlib", role: "group", "aria-label": "해 볼 것" }, when, what, el("p", { class: "lb-madlib-tail" }, daysWord, " 동안 이렇게 살아 볼래요.")),
+    el("h1", { class: "lb-poster-h1", tabindex: "-1", text: "실천해 보기" }), fromSlot,
+    el("div", { class: "lb-madlib", role: "group", "aria-label": "해 볼 것" }, when, what, el("p", { class: "lb-madlib-tail" }, daysWord, " 동안 실천해 볼래요.")),
     el("p", { class: "caption lb-madlib-note", text: "'어떤 때'는 비워 둬도 돼요. 어땠는지는 해 본 내가 정해요." }),
     daySlot, sugSlot, scene({ sign: true }),
     el("div", { class: "sd-actions" }, hint, start));
@@ -280,7 +282,7 @@ function renderActive(main, navigate) {
   const screen = el("div", { class: "screen settings-sub lb lb-try tb-rise" });
   function draw(focusSel) {
     put(screen, head(navigate, "lookback", "돌아보기로"), scene({ sign: true }),
-      el("p", { class: "sx-eyebrow lb-center", text: "살아 보는 중" }), pathTitle(x), el("p", { class: "sxd-sub lb-center", text: rangeText(x) }), fromLine(x),
+      el("p", { class: "sx-eyebrow lb-center", text: "실천하는 중" }), pathTitle(x), el("p", { class: "sxd-sub lb-center", text: rangeText(x) }), fromLine(x),
       el("div", { class: "lb-walk" }, trail(x), todayToggle(x, draw), el("p", { class: "caption", text: "누른 날만 채워져요. 누르지 않은 날은 빈칸으로 남을 뿐이에요." })),
       el("div", { class: "st-rows lb-try-rows" }, el("div", { class: "st-row st-switch-row" }, el("span", { class: "st-ic-frame" }, ICONS.bell()), el("span", { class: "st-row-name", text: "끝나는 날 알려 주기" }),
         el("button", { type: "button", class: "switch", role: "switch", "aria-checked": String(alarm), "aria-label": "끝나는 날 알려 주기", onclick: () => { alarm = !alarm; draw(".switch"); } }, el("i", { "aria-hidden": "true" })))),
@@ -347,26 +349,16 @@ function pathSheet(navigate) {
   const draw = (focusSel) => { put(bodyNode, pathTitle(x, "p"), el("p", { class: "sxd-sub lb-center", text: rangeText(x) }),
     el("div", { class: "lb-walk" }, trail(x), ended ? el("p", { class: "note", text: "정한 기간이 끝났어요." }) : todayToggle(x, draw))); if (focusSel) bodyNode.querySelector(focusSel)?.focus(); };
   draw();
-  openSheet({ title: ended ? "해 보니 어땠나요?" : "살아 보는 중", body: [bodyNode], primary: { text: ended ? "돌아보기" : "자세히 보기", onclick: () => navigate("lookback/try") }, secondary: { text: "닫기" } });
+  openSheet({ title: ended ? "해 보니 어땠나요?" : "실천하는 중", body: [bodyNode], primary: { text: ended ? "돌아보기" : "자세히 보기", onclick: () => navigate("lookback/try") }, secondary: { text: "닫기" } });
 }
 export function todayMark(box, headNode, navigate) {
   const st = pathState();
   if (st === "none") return;
   const open = (ev) => { ev.preventDefault(); pathSheet(navigate); };
-  const label = st === "ended" ? `'${lb.path.what}' 기간이 끝났어요` : `'${lb.path.what}' 살아 보는 중`;
+  const label = st === "ended" ? `'${lb.path.what}' 기간이 끝났어요` : `'${lb.path.what}' 실천하는 중`;
   box.append(el("a", { class: `lb-forest-sign${st === "ended" ? " is-ended" : ""}`, href: "#/lookback/try", "aria-label": label, onclick: open }, signPost("lb-forest-sign-svg")));
   if (!box.querySelector(".yline")) box.append(el("p", { class: "yline lb-yline" }, el("a", { href: "#/lookback/try", onclick: open }, label, chev(""))));
 }
 
-// 달력의 입구: 날짜를 고르지 않았을 때의 빈 자리에 알약 하나.
-export const calendarEntry = () => el("a", { class: "st-pill-link lb-cal-entry", href: "#/lookback" }, el("span", { class: "st-pill-link-face" }, "지난 기록 다시 읽기", chev()));
 
-// 통계 맨 아래의 줄 하나: 수가 아니라 글로 다시 읽는 곳으로 가는 입구.
-export function statsRows(navigate) {
-  const st = pathState();
-  return el("section", { class: "sx-sec lb-stats-rows" }, el("h2", { class: "sx-eyebrow", text: "글로 다시 읽기" }),
-    el("div", { class: "st-rows" }, el("button", { type: "button", class: "st-row", onclick: () => navigate("lookback") },
-      el("span", { class: "st-ic-frame" }, ICONS.read()), el("span", { class: "st-row-name", text: "돌아보기" }),
-      el("span", { class: "st-row-trail" }, st === "active" ? el("span", { class: "st-row-value", text: "살아 보는 중" }) : null, chev()))));
-}
 export const statsDetailReader = () => null; // 1판의 2C안(통계 친구 상세에서 이어 읽기)은 고르지 않았다 — stats.js의 자리만 남긴다

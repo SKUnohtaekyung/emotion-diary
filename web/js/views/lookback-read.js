@@ -68,12 +68,12 @@ export function endBlock(navigate, days, { again = true } = {}) {
       el("div", { class: "sx-pillrow" }, words.map((item) => el("button", { type: "button", class: "sx-pill lb-again-pill", "aria-label": `${item.word}, ${item.days.length}일. 그날들 다시 읽기`, onclick: () => wordSheet(item) }, item.word, el("em", { text: `${item.days.length}일` })))),
       el("p", { class: "caption", text: "센 것만 보여 드려요. 누르면 그 말이 나온 날을 모아 읽을 수 있어요." })) : null,
     marked,
-    el("div", { class: "stack" }, el("button", { type: "button", class: "btn primary big", text: "한 줄 적기", onclick: () => navigate("lookback/write") })));
+    el("div", { class: "stack" }, el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: () => navigate("lookback/write") })));
 }
 const emptyBlock = (navigate, text) => el("div", { class: "sx-empty" }, el("p", { class: "sx-headline", text }),
   el("p", { class: "caption", text: "오늘 화면에서 마음을 남기면 여기에서 다시 읽을 수 있어요." }),
   el("div", { class: "stack" }, el("button", { type: "button", class: "btn secondary", text: "오늘 화면으로", onclick: () => navigate("today") })));
-// 모아 둔 기록 알약(위 오른쪽): 모아 둘 때마다 여기에 쌓이는 것이 보인다. 누르면 한 줄 적기로 간다
+// 모아 둔 기록 알약(위 오른쪽): 모아 둘 때마다 여기에 쌓이는 것이 보인다. 누르면 기준 쓰기로 간다
 function trayChip(navigate) {
   const chip = el("button", { type: "button", class: "lb-traychip", onclick: () => navigate("lookback/write") });
   onMarks(chip, () => { chip.hidden = !lb.marks.size; put(chip, el("span", { class: "lb-traychip-pebs", "aria-hidden": "true" }, [...lb.marks].sort().slice(-3).map((iso) => { const c = catsOf(recordOf(iso))[0]; return c ? pebbleImg(c, { size: 22 }) : null; })),
@@ -135,7 +135,7 @@ function renderMonth(main, navigate) {
   }
   const tray = el("div", { class: "lb-traybar" });
   onMarks(tray, () => { tray.hidden = !lb.marks.size; put(tray, el("p", {}, el("b", { text: `모아 둔 기록 ${lb.marks.size}편` }), el("span", { text: "한데 놓고 보며 적어요" })),
-    el("button", { type: "button", class: "btn primary", text: "한 줄 적기", onclick: () => navigate("lookback/write") })); });
+    el("button", { type: "button", class: "btn primary", text: "기준 쓰기", onclick: () => navigate("lookback/write") })); });
   if (days.length) draw();
   put(main, el("div", { class: "screen lb lb-monthscreen tb-rise" }, head(navigate, "lookback", "돌아보기로"),
     el("h1", { tabindex: "-1", text: "최근 30일" }),

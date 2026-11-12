@@ -253,3 +253,41 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 
 /* 단추로 쓴 알약 링크(문장 고르기): 브라우저 기본 단추 모양을 걷는다 */
 button.st-pill-link{padding:0;border:0;background:none;font:inherit;cursor:pointer}
+
+/* ════════ 5판 ════════ */
+/* 하단 탐색: 다섯 탭(오늘·달력·돌아보기·통계·설정) */
+.bottom-nav-rail{grid-template-columns:repeat(5,1fr)}
+.lb-hub{padding-top:0}
+
+/* 내 기준: 언덕 위에 놓인 쪽지. 흰 하늘 아래 옅은 언덕이 화면 끝까지 깔리고(일기 장면의 .nt-haze·.nt-hill과 같은 색), 버튼 줄은 가까운 언덕 위에 얹힌다 */
+.screen.lb-note{position:relative;overflow:hidden}
+.lb-note>*{position:relative;z-index:1}
+.lb-note>.lb-note-land{position:absolute;z-index:0;left:0;right:0;top:11.75rem;bottom:0;pointer-events:none}
+.lb-note-land .far{position:absolute;left:-30%;right:-20%;top:0;bottom:0;border-radius:50% 50% 0 0/3.5rem 3.5rem 0 0;background:color-mix(in srgb,var(--land-hill-far) 58%,var(--bg))}
+.lb-note-land .mid{position:absolute;left:-10%;right:-70%;top:max(52%,19rem);bottom:0;border-radius:50% 50% 0 0/4.5rem 4.5rem 0 0;background:var(--land-hill-far)}
+.lb-note-land .lb-scene-tree.t1{left:84%;top:-12px;bottom:auto}
+.lb-note-land .lb-scene-tree.t2{left:91%;top:-4px;bottom:auto}
+.lb-note-sun{position:absolute;left:58%;top:-.9rem;width:2rem;height:2rem;border-radius:50%;background:var(--land-sun)}
+.lb-note-sun::before{content:"";position:absolute;inset:-.55rem;border-radius:50%;border:2.5px solid var(--land-sun-ring)}
+.lb-note-stonerow{display:flex;justify-content:flex-end;height:44px;margin:var(--sp-3) var(--sp-6) 0 0}
+.lb-note-stonerow .lb-note-stone{position:static;width:60px;height:auto}
+.lb-slips.few+.lb-note-stonerow{justify-content:flex-start;margin:calc(var(--sp-2) * -1) 0 0 var(--sp-6)}
+.lb-note .lb-slips{margin-top:calc(var(--sp-10) + var(--sp-2))}
+.lb-note .lb-tray{background:var(--bg)}
+.lb-note .lb-tray .lb-ref{background:var(--surface-soft)}
+.lb-note .lb-how li::before{background:var(--bg)}
+.lb-note .sd-actions{background:transparent}
+.lb-note .sd-actions::before{content:"";position:absolute;z-index:-1;left:calc(var(--sp-5) * -1.6);right:calc(var(--sp-5) * -1.6);top:-.5rem;bottom:0;border-radius:50% 50% 0 0/2rem 2rem 0 0;background:var(--land-hill-mid)}
+/* 쪽지: 접힌 모서리는 진짜로 잘라 낸다(바탕이 흰색이 아니어도 맞게) — 종이 면은 ::before가 그리고 조약돌은 잘리지 않는다 */
+.lb-slip{background:none;isolation:isolate}
+.lb-slip::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:14px;background:var(--service-light);clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%)}
+.lb-slip-fold{background:linear-gradient(135deg,var(--paper-rule) 50%,transparent 50%)}
+/* 한두 장일 때: 가운데 크기의 쪽지를 왼쪽·오른쪽으로 엇갈려 놓는다 */
+.lb-slips.few{display:flex;flex-direction:column;gap:var(--sp-8)}
+.lb-slips.few li{width:min(80%,17.5rem)}
+.lb-slips.few li:nth-child(even){align-self:flex-end}
+.lb-slip.mid{min-height:124px;padding:var(--sp-6) var(--sp-5)}
+.lb-slip.mid .lb-slip-text{font-size:1.125rem;line-height:1.75rem;font-weight:700;letter-spacing:-.01em}
+.lb-slip.mid .lb-slip-pebs img{width:30px}
+.screen.lb-note{padding-bottom:0}
+.lb-note .lb-how{margin-top:calc(var(--sp-10) + var(--sp-4))}

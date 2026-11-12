@@ -32,7 +32,7 @@ const ROUTES = {
   welcome: { view: renderWelcome, tab: "today", fullscreen: true },
   auth: { view: renderAuth, tab: "today", fullscreen: true }, // 로그인·가입(공개 서비스 시안, D-104)
   help: { view: renderHelp, tab: "settings", fullscreen: true },
-  lookback: { view: renderLookback, tab: "stats", fullscreen: true } // 돌아보기·내 기준·작은 실험(TASK-LOOKBACK-01 시안)
+  lookback: { view: renderLookback, tab: "lookback", fullscreen: (rest) => rest.length > 0 } // 돌아보기·내 기준·작은 실험(TASK-LOOKBACK-01 시안)
 };
 const navigate = (route) => { if (location.hash === `#/${route}`) render(); else location.hash = `#/${route}`; };
 
@@ -54,7 +54,7 @@ function render() {
   for (const a of document.querySelectorAll(".bottom-nav a")) {
     if (a.dataset.tab === tab) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
   }
-  const position = { today: "12.5%", calendar: "37.5%", stats: "62.5%", settings: "87.5%" }[tab];
+  const position = { today: "10%", calendar: "30%", lookback: "50%", stats: "70%", settings: "90%" }[tab]; // 다섯 탭(돌아보기 탭을 더했다, TASK-LOOKBACK-01 시안)
   navRail.style.setProperty("--nav-position", position);
   if (render.currentTab && render.currentTab !== tab) {
     navRail.classList.remove("is-moving");

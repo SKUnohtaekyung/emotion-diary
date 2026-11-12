@@ -26,6 +26,7 @@ export const SHOTS = [
   ["r4-30일-말고름","lookback/read?p=30",740,"document.querySelector(\".lb-again-pill\").click()"],
   ["r4-30일-끝","lookback/read?p=30",740,"window.scrollTo(0, 99999)"],
   ["r4-기준-1","lookback/note?lbs=one",740],
+  ["r4-기준-2", "lookback/note?lbs=two", 740],
   ["r4-기준-5","lookback/note?lbs=some",1000],
   ["r4-기준-20","lookback/note?lbs=many",2000],
   ["r4-기준-빈","lookback/note?lbs=empty",740],
@@ -44,7 +45,7 @@ export const SHOTS = [
   ["r4-오늘-끝","today?lbx=ended",740],
   ["r4-완료-묻기","write?s=done&lbx=active",740],
   ["r4-완료-전하기","write?s=done&lbx=none&lbt=joy",740],
-  ["r4-통계아래","stats?lbx=active",740,"document.querySelector('.lb-stats-rows').scrollIntoView()"],
+  ["r4-통계","stats",740],
   ["r4-달력","calendar",740],
   ["9-검토페이지","/review-lookback.html",1500,"document.querySelectorAll('h2')[0].scrollIntoView()"]
 ];
