@@ -288,3 +288,7 @@ button.st-pill-link:focus-visible .st-pill-link-face{outline:var(--emphasis) sol
 .lb-endday.blank{visibility:hidden}
 .lb-endday.off{background:transparent;color:var(--subtle);cursor:default}
 .lb-endday.off:active{transform:none}
+/* 긴 기간의 날 줄: 요일 글자 없이 작은 점(14px)으로 줄 짓는다. 오늘은 민트 칸 그대로, 해 본 날은 채운 돌 그대로 */
+.lb-trail.dense{display:grid;grid-template-columns:repeat(auto-fill,14px);gap:6px;justify-content:center} /* 줄마다 같은 칸에 맞추고 묶음째 가운데 — 마지막 줄만 가운데로 몰리지 않게 */
+.lb-trail.dense li>span:not(.sr):not(.day){display:none}
+.lb-trail.dense .day.mini{width:14px;height:14px;min-height:14px}

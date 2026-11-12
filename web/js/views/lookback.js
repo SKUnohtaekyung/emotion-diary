@@ -71,7 +71,8 @@ const slipNode = (s) => [el("span", { class: "lb-slip-text", text: s.text }),
 const rangeText = (x) => `${monthDay(x.start)}부터 ${monthDay(pathEnd(x))}까지`;
 function trail(days, walked = new Set()) {
   const t = todayIso();
-  return el("ol", { class: "lb-trail", "aria-label": "이 기간의 날들" }, days.map((iso) => el("li", { class: iso === t ? "today" : "" },
+  // 기간이 이레를 넘으면(7판 일곱째 보강) 요일 글자 없이 작은 점으로만 줄 짓는다 — 90일이 동그라미 아흔 개·열 줄이 되어 화면을 밀어내지 않게. 수는 여전히 적지 않는다.
+  return el("ol", { class: `lb-trail${days.length > 14 ? " dense" : ""}`, "aria-label": "이 기간의 날들" }, days.map((iso) => el("li", { class: iso === t ? "today" : "" },
     dayCell({ tag: "span", mini: true, status: walked.has(iso) ? "completed" : "none", today: iso === t, "aria-hidden": "true" }), el("span", { text: iso === t ? "오늘" : weekday(iso) }),
     el("span", { class: "sr", text: `${monthDay(iso)} ${walked.has(iso) ? "해 본 날" : iso > t ? "아직 오지 않은 날" : "표시 없음"}` }))));
 }

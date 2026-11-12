@@ -65,6 +65,8 @@ export function readParams(params) {
   if (reseed) { seed(); if (!seeded) seedPath("active"); seeded = true; }
   const x = params.get("lbx");
   if (["none", "active", "ended"].includes(x)) seedPath(x);
+  const dd = Number(params.get("lbd")); // QA: 실천 기간의 날 수(예: ?lbx=active&lbd=60)
+  if (dd > 0 && lb.path) { lb.path.days = Math.min(90, dd); if (x === "ended") lb.path.start = addDays(todayIso(), -dd - 1); }
 }
 
 export const toggleMark = (iso) => { if (lb.marks.has(iso)) { lb.marks.delete(iso); return false; } lb.marks.add(iso); return true; };
