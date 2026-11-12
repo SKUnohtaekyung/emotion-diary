@@ -4,7 +4,7 @@
 
 - 브랜치: `design/lookback-sian`(워크트리 `.claude/worktrees/lookback-sian`). 기준 `d9e4fd8`. 푸시·PR 없음.
 - 판마다의 기록: `ROUND2.md`~`ROUND8.md`. 흐름의 근거: `RESEARCH-FLOW.md`. 무엇을 왜: `CONCEPT.md`.
-- 일기 쓰기의 부담(유지율) 이야기는 따로 연 대화 세션 `diary-friction-talk`의 워크트리에 `tasks/lookback/2026-11-12/DISCUSS-FRICTION.md`로 있다(커밋 안 됨, 이 브랜치에 없음).
+- 일기 쓰기의 부담(유지율) 이야기는 따로 연 대화 세션 `diary-friction-talk`이 `tasks/lookback/2026-11-12/DISCUSS-FRICTION.md`에 적고 있다(이 폴더에 있지만 커밋하지 않았다 — 그 세션은 사용자가 원할 때만 커밋한다).
 
 ## 1. 확정된 화면과 시안 주소(`#/` 뒤)
 
