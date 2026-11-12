@@ -57,12 +57,20 @@ export function renderRead(main, navigate, params) {
       put(foot, el("button", { type: "button", class: "btn primary big", text: "오늘 화면으로", onclick: () => navigate("today") }));
       return;
     }
-    if (i >= days.length) { // 다 읽은 자리: 물음 하나
-      const n = lb.marks.size; // 장면: 큰 나무 그늘에서 지나온 길과 물가를 내려다본다(길 끝에서 돌아본 자리)
+    if (i >= days.length) { // 다 읽은 자리(8판): 7판의 "중요한 것이 보였나요?"는 여러 날을 한 문장으로 묶으라는 추상적 요구였다.
+      // 구체적인 것부터 묻는다 — 모아 둔 날이 있으면 그 날들을 나란히(비교) 놓고 "같은 것이 있었나요?"(발견), 없으면 "눈에 띈 장면이 있었나요?".
+      // 쓰는 것은 고를 수 있고, "아직 모르겠어요"·"읽기만 할게요"가 정상 끝이다(일기를 쓰는 사람은 성찰은 높고 통찰은 낮았다 — Grant 외 2002. RESEARCH-FLOW.md §2.4).
+      const marked = days.filter((iso) => lb.marks.has(iso));
+      const row = (iso) => { const rec = recordOf(iso);
+        return el("li", { class: "lb-day" }, el("button", { type: "button", class: "lb-day-head", "aria-haspopup": "dialog", onclick: () => daySheet(iso) },
+          el("span", { class: "lb-day-pebs", "aria-hidden": "true" }, catsOf(rec).slice(0, 2).map((c) => pebbleImg(c, { size: 26 }))),
+          el("span", { class: "lb-day-main" }, el("span", { class: "lb-day-date" }, el("b", { text: monthDay(iso) }), ` ${weekday(iso)}`), el("span", { class: "lb-day-event", text: rec.event })), chev("lb-day-chev"))); };
       put(screen, top("다 읽었어요", 1),
-        el("h1", { tabindex: "-1", class: "lb-ask", text: "중요한 것이 보였나요?" }),
-        el("p", { class: "lede" }, lines(n ? `모아 둔 기록 ${n}편을 보며 한 줄로 써 봐요.` : "없었다면 여기서 닫아도 돼요.")), scape({ foot }));
-      put(foot, el("button", { type: "button", class: "btn text", text: "닫기", onclick: leave }),
+        el("h1", { tabindex: "-1", class: "lb-ask", text: marked.length ? "모아 둔 날에 같은 것이 있었나요?" : "다시 보니 눈에 띈 장면이 있었나요?" }),
+        el("p", { class: "lede" }, lines(marked.length ? "모아 둔 날을 나란히 놓았어요." : "없었다면 여기서 닫아도 돼요.", "친구의 일기를 읽듯 한 걸음 떨어져 봐도 좋아요.")),
+        marked.length ? el("ul", { class: "lb-days lb-marked" }, marked.map(row)) : null,
+        scape({ compact: marked.length > 0, foot }));
+      put(foot, el("button", { type: "button", class: "btn text", text: marked.length ? "아직 모르겠어요" : "읽기만 할게요", onclick: leave }),
         el("button", { type: "button", class: "btn primary big", text: "기준 쓰기", onclick: () => navigate("lookback/write") }));
       return;
     }
@@ -72,10 +80,11 @@ export function renderRead(main, navigate, params) {
       el("h1", { tabindex: "-1", class: `lb-read-event ${sizeClass(rec.event)}`, text: rec.event }),
       rec.reason?.trim() ? el("p", { class: `lb-read-reason ${sizeClass(rec.event)}`, text: rec.reason }) : null,
       el("a", { class: "link lb-read-open", href: `#/record/${iso}?from=lookback`, text: "편지 전체 보기" }),
+      i === 0 ? el("p", { class: "caption lb-mark-hint", text: "다시 보고 싶은 날은 '모아 두기'를 눌러요." }) : null, // 무엇을 위한 버튼인지 처음부터 보인다(8판)
       scape({ land: overRoad(renderLand(doneLayout(catsOf(rec)))), foot, cls: "lb-dayland" }));
     const mark = el("button", { type: "button", class: "choice lb-mark", "aria-pressed": String(marked) }, el("span", { class: "ck", "aria-hidden": "true", text: "✓" }), el("span", { text: "모아 두기" }));
     mark.addEventListener("click", () => { const on = toggleMark(iso); mark.setAttribute("aria-pressed", String(on));
-      if (on && !taught) { taught = true; toast("모아 뒀어요. 다 읽고 나서 한데 놓고 볼 수 있어요"); } else announce(on ? "모아 뒀어요" : "뺐어요"); });
+      if (on && !taught) { taught = true; toast("모아 뒀어요. 다 읽고 나서 나란히 볼 수 있어요"); } else announce(on ? "모아 뒀어요" : "뺐어요"); });
     put(foot, i > 0 ? el("button", { type: "button", class: "btn text", text: "이전", onclick: () => go(i - 1) }) : null, mark,
       el("button", { type: "button", class: "btn primary big", text: i === days.length - 1 ? "다 읽었어요" : "다음", onclick: () => go(i + 1) }));
   }

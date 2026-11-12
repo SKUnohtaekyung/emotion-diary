@@ -1,10 +1,11 @@
 // 돌아보기·내 기준·해 보는 길 시안의 상태(TASK-LOOKBACK-01 단계 A, 2판). 저장하지 않는다 — 이 모듈의 변수에만 있고 새로 고치면 처음으로 돌아간다.
 // 기준과 길의 문장은 모두 지어낸 예시다(실제 일기 아님, AGENTS §3).
-// 상태 바꾸기(QA): ?lbs=empty|few|one|some|many(기록·기준의 양), ?lbx=none|active|ended(해 보는 길), ?lbt=thanks|joy|big|none|recent(전하기 한 줄이 나오는 까닭), ?kb=1.
+// 상태 바꾸기(QA): ?lbs=empty|few|one|some|many(기록·기준의 양), ?lbx=none|active|ended(해 보는 길), ?lbd=날 수, ?lbe=gap(7판의 빈 칸 날 줄),
+//   ?lbt=thanks|joy|big|none|week(완료 화면 한 줄 — week는 새 주의 첫 일기에 나오는 다시 읽기 초대), ?kb=1.
 import { state, toISO } from "../state.js";
 import { dayStatus, sampleRecord, effectiveToday } from "../sample.js";
 
-export const qa = { amount: "normal", tell: null, keyboard: false };
+export const qa = { amount: "normal", tell: null, keyboard: false, gaps: false }; // gaps: 해 보는 중의 날 줄을 7판처럼 빈 칸까지 그린다(?lbe=gap, 8판 비교용)
 
 const addDays = (iso, n) => { const [y, m, d] = iso.split("-").map(Number); return toISO(new Date(y, m - 1, d + n)); };
 export const todayIso = () => toISO(effectiveToday());
@@ -14,7 +15,7 @@ const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 export const weekday = (iso) => { const [y, m, d] = iso.split("-").map(Number); return WEEKDAYS[new Date(y, m - 1, d).getDay()]; };
 export const monthDayWeek = (iso) => `${monthDay(iso)} (${weekday(iso)})`;
 
-export const lb = { marks: new Set(), standards: [], path: null, past: [], seq: 100 };
+export const lb = { marks: new Set(), standards: [], path: null, past: [], seq: 100, invited: new Set() }; // invited: 한 번만 나오는 초대를 이미 보였는지(8판)
 
 export const recordOf = (iso) => (state.completed?.date === iso ? state.completed : sampleRecord(iso));
 const isRecorded = (iso) => { const [y, m, d] = iso.split("-").map(Number); return dayStatus(new Date(y, m - 1, d)) === "completed"; };
@@ -39,7 +40,8 @@ function seed() {
   const pick = (k) => days[Math.max(0, days.length - 1 - k)];
   lb.marks = new Set(qa.amount === "empty" ? [] : [pick(1), pick(4), pick(7)].filter(Boolean));
   const n = AMOUNT[qa.amount] ?? 3;
-  lb.standards = LINES.slice(0, n).map((text, i) => ({ id: i + 1, text, folded: false, at: addDays(t, -(2 + i * 3)),
+  const NEEDS = ["미리 말해 주는 사람이 좋다", "저녁 하나는 비워 두고 싶다"]; // 쪽지의 둘째 칸(그래서 나에게 필요한 것, 8판) — 앞의 두 장만 적혀 있다
+  lb.standards = LINES.slice(0, n).map((text, i) => ({ id: i + 1, text, need: NEEDS[i] ?? "", folded: false, at: addDays(t, -(2 + i * 3)),
     from: i === 0 ? [pick(4), pick(1)].filter(Boolean) : i === 1 ? [pick(7)].filter(Boolean) : i % 4 === 0 ? [pick(i)].filter(Boolean) : [] }));
   if (qa.amount === "normal") lb.standards.push({ id: 9, text: LINES[3], folded: true, at: addDays(t, -20), from: [] });
   if (qa.amount === "some") lb.standards.push({ id: 31, text: LINES[5], folded: true, at: addDays(t, -24), from: [] }, { id: 32, text: LINES[6], folded: true, at: addDays(t, -27), from: [] }); // 접어 둔 기준 칸(7판)
@@ -62,18 +64,20 @@ export function readParams(params) {
   if (amount in AMOUNT && amount !== qa.amount) { qa.amount = amount; reseed = true; }
   if (params.has("lbt")) qa.tell = params.get("lbt");
   if (params.has("kb")) qa.keyboard = params.get("kb") === "1";
+  if (params.has("lbe")) qa.gaps = params.get("lbe") === "gap";
   if (reseed) { seed(); if (!seeded) seedPath("active"); seeded = true; }
   const x = params.get("lbx");
   if (["none", "active", "ended"].includes(x)) seedPath(x);
   const dd = Number(params.get("lbd")); // QA: 실천 기간의 날 수(예: ?lbx=active&lbd=60)
-  if (dd > 0 && lb.path) { lb.path.days = Math.min(90, dd); if (x === "ended") lb.path.start = addDays(todayIso(), -dd - 1); }
+  if (dd > 0 && lb.path) { lb.path.days = Math.min(DAY_MAX, dd); if (x === "ended") lb.path.start = addDays(todayIso(), -dd - 1); }
+  if (params.get("lbm") === "0") lb.marks.clear(); // QA: 모아 둔 날 없이 다 읽은 자리를 본다
 }
 
 export const toggleMark = (iso) => { if (lb.marks.has(iso)) { lb.marks.delete(iso); return false; } lb.marks.add(iso); return true; };
-export function saveStandard({ id, text, from = [] }) {
+export function saveStandard({ id, text, need = "", from = [] }) {
   const found = lb.standards.find((s) => s.id === id);
-  if (found) { found.text = text; found.from = from; return found; }
-  const made = { id: (lb.seq += 1), text, from, folded: false, at: todayIso() };
+  if (found) { found.text = text; found.need = need; found.from = from; return found; }
+  const made = { id: (lb.seq += 1), text, need, from, folded: false, at: todayIso() };
   lb.standards.unshift(made);
   return made;
 }
@@ -82,7 +86,8 @@ export const removeStandard = (id) => { lb.standards = lb.standards.filter((s) =
 export function orderStandards(ids) { const by = new Map(lb.standards.map((x) => [x.id, x])); lb.standards = [...ids.map((id) => by.get(id)).filter(Boolean), ...lb.standards.filter((x) => !ids.includes(x.id))]; }
 export function moveStandard(id, delta) { const open = lb.standards.filter((x) => !x.folded).map((x) => x.id), i = open.indexOf(id), j = i + delta; if (i < 0 || j < 0 || j >= open.length) return false; [open[i], open[j]] = [open[j], open[i]]; orderStandards(open); return true; }
 export const EXAMPLES = [["서운한 마음이 들 때", "하루 뒤에 말하기"], ["잠자리에 들기 30분 전", "화면 끄기"], ["답하기 전에", "한 박자 쉬기"], ["궁금한 곳이 생기면", "글 말고 직접 가 보기"]];
-export const DAY_CHOICES = [3, 5, 7, 14];
+export const DAY_CHOICES = [3, 7, 14, 28]; // 8판: 습관 기간이 아니라 며칠 해 보는 실험이라 상한 4주(RESEARCH-FLOW.md §2.1). 끝에서 이어서 해 볼 수 있다
+export const DAY_MAX = 28;
 
 // ── 여러 날에 나온 말(기계적으로 센 것이다 — 뜻을 풀거나 까닭을 대지 않는다). 고른 말은 그대로 세고, 적은 글은 낱말 끝의 조사를 한 번 떼어 센다.
 // 시안의 셈은 거칠다: 실제 코드에서는 형태소 분석이 필요하다(검토 페이지의 '기술 계획').
