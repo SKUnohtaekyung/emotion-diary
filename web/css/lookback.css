@@ -94,7 +94,7 @@
 /* ── 내 기준(탭의 첫 화면): 언덕 위에 놓인 쪽지. 흰 하늘 아래 옅은 언덕이 화면 끝까지 깔리고 버튼은 가까운 언덕 위에 얹힌다 ── */
 .screen.lb-home{position:relative;display:flex;flex-direction:column;padding-bottom:0;overflow:hidden}
 .lb-home>*{position:relative;z-index:1}
-.lb-home>.lb-note-land{position:absolute;z-index:0;left:0;right:0;top:7.75rem;bottom:0;pointer-events:none}
+.lb-home>.lb-note-land{position:absolute;z-index:0;left:0;right:0;top:6.75rem;bottom:0;pointer-events:none}
 .lb-note-land .far{position:absolute;left:-30%;right:-20%;top:0;bottom:0;border-radius:50% 50% 0 0/3.5rem 3.5rem 0 0;background:color-mix(in srgb,var(--land-hill-far) 58%,var(--bg))}
 .lb-note-land .mid{position:absolute;left:-10%;right:-70%;top:max(52%,19rem);bottom:0;border-radius:50% 50% 0 0/4.5rem 4.5rem 0 0;background:var(--land-hill-far)}
 .lb-scene-tree{position:absolute;width:calc(var(--r) * 2);height:calc(var(--r) * 2.8);translate:-50% 0}
@@ -110,17 +110,17 @@
 .lb-home .lede{margin:0}
 .lb-edit-hint{margin:var(--sp-2) 0 0}
 /* 실천하는 것이 있을 때의 한 줄 띠 */
-.lb-strip{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-top:calc(var(--sp-10) + var(--sp-5));padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-card);background:var(--bg);color:var(--text);text-decoration:none;transition:transform var(--dur-fast) var(--ease)}
+.lb-strip{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);margin-top:var(--sp-6);padding:var(--sp-3) var(--sp-4);border-radius:var(--radius-card);background:var(--bg);color:var(--text);text-decoration:none;transition:transform var(--dur-fast) var(--ease)}
 .lb-strip:active{transform:scale(var(--press-row))}
 .lb-strip-text{display:flex;flex-direction:column;min-width:0}
 .lb-strip small{font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:var(--fw-body-strong);color:var(--muted)}
 .lb-strip b{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.lb-empty{margin-top:calc(var(--sp-10) + var(--sp-6))}
+.lb-empty{margin-top:var(--sp-10)}
 .lb-empty-title{margin:0 0 var(--sp-2);font-size:1.5rem;line-height:2rem;font-weight:800;letter-spacing:-.025em}
 .lb-empty .note{margin:0;color:var(--text)}
 /* 쪽지: 크림 종이, 오른쪽 아래 모서리가 접혀 있고(진짜로 잘라 낸다), 위 모서리에는 그 문장이 나온 날의 조약돌이 얹혀 있다. 기울이지 않는다(D-090) */
-.lb-slips{list-style:none;margin:calc(var(--sp-10) + var(--sp-6)) 0 0;padding:0}
-.lb-strip+.lb-slips{margin-top:var(--sp-8)}
+.lb-slips{list-style:none;margin:var(--sp-10) 0 0;padding:0}
+.lb-strip+.lb-slips{margin-top:var(--sp-5)}
 .lb-slips li{position:relative}
 .lb-slip{position:relative;isolation:isolate;display:block;width:100%;border:0;background:none;color:var(--paper-ink);font:inherit;text-align:left;cursor:pointer;transition:transform var(--dur-fast) var(--ease)}
 .lb-slip::before{content:"";position:absolute;inset:0;z-index:-1;border-radius:14px;background:var(--service-light);clip-path:polygon(0 0,100% 0,100% calc(100% - 20px),calc(100% - 20px) 100%,0 100%)}
@@ -130,8 +130,8 @@
 .lb-slip-pebs{position:absolute;right:12px;top:-11px;display:flex}
 .lb-slip-pebs img{width:26px;height:auto}
 .lb-slip-pebs img+img{margin-left:-9px}
-.lb-slips.grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-5) var(--sp-3);align-items:start}
-.lb-slip.small{min-height:104px;padding:var(--sp-5) var(--sp-4)}
+.lb-slips.grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--sp-3);align-items:start}
+.lb-slip.small{min-height:88px;padding:14px var(--sp-4)}
 .lb-slip.small .lb-slip-text{font-size:var(--fs-body);line-height:1.5rem;font-weight:700}
 /* 한두 장일 때: 가운데 크기의 쪽지를 왼쪽·오른쪽으로 엇갈려 놓는다 */
 .lb-slips.few{display:flex;flex-direction:column;gap:var(--sp-8)}
@@ -164,12 +164,14 @@
 .lb-folded .lb-slip-text{font-weight:700}
 /* 아래 버튼 둘은 가까운 언덕 위에 얹힌다(탭의 첫 화면이라 붙박지 않는다 — 그 아래에 하단 탐색이 있다).
    7판: 완료 화면처럼 같은 폭 둘을 나란히(옅은 것 · 짙은 것) 두고, 언덕이 하단 탐색 뒤까지 이어진다(6판은 탐색 위에서 흰색으로 바래 언덕이 끊겼다). */
-.lb-home>.lb-home-actions{position:relative;bottom:auto;margin-top:auto;padding:var(--sp-10) 0 var(--sp-4);background:transparent}
-.lb-home-actions::before{content:"";position:absolute;z-index:-1;left:calc(var(--sp-5) * -1.6);right:calc(var(--sp-5) * -1.6);top:var(--sp-4);bottom:0;border-radius:50% 50% 0 0/2rem 2rem 0 0;background:var(--land-hill-mid)}
+/* 아래 여백 = 하단 탐색이 위로 겹쳐 오는 바래는 띠(--nav-fade, 24px) + 12px — 끝까지 내려도 버튼이 그 띠에 걸리지 않는다 */
+.lb-home>.lb-home-actions{position:relative;bottom:auto;margin-top:auto;padding:10px 0 calc(24px + var(--sp-3));background:transparent}
+.lb-home-actions::before{content:"";position:absolute;z-index:-1;left:calc(var(--sp-5) * -1.6);right:calc(var(--sp-5) * -1.6);top:0;bottom:0;border-radius:50% 50% 0 0/2rem 2rem 0 0;background:var(--land-hill-mid)}
 .lb-home-btns{display:flex;flex-wrap:wrap-reverse;gap:var(--sp-3)}
 .lb-home-btns .btn{flex:1 1 0;min-width:max-content}
 .lb-home-marks{margin:0;text-align:center;font-size:var(--fs-label);line-height:var(--lh-label);font-weight:var(--fw-body-strong)}
-body:has(.lb-home) .bottom-nav{background:var(--land-hill-mid)}
+/* 하단 탐색 위의 바래는 띠는 기본(투명 → 흰색)과 같은 짜임으로 투명 → 언덕색이다. 7판 첫 손질의 단색은 그 띠가 버튼 아랫단을 덮었다 */
+body:has(.lb-home) .bottom-nav{background:linear-gradient(to bottom,color-mix(in srgb,var(--land-hill-mid) 0%,transparent) 0,color-mix(in srgb,var(--land-hill-mid) 82%,transparent) calc(var(--nav-fade) * .6),var(--land-hill-mid) var(--nav-fade))}
 
 /* ── 기준 쓰기: 일기 첫 단계의 종이·언덕 장면을 그대로 쓴다 ── */
 .lb-write-refs{margin:0 0 var(--sp-2)}
@@ -256,3 +258,8 @@ main:has(.lb-kb) .step-footer{bottom:290px}
   .lbs-cloud{animation:none}
   .lb-slips.is-editing .lb-slip{animation:none}
 }
+
+/* 지난 30일의 '말로 찾기': 설정의 알약 링크(.st-pill-link)를 단추로 쓴다 — 단추의 기본 테두리·바탕을 걷는다 */
+button.st-pill-link{padding:0;border:0;background:none;font:inherit;color:inherit;cursor:pointer}
+button.st-pill-link:focus-visible{outline:none}
+button.st-pill-link:focus-visible .st-pill-link-face{outline:var(--emphasis) solid var(--service-ink);outline-offset:2px}
