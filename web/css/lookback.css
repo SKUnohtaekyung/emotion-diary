@@ -184,6 +184,9 @@ main:has(.lb-kb) .step-footer{bottom:290px}
 /* ── 실천해 보기 ── */
 /* ① 무엇을: 노트 위의 큰 글자 빈칸 둘 */
 .nt-paper .lb-madlib{gap:var(--sp-1);padding:var(--sp-4) 0 var(--sp-2)}
+/* 빈칸 둘은 저마다 밑줄(점선 → 쓰면 실선)이 있어 종이의 가로줄과 겹쳐 읽기 어려웠다(7판 셋째 보강). 이 노트만 줄 없는 종이로 둔다.
+   기준 쓰기의 노트는 줄 위에 그대로 쓰는 칸이라 줄을 남긴다. */
+.nt-paper:has(.lb-madlib){background:var(--paper);padding-bottom:var(--sp-3)}
 .lb-blank{display:block;width:100%;padding:0;border:0;border-bottom:var(--emphasis) dashed var(--border-strong);border-radius:0;background:none;resize:none;overflow:hidden;color:var(--text);letter-spacing:-.03em}
 .lb-blank:not(:placeholder-shown){border-bottom-style:solid;border-bottom-color:var(--service-mint)}
 .lb-blank:focus-visible{outline:none;border-bottom-color:var(--service-ink);border-bottom-style:solid}
