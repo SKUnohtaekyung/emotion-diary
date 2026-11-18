@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>로딩 화면 시안 — 조약돌 모양과 기다림 표시</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/splash-variants.css">
+<link rel="stylesheet" href="css/splash-lab.css">
+<script type="module" src="js/splash-lab.js"></script>
+</head>
+<body>
+<header class="lab-head">
+  <h1>로딩 화면 — 조약돌 모양과 기다림 표시</h1>
+  <p>B안(아이콘에서 이어짐)을 다듬는다. 원 대신 오늘 화면 돌의 실루엣을 딴 평면 조약돌로, 그리고 오래 걸릴 때만 움직이는 표시를 단다.</p>
+  <ol class="lab-rule">
+    <li><b>0.3초 안</b>에 준비되면 로딩 화면을 아예 보이지 않는다</li>
+    <li><b>0.3~2초</b>: 조약돌만 가만히(1초 안팎의 짧은 기다림에 반복 움직임은 오히려 거슬린다 — NN/g)</li>
+    <li><b>2~10초</b>: 움직이는 표시 하나(아래 ②에서 고른다)</li>
+    <li><b>10초가 넘으면</b>: '연결이 느린 것 같아요 · 다시 시도'</li>
+    <li>준비되면 언제든 조약돌이 오늘 화면의 돌 자리로 내려앉으며 넘어간다(보였다면 최소 0.6초)</li>
+  </ol>
+</header>
+<main class="lab-main">
+  <section aria-labelledby="sec-shape">
+    <h2 id="sec-shape">① 조약돌 모양</h2>
+    <p class="lab-sub">네 가지 다 오늘 화면 돌 그림의 실루엣에서 땄다 — 그래서 넘어갈 때 진짜 돌 위에 그대로 겹친다. 오른쪽 아래 작은 칸은 같은 모양으로 바꾼 앱 아이콘.</p>
+    <div class="lab-row" id="shapes"></div>
+  </section>
+  <section aria-labelledby="sec-motion">
+    <h2 id="sec-motion">② 2~10초의 움직이는 표시</h2>
+    <div class="lab-chips" role="group" aria-label="움직임 견본의 조약돌 모양" id="motion-shape"></div>
+    <div class="lab-row" id="motions"></div>
+  </section>
+  <section aria-labelledby="sec-run">
+    <h2 id="sec-run">③ 처음부터 끝까지 — 실제 시안에서</h2>
+    <div class="lab-run">
+      <div class="lab-phone lab-phone-big"><iframe title="로딩부터 오늘 화면까지" id="run-frame"></iframe></div>
+      <div class="lab-run-controls">
+        <p class="lab-label">조약돌 모양</p><div class="lab-chips" id="run-shape" role="group" aria-label="조약돌 모양"></div>
+        <p class="lab-label">움직이는 표시</p><div class="lab-chips" id="run-motion" role="group" aria-label="움직이는 표시"></div>
+        <p class="lab-label">불러오는 시간</p><div class="lab-chips" id="run-time" role="group" aria-label="불러오는 시간"></div>
+        <button type="button" class="lab-replay" id="run-replay">처음부터 다시</button>
+        <p class="lab-note" id="run-note"></p>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>

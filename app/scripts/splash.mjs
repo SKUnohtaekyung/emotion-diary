@@ -1,9 +1,10 @@
-// 앱 시작 로딩 화면의 빈 숲 그림(D-092 ④, TASK-JOURNAL-01 J-8 PLAN A-8). 오늘 화면의 숲(ui/forestArt.ts)과 같은 계산으로 굳힌 정적 SVG다.
+// 빈 숲 그림(D-092 ④, TASK-JOURNAL-01 J-8 PLAN A-8). 오늘 화면의 숲(ui/forestArt.ts)과 같은 계산으로 굳힌 정적 SVG다.
+// 2026-11-18 로딩 화면은 남색 + 평면 조약돌로 바뀌었고(D-134), 이 그림은 덮개(ui/cover.ts)와 잠금 장면(ui/scene.ts)이 쓴다.
 // 스크립트·CSS 값 파일보다 먼저 그려져야 해서 색은 design/tokens.json에서 읽어 fill 속성으로 넣는다(<style>·style 속성 없음 — CSP·iOS 미확인).
-// 조약돌·가운데 돌은 넣지 않는다(돌은 index.html의 splash-stone 그림이 숨 쉰다). 시안 scripts/build-splash.mjs와 같은 자리.
-//   node app/scripts/splash.mjs   → app/client/public/splash.svg, splash-stone.png
+// 조약돌·가운데 돌은 넣지 않는다. 시안 scripts/build-splash.mjs와 같은 자리.
+//   node app/scripts/splash.mjs   → app/client/public/splash.svg
 // 시험(app/test/client/splash.test.ts)이 커밋된 파일이 지금 계산과 같은지 본다 — 숲이나 색을 바꾸면 이 스크립트를 다시 돌린다.
-import { copyFileSync, readFileSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { buildForest, H, W } from "../client/src/ui/forestArt.ts";
@@ -69,6 +70,5 @@ export const SPLASH_FILE = path.join(root, "app", "client", "public", "splash.sv
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   writeFileSync(SPLASH_FILE, splashSvg());
-  copyFileSync(path.join(root, "design", "pebbles", "ui", "stone-rest-320.png"), path.join(root, "app", "client", "public", "splash-stone.png"));
-  console.info("만듦: app/client/public/splash.svg, splash-stone.png");
+  console.info("만듦: app/client/public/splash.svg");
 }

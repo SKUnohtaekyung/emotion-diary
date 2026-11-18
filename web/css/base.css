@@ -47,6 +47,7 @@ main{flex:1;display:flex;flex-direction:column;min-width:0}
 @keyframes splash-in{to{opacity:1}}
 @keyframes splash-breathe{from{transform:scale(1)}to{transform:scale(1.025,1.04)}} /* 숨 — 오늘 화면 돌의 흔들림(motion.stone.rock 3.8s)과 같은 호흡 길이 */
 @media (prefers-reduced-motion:reduce){.splash-stone img{animation:none}}
+/* 로딩 화면 비교 시안(?sv=b — splash-lab.html)의 규칙은 css/splash-variants.css에 따로 둔다. */
 main:focus{outline:none}
 .screen{flex:1;padding:var(--sp-5) var(--sp-5) var(--sp-8);min-width:0}
 .stack{display:flex;flex-direction:column;gap:var(--sp-2);margin-top:var(--sp-4)}

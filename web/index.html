@@ -26,11 +26,25 @@
 <link rel="stylesheet" href="css/auth.css">
 <link rel="stylesheet" href="css/lock.css">
 <link rel="stylesheet" href="css/film.css">
+<link rel="stylesheet" href="css/splash-variants.css">
 <script type="module" src="js/main.js"></script>
+<!-- 로딩 화면(D-134): 기본은 남색 + 겹친 두 돌(s1) + 잔물결(ripple) — 앱과 같다. 비교용으로 ?sv=a(예전 빈 숲), ?mk=s1~s4, ?mo=hop|ripple|dots|rock|none(splash-lab.html). 첫 그림보다 먼저 정해져야 해서 여기서만 짧은 스크립트를 쓴다(시안 전용) -->
+<script>(function(){var q=new URLSearchParams(location.search),h=document.documentElement;if(q.get("sv")==="a")return;h.setAttribute("data-sv","b");h.setAttribute("data-mk",/^s[1-4]$/.test(q.get("mk")||"")?q.get("mk"):"s1");h.setAttribute("data-mo",/^(hop|ripple|dots|rock|none)$/.test(q.get("mo")||"")?q.get("mo"):"ripple");})();</script>
 </head>
 <body>
 <!-- 앱 시작 로딩 화면(D-092 ④): 스크립트보다 먼저 그려지는 빈 숲과 돌 하나. 300ms 안에 준비되면 보이지 않는다 — 걷는 일은 js/splash.js -->
-<div class="splash" id="splash" aria-hidden="true"><div class="splash-box"><img class="splash-art" src="splash.svg" alt=""><span class="splash-stone"><img src="/design/pebbles/ui/stone-rest-320.png" alt=""></span></div></div>
+<div class="splash" id="splash"><div class="splash-box" aria-hidden="true"><img class="splash-art" src="splash.svg" alt=""><span class="splash-stone"><img src="/design/pebbles/ui/stone-rest-320.png" alt=""></span></div>
+  <!-- 비교 시안 B(?sv=b): 오늘 화면 숲 하늘과 같은 남색 단색 + 평면 조약돌(splash-pebbles.svg). A(기본)에서는 숨는다. 규칙은 css/splash-variants.css -->
+  <!-- 색은 CSS 변수가 오기 전에 그려져야 해서 SVG에 둔다(빈 숲 splash.svg와 같은 까닭): #0B1228 = tokens forest.sky·manifest background_color, #62FDB4 = tokens service.mint -->
+  <svg class="splash-veil" aria-hidden="true" viewBox="0 0 1 1" preserveAspectRatio="none"><rect width="1" height="1" fill="#0B1228"/></svg>
+  <div class="splash-center" aria-hidden="true">
+    <svg class="splash-ripples" viewBox="0 0 140 40"><ellipse cx="70" cy="20" rx="64" ry="16" fill="none" stroke="#62FDB4" stroke-width="2"/><ellipse cx="70" cy="20" rx="64" ry="16" fill="none" stroke="#62FDB4" stroke-width="2"/></svg>
+    <span class="splash-mark"><svg viewBox="0 0 132 107"><use class="mk-s1" href="splash-pebbles.svg#s1"/><use class="mk-s2" href="splash-pebbles.svg#s2"/><use class="mk-s3" href="splash-pebbles.svg#s3"/><use class="mk-s4" href="splash-pebbles.svg#s4"/></svg></span>
+    <span class="splash-dots"><svg viewBox="0 0 132 107"><use href="splash-pebbles.svg#s2"/></svg><svg viewBox="0 0 132 107"><use href="splash-pebbles.svg#s2"/></svg><svg viewBox="0 0 132 107"><use href="splash-pebbles.svg#s2"/></svg></span>
+  </div>
+  <!-- 느릴 때만: 10초가 넘으면 다시 시도(움직임 줄이기면 2초 뒤 글자 한 줄이 움직임을 대신한다). 스크립트가 늦어도 보이게 CSS 시간으로만 드러낸다 -->
+  <div class="splash-slow" role="status"><p class="splash-wait">불러오는 중이에요</p><p class="splash-stuck">연결이 느린 것 같아요 <a href="">다시 시도</a></p></div>
+</div>
 <a class="skip" href="#main">본문으로 건너뛰기</a>
 <div class="app">
   <p class="proto-banner" role="note"><b>시안</b> 입력한 내용은 저장되거나 전송되지 않습니다</p>

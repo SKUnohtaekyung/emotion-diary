@@ -766,7 +766,11 @@
   }
 }
 
-/* ── 앱 시작 로딩 화면(D-092 ④, ui/splash.ts) — 오늘 화면의 빈 숲과 가운데 돌 하나. 300ms 동안은 투명하다(그 안에 준비되면 보이기 전에 걷는다) ── */
+/* ── 앱 시작 로딩 화면(D-134, ui/splash.ts) — 오늘 화면 숲 하늘과 같은 남색 위 평면 조약돌 하나(오늘 화면 돌의 실루엣). 조약돌은 300ms 동안 투명하다(그 안에 준비되면 보이기 전에 걷는다).
+   시간: 드러난 뒤 2초까지는 조약돌만 가만히(1초 안팎의 반복 움직임은 오히려 거슬린다 — NN/g) · 2~10초는 아래로 잔물결 · 10초가 넘으면 '다시 시도'.
+   표시는 CSS 시간으로만 드러난다(스크립트가 늦게 와도 보이게). 움직임 줄이기면 물결 대신 2초 뒤 글자 한 줄. 막·조약돌·물결 색은 index.html의 SVG fill(CSS보다 먼저 그려진다). ── */
+/* 남색 막은 첫 그림부터 깔린다(흰 바탕이 0.3초 비쳤다 남색으로 바뀌던 번쩍임을 없앤다 — manifest background_color·오늘 화면 숲 하늘과 같은 남색).
+   조약돌은 300ms 동안 투명하다 — 그 안에 준비되면 조약돌을 보이기 전에 막째 걷는다. */
 .splash {
   position: fixed;
   top: 0;
@@ -775,48 +779,102 @@
   z-index: 150;
   width: min(100%, 480px);
   overflow: hidden;
-  container-type: size;
-  background: var(--forest-sky, #0b1228);
-  opacity: 0;
   transform: translateX(-50%);
+}
+
+.splash-veil {
+  position: absolute;
+  inset: 0;
+  background: var(--forest-sky, #0b1228);
+}
+
+.splash-center {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  opacity: 0;
   animation: splash-in 0.16s linear 0.3s forwards;
 }
 
-.splash-box {
+/* 104×84 — 오늘 화면 돌(132×107)과 같은 비율이라 내려앉을 때 그 자리에 그대로 겹친다 */
+.splash-mark {
   position: absolute;
-  bottom: 0;
-  left: calc((100cqw - max(100cqw, calc(100cqh * 360 / 744))) / 2);
-  width: max(100cqw, calc(100cqh * 360 / 744));
-  aspect-ratio: 360 / 744;
-  transform-origin: 0 0;
-}
-
-.splash-art {
-  position: absolute;
-  inset: 0;
+  top: -42px;
+  left: -52px;
   display: block;
-  width: 100%;
-  height: 100%;
+  width: 104px;
+  height: 84px;
+  overflow: visible;
 }
 
-.splash-stone {
+.splash-ripples {
   position: absolute;
-  left: 31.667%;
-  top: 60.75%;
-  width: 36.667%;
-  aspect-ratio: 132 / 108;
+  top: 22px;
+  left: -70px;
+  width: 140px;
+  height: 40px;
+  overflow: visible;
 }
 
-.splash-stone img {
-  display: block;
-  width: 100%;
-  height: auto;
-  transform-origin: 50% 90%;
+.splash-ripples ellipse {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.splash-slow {
+  position: absolute;
+  right: 0;
+  bottom: calc(9% + env(safe-area-inset-bottom));
+  left: 0;
+  color: var(--neutral-bg, #fff);
+  font-size: var(--text-label-size, 0.875rem);
+  line-height: var(--text-label-line, 1.5);
+  text-align: center;
+}
+
+.splash-slow p {
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.splash-wait {
+  display: none;
+}
+
+.splash-stuck {
+  animation: splash-show 0.5s ease-out 10.3s forwards;
+}
+
+.splash-stuck a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-touch-target-min, 44px);
+  padding: 0 12px;
+  color: var(--service-mint, #62fdb4);
+  font-weight: 700;
+  text-underline-offset: 0.2em;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .splash-stone img {
-    animation: splash-breathe 3.8s ease-in-out infinite alternate;
+  .splash-ripples ellipse {
+    animation: splash-ripple 2s ease-out 2.3s infinite;
+  }
+  .splash-ripples ellipse + ellipse {
+    animation-delay: 3.3s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-ripples {
+    display: none;
+  }
+  .splash-wait {
+    display: block;
+    animation: splash-show 0.3s linear 2.3s forwards;
   }
 }
 
@@ -826,11 +884,20 @@
   }
 }
 
-@keyframes splash-breathe {
-  from {
-    transform: scale(1);
+@keyframes splash-ripple {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.45);
   }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes splash-show {
   to {
-    transform: scale(1.025, 1.04);
+    opacity: 0.8;
+    visibility: visible;
   }
 }

@@ -1,0 +1,49 @@
+/* 로딩 화면 비교 시안 B(?sv=b, splash-lab.html) — 오늘 화면 숲 하늘과 같은 남색 단색 위 평면 조약돌 하나. 준비되면 조약돌이 오늘 화면의 돌 자리로 내려앉는다(js/splash.js).
+   모양 ?mk=s1~s4(splash-pebbles.svg — 오늘 화면 돌 실루엣을 딴 평면 조약돌), 기다림 표시 ?mo=hop|ripple|dots|rock|none.
+   시간 규칙: 0.3초 안에 준비되면 아예 보이지 않음 · 드러난 뒤 2초까지는 조약돌만 가만히 · 2~10초는 움직이는 표시(NN/g: 1초 안의 반복 움직임은 거슬리고, 2~10초는 반복 표시)
+   · 10초가 넘으면 '연결이 느린 것 같아요 · 다시 시도'. 표시는 CSS 시간으로만 드러난다 — 스크립트가 늦게 와도 보인다.
+   색: 막·조약돌·물결은 SVG 안(변수가 오기 전에 그려져야 한다), 글자는 변수(오기 전에는 흰색).
+   비교 페이지의 견본 상자(.splash-demo)도 같은 규칙을 쓴다 — 거기서는 --mo-delay:0s로 움직임을 곧바로 튼다. */
+
+.splash-veil,.splash-center{display:none}
+html[data-sv] .splash-box{display:none}
+html[data-sv] .splash-veil{display:block;position:absolute;inset:0;width:100%;height:100%}
+:is(html[data-sv],.splash-demo) .splash-center{display:block;position:absolute;left:50%;top:44%;width:0;height:0}
+
+/* 조약돌: 104×84(오늘 화면 돌 132×107과 같은 비율 — 내려앉을 때 그대로 겹친다) */
+.splash-mark{position:absolute;left:-52px;top:-42px;width:104px;height:84px;transform-origin:50% 100%}
+.splash-mark svg{display:block;width:100%;height:100%;overflow:visible}
+.splash-mark use{display:none}
+[data-mk="s1"] .splash-mark .mk-s1,[data-mk="s2"] .splash-mark .mk-s2,[data-mk="s3"] .splash-mark .mk-s3,[data-mk="s4"] .splash-mark .mk-s4{display:inline}
+
+/* 기다림 표시(2초 뒤부터) */
+.splash-ripples,.splash-dots{display:none}
+[data-mo="hop"] .splash-mark{animation:splash-hop 1.4s cubic-bezier(.3,0,.3,1) var(--mo-delay,2.3s) infinite}
+[data-mo="rock"] .splash-mark{transform-origin:50% 92%;animation:splash-rock 2s ease-in-out var(--mo-delay,2.3s) infinite}
+[data-mo="ripple"] .splash-ripples{display:block;position:absolute;left:-70px;top:22px;width:140px;height:40px;overflow:visible}
+.splash-ripples ellipse{transform-box:fill-box;transform-origin:center;opacity:0;animation:splash-ripple 2s ease-out var(--mo-delay,2.3s) infinite}
+.splash-ripples ellipse+ellipse{animation-delay:calc(var(--mo-delay,2.3s) + 1s)}
+[data-mo="dots"] .splash-dots{display:flex;gap:12px;position:absolute;left:-39px;top:66px;opacity:0;animation:splash-appear .4s ease-out var(--mo-delay,2.3s) forwards}
+.splash-dots svg{width:18px;height:15px;opacity:.25;animation:splash-dot 1.2s ease-in-out var(--mo-delay,2.3s) infinite}
+.splash-dots svg:nth-child(2){animation-delay:calc(var(--mo-delay,2.3s) + .2s)}
+.splash-dots svg:nth-child(3){animation-delay:calc(var(--mo-delay,2.3s) + .4s)}
+
+@keyframes splash-hop{0%,62%,100%{transform:none}24%{transform:translateY(-14px) scale(.97,1.04)}44%{transform:translateY(0) scale(1.06,.93)}54%{transform:scale(.98,1.02)}}
+@keyframes splash-rock{0%,100%{transform:rotate(0)}25%{transform:rotate(-7deg)}75%{transform:rotate(7deg)}}
+@keyframes splash-ripple{0%{transform:scale(.45);opacity:.7}100%{transform:scale(1.35);opacity:0}}
+@keyframes splash-dot{0%,100%{opacity:.25;transform:none}30%{opacity:1;transform:translateY(-3px)}60%{opacity:.25;transform:none}}
+@keyframes splash-appear{to{opacity:1}}
+
+/* 10초가 넘으면(드러난 지 10초 = 페이지 시작 10.3초) 무엇이 일어나는지 말하고 다시 시도를 준다. 움직임 줄이기면 2초 뒤 글자 한 줄이 움직임을 대신한다 */
+.splash-slow{position:absolute;left:0;right:0;bottom:calc(9% + env(safe-area-inset-bottom));text-align:center;color:var(--bg,white);font:500 .875rem/1.5 "Pretendard Variable",system-ui,sans-serif}
+.splash-slow p{margin:0;opacity:0;visibility:hidden}
+.splash-wait{display:none}
+.splash-stuck{animation:splash-show .5s ease-out 10.3s forwards}
+.splash-stuck a{display:inline-flex;align-items:center;min-height:44px;padding:0 12px;color:var(--service-mint,inherit);font-weight:700;text-underline-offset:.2em}
+@keyframes splash-show{to{opacity:.8;visibility:visible}}
+
+@media (prefers-reduced-motion:reduce){
+  .splash-mark,.splash-ripples ellipse,.splash-dots svg,.splash-dots{animation:none !important}
+  .splash-ripples,.splash-dots{display:none !important}
+  .splash-wait{display:block;animation:splash-show .3s linear 2.3s forwards}
+}
