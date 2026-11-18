@@ -4,6 +4,7 @@
 
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
+| 공모전 발표 준비(성결대 창업아이디어 경진대회, 2026-11-24 Zoom 본선) | **진행 중(2026-11-18)** — 발표 방식 리서치, 사용자 생각 원문 저장·판단, 주장 근거 확인까지. Figma 덱 수정 전이고 사용자 답 일곱 가지를 기다린다. 제품 정본은 바꾸지 않았다(대회용 가설) | [contest/2026-sungkyul-startup/12-발표-준비-인계.md](../contest/2026-sungkyul-startup/12-발표-준비-인계.md) |
 | [TASK-REPLAN-01](archive/TASK-REPLAN-01.md) 전체 순서 다시 세우기 | 끝(2026-11-11) — 결정 D-126~D-128, 0단계 정본 동기화, `verify full` PASS. 커밋 전(브랜치 `docs/replan`) | [archive/](archive/README.md), 계획은 [replan/2026-11-11/PLAN.md](replan/2026-11-11/PLAN.md) |
 | **다음 할 일** TASK-ACCOUNTS-01 가입·들어오는 길(소셜 로그인·만 14세·동의·탈퇴·사람별 분리) | **대기 — 계획 초안(2026-11-12), 착수 전.** 전제: direct-journal·dashboard-reminder 휴대폰 확인과 관문 판정, `journal/direct`가 `main`에. 착수 때 질문 창 Q1~Q4를 한 번에 묻는다 | 요청 [accounts/2026-11-12/REQUESTS.md](accounts/2026-11-12/REQUESTS.md), 계획 [accounts/2026-11-12/PLAN.md](accounts/2026-11-12/PLAN.md) |
 | TASK-JOURNAL-01 일기 쓰기·오늘 화면을 시안 모양으로 | **진행 중(2026-11-11 승인 — D-131)** — 노드 `direct-journal` in_progress | 이 파일 아래, 계획은 [direct-journal/2026-11-11/PLAN.md](direct-journal/2026-11-11/PLAN.md) |

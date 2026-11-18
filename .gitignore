@@ -28,8 +28,16 @@ CLAUDE.local.md
 # Previous portable package and verification scratch space are not project source
 outputs/
 work/
+# humanize-korean 스킬이 실행한 폴더에 남기는 입력·중간 결과(윤문 대상 원문이 들어 있다)
+_workspace/
 
 # OS/editor noise
 .DS_Store
 Thumbs.db
 *.swp
+# 공모전 제출본: 학번·전화번호가 들어 있다(공개 저장소). 다시 만드는 스크립트와 빈 양식만 올린다
+contest/**/제출/개인정보.json
+contest/**/제출/양식-채우기.json
+contest/**/제출/*_HON.hwp
+contest/**/제출/*_HON_미리보기.pdf
+contest/**/제출/개인정보 수집 및 활용 동의서_*.hwpx
