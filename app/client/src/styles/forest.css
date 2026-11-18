@@ -397,8 +397,17 @@
   opacity: 0;
 }
 
-.forest:has(.stone:is(:hover, :focus-visible, :active)) .stone .lit {
+/* 돌이 켜지는 것은 누르는 동안·키보드 초점에서. 마우스 올림(:hover)은 진짜 마우스가 있는 기기에서만 —
+   iPhone은 :hover가 무언가를 보이게 하면(.lit opacity 0→1) 첫 탭을 '올림'으로 쓰고 클릭을 보내지 않아 돌을 두 번 눌러야 했다
+   (2026-11-18 휴대폰 확인 A3). 아래 움직임 규칙도 같은 까닭으로 :hover를 (hover: hover) 안에만 둔다. */
+.forest:has(.stone:is(:focus-visible, :active)) .stone .lit {
   opacity: 1;
+}
+
+@media (hover: hover) {
+  .forest:has(.stone:hover) .stone .lit {
+    opacity: 1;
+  }
 }
 
 .forest .stone:active .hop {
@@ -631,21 +640,39 @@
     animation: rock var(--stone-rock) ease-in-out infinite;
     animation-delay: -1.4s;
   }
-  .forest:not(.failed):has(.stone:is(:hover, :focus-visible)) .hop {
+  .forest:not(.failed):has(.stone:focus-visible) .hop {
     animation:
       joyhop var(--stone-hop) var(--spring) both,
       bob 1.5s ease-in-out var(--stone-hop) infinite;
   }
-  .forest:not(.failed):has(.stone:is(:hover, :focus-visible)) .halo0 {
+  .forest:not(.failed):has(.stone:focus-visible) .halo0 {
     opacity: 1;
     scale: 1.32;
     background: radial-gradient(circle, color-mix(in srgb, var(--bg) 72%, transparent) 0, color-mix(in srgb, var(--bg) 28%, transparent) 34%, transparent 68%);
   }
-  .forest:not(.failed):has(.stone:is(:hover, :focus-visible)) .ring {
+  .forest:not(.failed):has(.stone:focus-visible) .ring {
     animation: ring 1.6s ease-out infinite;
   }
-  .forest:not(.failed):has(.stone:is(:hover, :focus-visible)) .ring.b {
+  .forest:not(.failed):has(.stone:focus-visible) .ring.b {
     animation-delay: 0.8s;
+  }
+  @media (hover: hover) {
+    .forest:not(.failed):has(.stone:hover) .hop {
+      animation:
+        joyhop var(--stone-hop) var(--spring) both,
+        bob 1.5s ease-in-out var(--stone-hop) infinite;
+    }
+    .forest:not(.failed):has(.stone:hover) .halo0 {
+      opacity: 1;
+      scale: 1.32;
+      background: radial-gradient(circle, color-mix(in srgb, var(--bg) 72%, transparent) 0, color-mix(in srgb, var(--bg) 28%, transparent) 34%, transparent 68%);
+    }
+    .forest:not(.failed):has(.stone:hover) .ring {
+      animation: ring 1.6s ease-out infinite;
+    }
+    .forest:not(.failed):has(.stone:hover) .ring.b {
+      animation-delay: 0.8s;
+    }
   }
   .forest .ldk i,
   .today-head.skel .today-date,

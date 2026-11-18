@@ -222,6 +222,18 @@ describe("편지(D-063, J-5) — 카드·봉투·넘기기", () => {
     expect(cards[0]?.querySelector(".d10")?.getAttribute("aria-hidden")).toBe("true");
   });
 
+  it("'고치기'에서 돌아온 편지(openAt)는 열린 채로 시작하고, 고치기는 보던 카드 자리를 함께 넘긴다(휴대폰 확인 B10)", async () => {
+    const root = host();
+    const seen: number[] = [];
+    render(<Letter diary={diary()} date="2026-10-16" day="오늘" mode="write" openAt={2} onEdit={(_key, at) => seen.push(at)} />, root);
+    await flush();
+    // 열린 편지라 '남기기'가 카드가 봉투에 들어가는 긴 봉인을 탄다(seal.ts — 닫힌 봉투면 인장만 눌렸다)
+    expect(root.querySelector(".letter-stage")?.classList.contains("opened")).toBe(true);
+    root.querySelector<HTMLButtonElement>('[aria-label="슬픔 고치기"]')?.click();
+    expect(seen).toHaveLength(1);
+    expect(typeof seen[0]).toBe("number");
+  });
+
   it("카드마다 '고치기'가 그 단계로, 끝 화살표는 aria-disabled", async () => {
     const root = host();
     const targets: string[] = [];

@@ -123,7 +123,12 @@ describe("설정 하위 화면(TASK-JOURNAL-01 J-9)", () => {
     await open("/settings/privacy");
     expect([...document.querySelectorAll(".st-info-name")].map((node) => node.textContent)).toEqual(["직접 쓴 기록은 그대로예요", "보관과 지우기", "진단·치료 앱이 아니에요"]);
     expect(document.body.textContent).not.toMatch(/AI/);
-    expect(document.querySelector(".st-help-link")?.getAttribute("href")).toBe("#/help");
+    // 기록 칸을 쌓는 이동이다 — 위기 안내의 ‹가 이 화면으로 돌아온다(휴대폰 확인 C3)
+    const pill = document.querySelector<HTMLButtonElement>("button.st-help-link");
+    expect(pill?.textContent).toContain("도움이 필요할 때 보기");
+    pill?.click();
+    expect(location.hash).toBe("#/help");
+    expect((history.state as { pushed?: boolean } | null)?.pushed).toBe(true);
   });
 
   it("내 계정 → 부를 이름: 같은 이름이면 저장하지 않고 이유를 알린다, 바꾸면 PUT 뒤 앱 이름이 바뀐다", async () => {

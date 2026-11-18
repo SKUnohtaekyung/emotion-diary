@@ -234,7 +234,9 @@ function StatsList({ initial }: { initial: StatsPeriod }) {
   const [switched, setSwitched] = useState(false);
   const pick = (value: StatsPeriod) => {
     history.replaceState(history.state, "", `#/stats?p=${value}`); // 친구 상세에서 돌아왔을 때 기간이 이어지게(쌓지 않는다 — D-091 ①)
-    setSwitched(true);
+    // 걷기는 친구들이 처음 보일 때 한 번이다. 7일이 비어(기록이 적어) 친구가 아직 안 보였다면 30일로 바꿨을 때 걷는다
+    // (2026-11-18 휴대폰 확인 D5 — 전환만 보고 막아서, 7일이 빈 사람은 걷는 모습을 영영 못 봤다)
+    if (load.kind === "ok" && load.summary.enough) setSwitched(true);
     setPeriod(value);
     announce(`최근 ${value}일 통계`);
   };

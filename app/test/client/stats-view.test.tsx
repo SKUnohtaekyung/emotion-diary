@@ -112,6 +112,31 @@ describe("통계 첫 화면", () => {
     expect(tiles).not.toContain("이어서 쓴 날");
   });
 
+  it("친구들은 처음 보일 때 한 번 걷는다 — 7일이 비었으면 30일로 바꿨을 때 걷고, 그 뒤 전환에서는 다시 걷지 않는다(휴대폰 확인 D5)", async () => {
+    const pick = async (label: string) => {
+      [...document.querySelectorAll<HTMLButtonElement>('[role="radio"]')].find((button) => button.textContent === label)?.click();
+      await flush(30);
+    };
+    const cutoff = new Date(Date.parse(`${TODAY}T00:00:00Z`) - 8 * 86_400_000).toISOString().slice(0, 10);
+    server(completed.filter((diary) => diary.entryDate <= cutoff));
+    await open("#/stats");
+    expect(document.querySelector(".sx-tracks")).toBeNull();
+    await pick("최근 30일");
+    expect(document.querySelector(".sx-tracks")?.classList.contains("sx-animate-in")).toBe(true);
+    await pick("최근 7일");
+    await pick("최근 30일");
+    expect(document.querySelector(".sx-tracks")?.classList.contains("sx-animate-in")).toBe(false);
+  });
+
+  it("첫 화면에서 친구가 보였으면 그때 걷고, 기간을 바꾸면 걷지 않는다(D-080)", async () => {
+    server();
+    await open("#/stats");
+    expect(document.querySelector(".sx-tracks")?.classList.contains("sx-animate-in")).toBe(true);
+    [...document.querySelectorAll<HTMLButtonElement>('[role="radio"]')].find((button) => button.textContent === "최근 30일")?.click();
+    await flush(30);
+    expect(document.querySelector(".sx-tracks")?.classList.contains("sx-animate-in")).toBe(false);
+  });
+
   it("불러오지 못하면 상태 블록과 다시 시도(F-21)", async () => {
     stubFetch(() => "offline");
     await open("#/stats");

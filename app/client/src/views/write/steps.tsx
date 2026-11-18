@@ -413,11 +413,17 @@ function ReflectionStep({ session, stepKey, change, ctl }: StepProps) {
 
 /** 편지(D-063) — 닫힌 봉투, 열면 카드를 옆으로 넘긴다. 열지 않고도 남길 수 있다(Letter.tsx) */
 function LetterStep({ session, day, ctl, onEdit }: StepProps) {
-  const [opened, setOpened] = useState(false);
+  // 카드의 '고치기'로 떠났다 돌아오면 열린 편지의 그 카드로 연다(session.letterAt)
+  const [openAt] = useState(() => session.letterAt);
+  const [opened, setOpened] = useState(openAt !== null);
+  const edit = (target: StepKey, at: number): void => {
+    session.letterAt = at;
+    onEdit(target);
+  };
   return (
     <>
       <p class="letter-sub">{opened ? "옆으로 넘겨서 확인해요." : `${day}의 마음을 나에게 쓴 편지로 담았어요. 봉투를 열어 마지막으로 읽어 봐요.`}</p>
-      <Letter diary={session.saver.diary} date={session.date} day={day} mode="write" onEdit={onEdit} onOpened={() => setOpened(true)} handle={ctl.letter} />
+      <Letter diary={session.saver.diary} date={session.date} day={day} mode="write" onEdit={edit} onOpened={() => setOpened(true)} handle={ctl.letter} openAt={openAt} />
     </>
   );
 }

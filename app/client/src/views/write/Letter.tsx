@@ -241,21 +241,24 @@ export interface LetterProps {
   date: string;
   day: "오늘" | "그날";
   mode: "write" | "read";
-  onEdit?: (target: StepKey) => void;
+  /** 카드의 '고치기' — 그때 보던 카드 자리(at)를 함께 넘긴다 */
+  onEdit?: (target: StepKey, at: number) => void;
   onOpened?: () => void;
   handle?: LetterHandle;
+  /** 열린 채로 이 카드에서 시작한다('고치기'에서 돌아온 편지). 없으면 쓰기는 닫힌 봉투, 읽기는 열린 편지 */
+  openAt?: number | null;
 }
 
-export function Letter({ diary, date, day, mode, onEdit, onOpened, handle }: LetterProps) {
-  const [phase, setPhase] = useState<LetterPhase>(mode === "read" ? "opened" : "closed");
-  const [at, setAt] = useState(0);
+export function Letter({ diary, date, day, mode, onEdit, onOpened, handle, openAt = null }: LetterProps) {
+  const [phase, setPhase] = useState<LetterPhase>(mode === "read" || openAt !== null ? "opened" : "closed");
+  const [at, setAt] = useState(openAt ?? 0);
   const stage = useRef<HTMLDivElement>(null);
   const pager = useRef<HTMLDivElement>(null);
   const clipRef = useRef<string | null>(null);
   if (clipRef.current === null) clipRef.current = nextClip();
   const clip = clipRef.current;
   const spoken = useRef(0);
-  const cards = buildCards(diary, date, day, onEdit);
+  const cards = buildCards(diary, date, day, onEdit && ((target: StepKey) => onEdit(target, index())));
   const total = cards.length;
   const cats = CATEGORIES.map((item) => item.code).filter((code) => diary.categories.some((item) => item.code === code));
   if (handle) handle.stage = stage.current;
@@ -288,6 +291,13 @@ export function Letter({ diary, date, day, mode, onEdit, onOpened, handle }: Let
     void document.fonts?.ready.then(markScrollers);
     return () => cancelAnimationFrame(frame);
   });
+
+  // '고치기'에서 돌아왔으면 그 카드로(움직임 없이 바로)
+  useLayoutEffect(() => {
+    if (openAt === null || !pager.current) return;
+    pager.current.scrollLeft = Math.min(openAt, total - 1) * step();
+    spoken.current = Math.min(openAt, total - 1);
+  }, []);
 
   useEffect(() => {
     const node = pager.current;

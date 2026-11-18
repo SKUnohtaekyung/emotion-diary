@@ -1,5 +1,5 @@
 /// <reference path="../../client/src/env.d.ts" />
-// 도움이 필요할 때(위기 안내) 화면 `#/help` (UX_SPEC §3·§6.1·§17, EVAL_PLAN §14 crisis-help-unreviewed-label, TASK-PERSONAL-01 A-1~A-4).
+// 도움이 필요할 때(위기 안내) 화면 `#/help` (UX_SPEC §3·§6.1·§17, TASK-PERSONAL-01 A-1~A-3, D-132 — 출처·확인일·'검토 전'은 화면에 적지 않는다).
 // 연락처는 묶음에 든 data/crisis-resources/kr.json이고, 시험은 자원 값을 바꿔 넣을 수 있게 createHelpView에 직접 넘긴다. 서버는 가짜 fetch다.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import crisis from "../../../data/crisis-resources/kr.json";
@@ -50,7 +50,6 @@ const byText = (text: string) => buttons().find((button) => button.textContent =
 const links = () => [...document.querySelectorAll<HTMLAnchorElement>("a")];
 const hrefs = () => links().map((link) => link.getAttribute("href"));
 const text = () => document.getElementById("app")?.textContent ?? "";
-const review = () => document.querySelector(".help-review");
 const rows = () => [...document.querySelectorAll<HTMLElement>(".help-row")];
 
 /** 위기 안내를 주어진 자원으로 연다. 자원을 안 주면 묶음에 든 kr.json 그대로다. */
@@ -66,11 +65,11 @@ const todayReply = () => ({
 });
 
 describe("위기 안내 — 구성", () => {
-  it("제목과 세 묶음(지금 위험하다면·이야기할 곳·출처), 문서 제목", () => {
+  it("제목과 두 묶음(지금 위험하다면·이야기할 곳), 문서 제목", () => {
     open();
     expect(document.querySelector("h1")?.textContent).toBe("혼자 견디지 않아도 돼요");
     expect(document.title).toBe("혼자 견디지 않아도 돼요 — 감정일기");
-    expect([...document.querySelectorAll("h2")].map((node) => node.textContent)).toEqual(["지금 위험하다면", "이야기할 곳", "출처"]);
+    expect([...document.querySelectorAll("h2")].map((node) => node.textContent)).toEqual(["지금 위험하다면", "이야기할 곳"]);
     expect(document.querySelector(".help-screen")).not.toBeNull();
   });
 
@@ -105,9 +104,8 @@ describe("위기 안내 — 구성", () => {
     expect(rows()[1]?.textContent).toContain("지역번호를 붙여요");
   });
 
-  it("확인일·해외 안내·진단이나 위기 대응 서비스가 아니라는 고지가 있다", () => {
+  it("해외 안내와 진단이나 위기 대응 서비스가 아니라는 고지가 있다", () => {
     open();
-    expect(text()).toContain("2026년 9월 25일에 각 기관의 공식 안내로 확인했어요.");
     expect(text()).toContain(crisis.abroad);
     expect(text()).toContain("이 앱은 진단이나 위기 대응 서비스가 아니에요.");
   });
@@ -161,59 +159,18 @@ describe("위기 안내 — 접근 이름", () => {
   });
 });
 
-describe("위기 안내 — 검토 전 표기 (A-4)", () => {
-  it("kr.json 그대로(clinicalSafety: pending)면 '검토 전'이 제목 아래 첫 묶음보다 앞에 보인다", () => {
-    expect(crisis.review.clinicalSafety).toBe("pending");
-    open();
-    const notice = review();
-    expect(notice?.textContent).toContain("검토 전");
-    expect(notice?.textContent).toBe("검토 전 번호는 공식 누리집으로 확인했어요. 전문가 검토는 아직 받지 않았어요.");
-    expect(notice?.querySelector("strong")?.textContent).toBe("검토 전");
-    const firstHeading = document.querySelector("h2");
-    expect(notice && firstHeading && notice.compareDocumentPosition(firstHeading) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-  });
-
-  it("'검토 전' 규칙은 글자를 줄이거나 흐리게 하지 않는다 — 본문 색, font-size·opacity 없음", () => {
-    const css = readSource("../../client/src/styles/help.css");
-    const rule = /\.help-review\s*\{([^}]*)\}/.exec(css)?.[1] ?? "";
-    expect(rule).toContain("var(--neutral-text)");
-    expect(rule).not.toMatch(/font-size|opacity|color-mix/);
-  });
-
-  it("clinicalSafety가 'reviewed'이면 보이지 않는다", () => {
-    const resource = fresh();
-    resource.review.clinicalSafety = "reviewed";
-    open(resource);
-    expect(review()).toBeNull();
-    expect(text()).not.toContain("검토 전");
-    // 나머지 화면은 그대로다
-    expect(hrefs()).toContain("tel:112");
-    expect(rows()).toHaveLength(3);
-  });
-
+describe("위기 안내 — 출처·확인일·검토 상태는 화면에 없다 (D-132)", () => {
   it.each([
-    ["pending", { clinicalSafety: "pending" }],
-    ["unreviewed", { clinicalSafety: "unreviewed" }],
-    ["대소문자가 다른 값", { clinicalSafety: "Reviewed" }],
-    ["참/거짓 값", { clinicalSafety: true }],
-    ["값 없음", {}],
-    ["review가 없음", undefined],
-    ["review가 글자", "reviewed"]
-  ])("검토 상태가 %s이면 보인다 — 알 수 없으면 보이는 쪽이다", (_name, review_) => {
-    const resource = fresh() as Record<string, unknown>;
-    if (review_ === undefined) delete resource.review;
-    else resource.review = review_;
-    open(resource);
-    expect(review()?.textContent).toContain("검토 전");
-  });
-
-  it("공식 누리집 확인이 끝나지 않았으면 그렇다고 하지 않고, 확인했다는 줄도 없다", () => {
-    const resource = fresh();
-    resource.review.officialSources = "pending";
-    open(resource);
-    expect(review()?.textContent).toBe("검토 전 전문가 검토는 아직 받지 않았어요.");
-    expect(text()).not.toContain("공식 누리집");
-    expect(text()).not.toContain("공식 안내로 확인했어요");
+    ["kr.json 그대로(clinicalSafety: pending)", (r: Resource) => r],
+    ["검토가 끝난 값", (r: Resource) => ({ ...r, review: { clinicalSafety: "reviewed", officialSources: "checked" } })],
+    ["review가 없는 값", (r: Resource) => ({ ...r, review: undefined })]
+  ])("%s이어도 '검토 전'·확인일·출처 링크가 보이지 않는다", (_name, shape) => {
+    expect(crisis.review.clinicalSafety).toBe("pending");
+    open(shape(fresh()));
+    for (const hidden of ["검토 전", "전문가 검토", "공식 누리집", "공식 안내로 확인", "출처"]) expect(text()).not.toContain(hidden);
+    expect(document.querySelector(".help-review, .help-source, .help-link")).toBeNull();
+    // 바깥으로 나가는 https 링크가 없다 — 전화·문자뿐
+    for (const href of hrefs()) expect(href).toMatch(/^(tel|sms):/);
   });
 });
 
@@ -239,22 +196,19 @@ describe("위기 안내 — 112·119는 자원 없이도 (A-3)", () => {
     // 이야기할 곳이 비었다는 것을 알리고 위의 112·119를 가리킨다
     expect(rows()).toHaveLength(0);
     expect(text()).toContain("연락처 목록을 열지 못했어요. 지금 위험하다면 위의 112나 119에 전화해 주세요.");
-    // 해외 안내와 고지는 자원 없이도 있고, 검토 상태를 모르니 '검토 전'도 보인다
+    // 해외 안내와 고지는 자원 없이도 있다
     expect(text()).toContain("해외에 있다면 그 나라의 응급 번호로 연락해 주세요.");
     expect(text()).toContain("이 앱은 진단이나 위기 대응 서비스가 아니에요.");
-    expect(review()?.textContent).toContain("검토 전");
-    // 출처가 없으면 출처 묶음을 만들지 않는다
     expect([...document.querySelectorAll("h2")].map((node) => node.textContent)).toEqual(["지금 위험하다면", "이야기할 곳"]);
     // 돌아갈 길은 있다
     expect(byText("‹ 뒤로")).toBeDefined();
   });
 
-  it("긴급번호 항목이 자원에 없으면 그 출처만 빠지고 112·119 버튼은 그대로다", () => {
+  it("긴급번호 항목이 자원에 없어도 112·119 버튼은 그대로다", () => {
     const resource = fresh();
     resource.emergency = [];
     open(resource);
     expect(hrefs()).toEqual(expect.arrayContaining(["tel:112", "tel:119"]));
-    expect(document.querySelectorAll(".help-source")).toHaveLength(3);
   });
 
   it("묶음에 든 실제 kr.json으로 연 화면에서도 같다", () => {
@@ -264,7 +218,7 @@ describe("위기 안내 — 112·119는 자원 없이도 (A-3)", () => {
 });
 
 describe("위기 안내 — 모양이 틀린 항목은 건너뛴다", () => {
-  it("전화로 쓸 수 없는 번호·이름 없는 항목은 줄을 만들지 않고, https가 아닌 출처와 엉뚱한 문자 번호는 버린다", () => {
+  it("전화로 쓸 수 없는 번호·이름 없는 항목은 줄을 만들지 않고, 엉뚱한 문자 번호는 버린다", () => {
     const resource = fresh();
     resource.contacts = [
       { id: "bad-number", number: "tel:112", name: "나쁜 번호", hours: "24시간" },
@@ -286,52 +240,8 @@ describe("위기 안내 — 모양이 틀린 항목은 건너뛴다", () => {
     expect(text()).not.toContain("나쁜 번호");
     expect(hrefs().join(" ")).not.toMatch(/javascript:|http:/);
     expect(hrefs().filter((href) => href?.startsWith("sms:"))).toEqual([]);
-    // 출처 링크는 https 하나(+ 긴급번호 줄의 출처, kr.json 그대로)뿐이다
-    const sources = links()
-      .filter((link) => link.classList.contains("help-link"))
-      .map((link) => link.getAttribute("href"));
-    expect(sources).toContain("https://www.example.go.kr/ok");
-    expect(sources).toHaveLength(1 + crisis.emergency.flatMap((item) => item.sources).length);
-  });
-
-  it("확인일 모양이 틀리면 확인했다는 줄을 만들지 않는다", () => {
-    const resource = fresh();
-    resource.checked = "어제";
-    open(resource);
-    expect(text()).not.toContain("공식 안내로 확인했어요");
-    expect(text()).toContain("이 앱은 진단이나 위기 대응 서비스가 아니에요.");
-  });
-});
-
-describe("위기 안내 — 출처 링크", () => {
-  it("kr.json의 출처가 모두 링크이고 rel=noreferrer, target 없음(앱 안 Safari 창으로 열린다)", () => {
-    open();
-    const expected = [...crisis.emergency, ...crisis.contacts].flatMap((item) => item.sources);
-    expect(expected).toHaveLength(7);
-    const sources = links().filter((link) => link.classList.contains("help-link"));
-    expect(sources.map((link) => link.getAttribute("href")).sort()).toEqual([...expected].sort());
-    for (const link of sources) {
-      expect(link.getAttribute("rel")).toBe("noreferrer");
-      expect(link.hasAttribute("target")).toBe(false);
-      expect(link.getAttribute("href")).toMatch(/^https:\/\//);
-    }
-    // 어느 기관의 출처인지 줄 머리에 있다
-    const headings = [...document.querySelectorAll(".help-source > .help-meta")].map((node) => node.textContent);
-    expect(headings).toEqual([
-      "112 경찰 · 경찰청",
-      "119 구급 · 소방청",
-      "109 자살예방상담전화 · 보건복지부",
-      "1388 청소년상담 · 성평등가족부",
-      "1577-0199 정신건강 위기상담전화 · 보건복지부"
-    ]);
-  });
-
-  it("출처 링크의 이름에 기관과 번호, 순서, 누리집 주소가 있다", () => {
-    open();
-    const names = links().map((link) => link.getAttribute("aria-label"));
-    expect(names).toContain("1388 청소년상담 출처 1 mogef.go.kr");
-    expect(names).toContain("1388 청소년상담 출처 2 mogef.go.kr");
-    expect(names).toContain("109 자살예방상담전화 출처 1 129.go.kr");
+    // 자원에 출처 주소가 있어도 화면에는 링크로 나오지 않는다(D-132)
+    expect(hrefs().join(" ")).not.toContain("example.go.kr");
   });
 });
 
@@ -345,7 +255,7 @@ describe("위기 안내 — 돌아가기 (UX_SPEC §17)", () => {
     expect(document.querySelector(".screen-top .back-button")).not.toBeNull();
   });
 
-  it("앱 안에서(설정의 줄처럼 push로) 들어오면 ‹ 뒤로는 밀어서 뒤로와 같이 앞 화면으로 돌아간다", async () => {
+  it("앱 안에서(설정의 줄·개인정보 안내의 알약처럼 push로) 들어오면 ‹ 뒤로는 밀어서 뒤로와 같이 앞 화면으로 돌아간다", async () => {
     stubFetch((request) => (request.path === "/api/today" ? todayReply() : { status: 204 }));
     history.replaceState(null, "", "/#/today");
     render();

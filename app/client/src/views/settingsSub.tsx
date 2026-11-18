@@ -144,12 +144,13 @@ function Privacy() {
         />
       </div>
       {/* 위기 연락처는 위기 안내 화면(D-094)에만 적는다 — 여기에는 그리로 가는 알약만 */}
-      <a class="st-pill-link st-help-link" href="#/help">
+      {/* 설정의 줄처럼 기록 칸을 쌓아 이동한다 — 그냥 링크(#/help)였을 때는 위기 안내의 ‹가 갈 곳을 몰라 오늘 화면으로 갔다(2026-11-18 휴대폰 확인 C3) */}
+      <button type="button" class="st-pill-link st-help-link" onClick={() => navigate("#/help")}>
         <span class="st-pill-link-face">
           도움이 필요할 때 보기
           <Chev />
         </span>
-      </a>
+      </button>
     </section>
   );
 }
