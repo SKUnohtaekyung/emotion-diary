@@ -5,6 +5,7 @@
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
 | [TASK-REPLAN-01](archive/TASK-REPLAN-01.md) 전체 순서 다시 세우기 | 끝(2026-11-11) — 결정 D-126~D-128, 0단계 정본 동기화, `verify full` PASS. 커밋 전(브랜치 `docs/replan`) | [archive/](archive/README.md), 계획은 [replan/2026-11-11/PLAN.md](replan/2026-11-11/PLAN.md) |
+| **다음 할 일** TASK-ACCOUNTS-01 가입·들어오는 길(소셜 로그인·만 14세·동의·탈퇴·사람별 분리) | **대기 — 계획 초안(2026-11-12), 착수 전.** 전제: direct-journal·dashboard-reminder 휴대폰 확인과 관문 판정, `journal/direct`가 `main`에. 착수 때 질문 창 Q1~Q4를 한 번에 묻는다 | 요청 [accounts/2026-11-12/REQUESTS.md](accounts/2026-11-12/REQUESTS.md), 계획 [accounts/2026-11-12/PLAN.md](accounts/2026-11-12/PLAN.md) |
 | TASK-JOURNAL-01 일기 쓰기·오늘 화면을 시안 모양으로 | **진행 중(2026-11-11 승인 — D-131)** — 노드 `direct-journal` in_progress | 이 파일 아래, 계획은 [direct-journal/2026-11-11/PLAN.md](direct-journal/2026-11-11/PLAN.md) |
 | TASK-REFLECT-01 화면 기초와 돌아보기(달력 + 통계) | **코드 끝·휴대폰 확인 대기(2026-11-11)** — D-129·D-130. 노드 `dashboard-reminder` verifying, 휴대폰 확인은 다음 묶음과 함께 | 이 파일 아래, 계획은 [reflection/2026-11-11/PLAN.md](reflection/2026-11-11/PLAN.md) |
 | direct-journal 착수 준비(시안 이식 지도) | 준비 끝(2026-10-20). 2026-11-11 D-126으로 순서가 바뀌었다 — MAP의 조각 지도는 새 순서의 화면 기초·작성 흐름·오늘·설정·가입이 그대로 쓰고, 남았던 Q3·Q4는 2026-11-11 D-128로 답했다 | [direct-journal/2026-10-20/](direct-journal/2026-10-20/QUESTIONS.md)(MAP·FACTS·QUESTIONS) |

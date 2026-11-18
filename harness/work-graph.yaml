@@ -279,6 +279,7 @@ nodes:
   - id: accounts
     status: blocked
     depends_on: [direct-journal]
+    # 2026-11-12 요청서·계획 초안: tasks/accounts/2026-11-12/REQUESTS.md·PLAN.md(TASK-ACCOUNTS-01, 착수 전 — 질문 창 Q1~Q4는 착수 때).
     # 2026-11-11 새 노드(D-126): 여러 사람이 쓰기 — 소셜 로그인(카카오·구글), 가입 때 만 14세 이상 확인, 이용약관·개인정보 처리방침·
     # 건강정보 별도 동의, 회원 탈퇴(모든 기록 지우기 + 계정), 사람별 데이터 분리 재검증, 접근 열쇠 퇴역, 시안의 들어오는 길·온보딩
     # (MAP §5 조각 10·11). 표는 이미 모든 행에 owner_key가 있다 — 바뀌는 것은 세션 주체(app/worker/src/context.ts의
