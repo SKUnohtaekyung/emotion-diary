@@ -1,0 +1,903 @@
+/* 오늘 화면의 어두운 숲(D-062·D-067·D-072·D-084) — 시안 web/css/scene.css '오늘' 절을 옮겼다(TASK-JOURNAL-01 J-7, ui/Forest.tsx·views/today.tsx).
+   시안의 .scene·.scene-box·.scene-art는 이 앱에서 잠금 층이 .scene을 쓰고 있어 .forest·.forest-box·.forest-art로 이름을 바꿨다. 나머지 부품 이름은
+   .forest 아래로 묶었다. 색은 전부 토큰 변수(--forest-*·계열 500/300). 움직임은 no-preference 안에서만 — 줄이면 숲이 멈춰 있다. */
+
+.screen.today {
+  position: relative;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  background: var(--forest-sky);
+  color: var(--bg);
+}
+
+.forest-wrap {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.forest {
+  position: relative;
+  flex: 1;
+  min-height: 34rem;
+  overflow: hidden;
+  container-type: size;
+  background: var(--forest-sky);
+}
+
+.forest-box {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: max(100cqw, calc(100cqh * 360 / 744));
+  aspect-ratio: 360 / 744;
+  transform: translateX(-50%);
+}
+
+.forest-art,
+.forest-fore,
+.forest-svg {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.f-tree-far * {
+  fill: var(--forest-tree-far);
+  stroke: var(--forest-tree-far);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.f-tree-mid * {
+  fill: var(--forest-tree-mid);
+  stroke: var(--forest-tree-mid);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+
+.f-tree-near * {
+  fill: var(--forest-tree-near);
+  stroke: var(--forest-tree-near);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.f-tree-edge * {
+  fill: var(--forest-tree-edge);
+  stroke: var(--forest-tree-edge);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+
+.f-ground-far {
+  fill: var(--forest-ground-far);
+}
+
+.f-ground-mid {
+  fill: var(--forest-ground-mid);
+}
+
+.f-road-far {
+  stop-color: var(--forest-path-far);
+}
+
+.f-road-near {
+  stop-color: var(--forest-path-near);
+}
+
+/* 숲 속의 작은 식물(D-072) — 숲 색에 민트를 조금 섞은 어두운 초록 세 단계 */
+.f-pl-a {
+  fill: color-mix(in srgb, var(--forest-tree-mid) 76%, var(--service-mint));
+}
+
+.f-pl-b {
+  fill: color-mix(in srgb, var(--forest-tree-mid) 62%, var(--service-mint));
+}
+
+.f-pl-c {
+  fill: color-mix(in srgb, var(--forest-tree-mid) 50%, var(--service-mint));
+}
+
+.f-near.f-pl-a {
+  fill: color-mix(in srgb, var(--forest-tree-edge) 82%, var(--service-mint));
+}
+
+.f-near.f-pl-b {
+  fill: color-mix(in srgb, var(--forest-tree-edge) 70%, var(--service-mint));
+}
+
+.f-fore.f-pl-a {
+  fill: color-mix(in srgb, var(--forest-tree-mid) 70%, var(--service-mint));
+}
+
+/* 밤하늘은 짙은 남색 한 색(D-084) */
+.f-sky {
+  fill: var(--forest-sky);
+}
+
+.f-star {
+  fill: var(--bg);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.f-fly {
+  fill: var(--service-mint);
+  opacity: 0.55;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* ── 위 글: 날짜 줄('지난 기록' 알약)과 큰 질문 ── */
+.today-head {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 15;
+  padding: calc(clamp(4rem, 12.5dvh, 7rem) + env(safe-area-inset-top)) var(--sp-5) 0;
+  pointer-events: none;
+}
+
+.today-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin: 0 0 var(--sp-1);
+}
+
+.today-head .today-date {
+  margin: 0;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-body-strong);
+  color: color-mix(in srgb, var(--bg) 78%, transparent);
+}
+
+/* 알약의 보이는 높이 36px, 줄에서 차지하는 자리는 위아래 −6px로 글자 높이에 맞춘다. 누르는 자리 44px은 ::after로(D-090 ③) */
+.today-past {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  margin: -6px 0;
+  padding: 0 14px 0 11px;
+  border-radius: var(--radius-chip);
+  background: color-mix(in srgb, var(--bg) 11%, transparent);
+  color: var(--bg);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-body-strong);
+  text-decoration: none;
+  white-space: nowrap;
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.today-past::after {
+  content: "";
+  position: absolute;
+  inset: -4px 0;
+}
+
+.today-past svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.today-past:focus-visible {
+  outline: var(--emphasis) solid var(--service-mint);
+  outline-offset: 0;
+}
+
+@media (hover: hover) {
+  .today-past:hover {
+    background: color-mix(in srgb, var(--bg) 16%, transparent);
+  }
+}
+
+/* 큰 질문은 글자 자체가 그림이다(D-067) — 작게 시작해 '마음'이 크게 서고 끝말이 오른쪽으로 물러난다 */
+.today-head .hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(0.7rem, 4.2vw, 1.15rem);
+  margin: 0;
+  color: var(--bg);
+  line-height: 1;
+}
+
+.today-head .hero > span {
+  display: block;
+}
+
+.today-head .ty1 {
+  margin-left: 0.15em;
+  font-size: clamp(1.15rem, 5.8vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.today-head .ty2 {
+  margin: 0 0 0 -0.05em;
+  font-size: clamp(4.4rem, 25vw, 6.6rem);
+  line-height: 0.98;
+  font-weight: 900;
+  letter-spacing: -0.065em;
+}
+
+.today-head .ty2 small {
+  margin-left: 0.06em;
+  font-size: 0.44em;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.today-head .ty3 {
+  margin-left: 1.05em;
+  font-size: clamp(1.75rem, 8.8vw, 2.45rem);
+  line-height: 1.1;
+  font-weight: 750;
+  letter-spacing: -0.04em;
+}
+
+/* ── 감정 조약돌(D-067): 평소 채도·밝기를 낮춰 숲에 묻혀 있다. 기록이 있는 날은 고른 계열만 켜진다 ── */
+.forest .pb {
+  --c: color-mix(in srgb, var(--k) 70%, var(--k3));
+  position: absolute;
+  z-index: var(--z, 3);
+  opacity: calc(0.62 + var(--dp, 0.5) * 0.38);
+  pointer-events: none;
+}
+
+.forest .pb .halo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 300%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, var(--c) 0, color-mix(in srgb, var(--c) 40%, transparent) 42%, transparent 100%);
+  mix-blend-mode: screen;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.forest .pb img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: rotate(var(--r, 0deg));
+  filter: saturate(0.5) brightness(0.58);
+}
+
+.forest.recorded .pb.off {
+  opacity: 0.4;
+}
+
+.forest.recorded .pb.on {
+  opacity: 1;
+}
+
+.forest.recorded .pb.on .halo {
+  opacity: 0.95;
+}
+
+.forest.recorded .pb.on img {
+  filter: saturate(1.1) brightness(1.05) drop-shadow(0 0 5px var(--c));
+}
+
+/* 돌을 누를 때 조약돌은 은은하게만 켜진다(D-077) */
+.ignite .forest .pb {
+  opacity: 1;
+}
+
+.ignite .forest .pb .halo {
+  opacity: 0.55;
+}
+
+.ignite .forest .pb img {
+  filter: saturate(1) brightness(1) drop-shadow(0 0 4px var(--c));
+}
+
+.ignite .forest .halo0 {
+  opacity: 1;
+  scale: 1.5;
+  background: radial-gradient(circle, color-mix(in srgb, var(--bg) 78%, transparent) 0, color-mix(in srgb, var(--bg) 30%, transparent) 36%, transparent 70%);
+}
+
+.ignite .forest .stone .lit {
+  opacity: 1;
+}
+
+/* ── 가운데 돌 ── */
+.forest .halo0 {
+  position: absolute;
+  left: 13.9%;
+  top: 50.4%;
+  z-index: 8;
+  width: 72.2%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--service-mint) 30%, transparent) 0, color-mix(in srgb, var(--service-mint) 10%, transparent) 40%, transparent 68%);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.forest .ring {
+  position: absolute;
+  left: 36.1%;
+  top: 61.2%;
+  z-index: 8;
+  width: 27.8%;
+  aspect-ratio: 1;
+  border: 2px solid color-mix(in srgb, var(--bg) 60%, transparent);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.forest .stone {
+  position: absolute;
+  left: 31.667%;
+  top: 60.75%;
+  z-index: 11;
+  width: 36.667%;
+  aspect-ratio: 132 / 108;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.forest .stone:focus-visible {
+  outline: 3px solid var(--service-mint);
+  outline-offset: 8px;
+  border-radius: 40px;
+}
+
+.forest .stone .hop,
+.forest .stone .rock {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+
+.forest .stone .hop {
+  transform-origin: 50% 92%;
+}
+
+.forest .stone .rock {
+  transform-origin: 50% 90%;
+}
+
+.forest .stone-img {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: auto;
+}
+
+.forest .stone .lit {
+  opacity: 0;
+}
+
+/* 돌이 켜지는 것은 누르는 동안·키보드 초점에서. 마우스 올림(:hover)은 진짜 마우스가 있는 기기에서만 —
+   iPhone은 :hover가 무언가를 보이게 하면(.lit opacity 0→1) 첫 탭을 '올림'으로 쓰고 클릭을 보내지 않아 돌을 두 번 눌러야 했다
+   (2026-11-18 휴대폰 확인 A3). 아래 움직임 규칙도 같은 까닭으로 :hover를 (hover: hover) 안에만 둔다. */
+.forest:has(.stone:is(:focus-visible, :active)) .stone .lit {
+  opacity: 1;
+}
+
+@media (hover: hover) {
+  .forest:has(.stone:hover) .stone .lit {
+    opacity: 1;
+  }
+}
+
+.forest .stone:active .hop {
+  transform: scale(0.94);
+}
+
+.forest .cap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 81.2%;
+  z-index: 12;
+  margin: 0;
+  text-align: center;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-body-strong);
+  letter-spacing: -0.01em;
+  color: color-mix(in srgb, var(--bg) 92%, transparent);
+}
+
+.forest .cap[hidden] {
+  display: none;
+}
+
+.forest .dchip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 76.1%;
+  z-index: 12;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.forest .dchip span {
+  display: flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 var(--sp-3);
+  border-radius: var(--radius-chip);
+  background: color-mix(in srgb, var(--bg) 16%, transparent);
+  color: var(--bg);
+  font-size: var(--fs-caption);
+  font-weight: var(--fw-body-strong);
+}
+
+/* 지난 날 쓰던 글 줄 — 돌 안내(주)보다 조용한 글자 줄 */
+.forest .yline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 85%;
+  z-index: 12;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+}
+
+.forest .yline button {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--touch);
+  padding: 0 var(--sp-2);
+  border: 0;
+  border-radius: 10px;
+  background: none;
+  color: color-mix(in srgb, var(--bg) 78%, transparent);
+  font: inherit;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-body-strong);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.forest .yline button:focus-visible {
+  outline: var(--emphasis) solid var(--service-mint);
+  outline-offset: 0;
+}
+
+/* 오류·연결 끊김(돌은 막힘)과 이 휴대폰에 남은 글 — 돌 아래 한 덩어리 */
+.forest .today-status {
+  position: absolute;
+  left: var(--sp-5);
+  right: var(--sp-5);
+  top: 79%;
+  z-index: 12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  text-align: center;
+}
+
+.forest .today-line {
+  margin: 0;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  font-weight: var(--fw-body-strong);
+  color: color-mix(in srgb, var(--bg) 88%, transparent);
+}
+
+.forest .today-retry {
+  min-width: 8rem;
+  background: color-mix(in srgb, var(--bg) 16%, transparent);
+  color: var(--bg);
+}
+
+.forest .today-retry:focus-visible {
+  outline: var(--emphasis) solid var(--service-mint);
+  outline-offset: 2px;
+}
+
+.forest.failed .stone {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* 로딩: 조약돌·돌·문구 자리에 옅은 막대(같은 자리·같은 줄 수) */
+.forest.loading :is(.pb, .stone, .halo0, .ring, .cap, .dchip) {
+  visibility: hidden;
+}
+
+.forest .ldk {
+  position: absolute;
+  inset: 0;
+  z-index: 12;
+}
+
+.forest .ldk i {
+  position: absolute;
+  display: block;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--bg) 14%, transparent);
+}
+
+.forest .ldk i.ldk-stone {
+  left: 31.7%;
+  top: 63%;
+  width: 36.7%;
+  height: 13%;
+  border-radius: 58% 42% 54% 46% / 46% 54% 42% 58%;
+}
+
+.forest .ldk i.ldk-cap {
+  left: 31%;
+  top: 81.5%;
+  width: 38%;
+  height: 2.2%;
+}
+
+.today-head.skel .today-date,
+.today-head.skel .hero {
+  width: fit-content;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--bg) 14%, transparent);
+  color: transparent;
+}
+
+/* 돌에서 퍼지는 흰빛(전체 화면). 반지름은 가장 먼 모서리까지 덮도록 Forest.tsx가 --fs로 준다 */
+.flood {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.flood .disc {
+  position: absolute;
+  left: var(--fx);
+  top: var(--fy);
+  width: var(--fs);
+  height: var(--fs);
+  border-radius: 50%;
+  background: radial-gradient(circle closest-side, var(--bg) 0, var(--bg) 70%, transparent 100%);
+  transform: translate(-50%, -50%) scale(0.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flood .disc {
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* ── 움직임: 별·반딧불 깜빡임, 돌 흔들림·통통·물결, 기록 있는 날의 켜진 조약돌, 큰 질문 올라오기 ── */
+@media (prefers-reduced-motion: no-preference) {
+  .f-star {
+    animation: twinkle 4s ease-in-out infinite;
+    animation-delay: var(--sd, 0s);
+  }
+  .f-fly {
+    animation: twinkle 5s ease-in-out infinite;
+    animation-delay: var(--sd, 0s);
+  }
+  .today-head .hero > span {
+    animation: typeup 0.7s var(--ease) both;
+  }
+  .today-head .ty1 {
+    animation-delay: 0.05s;
+  }
+  .today-head .ty2 {
+    animation-delay: 0.16s;
+  }
+  .today-head .ty3 {
+    animation-delay: 0.3s;
+  }
+  .forest .pb {
+    transition: opacity 0.4s;
+  }
+  .forest .pb .halo {
+    transition: opacity 0.35s ease var(--ld, 0s);
+  }
+  .forest .pb img {
+    transition: filter 0.35s ease var(--ld, 0s);
+  }
+  .forest.recorded .pb.on .halo {
+    animation: twinkle var(--dur, 4s) ease-in-out infinite;
+    animation-delay: var(--d, 0s);
+  }
+  .forest .halo0 {
+    transition:
+      opacity 0.45s,
+      scale 0.45s var(--spring);
+  }
+  .forest .stone .lit {
+    transition: opacity 0.3s;
+  }
+  .forest:not(.failed) .stone .rock {
+    animation: rock var(--stone-rock) ease-in-out infinite;
+    animation-delay: -1.4s;
+  }
+  .forest:not(.failed):has(.stone:focus-visible) .hop {
+    animation:
+      joyhop var(--stone-hop) var(--spring) both,
+      bob 1.5s ease-in-out var(--stone-hop) infinite;
+  }
+  .forest:not(.failed):has(.stone:focus-visible) .halo0 {
+    opacity: 1;
+    scale: 1.32;
+    background: radial-gradient(circle, color-mix(in srgb, var(--bg) 72%, transparent) 0, color-mix(in srgb, var(--bg) 28%, transparent) 34%, transparent 68%);
+  }
+  .forest:not(.failed):has(.stone:focus-visible) .ring {
+    animation: ring 1.6s ease-out infinite;
+  }
+  .forest:not(.failed):has(.stone:focus-visible) .ring.b {
+    animation-delay: 0.8s;
+  }
+  @media (hover: hover) {
+    .forest:not(.failed):has(.stone:hover) .hop {
+      animation:
+        joyhop var(--stone-hop) var(--spring) both,
+        bob 1.5s ease-in-out var(--stone-hop) infinite;
+    }
+    .forest:not(.failed):has(.stone:hover) .halo0 {
+      opacity: 1;
+      scale: 1.32;
+      background: radial-gradient(circle, color-mix(in srgb, var(--bg) 72%, transparent) 0, color-mix(in srgb, var(--bg) 28%, transparent) 34%, transparent 68%);
+    }
+    .forest:not(.failed):has(.stone:hover) .ring {
+      animation: ring 1.6s ease-out infinite;
+    }
+    .forest:not(.failed):has(.stone:hover) .ring.b {
+      animation-delay: 0.8s;
+    }
+  }
+  .forest .ldk i,
+  .today-head.skel .today-date,
+  .today-head.skel .hero {
+    animation: skel 1.6s ease-in-out infinite;
+  }
+}
+
+@keyframes rock {
+  0%,
+  100% {
+    transform: rotate(-3.2deg);
+  }
+  50% {
+    transform: rotate(3.2deg);
+  }
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: scale(0.86);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.14);
+  }
+}
+
+@keyframes joyhop {
+  0% {
+    transform: translateY(0) scale(1, 1);
+  }
+  18% {
+    transform: translateY(2px) scale(1.06, 0.92);
+  }
+  42% {
+    transform: translateY(-14%) scale(0.96, 1.05);
+  }
+  62% {
+    transform: translateY(0) scale(1.05, 0.95);
+  }
+  78% {
+    transform: translateY(-6%) scale(0.98, 1.02);
+  }
+  100% {
+    transform: translateY(0) scale(1, 1);
+  }
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4%);
+  }
+}
+
+@keyframes ring {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(2.1);
+    opacity: 0;
+  }
+}
+
+@keyframes typeup {
+  0% {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes skel {
+  0%,
+  100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ── 앱 시작 로딩 화면(D-134, ui/splash.ts) — 오늘 화면 숲 하늘과 같은 남색 위 평면 조약돌 하나(오늘 화면 돌의 실루엣). 조약돌은 300ms 동안 투명하다(그 안에 준비되면 보이기 전에 걷는다).
+   시간: 드러난 뒤 2초까지는 조약돌만 가만히(1초 안팎의 반복 움직임은 오히려 거슬린다 — NN/g) · 2~10초는 아래로 잔물결 · 10초가 넘으면 '다시 시도'.
+   표시는 CSS 시간으로만 드러난다(스크립트가 늦게 와도 보이게). 움직임 줄이기면 물결 대신 2초 뒤 글자 한 줄. 막·조약돌·물결 색은 index.html의 SVG fill(CSS보다 먼저 그려진다). ── */
+/* 남색 막은 첫 그림부터 깔린다(흰 바탕이 0.3초 비쳤다 남색으로 바뀌던 번쩍임을 없앤다 — manifest background_color·오늘 화면 숲 하늘과 같은 남색).
+   조약돌은 300ms 동안 투명하다 — 그 안에 준비되면 조약돌을 보이기 전에 막째 걷는다. */
+.splash {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 150;
+  width: min(100%, 480px);
+  overflow: hidden;
+  transform: translateX(-50%);
+}
+
+.splash-veil {
+  position: absolute;
+  inset: 0;
+  background: var(--forest-sky, #0b1228);
+}
+
+.splash-center {
+  position: absolute;
+  top: 44%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  animation: splash-in 0.16s linear 0.3s forwards;
+}
+
+/* 104×84 — 오늘 화면 돌(132×107)과 같은 비율이라 내려앉을 때 그 자리에 그대로 겹친다 */
+.splash-mark {
+  position: absolute;
+  top: -42px;
+  left: -52px;
+  display: block;
+  width: 104px;
+  height: 84px;
+  overflow: visible;
+}
+
+.splash-ripples {
+  position: absolute;
+  top: 22px;
+  left: -70px;
+  width: 140px;
+  height: 40px;
+  overflow: visible;
+}
+
+.splash-ripples ellipse {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.splash-slow {
+  position: absolute;
+  right: 0;
+  bottom: calc(9% + env(safe-area-inset-bottom));
+  left: 0;
+  color: var(--neutral-bg, #fff);
+  font-size: var(--text-label-size, 0.875rem);
+  line-height: var(--text-label-line, 1.5);
+  text-align: center;
+}
+
+.splash-slow p {
+  margin: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.splash-wait {
+  display: none;
+}
+
+.splash-stuck {
+  animation: splash-show 0.5s ease-out 10.3s forwards;
+}
+
+.splash-stuck a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--size-touch-target-min, 44px);
+  padding: 0 12px;
+  color: var(--service-mint, #62fdb4);
+  font-weight: 700;
+  text-underline-offset: 0.2em;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .splash-ripples ellipse {
+    animation: splash-ripple 2s ease-out 2.3s infinite;
+  }
+  .splash-ripples ellipse + ellipse {
+    animation-delay: 3.3s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-ripples {
+    display: none;
+  }
+  .splash-wait {
+    display: block;
+    animation: splash-show 0.3s linear 2.3s forwards;
+  }
+}
+
+@keyframes splash-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes splash-ripple {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.45);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes splash-show {
+  to {
+    opacity: 0.8;
+    visibility: visible;
+  }
+}

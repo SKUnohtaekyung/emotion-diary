@@ -3,17 +3,25 @@
 // 값이 든 화면(ARCHITECTURE §11.9)은 `이름/:date` 모양이다 — 작성 흐름·기록 보기·완료(TASK-SLICE-01 PLAN A-9).
 
 import { isIsoDate } from "../../../shared/diary";
+import { CATEGORY_CODES } from "../../../shared/taxonomy";
 
 export const ROUTES = [
   "auth",
   "auth/name",
   "welcome",
   "today",
+  "calendar",
+  "stats",
+  "settings",
   "settings/lock",
   "settings/pin",
   "settings/export",
   "settings/delete",
   "settings/deleted",
+  "settings/day",
+  "settings/privacy",
+  "settings/profile",
+  "settings/name",
   "help"
 ] as const;
 export type RouteName = (typeof ROUTES)[number];
@@ -24,15 +32,15 @@ export type DateRouteName = `${(typeof DATE_ROUTES)[number]}/:date`;
 
 /** 로그인이 끝난 뒤 돌아가도 되는 화면. 열쇠·이름·반가워요는 지나가면 사라지는 화면이라 뺀다. */
 /** 삭제 완료(settings/deleted)는 한 번 보고 지나가는 화면이라 뺀다. 도움이 필요할 때(help)는 로그인 뒤 화면이라 넣는다. */
-const RETURNABLE: readonly string[] = ["today", "settings/lock", "settings/pin", "settings/export", "settings/delete", "help"];
+const RETURNABLE: readonly string[] = ["today", "calendar", "stats", "settings", "settings/lock", "settings/pin", "settings/export", "settings/delete", "settings/day", "settings/privacy", "settings/profile", "settings/name", "help"];
 
 export interface ParsedRoute {
   /** 화면 주소(query 없음, 값 포함 — 예: write/2026-10-16). 비었거나 모르는 이름이면 known이 거짓 */
   path: string;
   /** 화면 표의 이름(값 자리는 `:date` — 예: write/:date). 정확한 이름이면 path와 같다 */
   name: string;
-  /** 값 조각. 날짜 화면이면 date */
-  params: { date?: string };
+  /** 값 조각. 날짜 화면이면 date, 통계 친구 상세면 category */
+  params: { date?: string; category?: string };
   query: URLSearchParams;
   known: boolean;
 }
@@ -44,6 +52,12 @@ function matchDateRoute(path: string): { name: DateRouteName; date: string } | n
   return isIsoDate(value) ? { name: `${head}/:date` as DateRouteName, date: value } : null;
 }
 
+/** `stats/joy` → 통계 친구 상세(TASK-REFLECT-01 R-4). 아홉 계열 코드가 아니면 null. */
+function matchCategoryRoute(path: string): string | null {
+  const [head, value, ...rest] = path.split("/");
+  return head === "stats" && value && !rest.length && CATEGORY_CODES.includes(value) ? value : null;
+}
+
 export function parseHash(hash: string): ParsedRoute {
   const body = hash.replace(/^#/, "").replace(/^\//, "");
   const cut = body.indexOf("?");
@@ -51,11 +65,13 @@ export function parseHash(hash: string): ParsedRoute {
   const query = new URLSearchParams(cut === -1 ? "" : body.slice(cut + 1));
   const dated = matchDateRoute(path);
   if (dated) return { path, name: dated.name, params: { date: dated.date }, query, known: true };
+  const category = matchCategoryRoute(path);
+  if (category) return { path, name: "stats/:category", params: { category }, query, known: true };
   return { path, name: path, params: {}, query, known: (ROUTES as readonly string[]).includes(path) };
 }
 
 export function isReturnable(path: string | null | undefined): path is string {
-  return typeof path === "string" && (RETURNABLE.includes(path) || matchDateRoute(path) !== null);
+  return typeof path === "string" && (RETURNABLE.includes(path) || matchDateRoute(path) !== null || matchCategoryRoute(path) !== null);
 }
 
 export interface GuardState {

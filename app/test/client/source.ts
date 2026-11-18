@@ -11,11 +11,11 @@ export function readSource(relative: string): string {
   return readFileSync(`${here}/${relative}`, "utf8");
 }
 
-/** app/client/src 아래의 .ts 파일(.d.ts 제외)을 상대 경로와 함께 읽는다. */
+/** app/client/src 아래의 .ts·.tsx 파일(.d.ts 제외)을 상대 경로와 함께 읽는다 — .tsx를 빼면 CSP 검사가 Preact 화면을 조용히 건너뛴다. */
 export function clientSources(): Array<{ path: string; text: string }> {
   const dir = `${here}/../../client/src`;
   return readdirSync(dir, { recursive: true })
     .map((path) => path.replaceAll("\\", "/"))
-    .filter((path) => path.endsWith(".ts") && !path.endsWith(".d.ts"))
+    .filter((path) => (path.endsWith(".ts") || path.endsWith(".tsx")) && !path.endsWith(".d.ts"))
     .map((path) => ({ path, text: readFileSync(`${dir}/${path}`, "utf8") }));
 }

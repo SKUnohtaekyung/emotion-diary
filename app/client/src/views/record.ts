@@ -1,13 +1,35 @@
-// 기록 보기 `#/record/<날짜>` — 편지의 읽기 모드, 평면판(UX_SPEC §7, TASK-SLICE-01 사용자 결정 U-3).
+// 기록 보기 `#/record/<날짜>` — 편지의 읽기 모드(UX_SPEC §7). 2026-11-12 작성 흐름의 편지 카드를 그대로 쓴다(TASK-JOURNAL-01 J-5, 봉투 연출 없음).
 // 부분마다 '고치기'가 그 단계로 고치기 흐름을 연다(D-100 ②). 완료 취소·지우기는 이 조각에 없다(direct-journal).
 // 없는·미래 날짜는 '이 날의 편지가 없어요'(D-083 ②). 임시저장이면 이어 쓰기로 보낸다.
 
 import type { DiaryEntryView } from "../../../shared/diary";
+import { CATEGORY_CODES } from "../../../shared/taxonomy";
+import { createElement } from "preact";
 import { h } from "../lib/dom";
+import { mountPreact } from "../lib/mount";
+import { openRecordMenu } from "../ui/recordMenu";
+import { Letter } from "./write/Letter";
+
+const SVG = "http://www.w3.org/2000/svg";
+/** ⋯ 아이콘 — 채운 점 셋(ui/icons.tsx DotsIcon과 같은 모양, 이 화면은 Preact 밖) */
+function dotsIcon(): SVGSVGElement {
+  const svg = document.createElementNS(SVG, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("aria-hidden", "true");
+  svg.setAttribute("class", "dots3");
+  for (const cx of ["5", "12", "19"]) {
+    const dot = document.createElementNS(SVG, "circle");
+    dot.setAttribute("cx", cx);
+    dot.setAttribute("cy", "12");
+    dot.setAttribute("r", "1.7");
+    svg.append(dot);
+  }
+  return svg;
+}
 import { monthDay } from "../lib/format";
 import { back, navigate, pushFlowStep, syncTitle, type ViewContext } from "../router";
-import { fetchDiary } from "../write/api";
-import { categoryLabel, emotionLabel, fromEntry, type StepKey, stepQuery } from "../write/flow";
+import { fetchDiary, fetchToday } from "../write/api";
+import { fromEntry, type StepKey, stepQuery } from "../write/flow";
 import { readUnsent } from "../write/unsent";
 
 let flowSeq = 0;
@@ -17,69 +39,46 @@ function editFrom(date: string, step: StepKey): void {
   pushFlowStep(`#/write/${date}?${stepQuery(step)}`, `r${Date.now().toString(36)}${flowSeq}`);
 }
 
-function letter(entry: DiaryEntryView): HTMLElement[] {
-  const diary = fromEntry(entry);
-  const edit = (label: string, step: StepKey) => {
-    const button = h("button", { type: "button", class: "btn btn-quiet btn-small", text: "고치기", "aria-label": `${label} 고치기` });
-    button.addEventListener("click", () => editFrom(entry.entryDate, step));
-    return button;
-  };
-  const cards: HTMLElement[] = [];
-  for (const category of diary.categories) {
-    const label = categoryLabel(category.code);
-    cards.push(
-      h(
-        "section",
-        { class: "letter-card", "data-category": category.code },
-        h("div", { class: "letter-head" }, h("h2", {}, h("span", { class: "choice-mark", "aria-hidden": "true" }), label), edit(label, { step: "details", category: category.code })),
-        h("p", { class: "letter-size", text: `크기 ${category.intensity ?? "–"}` }),
-        h(
-          "ul",
-          { class: "letter-pills" },
-          ...diary.emotions
-            .filter((item) => item.category === category.code)
-            .map((item) => h("li", { text: item.own !== null ? `${emotionLabel(item.code)} (크기 ${item.own})` : emotionLabel(item.code) }))
-        )
-      )
-    );
-  }
-  const text = (heading: string, value: string, step: StepKey) =>
-    h(
-      "section",
-      { class: "letter-card" },
-      h("div", { class: "letter-head" }, h("h2", { text: heading }), edit(heading, step)),
-      h("p", { class: "letter-text", text: value })
-    );
-  cards.push(text("있었던 일", diary.eventText, { step: "event", category: null }), text("이유", diary.reasonText, { step: "reason", category: null }));
-  for (const [kind, heading, step] of [
-    ["praises", "칭찬", "praise"],
-    ["gratitudes", "감사", "gratitude"]
-  ] as const) {
-    const filled = diary[kind].filter((value) => value.trim() !== "");
-    if (!filled.length) continue;
-    cards.push(
-      h(
-        "section",
-        { class: "letter-card" },
-        h("div", { class: "letter-head" }, h("h2", { text: heading }), edit(heading, { step, category: null })),
-        h("ul", { class: "letter-list" }, ...filled.map((value) => h("li", { text: value })))
-      )
-    );
-  }
-  return cards;
+/** 편지의 읽기 모드 — 작성 흐름과 같은 카드(Letter.tsx), 봉투 연출 없이 열린 채. 부분마다 '고치기'가 그 단계로 고치기 흐름(D-100 ②) */
+function letter(entry: DiaryEntryView, today: boolean): { nodes: HTMLElement[]; unmount: () => void } {
+  const host = h("div", { class: "record-letter" });
+  const unmount = mountPreact(
+    host,
+    createElement(Letter, {
+      diary: fromEntry(entry),
+      date: entry.entryDate,
+      day: today ? "오늘" : "그날",
+      mode: "read",
+      onEdit: (step: StepKey) => editFrom(entry.entryDate, step)
+    })
+  );
+  return { nodes: [h("p", { class: "letter-sub", text: "옆으로 넘겨서 다시 읽어요." }), host], unmount };
 }
 
 export function renderRecord({ root, route, alive }: ViewContext): () => void {
   const date = route.params.date ?? "";
-  const backButton = h("button", { type: "button", class: "back-button", text: "‹ 오늘로" });
-  backButton.addEventListener("click", () => back("#/today"));
+  // 달력의 작은 편지에서 왔으면 '달력으로' — 돌아가면 그날이 고른 채로 열린다(UX_SPEC §7, TASK-REFLECT-01 A-11)
+  // 통계 친구 상세의 미리보기에서 왔으면 '통계로' — 같은 친구·같은 기간으로 돌아간다(시안 tabs.js renderRecord의 from=stats)
+  const from = route.query.get("from");
+  const statsCategory = route.query.get("cat");
+  const fromStats = from === "stats" && statsCategory !== null && CATEGORY_CODES.includes(statsCategory);
+  const fromCalendar = from === "calendar";
+  const backTo = fromStats ? `#/stats/${statsCategory}?p=${route.query.get("p") === "30" ? 30 : 7}` : fromCalendar ? `#/calendar?d=${date}` : "#/today";
+  const backButton = h("button", { type: "button", class: "back-button", text: fromStats ? "‹ 통계로" : fromCalendar ? "‹ 달력으로" : "‹ 오늘로" });
+  backButton.addEventListener("click", () => back(backTo));
   const title = h("h1", { text: `${monthDay(date)}의 편지` });
   const area = h("div", { class: "record-body", "aria-busy": "true" }, h("p", { class: "note", text: "불러오는 중이에요." }));
-  root.append(h("section", { class: "screen record" }, h("div", { class: "screen-top" }, backButton), title, area));
+  let unmountLetter = (): void => {};
+  // ⋯ 기록 메뉴(고치기·완료 취소·지우기, A-6) — 기록을 읽은 뒤에만 보인다
+  const more = h("button", { type: "button", class: "icon-btn plain record-more", "aria-label": "더보기", "aria-haspopup": "dialog", hidden: true });
+  more.append(dotsIcon());
+  root.append(h("section", { class: "screen record" }, h("div", { class: "screen-top" }, backButton, more), title, area));
 
   const load = async (): Promise<void> => {
     area.setAttribute("aria-busy", "true");
-    const result = await fetchDiary(date);
+    // 오늘의 편지면 '오늘', 지난 날이면 '그날' — 오늘은 서버가 센다(못 읽으면 '그날')
+    const [result, todayResult] = await Promise.all([fetchDiary(date), fetchToday()]);
+    const today = todayResult.ok ? todayResult.data.date : null;
     if (!alive()) return;
     area.removeAttribute("aria-busy");
     if (result.ok && result.data.status === "draft") {
@@ -88,7 +87,21 @@ export function renderRecord({ root, route, alive }: ViewContext): () => void {
       return;
     }
     if (result.ok) {
-      const nodes = letter(result.data);
+      unmountLetter();
+      const shown = letter(result.data, today !== null && result.data.entryDate >= today);
+      unmountLetter = shown.unmount;
+      const entry = result.data;
+      more.hidden = false;
+      more.onclick = () =>
+        openRecordMenu({
+          entry,
+          opener: more,
+          onEdit: () => editFrom(date, { step: "letter", category: null }),
+          // 완료 취소 뒤에는 달력의 그날(쓰던 글 쪽지)로(시안 tabs.js) — 지운 뒤에는 달력으로
+          onUncompleted: () => navigate(`#/calendar?d=${date}`, { replace: true }),
+          onDeleted: () => navigate("#/calendar", { replace: true })
+        });
+      const nodes = shown.nodes;
       // 이 휴대폰에 남은 사본 — 고치던 내용이든, 다른 곳에서 완료되기 전에 쓰던 임시저장이든 — 으로 가는 길(PR #40 리뷰).
       // 들어가면 흐름이 서버 기록과 비교해 덮지 않고 묻는다.
       const copy = readUnsent(date);
@@ -117,5 +130,5 @@ export function renderRecord({ root, route, alive }: ViewContext): () => void {
     area.replaceChildren(h("p", { text: result.offline ? "연결이 끊겼어요 · 연결되면 볼 수 있어요" : "불러오지 못했어요 · 잠시 뒤 다시 시도해 주세요" }), retry);
   };
   void load();
-  return () => {};
+  return () => unmountLetter();
 }

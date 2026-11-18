@@ -22,12 +22,30 @@ describe("tokenVars", () => {
     expect(vars["--emotion-joy-700"]).toBe(color.emotion.joy["700"]);
     expect(vars["--emotion-sadness-100"]).toBe(color.emotion.sadness["100"]);
     expect(Object.keys(vars).some((name) => name.startsWith("--emotion-") && /label|source/.test(name))).toBe(false);
-    expect(vars["--text-body-size"]).toBe("16px");
-    expect(vars["--text-body-line"]).toBe("24px");
+    // 글자는 rem — 기본 글자 크기를 키우면 따라 커진다(DESIGN_SYSTEM §9, TASK-REFLECT-01 A-13)
+    expect(vars["--text-body-size"]).toBe("1rem");
+    expect(vars["--text-body-line"]).toBe("1.5rem");
     expect(vars["--space-4"]).toBe("16px");
     expect(vars["--radius-control"]).toBe("8px");
     expect(vars["--size-touch-target-min"]).toBe("44px");
     expect(vars["--size-content-max-width"]).toBe("480px");
+  });
+
+  it("시안 이름의 변수도 같은 값으로 펼친다(web/js/tokens.js와 같은 규칙 — A-13)", () => {
+    const vars = tokenVars();
+    expect(vars["--bg"]).toBe(color.neutral.bg.light);
+    expect(vars["--muted"]).toBe(color.neutral["text-muted"].light);
+    expect(vars["--danger"]).toBe(color.semantic.danger.light);
+    expect(vars["--fs-body"]).toBe("1rem");
+    expect(vars["--sp-4"]).toBe("16px");
+    expect(vars["--anger-500"]).toBe(color.emotion.anger["500"]);
+    // 노랑(joy)은 강조색만 700(accent-override)
+    expect(vars["--joy-accent"]).toBe(color.emotion.joy["700"]);
+    expect(vars["--sadness-accent"]).toBe(color.emotion.sadness["500"]);
+    expect(vars["--land-hill-far"]).toBe(color.land["hill-far"].light);
+    expect(vars["--paper"]).toBe(color.paper.paper.light);
+    expect(vars["--press-pill"]).toBe("0.97");
+    expect(vars["--dis-surface"]).toBe("12%");
   });
 
   it("글 설명(note)이나 다크 값은 변수가 되지 않는다", () => {

@@ -13,6 +13,7 @@ import { clearToasts } from "../../client/src/ui/toast";
 import { renderDeleteAll, renderDeleted } from "../../client/src/views/deleteAll";
 import { fetchExport } from "../../client/src/write/dataApi";
 import { renderExportData } from "../../client/src/views/exportData";
+import { renderSettings } from "../../client/src/views/settings";
 import { renderToday } from "../../client/src/views/today";
 import { emptyDiary, withText } from "../../client/src/write/flow";
 import { resetSaversForTest, Saver } from "../../client/src/write/saver";
@@ -68,7 +69,7 @@ const EXPORT_PAGE: ExportPage = { ...EXPORT_FILE, next: null };
 
 const todayReply = (): FakeReply => ({
   status: 200,
-  body: { date: "2026-10-16", timezone: "Asia/Seoul", dayStartHour: 4, entry: null, pastDraft: null } satisfies TodayInfo
+  body: { date: "2026-10-16", timezone: "Asia/Seoul", dayStartHour: 4, entry: null, pastDraft: null, firstRecordDate: null } satisfies TodayInfo
 });
 
 /** 오늘 말고 다른 요청(오늘 화면의 배경 보내기가 부르는 그날 기록 조회 등)은 닿지 않게 둔다. */
@@ -112,6 +113,7 @@ beforeEach(() => {
   Object.assign(app, { authenticated: true, locked: false, appLock: false, hasName: true, name: "시험" });
   registerViews({
     today: renderToday,
+    settings: renderSettings,
     auth: stub,
     "auth/name": stub,
     "settings/lock": stub,
@@ -844,9 +846,9 @@ describe("화면 주소와 진입", () => {
     expect(guardRoute(state, parseHash("#/today")).redirect).toBe("#/auth/name");
   });
 
-  it("오늘 화면의 작은 줄에서 두 화면으로 push한다", async () => {
+  it("설정 목록의 줄에서 두 화면으로 push한다(오늘 화면 아래 줄은 걷었다 — TASK-JOURNAL-01 A-10)", async () => {
     stubFetch(() => todayReply());
-    history.replaceState(null, "", "/#/today");
+    history.replaceState(null, "", "/#/settings");
     render();
     await flush(10);
     const length = history.length;
@@ -854,7 +856,7 @@ describe("화면 주소와 진입", () => {
     expect(location.hash).toBe("#/settings/export");
     expect(history.length).toBe(length + 1);
 
-    history.replaceState(null, "", "/#/today");
+    history.replaceState(null, "", "/#/settings");
     render();
     await flush(10);
     const before = history.length;

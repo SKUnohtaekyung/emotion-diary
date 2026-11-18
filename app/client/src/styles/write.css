@@ -5,6 +5,7 @@
 
 /* display를 정한 부품에 hidden을 달면 숨게 한다(부품 클래스 + [hidden]이 부품 클래스보다 구체적이다) */
 .btn[hidden],
+.link[hidden],
 .own-tag[hidden],
 .own-list[hidden] {
   display: none;
@@ -21,55 +22,64 @@
 [data-category="fear"] { --cat-mark: var(--emotion-fear-500); --cat-soft: var(--emotion-fear-50); --cat-line: var(--emotion-fear-300); }
 [data-category="disgust"] { --cat-mark: var(--emotion-disgust-500); --cat-soft: var(--emotion-disgust-50); --cat-line: var(--emotion-disgust-300); }
 
-/* ── 작성 흐름 ── */
+/* ── 작성 흐름의 틀(시안 write.css·flow.css, TASK-JOURNAL-01 J-1) ──
+   위 줄·버튼 줄은 화면에 고정하지 않고 흐름 안에 둔다(D-123, MAP R2) — 시안의 sticky만 뺐다. */
 .write-top {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
-  min-height: var(--size-touch-target-min);
-  margin-top: calc(var(--space-2) * -1);
+  justify-content: space-between;
+  gap: var(--sp-1);
+  min-height: var(--touch);
+  margin: calc(var(--sp-2) * -1) calc(var(--sp-2) * -1) calc(var(--sp-3) * -1);
 }
 
-.icon-button {
-  flex: none;
-  width: var(--size-touch-target-min);
-  height: var(--size-touch-target-min);
-  padding: 0;
-  border: 0;
-  border-radius: var(--radius-control);
-  background: none;
-  color: var(--neutral-text);
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
+.write-top .dots3 {
+  fill: currentColor;
+  stroke: none;
 }
 
 .icon-spacer {
   flex: none;
-  width: var(--size-touch-target-min);
+  width: var(--touch);
 }
 
-.write-progress-box {
+/* 'n / N'과 저장 상태가 한 덩어리 — 길면 상태가 아래 줄로 내려간다(글자 200%) */
+.wf-count {
   display: flex;
   flex: 1;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-1);
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  column-gap: var(--sp-2);
+  min-width: 0;
+  text-align: center;
 }
 
 .write-progress {
-  color: var(--neutral-text-muted);
-  font-size: var(--text-label-size);
-  line-height: var(--text-label-line);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  font-weight: var(--fw-body-strong);
+  color: var(--muted);
   font-variant-numeric: tabular-nums;
 }
 
+.save-status {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  color: var(--muted);
+}
+
+.save-status.is-warning {
+  color: var(--text);
+  font-weight: var(--fw-body-strong);
+}
+
+/* 얇은 진행선 — 빈 트랙 = 바탕 + ink 12%(D-099 progress E1) */
 .write-bar {
-  width: 100%;
-  height: 4px;
+  height: 3px;
   overflow: hidden;
-  border-radius: 2px;
-  background: var(--neutral-surface-soft);
+  border-radius: var(--radius-chip);
+  background: color-mix(in srgb, var(--service-ink) var(--dis-surface, 12%), var(--state-bg, var(--bg)));
 }
 
 .write-bar-fill {
@@ -78,40 +88,54 @@
   background: var(--service-ink);
 }
 
-.write-banner {
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-control);
-  background: var(--neutral-surface-soft);
-  font-size: var(--text-label-size);
-  line-height: var(--text-label-line);
-  font-weight: 600;
-}
-
-.save-row {
+/* 안내 띠 묶음 — 여럿이면 사이 8px, 모두 없으면 자리를 차지하지 않는다(D-099 banner H1) */
+.wf-banners {
   display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.wf-banners:empty {
+  display: none;
+}
+
+.write-banner svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* 저장 실패 띠 — 말과 '다시 시도'를 한 줄 양 끝에, 44px 누르는 자리는 음 여백으로 띠 높이를 맞춘다 */
+.wf-fail {
   align-items: center;
-  gap: var(--space-2);
-  min-height: var(--text-label-line);
+  justify-content: space-between;
 }
 
-.save-status {
-  min-height: var(--text-label-line);
-  color: var(--neutral-text-muted);
-  font-size: var(--text-label-size);
-  line-height: var(--text-label-line);
+.wf-fail .link {
+  margin: calc((var(--touch) - 1.5em) / -2) calc(var(--sp-2) * -1);
 }
 
-.save-status.is-warning {
-  color: var(--neutral-text);
-  font-weight: 600;
+.write h1 {
+  font-size: 2.125rem;
+  line-height: 2.625rem;
 }
 
-/* '다음'이 막힌 까닭 — 빨간 오류가 아니라 ink 안내 한 줄(D-098 ③) */
+.write h1.hero {
+  font-size: clamp(1.5rem, 8.4vw, 1.9rem);
+  line-height: 1.25;
+}
+
+/* '다음'이 막힌 까닭 — 빨간 오류가 아니라 ink 안내 한 줄, '!' 없음(D-098 ③) */
 .write-hint {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  font-weight: var(--fw-body-strong);
   color: var(--service-ink);
-  font-size: var(--text-label-size);
-  line-height: var(--text-label-line);
-  font-weight: 700;
 }
 
 .write-text {
@@ -132,57 +156,597 @@
   display: flex;
 }
 
-/* 내용 바로 뒤의 버튼 줄(U-1). 화면에 고정하지 않는다. */
-.write-nav {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
-  gap: var(--space-3);
-  margin-top: var(--space-2);
+/* 글자 버튼 — 면 없이 ink 글자(시안 .btn.text) */
+.btn-text {
+  background: none;
+  color: var(--service-ink);
 }
 
-/* 고르기 — 마음(아홉)·세부 감정(알약) */
+/* 내용 바로 뒤의 버튼 줄(U-1·D-123). 화면에 고정하지 않는다. 한 줄에 안 들면 주 버튼이 위(wrap-reverse) */
+.write-nav {
+  display: flex;
+  flex-wrap: wrap-reverse;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-top: var(--sp-2);
+}
+
+.write-nav .btn-text {
+  flex: 1 0 auto;
+  min-width: 96px;
+  padding: 0 var(--sp-3);
+}
+
+.write-nav .btn-primary {
+  flex: 999 1 auto;
+}
+
+/* ── 고르기 알약(세부 감정·떠나는 이유) — 시안 write.css .choice: 체크 동그라미 + 이름, 고르면 ink 면 + 민트 체크(D-098 선택) ── */
 .choice {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  min-height: var(--size-touch-target-min);
-  padding: 0 var(--space-3);
-  border: 1px solid var(--neutral-border-strong);
-  background: var(--neutral-bg);
-  color: var(--neutral-text);
-  font-weight: 600;
+  gap: var(--sp-2);
+  min-height: var(--touch);
+  padding: 0 var(--sp-4) 0 var(--sp-2);
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: var(--tint-pill, color-mix(in srgb, var(--bg) 74%, transparent));
+  color: var(--service-ink);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-label);
   text-align: left;
   cursor: pointer;
 }
 
-.choice[aria-pressed="true"] {
-  border-color: var(--service-ink);
-  background: var(--service-ink);
-  color: var(--neutral-bg);
-}
-
-.choice[aria-pressed="true"]::after {
-  content: "✓";
-  margin-left: auto;
-  padding-left: var(--space-1);
-}
-
-/* 기본 3열, 글자를 키우거나 폭이 좁으면 2열·1열로 — 이름이 잘리지 않게(UX_SPEC §4 격자 폴백·§12 200% 글자) */
-.choice-grid {
+.choice .ck {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 6.25em), 1fr));
-  gap: var(--space-2);
+  place-items: center;
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--service-ink) 12%, transparent);
+  font-size: 14px;
+  line-height: 1;
+  color: transparent;
 }
 
-.choice-name {
-  min-width: 0;
+.choice[aria-pressed="true"] {
+  background: var(--service-ink);
+  color: var(--bg);
 }
 
-.choice-feeling {
-  min-height: 56px;
-  border-radius: var(--radius-control);
+.choice[aria-pressed="true"] .ck {
+  background: var(--service-mint);
+  color: var(--service-ink);
 }
 
+.choice-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+/* ── 마음 고르기 — 초록 언덕 위의 친구들(D-066·D-128, 시안 write.css). 화면 전체가 land 초록, 장면은 화면 폭 끝까지 ── */
+.screen.pick {
+  --muted: var(--text);
+  --subtle: var(--text);
+  --focus: var(--service-ink);
+  --state-bg: var(--land-hill-far);
+  padding-bottom: 0;
+  /* 아래 160px은 가까운 언덕 색 — 버튼 줄 아래 남는 자리(안전 영역·개발용 상태 칸 자리)까지 땅이 이어진다. 그 위 경계는 장면 그림이 덮는다 */
+  background: linear-gradient(to top, var(--land-hill-near) 160px, var(--land-hill-far) 160px);
+}
+
+.screen.pick:has(.fl-grid) {
+  background: var(--land-hill-far);
+}
+
+.pick-scene {
+  position: relative;
+  flex: 1;
+  min-height: 31rem;
+  margin: calc(var(--sp-4) * -1) calc(var(--sp-4) * -1) 0;
+  overflow: hidden;
+}
+
+.meadow-fit {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.meadow {
+  position: relative;
+  flex: none;
+  width: min(100cqw, calc(100cqh * 360 / 590));
+  aspect-ratio: 360 / 590;
+  container-type: inline-size;
+}
+
+.meadow-art-wrap,
+.meadow-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.meadow-art .fh1 {
+  fill: var(--land-hill-mid);
+}
+.meadow-art .fh2 {
+  fill: color-mix(in srgb, var(--land-hill-mid) 45%, var(--land-hill-near));
+}
+.meadow-art .fh3 {
+  fill: var(--land-hill-near);
+}
+.meadow-art .froad {
+  fill: color-mix(in srgb, var(--bg) 62%, var(--land-hill-far));
+}
+.meadow-art .ft-c {
+  fill: color-mix(in srgb, var(--land-hill-near) 82%, var(--service-ink));
+}
+.meadow-art .ft-t {
+  fill: color-mix(in srgb, var(--land-hill-near) 55%, var(--service-ink));
+}
+
+.ff {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 21.7%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ff-pic {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 19.5cqw;
+  transform: rotate(var(--tilt, 0deg));
+}
+
+/* 세부 감정 무대의 친구(아래 .detail-stage 묶음) — 같은 .friend-img를 고치는 규칙끼리 구체성 순서를 지키려고 여기 둔다 */
+.stage-art .friend-img {
+  width: 100%;
+  height: 100%;
+}
+
+.ff-pic .friend-img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.ff[aria-pressed="true"] .ff-pic {
+  transform: rotate(var(--tilt, 0deg)) scale(1.08);
+}
+
+.ff-nm {
+  margin-top: 0.15rem;
+  padding: 0 max(0.5rem, 2.4cqw);
+  border-radius: var(--radius-chip);
+  font-size: max(0.8125rem, 3.9cqw);
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.ff[aria-pressed="true"] .ff-nm {
+  background: var(--service-ink);
+  color: var(--bg);
+}
+
+.ff small {
+  margin-top: 1px;
+  font-size: max(0.75rem, 3.2cqw);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.ff-ck {
+  position: absolute;
+  right: 2%;
+  top: -4%;
+  display: none;
+  place-items: center;
+  width: max(1.25rem, 5.6cqw);
+  height: max(1.25rem, 5.6cqw);
+  border-radius: 50%;
+  background: var(--service-ink);
+  color: var(--bg);
+  font-style: normal;
+  font-size: max(0.7rem, 3cqw);
+  font-weight: 900;
+  transform: rotate(calc(var(--tilt, 0deg) * -1));
+}
+
+.ff[aria-pressed="true"] .ff-ck {
+  display: grid;
+}
+
+.ff:focus-visible {
+  outline: 3px solid var(--service-ink);
+  outline-offset: 2px;
+  border-radius: 14px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ff-pic {
+    transition: transform var(--dur-base) var(--ease);
+  }
+  .ff-pic .friend-img {
+    animation: ffbob 5.2s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.83s);
+  }
+  .ff-pic.hop {
+    animation: ffhop 420ms var(--ease);
+  }
+}
+
+@keyframes ffbob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2.2%);
+  }
+}
+
+@keyframes ffhop {
+  0% {
+    transform: rotate(var(--tilt, 0deg)) scale(1);
+  }
+  38% {
+    transform: translateY(-9%) rotate(var(--tilt, 0deg)) scale(1.12);
+  }
+  72% {
+    transform: translateY(1.5%) rotate(var(--tilt, 0deg)) scale(1.04);
+  }
+  100% {
+    transform: rotate(var(--tilt, 0deg)) scale(1.08);
+  }
+}
+
+@media (max-height: 700px) {
+  .screen.pick h1.hero {
+    font-size: 1.5rem;
+  }
+}
+
+/* 버튼 줄은 장면 바로 아래, 가장 가까운 언덕 색 위에 선다 — 땅이 버튼 줄 뒤까지 이어진다(MAP A-9). 고정하지 않고(D-123) 장면에 겹치지도 않는다:
+   시안처럼 겹치면 글자를 키워 버튼 줄이 두 줄이 될 때 친구를 가린다(2026-11-11 E2E layout 200%에서 잡음). 위 margin은 화면 칸 사이(16px)를 없앤다 */
+.screen.pick .write-nav {
+  --state-bg: var(--land-hill-near);
+  margin: calc(var(--sp-4) * -1) calc(var(--sp-4) * -1) 0;
+  padding: var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom));
+  background: var(--land-hill-near);
+}
+
+.screen.pick .write-nav .btn-text {
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+}
+
+/* 큰 글자 격자(D-083 ③): 기울기 0, 언덕 그림 없이 하늘색 바탕, 버튼 줄은 겹치지 않는다 */
+/* 격자에서는 내용 높이만큼 자란다 — 줄어들면 친구 그림이 아래 버튼 줄 위로 넘친다(E2E layout 200%) */
+.pick-scene.fl-grid {
+  flex: 1 0 auto;
+  overflow: visible;
+  min-height: 0;
+  margin-top: 0;
+}
+/* 자유 배치의 크기 기준(container-type: size)을 풀어야 격자 높이만큼 자란다 — 그대로면 높이가 0이 되어 친구가 버튼 줄 위로 넘친다 */
+.pick-scene.fl-grid .meadow-fit {
+  position: static;
+  display: block;
+  container-type: normal;
+}
+.pick-scene.fl-grid .meadow {
+  width: 100%;
+  aspect-ratio: auto;
+  display: grid;
+  grid-template-columns: repeat(var(--fl-cols, 3), 1fr);
+  column-gap: var(--sp-2);
+  row-gap: var(--sp-6);
+  padding: var(--sp-5) var(--sp-3);
+}
+.pick-scene.fl-grid .meadow-art-wrap {
+  display: none;
+}
+.pick-scene.fl-grid .ff {
+  position: static;
+  width: auto;
+  transform: none;
+}
+.pick-scene.fl-grid .ff-pic {
+  height: 4.6rem;
+  transform: none;
+}
+.pick-scene.fl-grid .ff-pic .friend-img {
+  animation: none;
+}
+.pick-scene.fl-grid .ff-nm {
+  font-size: var(--fs-label);
+}
+.pick-scene.fl-grid .ff small {
+  font-size: var(--fs-caption);
+}
+
+/* 뿌리 글자 크기를 재는 숨은 1em 상자(ui/freeGrid.ts) */
+.em-probe {
+  position: fixed;
+  left: -9999px;
+  top: -9999px;
+  width: 1em;
+  height: 1em;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* ── 세부 감정(D-059·D-068·D-071): 바탕 = 그 계열 100·50을 6:4, pill = 300을 흰색에 45%(친구가 바탕에 묻히지 않게) ── */
+.detail-screen[data-category="enjoyment"] {
+  --c100: var(--enjoyment-100);
+  --c50: var(--enjoyment-50);
+  --c300: var(--enjoyment-300);
+}
+.detail-screen[data-category="wish"] {
+  --c100: var(--wish-100);
+  --c50: var(--wish-50);
+  --c300: var(--wish-300);
+}
+.detail-screen[data-category="sadness"] {
+  --c100: var(--sadness-100);
+  --c50: var(--sadness-50);
+  --c300: var(--sadness-300);
+}
+.detail-screen[data-category="anger"] {
+  --c100: var(--anger-100);
+  --c50: var(--anger-50);
+  --c300: var(--anger-300);
+}
+.detail-screen[data-category="joy"] {
+  --c100: var(--joy-100);
+  --c50: var(--joy-50);
+  --c300: var(--joy-300);
+}
+.detail-screen[data-category="love"] {
+  --c100: var(--love-100);
+  --c50: var(--love-50);
+  --c300: var(--love-300);
+}
+.detail-screen[data-category="hate"] {
+  --c100: var(--hate-100);
+  --c50: var(--hate-50);
+  --c300: var(--hate-300);
+}
+.detail-screen[data-category="fear"] {
+  --c100: var(--fear-100);
+  --c50: var(--fear-50);
+  --c300: var(--fear-300);
+}
+.detail-screen[data-category="disgust"] {
+  --c100: var(--disgust-100);
+  --c50: var(--disgust-50);
+  --c300: var(--disgust-300);
+}
+
+.detail-screen {
+  --tint: color-mix(in srgb, var(--c100) 60%, var(--c50));
+  --tint-pill: color-mix(in srgb, var(--c300) 45%, var(--bg));
+  --state-bg: var(--tint);
+  background: var(--tint);
+}
+
+.detail-screen .choice {
+  box-shadow: inset 0 0 0 var(--hairline) color-mix(in srgb, var(--service-ink) 18%, transparent);
+}
+
+.detail-screen .choice[aria-pressed="true"] {
+  box-shadow: none;
+}
+
+/* 친구와 바구니 — #app 위 끝에 붙고, 붙은 뒤로는 함께 줄어든다(sticky + transform, DetailStage.tsx) */
+.detail-stage {
+  --compact: 0.52;
+  position: sticky;
+  top: env(safe-area-inset-top);
+  z-index: 6;
+  flex: none;
+  height: 216px;
+  margin: calc(var(--sp-4) * -1) calc(var(--sp-4) * -1) 0;
+  pointer-events: none;
+}
+
+.detail-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 100%;
+  background: var(--tint);
+}
+
+.detail-stage.compact::before {
+  height: calc(216px * var(--compact) + var(--sp-1));
+}
+
+.stage-art {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 316px;
+  height: 216px;
+  margin-left: -158px;
+  transform-origin: 50% 0;
+}
+
+.detail-stage.compact .stage-art {
+  transform: scale(var(--compact));
+}
+
+/* 친구 200 + 바구니 112 = 316px 무대가 좁은 폭(360 화면·글자 200%)에서도 옆으로 넘치지 않게 단계로 줄인다(MAP R9 — 가로 스크롤 없음) */
+.detail-stage {
+  container-type: inline-size;
+}
+@container (max-width: 344px) {
+  .stage-art {
+    scale: 0.9;
+  }
+}
+@container (max-width: 290px) {
+  .stage-art {
+    scale: 0.78;
+  }
+}
+@container (max-width: 250px) {
+  .stage-art {
+    scale: 0.66;
+  }
+}
+@container (max-width: 212px) {
+  .stage-art {
+    scale: 0.56;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .detail-stage::before {
+    transition: height var(--dur-slow) var(--ease);
+  }
+  .stage-art {
+    transition: transform var(--dur-slow) var(--ease);
+  }
+}
+
+.stage-art .friend-spot {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 200px;
+  height: 200px;
+}
+
+#app:has(.detail-stage) {
+  scroll-padding-top: 170px;
+  scroll-padding-bottom: 96px;
+}
+
+.detail-skip {
+  align-self: flex-start;
+  margin: calc(var(--sp-2) * -1) 0 0 calc(var(--sp-2) * -1);
+}
+
+/* 바구니(D-068, 시안 basket.css) — 납작한 그림, 그림자·그라데이션 없음. 뒤 판 → 돌 → 앞 판 */
+.bk {
+  --bk-wall: color-mix(in srgb, var(--paper-ink) 72%, var(--text));
+  --bk-in: color-mix(in srgb, var(--paper-ink) 34%, var(--text));
+  --bk-weft: color-mix(in srgb, var(--envelope-back) 52%, var(--bk-wall));
+  --bk-warp: color-mix(in srgb, var(--envelope-flap) 82%, var(--bk-wall));
+  --bk-lip: var(--envelope-fold-light);
+  position: absolute;
+  right: 0;
+  bottom: 10px;
+  width: 112px;
+  height: 104px;
+  pointer-events: none;
+}
+.bk-rock {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 100%;
+}
+.bk-art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.bk-handle {
+  fill: none;
+  stroke: var(--bk-wall);
+  stroke-width: 4.6;
+  stroke-linecap: round;
+}
+.bk-in {
+  fill: var(--bk-in);
+}
+.bk-rim {
+  fill: none;
+  stroke: var(--bk-wall);
+  stroke-width: 5.4;
+  stroke-linecap: round;
+}
+.bk-wall {
+  fill: var(--bk-wall);
+  stroke: var(--bk-wall);
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.bk-weft {
+  fill: none;
+  stroke: var(--bk-weft);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+}
+.bk-warp {
+  fill: none;
+  stroke: var(--bk-warp);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+.bk-lip {
+  fill: none;
+  stroke: var(--bk-lip);
+  stroke-width: 1.3;
+  stroke-linecap: round;
+}
+.bk-stones {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.bk-stone {
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  rotate: var(--r);
+  z-index: var(--z);
+}
+
+/* 바구니로 미끄러지는 돌 — body 바로 아래에 잠깐 붙는다(Basket.tsx) */
+.fly-stone {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 200;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* 계열 표지 점 — 평면 크기·편지 카드가 아직 쓴다(J-3·J-5에서 친구 그림으로 바뀐다) */
 .choice-mark {
   flex: none;
   width: 12px;
@@ -191,262 +755,427 @@
   background: var(--cat-mark, var(--neutral-border-strong));
 }
 
-.choice[aria-pressed="true"] .choice-mark {
-  box-shadow: 0 0 0 2px var(--neutral-bg);
-}
-
-.choice-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
-
-.choice-pill {
-  border-color: var(--cat-line, var(--neutral-border-strong));
-  border-radius: var(--radius-chip);
-  background: var(--cat-soft, var(--neutral-bg));
-  font-weight: 500;
-}
-
-/* 크기 */
-.intensity-panel {
+/* ── 크기 — 길 위의 친구(D-069 ①, 시안 size.css, ui/intensity.ts) ──
+   계열마다 작은 풍경: 낮은 언덕 띠 · 굽이진 회색 길 · 길을 걷는 그 계열의 친구. 강조색으로 칠해진 길이가 크기다(색 단계로 강도를 말하지 않는다).
+   친구의 크기는 값과 무관하고 위치만 바뀐다. 진짜 컨트롤은 무대를 덮은 투명 range, 키보드 초점은 친구 둘레의 3px ink 링. */
+.intensity-panels {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
-  border: 1px solid var(--neutral-border);
-  border-radius: var(--radius-card);
+  gap: var(--sp-6);
 }
 
-.intensity-name {
+.intensity-panel {
+  --sz-road: color-mix(in srgb, var(--forest-path-near) 40%, var(--bg));
   display: flex;
-  align-items: center;
-  gap: var(--space-2);
+  flex-direction: column;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .intensity-panel.sz-block {
+    animation: sz-in var(--dur-slow) var(--ease) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+}
+
+@keyframes sz-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
 }
 
 .intensity {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
   container-type: inline-size;
 }
 
-/* 글자를 크게 키워 패널이 좁아지면 숫자를 위 줄로 올리고 −/+를 아래 줄 양끝에 둔다(넘치지 않게) */
-@container (max-width: 160px) {
+/* 글자를 크게 키워 폭이 좁아지면 숫자를 위 줄로 올리고 −/+를 아래 줄 양끝에 둔다 — 옆으로 넘치지 않게(UX_SPEC §12, E2E layout 200%) */
+@container (max-width: 220px) {
   .intensity-row {
     flex-wrap: wrap;
     justify-content: space-between;
+    width: 100%;
   }
-
-  .intensity-number {
+  .intensity-row .sz-num {
     flex-basis: 100%;
     order: -1;
   }
 }
 
+/* 머리 줄: 친구 이름·'~의 크기' / −·큰 숫자·+. 글자가 커지면 숫자 줄이 아래로 내려간다 */
+.sz-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-1) var(--sp-3);
+  min-height: var(--touch);
+}
+
+.sz-who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.sz-who strong {
+  font-size: var(--fs-heading);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-title);
+}
+
+.sz-who .intensity-name {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  font-weight: var(--fw-body);
+  color: var(--muted);
+}
+
 .intensity-row {
   display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--sp-1);
+  margin-left: auto;
+}
+
+/* 좁아져도 44px 아래로 줄지 않는다(UX_SPEC §12 터치 영역) — 시안 .step: 옅은 회색 원 */
+.stepper {
+  display: flex;
+  flex: none;
   align-items: center;
   justify-content: center;
-  gap: var(--space-4);
-}
-
-/* 좁아져도 44px 아래로 줄지 않는다(UX_SPEC §12 터치 영역) */
-.stepper {
-  flex: none;
-  width: var(--size-touch-target-min);
+  width: var(--touch);
+  height: var(--touch);
   padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-soft);
+  color: var(--service-ink);
   font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
 }
 
-.intensity-number {
-  min-width: 2.5ch;
-  font-size: var(--text-display-size);
-  line-height: var(--text-display-line);
-  font-weight: 800;
-  text-align: center;
+.stepper[aria-disabled="true"] {
+  color: color-mix(in srgb, var(--service-ink) var(--dis-content, 50%), var(--bg));
+  cursor: default;
+}
+
+.sz-num {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: var(--sp-1);
+  min-width: 4.75rem;
   font-variant-numeric: tabular-nums;
 }
 
-/* 화면 왼쪽 끝 밀기(뒤로 가기)와 부딪히지 않게 길을 안쪽으로 들인다(UX_SPEC §17 규칙 8) */
-.intensity-track {
-  position: relative;
-  padding: 0 var(--space-3);
+.intensity-number {
+  font-size: 2.25rem;
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.03em;
 }
 
+.sz-num small {
+  font-size: var(--fs-label);
+  line-height: 1;
+  font-weight: var(--fw-label);
+  color: var(--muted);
+}
+
+.sz-num.unset .intensity-number {
+  font-weight: 300;
+  color: var(--subtle);
+}
+
+/* 무대 */
+.sz-scene {
+  --sz-t: 0ms;
+  --sz-e: var(--ease);
+  position: relative;
+  height: var(--sz-h);
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.sz-scene[data-motion="spring"] {
+  --sz-t: var(--dur-slow);
+  --sz-e: var(--spring);
+}
+
+.sz-scene[data-motion="glide"] {
+  --sz-e: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sz-scene[data-motion="drag"] {
+  --sz-t: var(--dur-fast);
+}
+
+/* 양 끝은 흐려져 길이 계속 이어진다(끝·문·깃발 없음) */
+.sz-art {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, var(--service-ink) 9%, var(--service-ink) 91%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, var(--service-ink) 9%, var(--service-ink) 91%, transparent 100%);
+}
+
+.sz-hill {
+  fill: var(--land-hill-far);
+}
+.sz-hill.a {
+  opacity: 0.85;
+}
+.sz-hill.b {
+  opacity: 0.7;
+}
+.sz-pines {
+  fill: var(--land-hill-mid);
+  opacity: 0.8;
+}
+
+.sz-road,
+.sz-fill {
+  fill: none;
+  stroke-width: var(--sz-road-w);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.sz-road {
+  stroke: var(--sz-road);
+}
+
+.sz-fill {
+  stroke: var(--c);
+  stroke-dasharray: 100 300;
+  stroke-dashoffset: 100;
+}
+
+.sz-scene.unset .sz-fill {
+  opacity: 0;
+}
+
+.sz-dot {
+  fill: color-mix(in srgb, var(--forest-path-near) 52%, var(--bg));
+}
+.sz-dot.on {
+  fill: var(--bg);
+}
+
+/* 진짜 컨트롤: 투명한 range가 무대 위쪽을 덮는다(키보드·낭독기의 대상 — 손가락·마우스는 아래 층이 받는다) */
 .intensity-range {
-  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
   width: 100%;
-  height: var(--size-touch-target-min);
+  height: var(--sz-hit);
   margin: 0;
-  accent-color: var(--cat-mark, var(--service-ink));
-  /* 손가락·마우스는 위의 얇은 층이 받는다 — 키보드·낭독기는 range가 받는다 */
+  padding: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.intensity-range:focus-visible {
+  outline: none;
+}
+
+/* 누르는 층 — 좌우는 값 1·10의 반 칸 바깥까지(JS), 세로 스크롤은 브라우저에(pan-y). 화면 왼쪽 끝 밀기와도 떨어져 있다(UX_SPEC §17 규칙 8) */
+.intensity-hit {
+  position: absolute;
+  top: 0;
+  height: var(--sz-hit);
+  cursor: pointer;
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 손잡이: 길을 따라 걷는다(offset-path). 발이 길 한가운데 닿게 --sz-foot만큼 내려 앉힌다 */
+.sz-walker {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--sz-size);
+  height: var(--sz-size);
+  offset-rotate: 0deg;
+  offset-anchor: 50% 100%;
   pointer-events: none;
 }
 
-.intensity-range.is-unset::-webkit-slider-thumb {
-  opacity: 0;
+.sz-hop {
+  position: relative;
+  top: var(--sz-foot, 0);
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-.intensity-range.is-unset::-moz-range-thumb {
-  opacity: 0;
+.sz-body {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 100%;
 }
 
-.intensity-hit {
+.sz-body .friend-img,
+.sz-body .pebble-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.sz-scene[data-kind="mini"] .sz-body {
+  transform-origin: 50% 60%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sz-far,
+  .sz-near {
+    transition: transform var(--sz-t) var(--ease);
+  }
+  .sz-fill {
+    transition:
+      stroke-dashoffset var(--sz-t) var(--sz-e),
+      opacity var(--sz-t) linear;
+  }
+  .sz-walker {
+    transition:
+      offset-distance var(--sz-t) var(--sz-e),
+      transform var(--sz-t) var(--sz-e);
+  }
+  .sz-body {
+    transition: transform var(--sz-t) var(--sz-e);
+  }
+  .sz-scene[data-kind="main"] .sz-body {
+    animation: sz-breathe 5.2s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * -1.3s);
+  }
+}
+
+@keyframes sz-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015, 1.02);
+  }
+}
+
+.sz-ring {
   position: absolute;
-  inset: 0;
-  cursor: pointer;
-  touch-action: pan-y;
+  inset: -5px;
+  border: 3px solid var(--service-ink);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
 }
 
+.intensity-range:focus-visible ~ .sz-walker .sz-ring {
+  opacity: 1;
+}
+
+/* 눌러서 얻은 초점에는 링이 없고, 키를 누르면 나타난다 */
+.sz-scene[data-pointer] .intensity-range:focus-visible ~ .sz-walker .sz-ring {
+  opacity: 0;
+}
+
+/* 앵커 문구: 길 아래, 흐름 안(글자를 키우면 아래 요소를 밀어낸다) */
 .intensity-anchor {
-  color: var(--neutral-text-muted);
-  font-size: var(--text-label-size);
-  line-height: var(--text-label-line);
-  text-align: center;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
 }
 
+.intensity-panel .field-error:empty {
+  display: none;
+}
+
+.int-more {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin-left: calc(var(--sp-2) * -1);
+}
+
+.int-more::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-right: var(--emphasis) solid currentColor;
+  border-bottom: var(--emphasis) solid currentColor;
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.int-more[aria-expanded="true"]::after {
+  transform: translateY(2px) rotate(-135deg);
+}
+
+/* 세부 감정: 같은 구조의 작은 길, 손잡이는 그 계열의 조약돌 */
 .own-list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--neutral-border);
+  margin-top: var(--sp-1);
 }
 
 .own-row {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  padding: var(--sp-2) 0;
+}
+
+.own-row:first-child {
+  padding-top: 0;
 }
 
 .own-name {
-  font-weight: 600;
+  font-size: var(--fs-body);
+  font-weight: var(--fw-body-strong);
+}
+
+.sz-mini .sz-num {
+  min-width: 3.5rem;
+}
+
+.sz-mini .intensity-number {
+  font-size: var(--fs-title);
+  line-height: var(--lh-title);
+  font-weight: var(--fw-title);
+}
+
+.own-reset {
+  align-self: flex-start;
+  margin-left: calc(var(--sp-2) * -1);
 }
 
 .own-tag {
-  margin-left: var(--space-1);
-  padding: 0 var(--space-2);
-  border: 1px solid var(--neutral-border-strong);
+  display: inline-block;
+  padding: 0 var(--sp-2);
   border-radius: var(--radius-chip);
-  color: var(--neutral-text-muted);
-  font-size: var(--text-caption-size);
-  line-height: var(--text-caption-line);
-  font-weight: 600;
+  background: var(--surface-soft);
+  color: var(--service-ink);
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  font-weight: var(--fw-label);
 }
 
-/* 편지(검토·기록 보기)의 평면판 */
-.letter,
+/* 편지(검토·기록 보기)는 styles/letter.css(시안 카드·봉투, J-5) */
 .record-body {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: var(--space-3);
 }
 
-.letter-card {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-4);
-  border: 1px solid var(--neutral-border);
-  border-radius: var(--radius-card);
-  background: var(--neutral-surface);
-}
-
-.letter-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-}
-
-.letter-head h2 {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.letter-size {
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
-
-.letter-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.letter-pills li {
-  padding: var(--space-1) var(--space-3);
-  border: 1px solid var(--cat-line, var(--neutral-border-strong));
-  border-radius: var(--radius-chip);
-  background: var(--cat-soft, var(--neutral-bg));
-  font-size: var(--text-label-size);
-  line-height: var(--text-label-line);
-}
-
-.letter-text {
-  white-space: pre-wrap;
-}
-
-.letter-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  margin: 0;
-  padding-left: 1.2em;
-}
-
-/* ── 오늘 ── */
-.today-date {
-  color: var(--neutral-text-muted);
-  font-weight: 600;
-}
-
-.today-state {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-}
-
-.today-chip,
-.today-line {
-  color: var(--neutral-text-muted);
-  font-size: var(--text-label-size);
-  line-height: var(--text-label-line);
-  text-align: center;
-}
-
-/* 지난 날 쓰던 글 줄 — 기본 링크 모양을 쓰지 않는다 */
-.link-row {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: var(--size-touch-target-min);
-  padding: 0 var(--space-3);
-  border: 0;
-  border-radius: var(--radius-control);
-  background: var(--neutral-surface-soft);
-  color: var(--neutral-text);
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.skeleton-button {
-  height: var(--size-touch-target-min);
-  border-radius: var(--radius-control);
-  background: var(--neutral-surface-soft);
-}
-
-.today-tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin-top: auto;
-  padding-top: var(--space-8);
-}
+/* 오늘 화면은 styles/forest.css(시안 숲, J-7) */

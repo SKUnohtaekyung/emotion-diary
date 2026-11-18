@@ -153,13 +153,16 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 | `DELETE /api/session` | 로그아웃 — 이 기기의 로그인 cookie를 지운다 | CSRF |
 | `PUT /api/app-lock`, `DELETE /api/app-lock` | 앱 잠금 비밀번호를 정하기·바꾸기 / 끄기(§6, D-106·D-112) | 비밀번호는 본문으로만. 이미 걸려 있으면 **지금 비밀번호**를 함께 받거나, **이 세션이 접근 열쇠로 로그인한 지 10분 안**이어야 한다(§6 '잊었을 때') |
 | `POST /api/app-lock/unlock`, `POST /api/app-lock/lock` | 이 세션의 잠금 풀기(비밀번호) / 이 세션을 지금 잠그기 | 풀기: 서버가 대조하고 틀린 횟수를 센다. 잠그기: 비밀번호 없이 받는다(더 잠기는 쪽이라 화면의 요청을 믿어도 된다) |
-| `GET /api/today` | 서버가 센 오늘 날짜·시간대·하루 기준 시각, 오늘 기록의 요약(상태·판 번호·고른 계열·쓰던 단계 — 글 없음), 가장 최근의 지난 임시저장(D-122) | `X-Timezone` 필수 |
+| `GET /api/today` | 서버가 센 오늘 날짜·시간대·하루 기준 시각, 오늘 기록의 요약(상태·판 번호·고른 계열·쓰던 단계 — 글 없음), 가장 최근의 지난 임시저장(D-122), 첫 기록일(`firstRecordDate` — 처음 완료한 날의 가장 이른 값, 지금 완료 상태와 무관, 없으면 null. 있었던 일 안내 네 단계, TASK-JOURNAL-01 A-7) | `X-Timezone` 필수 |
 | `GET /api/diaries/:date` | 해당 날짜의 draft/completed 전체(없으면 404 — 없는·미래 날짜도 새로 만들지 않는다) | owner 강제, 날짜 모양 400 |
 | `PUT /api/diaries/:date` | 임시저장(통째로 — 새로 만들기 201 / 고치기 200). 완료된 기록은 완료 조건을 다시 검사한다(D-023) | revision + `Idempotency-Key` + `X-Timezone`, 새로 만들기는 서버가 센 오늘만(422 `not_today`), 본문 160,768바이트(DATA_MODEL §2), 모르는 칸 400 |
 | `POST /api/diaries/:date/complete` | 완료조건 검사 후 상태 전환(본문 `{revision}`) | 조건부 UPDATE 하나 + `Idempotency-Key`, 모자라면 422와 빠진 단계 목록 |
+| `POST /api/diaries/:date/uncomplete` | 완료 취소 — completed → draft, 판 번호 +1, `completed_at` 비움, `first_completed_*`는 그대로, 쓰던 단계는 편지(DATA_MODEL §5, TASK-JOURNAL-01 A-4). 본문 `{revision}` | 조건부 UPDATE 하나 + `Idempotency-Key`, 다른 판 409 `revision_conflict`, 임시저장 409 `not_completed`, 없거나 남의 기록 404 |
 | `DELETE /api/diaries/:date` | 영구 삭제(기록 하나 — 화면은 2단계 확인). 확인 토큰은 **지금 판 번호**(본문 `{revision}` — 본 그 판만 지운다, D-122) | CSRF + 판 번호 + `Idempotency-Key` + cascade(부모 먼저) |
 | `DELETE /api/diaries`(전체) | 확인 문구(`{ confirm: "모든 기록 삭제", pin? }`)를 받은 뒤 모든 기록과 영수증, 부를 이름·앱 잠금·하루 기준 시각 설정, 다른 기기 세션을 batch 하나로 영구 삭제(D-112 ⑩ — 접근 열쇠와 이 기기 세션은 남는다, D-124) | CSRF + 확인 토큰 + **본인 확인**(앱 잠금을 켠 경우 비밀번호를 한 번 더 — D-112 ⑤) + cascade |
-| `GET /api/dashboard?range=` | 완료 기록의 결정론적 집계 | 범위 제한 |
+| `GET /api/calendar/:month` | 그 달(`YYYY-MM`)에 기록이 있는 날의 날짜·상태(완료·쓰던 글)와 서버가 센 오늘. 글·감정 없음 — 작은 편지는 `GET /api/diaries/:date`(TASK-REFLECT-01 A-7, D-129) | owner 강제, 달 모양 400, `X-Timezone` 필수, 미래 달은 빈 목록 |
+| `GET /api/stats/:days` | 통계 **재료**(`7`·`30`): 이번 기간 + 바로 앞 같은 길이 기간의 완료 기록마다 날짜와 세부 감정(코드·계열·크기)만, 이어서 쓴 날을 셀 첫 완료 날짜(최근부터 400개까지). **글은 싣지 않는다.** 계산은 화면이 `app/shared/stats.ts`로 한다(A-6 — 서버·기기 어느 쪽에서든 도는 순수 함수) | owner 강제, 기간은 글자 그대로 `7`·`30`만(그 밖 400), `X-Timezone` 필수 |
+| ~~`GET /api/dashboard?range=`~~ | (옛 계획) 완료 기록의 결정론적 집계 — 2026-11-11 위 `GET /api/stats/:days`(재료) + 화면 계산으로 대체(A-6) | — |
 | `POST /api/journal-assist` | 현재 턴을 `ai_jobs`에 등록하고 job ID 반환 | full chat 비저장, payload 최소화 |
 | `GET /api/ai-jobs/:id` | job 상태/결과 조회(owner 전용) | timeout 시 fallback 안내 |
 | `GET /api/ai-jobs/next`, `POST /api/ai-jobs/:id/result` | PC worker 전용 lease/결과 반환 | worker secret, lease 만료, 결과 schema 재검증 |
@@ -296,14 +299,14 @@ MVP는 위의 Worker 하나가 모든 API를 처리하고, 접근 열쇠로 받�
 
 ## 11. Phase 1 뼈대 (TASK-MOBILE T3, 2026-10-14)
 
-앱의 첫 코드(`app-scaffold`)가 위 계약을 어떤 구성으로 지키는지 적는다. 화면은 도구(프레임워크) 없이 짓는다 — 사용자 결정 D-114. 나머지 구성은 에이전트가 정했다(D-115, 근거 `tasks/mobile/2026-10-14-t3/PLAN.md` '에이전트가 정한 것' T3 A-1~A-18). 배포 절차는 [DEPLOY.md](DEPLOY.md)가 정본이다. 이 절의 값이 코드와 다르면 코드를 고친다.
+앱의 첫 코드(`app-scaffold`)가 위 계약을 어떤 구성으로 지키는지 적는다. 화면은 처음엔 도구(프레임워크) 없이 지었고(D-114), 2026-11-11부터 Preact로 바꾼다(사용자 결정 D-127 — 옛 화면은 손댈 때 바꾸고, 그동안 라우터의 View에 `lib/mount.ts`의 `mountPreact`로 끼운다. JSX는 Vite 8의 oxc가 바꾼다 — TASK-REFLECT-01 A-1~A-4). 나머지 구성은 에이전트가 정했다(D-115, 근거 `tasks/mobile/2026-10-14-t3/PLAN.md` '에이전트가 정한 것' T3 A-1~A-18). 배포 절차는 [DEPLOY.md](DEPLOY.md)가 정본이다. 이 절의 값이 코드와 다르면 코드를 고친다.
 
 ### 11.1 저장소 구조
 
 | 자리 | 내용 |
 | --- | --- |
 | `app/worker/src/` | 서버. `index.ts`(진입·빌드 상수) → `app.ts`(경로 순서) → `session.ts`·`routes/*`·`dev/`(개발용 전용) |
-| `app/client/` | 화면. `index.html`, `src/`(TypeScript + DOM), `public/`(manifest·임시 아이콘·`_headers`) |
+| `app/client/` | 화면. `index.html`, `src/`(TypeScript + DOM, 2026-11-11부터 새 화면은 Preact `.tsx` — D-127), `public/`(manifest·임시 아이콘·`_headers`) |
 | `app/shared/` | 서버와 화면이 함께 쓰는 API 계약 `api.ts`와 개발용 전용 계약 `dev.ts` |
 | `app/migrations/` | D1 마이그레이션 `0001`~`0004`(DATA_MODEL §3.4·§3.9·§3.10·§3.11) |
 | `app/test/` | 서버 시험(`worker/`)과 화면 시험(`client/`), 실제 브라우저 E2E(`e2e/` — Playwright, 2026-10-16 D-123) |
@@ -355,7 +358,7 @@ Mac이 없어 iPhone 화면의 개발 도구를 쓸 수 없으므로(RK-036) 개
 - cookie 이름은 `__Host-session`(브라우저가 Secure·`Path=/`·Domain 없음을 강제), 값은 `v1.<세션 번호>.<주체>.<발급 ms>.<서명>`. 세션 번호는 16바이트 무작위, 서명은 `SESSION_SECRET`의 HMAC-SHA256. 기한은 cookie가 아니라 서버 기록의 마지막 발급 시각으로 잰다 — cookie 사본끼리 엇갈려도 끊기지 않게(홈 화면에 추가할 때 cookie가 복사된다는 WebKit 버그 보고가 있다 — bugs.webkit.org 325412, 우리 실측 S-01과는 반대).
 - 틀린 비밀번호는 **대조하기 전에 시도 한 번을 먼저 예약한다**(조건부 `UPDATE … RETURNING`) — 요청을 한꺼번에 여럿 보내도 다섯 번을 넘겨 맞혀 볼 수 없다. 접근 열쇠는 2026-10-15부터 먼저 대조하고 틀린 시도만 한 문장으로 센다 — 맞는 열쇠는 잠금과 상관없이 들어오고, 열쇠는 맞혀 볼 수 없는 길이라 대조 전 예약이 지키던 것이 없다(D-122, RK-041).
 - **활동 갱신은 잠금을 풀지 못한다.** 요청이 세션을 읽은 뒤 쓰기 전에 다른 요청('지금 잠그기')이 끼어도 되돌리지 않게, 잠김은 `MAX`로만 올리고 시각들도 뒤로 돌리지 않는다. 푸는 것은 비밀번호 풀기와 잠금 끄기뿐이다(2026-10-14 독립 검토 지적, 시험 `app/test/worker/router-and-race.test.ts`).
-- 오류 응답의 번호와 사유 코드: 400 `invalid_body`(본문 모양), 401 `unauthorized`(로그인 풀림)·`invalid_key`(틀린 열쇠), 403 `csrf`, 404·405, 409 `app_lock_off`, 413, 422 `invalid_pin`·`wrong_pin`·`pin_required`·`invalid_name`, 423 `app_locked`, 429 `key_locked`·`pin_resting`(+`Retry-After`), 500 `server_misconfigured`·`server_error`. 틀린 비밀번호를 422로 두는 것은 401(로그인 풀림)·403(CSRF)과 화면이 섞어 읽지 않게 하려는 것이다. 일기(2026-10-15): 400 `invalid_date`·`invalid_timezone`·`idempotency_key_required`, 409 `revision_conflict`(+`currentRevision`)·`not_draft`·`idempotency_mismatch`, 422 `invalid_text`·`invalid_category`·`invalid_emotion`·`invalid_intensity`·`invalid_reflection`·`invalid_resume`(+`field`)·`invalid_day_start`·`not_today`·`incomplete`(+`missing` — 흐름 순서의 단계 이름).
+- 오류 응답의 번호와 사유 코드: 400 `invalid_body`(본문 모양), 401 `unauthorized`(로그인 풀림)·`invalid_key`(틀린 열쇠), 403 `csrf`, 404·405, 409 `app_lock_off`, 413, 422 `invalid_pin`·`wrong_pin`·`pin_required`·`invalid_name`, 423 `app_locked`, 429 `key_locked`·`pin_resting`(+`Retry-After`), 500 `server_misconfigured`·`server_error`. 틀린 비밀번호를 422로 두는 것은 401(로그인 풀림)·403(CSRF)과 화면이 섞어 읽지 않게 하려는 것이다. 일기(2026-10-15): 400 `invalid_date`·`invalid_timezone`·`idempotency_key_required`, 409 `revision_conflict`(+`currentRevision`)·`not_draft`·`not_completed`(완료 취소)·`idempotency_mismatch`, 422 `invalid_text`·`invalid_category`·`invalid_emotion`·`invalid_intensity`·`invalid_reflection`·`invalid_resume`(+`field`)·`invalid_day_start`·`not_today`·`incomplete`(+`missing` — 흐름 순서의 단계 이름).
 - 쓸 수 없는 cookie(기한 지남·기록 없음·서명 틀림)를 받으면 응답에서 그 cookie를 지운다.
 
 ### 11.8 검사

@@ -1,0 +1,362 @@
+/* 시안(무드 v4, D-061)의 공통 부품 — web/css/base.css에서 옮겼다(TASK-REFLECT-01 R-1). 변수는 시안 이름(--bg, --fs-body, --sp-4 …)이고
+   tokens.ts가 design/tokens.json에서 앱 이름과 함께 펼친다(A-13). 시안과 다른 점:
+   - 하단 탐색은 sticky가 아니라 #app 밖 아래에 붙는다 — 스크롤은 #app만 한다(D-125, MAP R1).
+   - 버튼은 앱의 클래스(.btn-primary·.btn-quiet·.btn-danger)를 쓴다. 모양은 components.css가 시안 규칙으로 바꿨다. */
+
+.caption {
+  font-size: var(--fs-caption);
+  line-height: var(--lh-caption);
+  color: var(--subtle);
+}
+.note {
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  color: var(--muted);
+}
+
+/* ── 하단 탐색(§6.11, D-049): ink 알약 + 민트 방울. 위 24px는 흐림 띠로 #app 끝을 녹인다(D-091 ③) — 띠는 눌리지 않는다. ── */
+.bottom-nav {
+  --nav-fade: 24px;
+  position: relative;
+  z-index: var(--z-nav);
+  flex: none;
+  margin-top: calc(var(--nav-fade) * -1);
+  padding: calc(var(--sp-2) + var(--nav-fade)) var(--sp-3) calc(var(--sp-2) + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--bg) 0%, transparent), var(--bg) var(--nav-fade));
+  pointer-events: none;
+}
+.bottom-nav[hidden] {
+  display: none;
+}
+.bottom-nav-rail {
+  pointer-events: auto;
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  max-width: calc(var(--content-max) - 2 * var(--sp-3));
+  min-height: 56px;
+  margin: 0 auto;
+  border-radius: var(--radius-chip);
+  background: var(--service-ink);
+}
+.bottom-nav-indicator {
+  position: absolute;
+  z-index: 0;
+  top: 2px;
+  left: var(--nav-position, 37.5%);
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-blob);
+  background: var(--service-mint);
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+.bottom-nav a {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  min-width: var(--touch);
+  min-height: 56px;
+  color: var(--bg);
+  text-decoration: none;
+  touch-action: manipulation;
+}
+.bottom-nav a:focus-visible {
+  outline: var(--emphasis) solid var(--service-mint);
+  outline-offset: -4px;
+}
+.bottom-nav svg {
+  width: 25px;
+  height: 25px;
+  fill: none;
+  stroke: none;
+}
+.bottom-nav :is(.ic-line, .ic-stroke, .ic-cut, .ic-bars) {
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bottom-nav :is(.ic-mark, .ic-fill) {
+  display: none;
+}
+.bottom-nav .ic-fill {
+  fill: currentColor;
+}
+.bottom-nav a[aria-current] {
+  color: var(--service-ink);
+}
+.bottom-nav a[aria-current] .ic-fill {
+  display: inline;
+}
+.bottom-nav a[aria-current] .ic-line {
+  display: none;
+}
+/* 활성 아이콘은 ink 면이라 안쪽 선을 mint로 판다(D-080) */
+.bottom-nav a[aria-current] .ic-cut {
+  stroke: var(--service-mint);
+}
+.bottom-nav a[aria-current] .ic-mark {
+  display: inline;
+  fill: var(--service-mint);
+}
+.bottom-nav a[aria-current] .ic-bars {
+  stroke-width: 3.4;
+}
+.nav-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .bottom-nav-indicator {
+    transition: left var(--dur-slow) var(--spring);
+  }
+  .bottom-nav a {
+    transition: color var(--dur-fast) var(--ease);
+  }
+  .bottom-nav-rail.is-moving .bottom-nav-indicator {
+    animation: nav-indicator-settle var(--dur-slow) var(--spring);
+  }
+  /* 방울이 거의 도착한 뒤(이동 시간의 55%)에 새 아이콘을 ink로 */
+  .bottom-nav-rail.is-moving a[aria-current] {
+    transition-delay: calc(var(--dur-slow) * 0.55);
+  }
+}
+@media (hover: hover) {
+  .bottom-nav a:hover:not([aria-current]) {
+    color: var(--service-mint);
+  }
+}
+@keyframes nav-indicator-settle {
+  0% {
+    transform: translateX(-50%) scale(0.8, 0.88) rotate(-5deg);
+  }
+  58% {
+    transform: translateX(-50%) scale(1.08, 0.94) rotate(2deg);
+  }
+  100% {
+    transform: translateX(-50%) scale(1) rotate(0);
+  }
+}
+
+/* 같은 폭 두 버튼(완료 화면 — D-078) */
+.screen-actions.pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+}
+
+/* ── 원형 아이콘 버튼(icon-button.md): 44px, 옅은 회색 면, 이름은 aria-label ── */
+.icon-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: var(--touch);
+  height: var(--touch);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--surface-soft);
+  color: var(--service-ink);
+  cursor: pointer;
+}
+.icon-btn.plain {
+  background: none;
+}
+.icon-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.icon-btn[aria-disabled="true"] {
+  color: color-mix(in srgb, var(--service-ink) var(--dis-content), var(--state-bg, var(--bg)));
+  cursor: default;
+}
+
+/* ── 고르기 알약 두 개 이상(세그먼트 — 통계 기간 7일/30일) ── */
+.segmented {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--sp-1);
+  padding: var(--sp-1);
+  border-radius: var(--radius-chip);
+  background: var(--surface-soft);
+}
+.segmented button {
+  min-height: 44px;
+  padding: 0 var(--sp-4);
+  border: 0;
+  border-radius: var(--radius-chip);
+  background: transparent;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-label);
+  color: var(--muted);
+  cursor: pointer;
+}
+.segmented button[aria-checked="true"] {
+  background: var(--service-ink);
+  color: var(--bg);
+  font-weight: var(--fw-body-strong);
+}
+.segmented button:focus-visible {
+  outline-offset: -4px;
+}
+
+/* ── 글자 줄 버튼(.link), 시트 메뉴 줄, 안내 띠 ── */
+.link {
+  min-width: var(--touch);
+  min-height: var(--touch);
+  padding: 0 var(--sp-2);
+  border: 0;
+  border-radius: var(--radius);
+  background: none;
+  font-size: var(--fs-label);
+  font-weight: var(--fw-body-strong);
+  color: var(--text);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.banner {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: flex-start;
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--radius-card);
+  background: var(--service-light);
+  color: var(--service-ink);
+  font-size: var(--fs-label);
+  font-weight: var(--fw-body-strong);
+}
+.banner.soft {
+  background: var(--surface-soft);
+}
+
+/* ── 친구 그림(D-051): 정적 PNG, 상자·흰 테두리 없이 선다(D-061). 호흡은 2~3% 안쪽 ── */
+.friend-spot {
+  position: relative;
+  display: block;
+  flex: none;
+  line-height: 0;
+}
+.friend-img {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+.pebble-img {
+  display: block;
+  height: auto;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .breathe {
+    transform-origin: 50% 100%;
+    animation: breathe 5.2s ease-in-out infinite;
+    animation-delay: calc(var(--i, 0) * -1.3s);
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.025, 1.03);
+  }
+}
+
+/* ── 불러오기 상태(D-083, StatusBlock.tsx) ── */
+.status-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+  color: var(--text);
+}
+.status-title {
+  margin: 0;
+  font-size: var(--fs-heading);
+  font-weight: var(--fw-body-strong);
+}
+.status-detail {
+  margin: 0;
+  font-size: var(--fs-label);
+  color: var(--muted);
+}
+.status-retry {
+  margin-top: var(--sp-2);
+}
+.status-block.is-loading {
+  align-items: stretch;
+  width: 100%;
+}
+.status-block.is-loading i {
+  display: block;
+  height: 14px;
+  border-radius: 7px;
+  background: var(--surface-soft);
+}
+.status-block.is-loading i:nth-of-type(2) {
+  width: 72%;
+}
+.status-block.is-loading i:nth-of-type(3) {
+  width: 48%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .status-block.is-loading i {
+    animation: skel 1.6s ease-in-out infinite;
+  }
+}
+@keyframes skel {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+.status-block.dark {
+  color: var(--bg);
+}
+.status-block.dark .status-detail {
+  color: color-mix(in srgb, var(--bg) 78%, transparent);
+}
+.status-block.dark.is-loading i {
+  background: color-mix(in srgb, var(--bg) 14%, transparent);
+}
+
+/* ── 누름(D-098 ①, state.pressed): 알약 모양은 97%로 작아지고, 움직임 줄이기에서는 옅은 면만 ── */
+@media (prefers-reduced-motion: no-preference) {
+  :is(.btn, .icon-btn, .segmented button) {
+    transition: transform var(--dur-fast) var(--ease);
+  }
+  :is(.btn, .icon-btn, .segmented button):active:not([aria-disabled="true"], :disabled) {
+    transform: scale(var(--press-pill));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  :is(.btn, .icon-btn, .segmented button):active:not([aria-disabled="true"], :disabled) {
+    --press-face: color-mix(in srgb, var(--service-ink) var(--press-reduced), transparent);
+    background-image: linear-gradient(var(--press-face), var(--press-face));
+  }
+  :is(.btn-primary, .btn-danger, .segmented button[aria-checked="true"]):active:not([aria-disabled="true"], :disabled) {
+    --press-face: color-mix(in srgb, var(--bg) var(--press-reduced-ink), transparent);
+  }
+}

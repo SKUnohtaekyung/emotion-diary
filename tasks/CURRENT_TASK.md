@@ -5,8 +5,12 @@
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
 | 공모전 발표 준비(성결대 창업아이디어 경진대회, 2026-11-24 Zoom 본선) | **진행 중(2026-11-18)** — 발표 방식 리서치, 사용자 생각 원문 저장·판단, 주장 근거 확인까지. Figma 덱 수정 전이고 사용자 답 일곱 가지를 기다린다. 제품 정본은 바꾸지 않았다(대회용 가설) | [contest/2026-sungkyul-startup/12-발표-준비-인계.md](../contest/2026-sungkyul-startup/12-발표-준비-인계.md) |
-| TASK-PERSONAL-01 personal-start(본인 사용 시작) | **진행 중(2026-10-20)** — 사용자 답 U-1~U-4대로 계획 승인 없이 진행. 코드·운영 환경·문서는 커밋해 `main`에 반영했다(사용자 지시, 휴대폰 확인 전). 남은 것: 사용자 휴대폰 확인 → 정본 기록 → 관문 판정(아래 '다음 세션이 할 일') | 이 파일 아래, 요청·계획은 [personal-start/2026-10-20/](personal-start/2026-10-20/PLAN.md) |
-| direct-journal 착수 준비(쓰면서 시안 이식) | **준비 끝(2026-10-20) — 사용자 답 대기.** 변경 지도·사실표·질문 6개를 썼다. 작업 번호와 계획(PLAN)은 personal-start 관문 뒤, 질문의 답을 받고 정한다 | [direct-journal/2026-10-20/](direct-journal/2026-10-20/QUESTIONS.md)(MAP·FACTS·QUESTIONS) |
+| [TASK-REPLAN-01](archive/TASK-REPLAN-01.md) 전체 순서 다시 세우기 | 끝(2026-11-11) — 결정 D-126~D-128, 0단계 정본 동기화, `verify full` PASS. 커밋 전(브랜치 `docs/replan`) | [archive/](archive/README.md), 계획은 [replan/2026-11-11/PLAN.md](replan/2026-11-11/PLAN.md) |
+| **다음 할 일** TASK-ACCOUNTS-01 가입·들어오는 길(소셜 로그인·만 14세·동의·탈퇴·사람별 분리) | **대기 — 계획 초안(2026-11-12), 착수 전.** 전제: direct-journal·dashboard-reminder 휴대폰 확인과 관문 판정, `journal/direct`가 `main`에. 착수 때 질문 창 Q1~Q4를 한 번에 묻는다 | 요청 [accounts/2026-11-12/REQUESTS.md](accounts/2026-11-12/REQUESTS.md), 계획 [accounts/2026-11-12/PLAN.md](accounts/2026-11-12/PLAN.md) |
+| TASK-JOURNAL-01 일기 쓰기·오늘 화면을 시안 모양으로 | **진행 중(2026-11-11 승인 — D-131)** — 노드 `direct-journal` in_progress | 이 파일 아래, 계획은 [direct-journal/2026-11-11/PLAN.md](direct-journal/2026-11-11/PLAN.md) |
+| TASK-REFLECT-01 화면 기초와 돌아보기(달력 + 통계) | **코드 끝·휴대폰 확인 대기(2026-11-11)** — D-129·D-130. 노드 `dashboard-reminder` verifying, 휴대폰 확인은 다음 묶음과 함께 | 이 파일 아래, 계획은 [reflection/2026-11-11/PLAN.md](reflection/2026-11-11/PLAN.md) |
+| direct-journal 착수 준비(시안 이식 지도) | 준비 끝(2026-10-20). 2026-11-11 D-126으로 순서가 바뀌었다 — MAP의 조각 지도는 새 순서의 화면 기초·작성 흐름·오늘·설정·가입이 그대로 쓰고, 남았던 Q3·Q4는 2026-11-11 D-128로 답했다 | [direct-journal/2026-10-20/](direct-journal/2026-10-20/QUESTIONS.md)(MAP·FACTS·QUESTIONS) |
+| [TASK-PERSONAL-01](archive/TASK-PERSONAL-01.md) personal-start(본인 사용 시작) | 대체됨(2026-11-11, D-126) — 운영 건물 `emotion-diary-prod`·`#/help`·자판 배치 C·첫 백업 복원까지 짓고 `main`에 반영(PR #45·#46). 남은 휴대폰 확인·관문 판정은 하지 않는다 | [archive/](archive/README.md), 요청·계획은 [personal-start/2026-10-20/](personal-start/2026-10-20/PLAN.md) |
 | [TASK-SLICE-01](archive/TASK-SLICE-01.md) first-slice('오늘 한 편' 첫 조각) | 끝(2026-10-20) — 결정 D-123, 관문 `first-slice` 통과(화면 시험·E2E·CI는 PR #40·#41 → `main` `b74242c`, iPhone `mobile-slice` 2026-10-20). 남은 결함 하나(자판이 뜰 때 상단 줄이 상태 막대와 겹침 — PLAN 5-12) | [archive/](archive/README.md), 요청·계획은 [first-slice/2026-10-16/](first-slice/2026-10-16/PLAN.md) |
 | [TASK-DATA-02](archive/TASK-DATA-02.md) data-control(내 데이터 통제) | 끝(2026-10-17) — 결정 D-124, 관문 `data-control` 통과(F-14·F-15 시험, 개발용 환경 restore-drill, export-cpu-measured, CI). 커밋 `eedc783`·`85ac8c9` — PR #43 → PR #42 → `main` `8416734` | [archive/](archive/README.md), 요청·계획은 [data-control/2026-10-17/](data-control/2026-10-17/PLAN.md) |
 | [TASK-DATA-01](archive/TASK-DATA-01.md) data-foundation(저장 핵심) | 끝(2026-10-16) — 결정 D-122, 관문 `data-integrity` 통과(서버 시험, 개발용 환경 원격 검사 50/50, CI 두 OS). 커밋 `89c0017` — PR #38 → PR #37 → `main` `adb3d06`, 마감 정리 PR #39 → `main` `47ddd90` | [archive/](archive/README.md), 요청·계획은 [data-foundation/2026-10-15/](data-foundation/2026-10-15/PLAN.md) |
@@ -21,36 +25,40 @@
 | [TASK-TAXONOMY](TASK-TAXONOMY.md) · [V1](TASK-TAXONOMY-V1.md) · [PLAN-V2](TASK-TAXONOMY-PLAN-V2.md) | 완료(2026-09-05, D-038·D-040 accepted) | 별도 파일(다른 문서가 경로로 인용해 옮기지 않았다) |
 | TASK-INFRA-01 · ISSUE-26 · ISSUE-27 · CBM · DESIGN · BOOTSTRAP | 완료·보류 기록 | [archive/](archive/README.md) |
 
-# TASK-PERSONAL-01 — personal-start(본인 사용 시작): 운영 건물에서 본인이 실제 일기를 쓰기 시작한다
+# TASK-REFLECT-01 — 화면 기초와 돌아보기(달력 + 통계)
 
 ## 상태
 
-`in_progress`(2026-10-20 — 사용자 답 U-1~U-4: 운영 건물 지금 승인, 겹침 결함 포함, 계획 승인 없이 진행, 끝에 커밋 둘 + PR). **진행·증거는 [PLAN.md](personal-start/2026-10-20/PLAN.md) 한 곳이다**(D-118). 요청과 답은 [REQUESTS.md](personal-start/2026-10-20/REQUESTS.md).
+`verifying`(2026-11-11 — R-0~R-5와 R-6의 이 PC 몫 끝, 커밋함. 남은 것은 휴대폰 확인 하나 — D-130으로 다음 묶음의 휴대폰 확인과 함께 한다. 처음: 사용자 "Start stage 1 plan" → 계획 승인 "추천으로 고고", U-1 추천안, D-129). 운영 데이터 규칙(운영에 지우는 명령 금지, 구조 변경 전 내보내기 + 백업 — DEPLOY §8·RK-045)은 그대로다. **진행·증거는 [PLAN.md](reflection/2026-11-11/PLAN.md) 한 곳이다**(D-118).
 
-## 목표
+## 범위
 
-`harness/work-graph.yaml`의 `personal-start` 노드와 `docs/STATUS.md` §4 6번 — 관문 `personal-start`(`harness/quality-gates.yaml`)를 통과해 본인이 운영 건물에서 매일 실제 일기를 쓴다.
-
-## 넘겨받은 것
-
-- `first-slice` 휴대폰 확인에서 찾은 결함: 자판이 뜬 동안 작성 흐름의 상단 줄이 상태 막대와 겹친다(`tasks/first-slice/2026-10-16/PLAN.md` 5-12) — 이 작업에 넣었다(U-2).
-- `data-control`에서 넘긴 것: PC 작업 스케줄러 등록·운영 백업 토큰(`tasks/archive/TASK-DATA-02.md`, U-3).
+- 포함·제외는 PLAN §1. 공정표 노드 `dashboard-reminder`, 관문 `reflection-core`.
 
 ## 소유권
 
-- Main/Writer: 이 작업을 실행하는 세션 하나. 하위 에이전트는 커밋하지 않는다. `#/help` 화면은 Sonnet 작업자 하나가 짓고(2026-10-20 끝 — 같은 시간에 쓰는 작업자는 이제 없다) 메인이 다시 재서 합쳤다.
-- 소유 파일: `tasks/personal-start/**`, `tasks/CURRENT_TASK.md`, `tasks/archive/**`, `tasks/first-slice/**`, `app/scripts/**`, `app/client/index.html`, `app/client/src/styles/**`, `app/client/src/dev/**`, `app/client/src/views/**`, `app/client/src/lib/routes.ts`, `app/client/src/main.ts`, `app/test/client/**`, `app/test/e2e/**`, `docs/**`, `harness/**`, `wrangler.jsonc`, `.gitignore`
+- Main/Writer: 이 작업을 실행하는 세션 하나. 하위 에이전트는 조사·검토만, 커밋하지 않는다.
+- 소유 파일: `tasks/reflection/**`, `tasks/CURRENT_TASK.md`, `app/client/**`, `app/shared/**`, `app/worker/**`, `app/test/**`, `app/scripts/**`, `vite.config.ts`, `vitest.config.ts`, `playwright.config.ts`, `package.json`, `package-lock.json`, `tsconfig*.json`, `biome.json`, `docs/**`, `harness/**`
 
-## 체크포인트
+## 인수 조건
 
-- 2026-10-20 짓기·올리기: PLAN 4-1~4-8 끝(운영 환경 `emotion-diary-prod`, `#/help`, 자판 겹침 배치 C — 운영 빌드 `20261019175608-d2ed814`에 이미 들어감). 사용자가 운영에서 로그인·부를 이름까지 했다.
-- 2026-10-20 커밋·`main` 반영(사용자 지시 — "지금까지 작업한거 전부 커밋 + pr + 메인에 푸시"): 커밋 셋 — first-slice 마감 기록 / personal-start / direct-journal 착수 준비와 이 인계. **휴대폰 확인과 관문 판정 전**에 반영한 것이라 personal-start는 여전히 `in_progress`다. PR 번호와 병합 결과는 PLAN 4-10.
-- 2026-10-20 휴대폰 2부(PLAN 4-9): 위기 안내 '검토 전'·S-05 내보내기 PASS. 배치 C에서도 자판이 뜨면 위쪽 줄이 상태 막대 자리로 밀려(실패) — 보이는 영역이 밀린 만큼 위를 비우는 고침을 개발용에서 실기기로 확인하고 운영에 올렸다(빌드 `20261020080719`, 운영판 검사 31/31). T-03 앱 전환 화면은 FAIL — 신호(blur·hidden)는 오지만 iOS가 카드 사진을 먼저 찍어 웹으로는 막을 수 없다(RK-039 일어남). 이 고침과 기록은 커밋해 `main`에 반영했다.
+- 관문 `reflection-core`(F-11·F-12·F-20·deterministic-statistics·timezone-boundaries·mobile-reflection)의 증거가 PLAN §6대로 있고 `node scripts/verify.mjs --mode full` PASS, 커밋·PR은 사용자 지시 뒤 CI 초록.
 
-## 다음 세션이 할 일
+# TASK-JOURNAL-01 — 일기 쓰기·오늘 화면을 시안 모양으로
 
-1. **사용자 휴대폰 확인의 남은 것**(PLAN 4-9) — 운영 앱(빌드 `20261020080719` 이후)에서 자판을 띄워 위쪽 줄이 제자리인지·`다음`까지 밀어서 닿는지(개발용에서는 확인됨), S-02(완전히 닫았다 열기), **T-03 FAIL을 받아들일지 사용자 결정**(RISK RK-039 — 받아들이면 관문은 한계를 적고 진행), 백업 예약 명령(`node app/scripts/backup.mjs schedule-command prod`가 출력한 것을 사용자가 실행). 결과를 사용자에게 받는다 — 에이전트는 iPhone을 조작할 수 없다.
-2. **정본 기록 → 관문 판정**(PLAN 4-10): 결과를 EVAL §4·§6 표에, 숫자는 STATUS §1에, 관문 `personal-start` 판정 → work-graph `personal-start` done → 이 절을 `tasks/archive/TASK-PERSONAL-01.md`로 옮김 → 커밋·PR(사용자 지시 때).
-3. **그다음 `direct-journal`**: 사용자가 [QUESTIONS.md](direct-journal/2026-10-20/QUESTIONS.md)의 질문 6개에 답 → DECISIONS에 기록(D-066 상태 포함) → Q1 답에 맞춰 work-graph·`quality-gates.yaml`(F-21)·ROADMAP·STATUS → `tasks/direct-journal/<날짜>/PLAN.md` → 조각 0부터([MAP.md](direct-journal/2026-10-20/MAP.md) §5). 질문 답은 휴대폰 확인을 기다리는 동안 미리 받아도 된다.
-4. **날짜가 걸린 것**: 있었던 일 안내 2단계 문구는 쓰기 시작한 지 30일째(추정 2026-11-19 무렵)에 바뀌어야 한다 — 서버에 첫 기록일 값이 그 전에 들어가야 한다(MAP A-7, 조각 4).
-5. 운영 명령은 `ALLOW_PROD=1`, 실제 일기가 생긴 운영에는 데이터를 지우는 명령(`--fresh`·`--reset-dev-data`·`drill.mjs`·SQL `DELETE`)을 쓰지 않는다(DEPLOY §8). 창고 구조를 바꾸기 전에는 내보내기 + 백업, 바꾼 뒤 복원 확인(RK-045).
+## 상태
+
+`in_progress`(2026-11-11 — 사용자 승인 "승인. 커밋 먼저 하고 작업해", D-131. 처음: D-130 "일기 쓰기, 오늘 화면 작업할거야"). 브랜치 `journal/direct`(`edb115d`에서). **진행·증거는 [PLAN.md](direct-journal/2026-11-11/PLAN.md) 한 곳이다**(D-118). 휴대폰 확인은 이 묶음 끝에 달력·통계(`tasks/reflection/2026-11-11/PHONE-GUIDE.md`)와 함께 — 그 전에 개발용 건물(이 PC에는 Cloudflare 로그인·`work/deploy/dev.*`가 없다)을 사용자와 정한다(PLAN J-10).
+
+## 범위
+
+- 포함·제외는 PLAN §1. 공정표 노드 `direct-journal`, 관문 `core-product`. 설정 하위 화면은 이번에 넣고, 들어오는 길·온보딩은 `accounts`에서(PLAN §3 U-1·U-2 답).
+
+## 소유권
+
+- Main/Writer: 이 작업을 실행하는 세션 하나. 하위 에이전트는 조사·검토만, 커밋하지 않는다.
+- 소유 파일: `tasks/direct-journal/**`, `tasks/reflection/**`, `tasks/CURRENT_TASK.md`, `app/client/**`, `app/shared/**`, `app/worker/**`, `app/test/**`, `app/scripts/**`, `vite.config.ts`, `vitest.config.ts`, `playwright.config.ts`, `package.json`, `package-lock.json`, `tsconfig*.json`, `biome.json`, `docs/**`, `harness/**`, `design/tokens.json`
+
+## 인수 조건
+
+- PLAN §5의 조각마다 화면 시험·E2E(axe serious/critical 0)·`verify --mode quick` 통과, 끝에 `node scripts/verify.mjs --mode full`·`npm run e2e` 통과, 새 맥락 검토 반영, 휴대폰 확인 결과가 EVAL §4·§6에 있고 관문 `core-product`(PLAN §6)·`reflection-core` 판정. 커밋·PR은 사용자 지시 뒤 CI 초록.

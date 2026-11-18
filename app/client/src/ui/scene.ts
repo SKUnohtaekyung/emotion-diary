@@ -56,7 +56,8 @@ export function createPinScene(options: PinSceneOptions): PinScene {
     class: `scene${options.overlay ? " scene-overlay" : ""}`,
     ...(options.overlay ? { role: "dialog", "aria-modal": "true", "aria-labelledby": titleId } : {})
   });
-  node.append(inner);
+  // 로딩 화면(.splash)과 같은 자리·같은 그림 — 로딩이 걷히면 그대로 이 화면이 된다. 아래 절반은 어두운 막이 숫자판의 대비를 지킨다(시안 lock.css)
+  node.append(h("div", { class: "scene-forest", "aria-hidden": "true" }, h("img", { class: "scene-forest-art", src: "/splash.svg", alt: "" })), inner);
 
   // 키보드 숫자는 초점이 장면 안 어디에 있든 받는다. 장면이 가려졌거나(inert) 시트가 위에 있으면 받지 않는다.
   const onDocKey = (event: KeyboardEvent): void => {

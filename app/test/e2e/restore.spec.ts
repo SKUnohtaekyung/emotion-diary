@@ -1,7 +1,7 @@
 // 끊김·닫힘·로그인 풀림·충돌에서 글을 잃지 않는가(TASK-SLICE-01 PLAN §6 — e2e-reload-restore ②③, F-22, F-09, F-05).
 // 글은 모두 시험용 가짜 문장이다.
 import { expect, test } from "@playwright/test";
-import { accessKey, enterApp, freshToday, next, serverEntry, todayDate, waitSaved, writeToReason } from "./helpers";
+import { accessKey, enterApp, freshToday, next, pickFeeling, serverEntry, todayDate, waitSaved, writeToReason } from "./helpers";
 
 const reasonField = "왜 이런 마음이 들었다고 느끼나요?";
 
@@ -89,7 +89,7 @@ test("⑥ 마음 셋·서로 다른 크기·따로 정한 크기가 저장·새�
   await page.getByRole("button", { name: "오늘의 마음 남기기" }).click();
   await page.getByLabel("무슨 일이 있었나요?").fill("가짜 사건: 여러 마음");
   await next(page);
-  for (const name of ["슬픔", "사랑", "공포"]) await page.getByRole("button", { name, exact: true }).click();
+  for (const name of ["슬픔", "사랑", "공포"]) await pickFeeling(page, name);
   await next(page);
   await page.locator(".choice-pill").nth(0).click();
   await page.locator(".choice-pill").nth(1).click();
@@ -132,7 +132,8 @@ test("⑥ 마음 셋·서로 다른 크기·따로 정한 크기가 저장·새�
   await page.getByRole("button", { name: "남기기" }).click();
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("오늘의 마음을 남겼어요");
 
-  // 고치기: 사랑의 크기를 3으로, 슬픔의 첫 세부 감정을 뺀다
+  // 고치기: 사랑의 크기를 3으로, 슬픔의 첫 세부 감정을 뺀다(완료 화면은 달력·통계 보기라 오늘 화면에서 기록을 연다 — D-078)
+  await page.goto("/#/today");
   await page.getByRole("button", { name: "오늘의 기록 보기" }).click();
   await page.getByRole("button", { name: "슬픔 고치기" }).click();
   await expect(page.locator(".write-banner")).toHaveText("완료된 기록을 수정 중이에요");

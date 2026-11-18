@@ -49,4 +49,15 @@ describe("앱 잠금 설정", () => {
     expect(isLockLayerShown()).toBe(false);
     expect(document.querySelector('[role="switch"]')?.getAttribute("aria-checked")).toBe("true");
   });
+
+  it("잠금이 켜져 있을 때만 '지금 잠그기'가 있고, 누르면 잠금을 청하고 잠금 층이 뜬다(오늘 화면에서 옮겨 옴, A-10)", async () => {
+    const calls = stubFetch((request) => (request.path === "/api/session" ? session({ appLock: true, locked: false }) : { status: 204 }));
+    navigate("#/settings/lock");
+    await vi.waitFor(() => expect(calls.some((call) => call.path === "/api/session")).toBe(true));
+    const button = [...document.querySelectorAll<HTMLButtonElement>("button")].find((b) => b.textContent === "지금 잠그기");
+    expect(button?.hidden).toBe(false);
+    button?.click();
+    await vi.waitFor(() => expect(isLockLayerShown()).toBe(true));
+    expect(calls.map((call) => `${call.method} ${call.path}`)).toContain("POST /api/app-lock/lock");
+  });
 });

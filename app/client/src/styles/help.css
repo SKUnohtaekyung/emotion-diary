@@ -6,15 +6,6 @@
   text-decoration: none;
 }
 
-/* '검토 전' 표기: 숨기거나 작게 묻지 않는다 — 본문 크기·본문 색 */
-.help-review {
-  color: var(--neutral-text);
-}
-
-.help-review strong {
-  font-weight: 700;
-}
-
 .help-section {
   display: flex;
   flex-direction: column;
@@ -63,13 +54,6 @@
   border-top: 0;
 }
 
-/* 출처 줄은 드물게 쓰는 자리라 선 없이 촘촘하게 */
-.help-source {
-  display: flex;
-  flex-direction: column;
-  padding: var(--space-2) 0;
-}
-
 .help-info {
   display: flex;
   flex-direction: column;
@@ -104,7 +88,7 @@
   flex: 1 1 8em;
 }
 
-/* 확인일·해외 안내·고지 */
+/* 해외 안내·고지 */
 .help-foot {
   display: flex;
   flex-direction: column;
@@ -113,29 +97,4 @@
   color: var(--neutral-text-muted);
   font-size: var(--text-label-size);
   line-height: var(--text-label-line);
-}
-
-/* 출처 링크: 기본 링크 색·밑줄을 쓰지 않고 본문 색에 옅은 밑줄. 터치 자리는 44px */
-.help-links {
-  display: flex;
-  flex-wrap: wrap;
-  column-gap: var(--space-4);
-}
-
-.help-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-1);
-  min-height: var(--size-touch-target-min);
-  color: var(--neutral-text);
-  font-size: var(--text-label-size);
-  line-height: var(--text-label-line);
-  text-decoration: underline;
-  text-decoration-color: var(--neutral-border-strong);
-  text-underline-offset: 0.2em;
-  overflow-wrap: anywhere;
-}
-
-.help-host {
-  color: var(--neutral-text-muted);
 }

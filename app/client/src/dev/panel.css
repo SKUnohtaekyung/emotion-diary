@@ -110,3 +110,15 @@
   overflow: hidden;
   pointer-events: none;
 }
+
+/* 하단 탐색이 보이는 화면(달력·통계·설정)에서는 상태 칸을 탐색 위로 올린다 — 모서리의 '설정' 칸을 가리지 않게(TASK-REFLECT-01 R-5, E2E가 잡음).
+   탐색 높이 = 알약 56 + 위아래 여백 8·8(흐림 띠는 눌리지 않아 겹쳐도 된다). */
+body:has(#bottom-nav:not([hidden])) .dev-panel {
+  bottom: calc(env(safe-area-inset-bottom) + 72px + var(--space-2));
+}
+
+/* 올린 상태 칸이 탐색 바로 위의 내용(달력의 '편지 열기' 등)을 가리지 않게, 그 높이만큼 #app 아래를 비운다 — 개발용 묶음에서만이다.
+   (운영 묶음에는 상태 칸이 없어 이 여백도 없다.) */
+body.has-dev-panel:has(#bottom-nav:not([hidden])) #app {
+  padding-bottom: calc(var(--keyboard-inset, 0px) + var(--size-touch-target-min) + var(--space-2));
+}

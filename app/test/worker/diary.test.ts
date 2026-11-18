@@ -2,7 +2,7 @@
 // 서버 길을 실제 요청 모양으로 부르고, 창고에 남은 행을 직접 세어 확인한다. 시각은 시험이 옮긴다(시작 2026-10-14 09:00 서울).
 import { readFileSync } from "node:fs";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
-import { diaryCompletePath, diaryPath, IDEMPOTENCY_HEADER, REPLAYED_HEADER, TIMEZONE_HEADER } from "../../shared/api";
+import { calendarPath, diaryCompletePath, diaryPath, diaryUncompletePath, IDEMPOTENCY_HEADER, REPLAYED_HEADER, TIMEZONE_HEADER } from "../../shared/api";
 import { DIARY_MAX_BODY_BYTES, EVENT_MAX_CHARS, REASON_MAX_CHARS, REFLECTION_MAX_CHARS } from "../../shared/diary";
 import { EMOTIONS } from "../../shared/taxonomy";
 import { cookieValue } from "../../worker/src/session";
@@ -71,6 +71,8 @@ const full = (overrides: Record<string, unknown> = {}) =>
 const save = (cookie: string, date: string, body: unknown, options: ApiOptions = {}) => api("PUT", diaryPath(date), { cookie, body, ...options });
 const complete = (cookie: string, date: string, revision: number, options: ApiOptions = {}) =>
   api("POST", diaryCompletePath(date), { cookie, body: { revision }, ...options });
+const uncomplete = (cookie: string, date: string, revision: number, options: ApiOptions = {}) =>
+  api("POST", diaryUncompletePath(date), { cookie, body: { revision }, ...options });
 const remove = (cookie: string, date: string, revision: number, options: ApiOptions = {}) => api("DELETE", diaryPath(date), { cookie, body: { revision }, ...options });
 const read = (cookie: string, date: string) => api("GET", diaryPath(date), { cookie });
 
@@ -206,6 +208,27 @@ describe("F-07 그날만 새로 쓰기, 지난 임시저장은 기한 없이 완
     expect(done.body).toMatchObject({ entryDate: TODAY, status: "completed", revision: 3, firstCompletedLocalDate: "2026-10-17" });
     const entry = await read(cookie, TODAY);
     expect(entry.body).toMatchObject({ entryDate: TODAY, firstCompletedLocalDate: "2026-10-17" });
+  });
+
+  it("오늘 화면의 첫 기록일은 처음 완료한 날(있었던 일 안내 단계, A-7) — 완료한 적이 없으면 null", async () => {
+    const cookie = await login(server);
+    await save(cookie, TODAY, draft({ eventText: "시작만 했다" }));
+    expect((await api("GET", "/api/today", { cookie })).body?.firstRecordDate).toBeNull();
+    await save(cookie, TODAY, full({ revision: 1 }));
+    expect((await complete(cookie, TODAY, 2)).status).toBe(200);
+    // 다른 주인의 기록은 세지 않는다
+    const allowlist = server.env.OWNER_ALLOWLIST;
+    server.env.OWNER_ALLOWLIST = "owner,other";
+    try {
+      expect((await api("GET", "/api/today", { cookie: await otherOwnerCookie() })).body?.firstRecordDate).toBeNull();
+    } finally {
+      server.env.OWNER_ALLOWLIST = allowlist;
+    }
+    server.clock.now += days(1);
+    const next = "2026-10-15";
+    await save(cookie, next, full());
+    expect((await complete(cookie, next, 1)).status).toBe(200);
+    expect((await api("GET", "/api/today", { cookie })).body?.firstRecordDate).toBe(TODAY);
   });
 
   it("없는 날·미래 날짜를 열면 404이고 새 기록을 만들지 않는다", async () => {
@@ -614,5 +637,57 @@ describe("요청 검사", () => {
     const reply = await save(cookie, TODAY.replace("14", "15"), full());
     expect(reply.status).toBe(201);
     expect(reply.cookie).toBeTruthy();
+  });
+});
+
+describe("완료 취소(TASK-JOURNAL-01 A-4) — 명시적 요청으로만 completed → draft", () => {
+  async function completed(cookie: string): Promise<void> {
+    expect((await save(cookie, TODAY, full())).status).toBe(201);
+    expect((await complete(cookie, TODAY, 1)).status).toBe(200);
+  }
+
+  it("임시저장이 되고 판 번호 +1, 완료 시각은 비우고 첫 완료일은 그대로 — 다시 이어 쓰면 편지부터, 다시 남기면 완료", async () => {
+    const cookie = await login(server);
+    await completed(cookie);
+    const back = await uncomplete(cookie, TODAY, 2);
+    expect(back.status).toBe(200);
+    expect(back.body).toMatchObject({ status: "draft", revision: 3, completedAt: null, firstCompletedLocalDate: TODAY });
+    const entry = await read(cookie, TODAY);
+    expect(entry.body).toMatchObject({ status: "draft", revision: 3, completedAt: null, firstCompletedLocalDate: TODAY, eventText: "친구와 오래 이야기했다", resume: { step: "letter" } });
+    // 달력에는 임시저장으로, 오늘 화면의 첫 기록일은 남는다
+    const month = await call(server, "GET", calendarPath("2026-10"), { cookie, headers: { [TIMEZONE_HEADER]: SEOUL } });
+    expect(((month.body?.days ?? []) as { date: string; status: string }[]).find((day) => day.date === TODAY)?.status).toBe("draft");
+    expect((await api("GET", "/api/today", { cookie })).body?.firstRecordDate).toBe(TODAY);
+    expect((await complete(cookie, TODAY, 3)).body).toMatchObject({ status: "completed", revision: 4, firstCompletedLocalDate: TODAY });
+  });
+
+  it("같은 열쇠로 다시 보내면 첫 응답 그대로·판 번호가 늘지 않는다, 열쇠가 없으면 400", async () => {
+    const cookie = await login(server);
+    await completed(cookie);
+    expect((await uncomplete(cookie, TODAY, 2, { key: null })).status).toBe(400);
+    const key = "uncomplete-key-000001";
+    const first = await uncomplete(cookie, TODAY, 2, { key });
+    const again = await uncomplete(cookie, TODAY, 2, { key });
+    expect(again.status).toBe(200);
+    expect(again.body).toEqual(first.body);
+    expect((await read(cookie, TODAY)).body?.revision).toBe(3);
+  });
+
+  it("다른 판 번호는 409(지금 판), 임시저장은 409 not_completed, 없는 날·남의 기록은 404", async () => {
+    const cookie = await login(server);
+    await completed(cookie);
+    expect((await uncomplete(cookie, TODAY, 1)).body).toEqual({ error: "revision_conflict", currentRevision: 2 });
+    expect((await uncomplete(cookie, TODAY, 2)).status).toBe(200);
+    expect((await uncomplete(cookie, TODAY, 3)).body).toMatchObject({ error: "not_completed" });
+    expect((await uncomplete(cookie, "2026-10-10", 1)).status).toBe(404);
+    expect((await complete(cookie, TODAY, 3)).status).toBe(200);
+    const allowlist = server.env.OWNER_ALLOWLIST;
+    server.env.OWNER_ALLOWLIST = "owner,other";
+    try {
+      expect((await uncomplete(await otherOwnerCookie(), TODAY, 4)).status).toBe(404);
+    } finally {
+      server.env.OWNER_ALLOWLIST = allowlist;
+    }
+    expect((await read(cookie, TODAY)).body?.status).toBe("completed");
   });
 });

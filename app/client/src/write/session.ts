@@ -24,6 +24,8 @@ export interface FlowSession {
   date: string;
   /** 서버가 센 오늘(이 글을 연 때) */
   today: string;
+  /** 처음 완료한 기록의 날(있었던 일 안내 단계, A-7). 모르거나 없으면 null */
+  firstRecordDate: string | null;
   mode: FlowMode;
   /** 서버 기록의 상태(아직 없는 새 글이면 null) */
   status: DiaryStatus | null;
@@ -36,6 +38,8 @@ export interface FlowSession {
   conflict: Conflict | null;
   /** 기기 사본에서 되살렸다 — 화면에 한 번 알린다 */
   restored: boolean;
+  /** 편지 카드의 '고치기'로 떠났으면 그 카드 자리 — 돌아오면 열린 편지의 그 카드로 연다(닫힌 봉투로 돌아오면 '남기기'가 짧은 봉인만 보였다, 2026-11-18 휴대폰 확인 B10) */
+  letterAt: number | null;
 }
 
 export type OpenResult =
@@ -175,6 +179,7 @@ export async function openSession(date: string): Promise<OpenResult> {
     id: newFlowId(),
     date,
     today,
+    firstRecordDate: todayResult.ok ? (todayResult.data.firstRecordDate ?? null) : null,
     mode: picked.mode,
     status: entry?.status ?? null,
     saver,
@@ -182,7 +187,8 @@ export async function openSession(date: string): Promise<OpenResult> {
     touched: picked.mode === "edit" && Boolean(copy),
     conflict: picked.conflict,
     // 살아 있는 저장 줄(화면을 떠났다 다시 연 것)은 되살린 것이 아니다
-    restored: !live && Boolean(copy) && !picked.conflict
+    restored: !live && Boolean(copy) && !picked.conflict,
+    letterAt: null
   };
   sessions.set(date, session);
   if (live?.status().state === "conflict") {
@@ -221,7 +227,8 @@ export function takeServer(session: FlowSession): FlowSession | null {
     serverStep: resumeKey(entry.resume),
     touched: false,
     conflict: null,
-    restored: false
+    restored: false,
+    letterAt: null
   };
   sessions.set(session.date, next);
   return next;

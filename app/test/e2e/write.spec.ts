@@ -1,7 +1,7 @@
 // 작성 흐름 E2E(TASK-SLICE-01 PLAN §6). 실제 브라우저(WebKit·Chromium)와 로컬 서버(로컬 D1)로 끝까지 간다.
 // 글은 모두 시험용 가짜 문장이다.
 import { expect, test } from "@playwright/test";
-import { freshToday, next, nextBlocked, serverEntry, todayDate, waitSaved } from "./helpers";
+import { freshToday, next, nextBlocked, pickFeeling, serverEntry, todayDate, waitSaved } from "./helpers";
 
 test.describe("⑤ 한 편 쓰고 남기고 다시 열기(F-03·F-04)", () => {
   test("사건 → 마음 둘 → 세부 감정 → 크기 → 이유 → 칭찬·감사 비움 → 편지 → 남기기 → 완료 → 기록 보기", async ({ page }) => {
@@ -17,8 +17,8 @@ test.describe("⑤ 한 편 쓰고 남기고 다시 열기(F-03·F-04)", () => {
     await next(page);
 
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("오늘은 어떤 마음이 머물렀나요?");
-    await page.getByRole("button", { name: "슬픔" }).click();
-    await page.getByRole("button", { name: "기쁨" }).click();
+    await pickFeeling(page, "슬픔");
+    await pickFeeling(page, "기쁨");
     await expect(page.locator(".write-progress")).toHaveText("2 / 9");
     await next(page);
 
@@ -76,7 +76,7 @@ test.describe("① 강제 새로고침 뒤 쓰던 단계·내용(F-24, e2e-reloa
     await page.getByRole("button", { name: "오늘의 마음 남기기" }).click();
     await page.getByLabel("무슨 일이 있었나요?").fill("가짜 사건: 새로고침 시험");
     await next(page);
-    await page.getByRole("button", { name: "분노" }).click();
+    await pickFeeling(page, "분노");
     await next(page);
     await page.locator(".choice-pill").first().click();
     await next(page);

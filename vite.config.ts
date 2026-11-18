@@ -1,4 +1,4 @@
-// 화면 빌드(D-114 — 도구 없이 TypeScript, Vite는 묶기만 한다).
+// 화면 빌드. 처음엔 도구 없이 TypeScript(D-114)였고 2026-11-11부터 Preact(D-127) — JSX는 Vite 8의 oxc가 바꾼다(TASK-REFLECT-01 A-2).
 // mode는 dev 또는 prod다. 개발용 전용 코드(상태 칸·오류 보고)는 __APP_ENV__로 갈라 운영 묶음에서 빠진다(D-115 ②).
 // 빌드 번호는 app/scripts/build.mjs가 APP_BUILD로 넘긴다 — 같은 번호가 서버 묶음에도 들어간다(D-115 ④).
 import { readFileSync, writeFileSync } from "node:fs";
@@ -45,6 +45,8 @@ export default defineConfig(({ mode }) => {
       __APP_ENV__: JSON.stringify(mode),
       __APP_BUILD__: JSON.stringify(process.env.APP_BUILD ?? "local")
     },
+    // .tsx의 JSX를 Preact의 jsx 함수로(자동 런타임). @preact/preset-vite는 @babel/core를 함께 요구해 쓰지 않는다.
+    oxc: { jsx: { runtime: "automatic", importSource: "preact" } },
     plugins: [appName(mode, outDir)],
     build: {
       outDir,

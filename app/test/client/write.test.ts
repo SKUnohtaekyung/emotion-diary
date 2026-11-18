@@ -15,6 +15,7 @@ import { clearToasts } from "../../client/src/ui/toast";
 import { renderDone } from "../../client/src/views/done";
 import { renderRecord } from "../../client/src/views/record";
 import { renderWrite } from "../../client/src/views/write";
+import { guideStage, stepCopy } from "../../client/src/views/write/steps";
 import { emptyDiary, withText } from "../../client/src/write/flow";
 import { resumeSaving } from "../../client/src/write/lifecycle";
 import { resetSaversForTest } from "../../client/src/write/saver";
@@ -66,8 +67,11 @@ const meta = (revision: number, status: "draft" | "completed" = "draft"): FakeRe
 interface Server {
   entry: DiaryEntryView | null;
   today?: string;
+  /** 처음 완료한 기록의 날(있었던 일 안내 단계) */
+  first?: string | null;
   put?: (request: FakeRequest) => FakeReply | "offline";
   complete?: (request: FakeRequest) => FakeReply | "offline";
+  uncomplete?: (request: FakeRequest) => FakeReply | "offline";
   del?: (request: FakeRequest) => FakeReply | "offline";
   /** 그날 기록 조회를 대신한다(없으면 entry로 200·404) */
   get?: (request: FakeRequest) => FakeReply | "offline";
@@ -76,8 +80,9 @@ interface Server {
 function serve(server: Server): FakeRequest[] {
   return stubFetch((request) => {
     if (request.path === "/api/today") {
-      return { status: 200, body: { date: server.today ?? TODAY, timezone: "Asia/Seoul", dayStartHour: 4, entry: null, pastDraft: null } };
+      return { status: 200, body: { date: server.today ?? TODAY, timezone: "Asia/Seoul", dayStartHour: 4, entry: null, pastDraft: null, firstRecordDate: server.first ?? null } };
     }
+    if (request.path.endsWith("/uncomplete")) return server.uncomplete?.(request) ?? meta((server.entry?.revision ?? 0) + 1);
     if (request.path.endsWith("/complete")) return server.complete?.(request) ?? meta((server.entry?.revision ?? 0) + 1, "completed");
     if (request.path.startsWith("/api/diaries/")) {
       if (request.method === "GET") {
@@ -99,7 +104,11 @@ async function open(hash: string): Promise<void> {
 
 const buttons = () => [...document.querySelectorAll<HTMLButtonElement>("button")];
 const byText = (text: string) => buttons().find((button) => button.textContent === text);
-const sheetButton = (text: string) => [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find((b) => b.textContent === text);
+/** 시트의 버튼 — 메뉴 줄은 이름 + 작은 설명이라 이름으로 시작하는 줄도 찾는다 */
+const sheetButton = (text: string) =>
+  [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find(
+    (b) => b.textContent === text || (b.classList.contains("menu-row") && b.firstElementChild?.firstChild?.textContent === text)
+  );
 const heading = () => document.querySelector("h1")?.textContent;
 
 beforeEach(() => {
@@ -127,7 +136,7 @@ afterEach(() => {
 });
 
 describe("단계와 이동", () => {
-  it("새 글은 있었던 일부터, 진행 표시는 '1 / 7'과 progressbar, 아래 고정 줄이 없다(U-1)", async () => {
+  it("새 글은 있었던 일부터, 진행 표시는 '1 / 7'과 progressbar, 아래 고정 줄이 없다(U-1), 첫 단계엔 '이전' 없이 ×가 나가기", async () => {
     serve({ entry: null });
     await open(`#/write/${TODAY}?step=event`);
     expect(heading()).toBe("오늘 있었던 일");
@@ -139,7 +148,30 @@ describe("단계와 이동", () => {
     // 버튼 줄은 글 칸 뒤, 같은 화면 흐름 안에 있다
     const nav = document.querySelector(".write-nav");
     expect(nav?.previousElementSibling?.querySelector("textarea#event")).not.toBeNull();
-    expect(byText("그만두기")).toBeDefined();
+    expect(byText("이전")).toBeUndefined();
+    expect(byText("그만두기")).toBeUndefined();
+    expect(document.querySelector('[aria-label="닫기"]')).not.toBeNull();
+  });
+
+  it("있었던 일 안내는 첫 기록일부터 지난 날로 네 단계 — 없으면 ①, 30일 ②, 90일 넘으면 ④(A-7)", async () => {
+    serve({ entry: null });
+    await open(`#/write/${TODAY}?step=event`);
+    expect(document.querySelector(".guide-slot .lede")?.textContent).toBe("잘 쓰지 않아도 괜찮아요. 기억나는 장면 하나부터 적어 보세요.");
+    // 자리표시자가 사라져도 다시 들을 수 있는 안내(D-099 K1)
+    expect(document.getElementById("event")?.getAttribute("placeholder")).toBe("있었던 일을 떠오르는 대로 적어요.");
+    expect(document.getElementById("event-help")?.textContent).toBe("있었던 일을 떠오르는 대로 적어요.");
+    expect(guideStage(null, TODAY)).toBe(0);
+    expect(guideStage("2026-09-17", "2026-10-16")).toBe(0);
+    expect(guideStage("2026-09-16", "2026-10-16")).toBe(1);
+    expect(guideStage("2026-08-17", "2026-10-16")).toBe(2);
+    expect(guideStage("2026-07-01", "2026-10-16")).toBe(3);
+    expect(stepCopy({ step: "event", category: null }, "그날", 3).guide).toBe("그날 남은 장면을 적어 보세요.");
+  });
+
+  it("서버가 알린 첫 기록일이 오래됐으면 그 단계의 안내를 보인다", async () => {
+    serve({ entry: null, first: "2026-07-01" });
+    await open(`#/write/${TODAY}?step=event`);
+    expect(document.querySelector(".guide-slot .lede")?.textContent).toBe("오늘 남은 장면을 적어 보세요.");
   });
 
   it("막힌 '다음'은 흐리되 초점을 받고, 누르면 ink 안내 한 줄과 읽어 주기 — 다음 단계로 가지 않는다(D-098 ③)", async () => {
@@ -157,6 +189,7 @@ describe("단계와 이동", () => {
     const area = document.getElementById("event") as HTMLTextAreaElement;
     area.value = FAKE;
     area.dispatchEvent(new Event("input"));
+    await flush(); // Preact는 바뀐 값을 다음 차례에 그린다
     expect(byText("다음")?.getAttribute("aria-disabled")).toBe("false");
   });
 
@@ -164,12 +197,13 @@ describe("단계와 이동", () => {
     serve({ entry: null });
     await open(`#/write/${TODAY}?step=feelings`);
     expect(heading()).toBe("오늘은 어떤 마음이 머물렀나요?");
-    const sad = document.querySelector<HTMLButtonElement>('.choice-feeling[data-category="sadness"]');
+    const sad = document.querySelector<HTMLButtonElement>('.ff[data-category="sadness"]');
     sad?.click();
+    await flush();
     expect(sad?.getAttribute("aria-pressed")).toBe("true");
     expect(document.querySelector(".write-progress")?.textContent).toBe("2 / 8");
     await flush(40);
-    expect(document.getElementById("live")?.textContent).toBe("슬픔 선택됨, 지금 1개 선택");
+    expect(document.getElementById("live")?.textContent).toBe("설이, 슬픔 선택됨, 지금 1개 선택");
     byText("다음")?.click();
     expect(location.hash).toBe(`#/write/${TODAY}?step=details&c=sadness`);
     expect(currentFlow()?.depth).toBe(2);
@@ -229,6 +263,7 @@ describe("저장", () => {
     const area = document.getElementById("reason") as HTMLTextAreaElement;
     area.value = "가짜 이유";
     area.dispatchEvent(new Event("input"));
+    await flush(); // 상태 줄이 '저장 중…'으로 바뀐 뒤부터 기다린다(Preact는 다음 차례에 그린다)
     await vi.waitFor(() => expect(document.querySelector(".save-status")?.textContent).toBe("아직 저장 안 됨 · 연결되면 저장해요"), {
       timeout: 3000
     });
@@ -349,8 +384,11 @@ describe("남기기·고치기·지우기", () => {
     });
     const calls = serve({ entry: full });
     await open(`#/write/${TODAY}?step=letter`);
+    const depthOne = history.length;
     byText("남기기")?.click();
     await vi.waitFor(() => expect(heading()).toBe("오늘의 마음을 남겼어요"), { timeout: 3000 });
+    // 흐름 칸(깊이 1)을 되감은 뒤 완료 칸 하나만 — 쌓으면 뒤로 밀기가 끝난 단계로 돌아간다(F-18, 2026-11-12 결함 주입에서 이 확인이 빠져 있었다)
+    expect(history.length).toBeLessThanOrEqual(depthOne);
     const complete = calls.find((call) => call.path.endsWith("/complete"));
     expect(complete?.body).toEqual({ revision: expect.any(Number) });
     expect(complete?.headers["idempotency-key"]).toBeTruthy();
@@ -448,13 +486,13 @@ describe("마감 검토 지적(2026-10-16)", () => {
     expect(puts[1]?.body).toMatchObject({ revision: 1, reasonText: "가짜 이유: 뒤에 더 씀" });
   });
 
-  it("L-1 고치기 흐름의 첫 칸에서 '그만두기'도 고친 것이 있으면 한 번 묻는다", async () => {
+  it("L-1 고치기 흐름의 첫 칸에서 ×도 고친 것이 있으면 한 번 묻는다", async () => {
     serve({ entry: entry({ status: "completed", reasonText: "가짜 이유" }) });
     await open(`#/write/${TODAY}?step=event`);
     const area = document.getElementById("event") as HTMLTextAreaElement;
     area.value = "가짜 고친 사건";
     area.dispatchEvent(new Event("input"));
-    byText("그만두기")?.click();
+    document.querySelector<HTMLButtonElement>('[aria-label="닫기"]')?.click();
     expect(document.querySelector(".sheet")?.textContent).toContain("고친 내용을 저장하지 않고 나갈까요?");
   });
 
@@ -475,7 +513,8 @@ describe("마감 검토 지적(2026-10-16)", () => {
     retry?.click();
     await vi.waitFor(() => expect(calls.filter((call) => call.method === "PUT").length).toBe(before + 1));
     await vi.waitFor(() => expect(document.querySelector(".save-status")?.textContent).toBe("저장됨 · 방금"));
-    expect(byText("다시 시도")?.hidden).toBe(true);
+    // 저장되면 '다시 시도'는 보이지 않는다(띠째 사라진다 — J-1 시안의 실패 띠)
+    expect(byText("다시 시도")?.hidden ?? true).toBe(true);
   });
 
   it("충돌 시트는 '바꾸기'를 고르면 이 휴대폰의 글이 사라진다는 것도 말한다(A-13)", async () => {
@@ -653,6 +692,43 @@ describe("기록 보기·완료", () => {
     expect(location.hash).toBe(`#/write/${TODAY}?step=reason`);
   });
 
+  it("기록 ⋯ 메뉴 — 완료 취소는 확인 뒤 본 판 번호로 보내고 달력의 그날로, 지우기는 두 번 묻는다(A-5·A-6)", async () => {
+    const calls = serve({ entry: entry({ status: "completed", revision: 5, reasonText: "가짜 이유" }) });
+    // 고치다 못 보낸 사본이 이 휴대폰에 있다 — 완료 취소는 그것을 지우지 않는다('쓴 내용은 지워지지 않아요', 2026-11-12 마감 검토 1)
+    writeUnsent({ v: 1, date: TODAY, mode: "edit", baseRevision: 5, diary: withText(emptyDiary(), "eventText", "가짜 고치던 글"), step: { step: "reason", category: null }, pending: null, savedAt: 1 });
+    history.replaceState(null, "", `/#/record/${TODAY}`);
+    render();
+    await flush(20);
+    document.querySelector<HTMLButtonElement>('.record-more[aria-label="더보기"]')?.click();
+    await flush();
+    expect(document.querySelector(".sheet")?.textContent).toContain("10월 16일의 편지");
+    sheetButton("완료 취소")?.click();
+    await flush();
+    expect(document.querySelector(".sheet")?.textContent).toContain("통계에서 빠져요. 쓴 내용은 지워지지 않아요.");
+    sheetButton("완료 취소")?.click();
+    await vi.waitFor(() => expect(location.hash).toBe(`#/calendar?d=${TODAY}`));
+    const sent = calls.find((call) => call.path.endsWith("/uncomplete"));
+    expect(sent?.body).toEqual({ revision: 5 });
+    expect(sent?.headers["idempotency-key"]).toBeTruthy();
+    expect(readUnsent(TODAY)?.diary.eventText).toBe("가짜 고치던 글");
+
+    history.replaceState(null, "", `/#/record/${TODAY}`);
+    render();
+    await flush(20);
+    document.querySelector<HTMLButtonElement>(".record-more")?.click();
+    await flush();
+    sheetButton("지우기")?.click();
+    await flush();
+    expect(document.querySelector(".sheet")?.textContent).toContain("기록을 지울까요?");
+    sheetButton("지우기")?.click();
+    await flush();
+    expect(document.querySelector(".sheet")?.textContent).toContain("정말 지울까요?");
+    expect(calls.some((call) => call.method === "DELETE")).toBe(false);
+    sheetButton("지우기")?.click();
+    await vi.waitFor(() => expect(location.hash).toBe("#/calendar"));
+    expect(calls.find((call) => call.method === "DELETE")?.body).toEqual({ revision: 5 });
+  });
+
   it("없는 날짜의 편지는 안내, 임시저장이면 이어 쓰기로", async () => {
     serve({ entry: null });
     history.replaceState(null, "", "/#/record/2026-10-01");
@@ -673,6 +749,12 @@ describe("기록 보기·완료", () => {
     history.replaceState(null, "", "/#/done/2026-10-15?day=past");
     render();
     expect(heading()).toBe("그날의 마음을 남겼어요");
-    expect(byText("그날의 기록 보기")).toBeDefined();
+    // 아래는 같은 폭 두 버튼 — 달력 보기(그날을 고른 채)·통계 보기(D-078)
+    byText("달력 보기")?.click();
+    expect(location.hash).toBe("#/calendar?d=2026-10-15");
+    history.replaceState(null, "", "/#/done/2026-10-15?day=past");
+    render();
+    byText("통계 보기")?.click();
+    expect(location.hash).toBe("#/stats");
   });
 });

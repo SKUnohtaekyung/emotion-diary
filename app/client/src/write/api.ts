@@ -1,7 +1,8 @@
 // 일기 요청(ARCHITECTURE §5, app/shared/diary.ts). 시간대 머리글은 늘, 영수증 열쇠는 바꾸는 요청에 붙인다.
 // 다시 보낼 때는 부른 쪽이 같은 열쇠를 넘긴다(ARCHITECTURE §4.1) — 여기서 열쇠를 만들지 않는다.
 
-import { API, diaryCompletePath, diaryPath, IDEMPOTENCY_HEADER, TIMEZONE_HEADER } from "../../../shared/api";
+import { API, diaryCompletePath,
+  diaryUncompletePath, diaryPath, IDEMPOTENCY_HEADER, TIMEZONE_HEADER } from "../../../shared/api";
 import type { DiaryEntryView, DiaryInput, DiaryMeta, TodayInfo } from "../../../shared/diary";
 import { type ApiResult, request } from "../lib/api";
 
@@ -35,6 +36,15 @@ export function putDiary(date: string, body: DiaryInput, key: string): Promise<A
   return request<DiaryMeta>("PUT", diaryPath(date), {
     body,
     headers: { ...zoneHeader(), [IDEMPOTENCY_HEADER]: key },
+    timeoutMs: SAVE_TIMEOUT_MS
+  });
+}
+
+/** 완료 취소(A-4) — 같은 열쇠로 다시 보내면 첫 응답을 받는다 */
+export function uncompleteDiaryRequest(date: string, revision: number, key: string): Promise<ApiResult<DiaryMeta>> {
+  return request<DiaryMeta>("POST", diaryUncompletePath(date), {
+    body: { revision },
+    headers: { [IDEMPOTENCY_HEADER]: key },
     timeoutMs: SAVE_TIMEOUT_MS
   });
 }

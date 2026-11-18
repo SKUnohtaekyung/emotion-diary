@@ -192,7 +192,13 @@ if (writes) {
   const readBack = await api("GET", `/api/diaries/${date}`, { headers: TZ });
   check("다시 열면 완료된 기록과 글", readBack.status === 200 && readBack.json?.status === "completed" && readBack.json?.eventText === DIARY);
   check("완료된 기록의 빈 이유로 고치기 422", (await api("PUT", `/api/diaries/${date}`, { body: { ...diaryBody, reasonText: " ", revision: 3 }, headers: { ...TZ, ...receipt() } })).status === 422);
-  check("기록 하나 지우기 200", (await api("DELETE", `/api/diaries/${date}`, { body: { revision: 3 }, headers: { ...TZ, ...receipt() } })).status === 200);
+  // 완료 취소(TASK-JOURNAL-01 A-4): 오래된 판 409 → 취소 200(임시저장·판 +1·첫 완료일 유지) → 임시저장을 또 취소하면 409 → 다시 완료
+  check("오래된 판 번호의 완료 취소 409", (await api("POST", `/api/diaries/${date}/uncomplete`, { body: { revision: 2 }, headers: receipt() })).status === 409);
+  const undone = await api("POST", `/api/diaries/${date}/uncomplete`, { body: { revision: 3 }, headers: receipt() });
+  check("완료 취소 200(임시저장·첫 완료일 유지)", undone.status === 200 && undone.json?.status === "draft" && undone.json?.revision === 4 && undone.json?.firstCompletedLocalDate === date);
+  check("임시저장의 완료 취소 409 not_completed", (await api("POST", `/api/diaries/${date}/uncomplete`, { body: { revision: 4 }, headers: receipt() })).json?.error === "not_completed");
+  check("다시 완료 200", (await api("POST", `/api/diaries/${date}/complete`, { body: { revision: 4 }, headers: { ...TZ, ...receipt() } })).status === 200);
+  check("기록 하나 지우기 200", (await api("DELETE", `/api/diaries/${date}`, { body: { revision: 5 }, headers: { ...TZ, ...receipt() } })).status === 200);
   check("지운 기록 404", (await api("GET", `/api/diaries/${date}`, { headers: TZ })).status === 404);
   const orphans = remoteRow("SELECT (SELECT count(*) FROM diary_categories) + (SELECT count(*) FROM diary_emotions) + (SELECT count(*) FROM diary_reflections) AS n");
   check("지운 뒤 딸린 행 0(연쇄 삭제)", orphans?.n === 0, `실측: ${orphans?.n}`);

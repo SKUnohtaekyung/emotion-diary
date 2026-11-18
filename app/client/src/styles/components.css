@@ -1,17 +1,23 @@
 /* 버튼·입력·스위치·시트·알림. 터치 자리는 44px 이상, 초점 링은 neutral.focus, 비활성은 투명도가 아니라 색을 섞어 표현한다(state.disabled). */
+/* 버튼(DESIGN_SYSTEM §6.1, D-098·D-099 — 시안 무드 v4로 맞춤, TASK-REFLECT-01 R-1): 눌리는 것은 ink 알약 하나(주), 보조는 옅은 회색 면,
+   굵은 윤곽 없음, 높이 48. 누름(97%)·움직임 줄이기의 옅은 면은 v4.css. 비활성은 투명도가 아니라 바탕에서 섞은 색(state.disabled). */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: var(--size-touch-target-min);
-  padding: 0 var(--space-5);
-  border: 1px solid var(--neutral-border-strong);
-  border-radius: var(--radius-control);
-  background: var(--neutral-bg);
-  color: var(--neutral-text);
+  gap: var(--space-2);
+  min-height: 48px;
+  padding: 0 var(--space-6);
+  border: 0;
+  border-radius: var(--radius-chip);
+  /* 종류를 붙이지 않은 버튼은 보조(옅은 회색 면)로 보인다 — 지금 있는 '다시 시도'·'남은 글 보기'·크기 −/+ 등이 글자만 남지 않게(마감 검토 4) */
+  background: var(--neutral-surface-soft);
+  color: var(--service-ink);
+  font-size: var(--text-body-size);
   font-weight: 600;
   cursor: pointer;
   text-align: center;
+  touch-action: manipulation;
 }
 
 .btn-block {
@@ -20,26 +26,32 @@
 }
 
 .btn-primary {
-  border-color: var(--service-ink);
   background: var(--service-ink);
   color: var(--neutral-bg);
 }
 
 .btn-quiet {
-  border-color: var(--neutral-border);
-  background: var(--neutral-bg);
+  background: var(--neutral-surface-soft);
+  color: var(--service-ink);
+}
+
+.btn-danger {
+  background: var(--semantic-danger);
+  color: var(--neutral-bg);
 }
 
 .btn-small {
+  min-height: var(--size-touch-target-min);
   padding: 0 var(--space-4);
   font-size: var(--text-label-size);
 }
 
-.btn:disabled,
-.btn[aria-disabled="true"] {
-  border-color: color-mix(in srgb, var(--neutral-bg), var(--service-ink) 12%);
-  background: color-mix(in srgb, var(--neutral-bg), var(--service-ink) 12%);
-  color: color-mix(in srgb, var(--neutral-bg), var(--service-ink) 50%);
+/* 면이 있는 주 버튼은 면 = 바탕+ink 12%, 글자 = 바탕+ink 50%. 옅은 회색 면 버튼은 면을 그대로 두고 글자만 바꾼다(시안 base.css와 같은 규칙) */
+.btn:is(.btn-primary, .btn-danger):is(:disabled, [aria-disabled="true"]) {
+  background: color-mix(in srgb, var(--service-ink) 12%, var(--state-bg, var(--neutral-bg)));
+}
+.btn:is(:disabled, [aria-disabled="true"]) {
+  color: color-mix(in srgb, var(--service-ink) 50%, var(--state-bg, var(--neutral-bg)));
   cursor: default;
 }
 
@@ -252,6 +264,96 @@
   width: 100%;
 }
 
+/* 손잡이와 올라오기(시안 base.css .sheet-grab·sheet-up, DESIGN_SYSTEM §6.11) — 움직임 줄이기면 그냥 나타난다 */
+.sheet-grab {
+  display: block;
+  width: 40px;
+  height: 5px;
+  margin: calc(var(--space-3) * -1) auto 0;
+  border-radius: 3px;
+  background: var(--neutral-border-strong);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .sheet-layer {
+    animation: sheet-dim-in var(--dur-base) var(--ease);
+  }
+  .sheet {
+    animation: sheet-up var(--dur-slow) var(--ease);
+  }
+}
+
+@keyframes sheet-dim-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(24px);
+    opacity: 0;
+  }
+}
+
+/* 메뉴 줄 — 이름 + 작은 설명, 줄 전체가 누르는 자리(시안 base.css .menu-row, D-098 ① 줄 모양 누름) */
+.sheet-menu {
+  display: flex;
+  flex-direction: column;
+}
+
+.menu-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 60px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  text-align: left;
+  font-size: var(--fs-heading);
+  line-height: var(--lh-heading);
+  font-weight: var(--fw-heading);
+  cursor: pointer;
+}
+
+.menu-row small {
+  display: block;
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  font-weight: var(--fw-body);
+  color: var(--muted);
+}
+
+.menu-row.danger {
+  color: var(--danger);
+}
+
+.menu-row::after {
+  content: "";
+  position: absolute;
+  inset: 0 -10px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--service-ink) 6%, transparent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.menu-row:active::after {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .menu-row {
+    transition: transform var(--dur-fast) var(--ease);
+  }
+  .menu-row:active {
+    transform: scale(0.985);
+  }
+}
+
 /* 알림 */
 .toast {
   position: fixed;
@@ -269,11 +371,29 @@
 }
 
 /* 덮개(D-113 ①): 앱을 떠나는 순간 숲 색으로 덮는다. 모든 것 위에 있다. */
-.cover {
+/* 덮개(ui/cover.ts): 숨은 채로 미리 그려 두고 .cover만 붙였다 뗀다(A-9) — display:none이 아니라 visibility라 그림이 이미 준비돼 있다 */
+.cover-layer {
   position: fixed;
   inset: 0;
   z-index: 100;
+  overflow: hidden;
   background: var(--forest-sky);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.cover-layer.cover {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.cover-art {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: max(100%, calc(100dvh * 360 / 744));
+  height: auto;
+  transform: translateX(-50%);
 }
 
 /* 내보내기·모든 기록 지우기(data-control) — 박스 없이 글 묶음과 목록으로만 나눈다 */

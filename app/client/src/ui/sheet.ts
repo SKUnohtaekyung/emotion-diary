@@ -7,7 +7,10 @@ import { focusElement, h, inertOutside, setInert } from "../lib/dom";
 
 export interface SheetAction {
   label: string;
-  kind?: "primary" | "quiet";
+  /** danger = 빨간 주 버튼(지우기 같은 되돌릴 수 없는 일 — DESIGN_SYSTEM §6.11 위험 시트). 메뉴 줄이면 이름만 빨강 */
+  kind?: "primary" | "quiet" | "danger";
+  /** 있으면 메뉴 줄(이름 + 작은 설명)로 그린다 — 작성·기록의 ⋯ 메뉴(UX_SPEC §4·§7, 시안 base.css .menu-row) */
+  detail?: string;
   /** 시트가 닫힌 다음에 부른다. 없으면 닫기만 한다. */
   onClick?: () => void | Promise<void>;
 }
@@ -84,25 +87,35 @@ export function openLayer(id: string, node: HTMLElement, opener?: HTMLElement | 
 export function openSheet(options: SheetOptions): void {
   sequence += 1;
   const titleId = `sheet-title-${sequence}`;
-  const buttons = options.actions.map((action) => {
-    const button = h("button", {
-      type: "button",
-      class: `btn ${action.kind === "primary" ? "btn-primary" : "btn-quiet"}`,
-      text: action.label
-    });
+  const rows: HTMLButtonElement[] = [];
+  const buttons: HTMLButtonElement[] = [];
+  for (const action of options.actions) {
+    const button = action.detail
+      ? h(
+          "button",
+          { type: "button", class: `menu-row${action.kind === "danger" ? " danger" : ""}` },
+          h("span", {}, action.label, h("small", { text: action.detail }))
+        )
+      : h("button", {
+          type: "button",
+          class: `btn ${action.kind === "primary" ? "btn-primary" : action.kind === "danger" ? "btn-danger" : "btn-quiet"}`,
+          text: action.label
+        });
     button.addEventListener("click", () => {
       void (async () => {
         await closeSheet();
         await action.onClick?.();
       })();
     });
-    return button;
-  });
+    (action.detail ? rows : buttons).push(button);
+  }
   const panel = h(
     "div",
     { class: "sheet", role: "dialog", "aria-modal": "true", "aria-labelledby": titleId },
+    h("i", { class: "sheet-grab", "aria-hidden": "true" }),
     h("h2", { id: titleId, class: "sheet-title", text: options.title }),
     ...(options.body ?? []).map((line) => h("p", { class: "sheet-body", text: line })),
+    rows.length ? h("div", { class: "sheet-menu" }, ...rows) : null,
     h("div", { class: "sheet-actions" }, ...buttons)
   );
   const layer = h("div", { class: "sheet-layer", "data-sheet": options.id }, panel);

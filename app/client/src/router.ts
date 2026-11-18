@@ -8,6 +8,7 @@ import { type ParsedRoute, guardRoute, parseHash } from "./lib/routes";
 import { KEYS, readStored, writeStored } from "./lib/storage";
 import { routeNameOf } from "./lib/errorInfo";
 import { app } from "./state";
+import { syncBottomNav } from "./ui/bottomNav";
 import { isCrashed } from "./ui/crash";
 import { consumeSheetPop } from "./ui/sheet";
 
@@ -91,6 +92,7 @@ export function render(): void {
   root.replaceChildren();
   root.removeAttribute("aria-busy");
   root.setAttribute("data-route", route.name);
+  syncBottomNav(route.name);
 
   const view = views.get(route.name);
   if (!view) return;

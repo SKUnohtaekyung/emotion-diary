@@ -7,6 +7,7 @@ import { emit } from "../../client/src/lib/probe";
 import { currentFlow, registerViews, render, resetRouterForTest, startRouter, type ViewContext } from "../../client/src/router";
 import { app } from "../../client/src/state";
 import { hideLockLayer } from "../../client/src/ui/lockLayer";
+import { confirmLogout } from "../../client/src/ui/logout";
 import { resetSheetsForTest } from "../../client/src/ui/sheet";
 import { clearToasts } from "../../client/src/ui/toast";
 import { renderToday } from "../../client/src/views/today";
@@ -73,12 +74,16 @@ afterEach(() => {
 
 const buttons = () => [...document.querySelectorAll<HTMLButtonElement>("button")];
 const byText = (text: string) => buttons().find((button) => button.textContent === text);
+/** 숲 가운데 돌 — 상태마다 이름이 다르다(J-7). 누르면 조약돌이 켜지고 흰빛이 퍼진 뒤 다음 화면으로 */
+const stone = (label: string) => document.querySelector<HTMLButtonElement>(`.stone[aria-label="${label}"]`);
 
 async function openToday(reply: FakeReply | "offline" | ((path: string) => FakeReply | "offline")) {
   const calls = stubFetch((request) => (typeof reply === "function" ? reply(request.path) : reply));
   history.replaceState(null, "", "/#/today");
   render();
   await flush(10);
+  // 숲은 오늘 기록을 확인한 뒤에야 상태를 그린다(Preact는 다음 차례에 그린다) — 바쁠 때도 확인이 끝날 때까지 기다린다
+  await vi.waitFor(() => expect(document.querySelector(".forest.loading")).toBeNull());
   return calls;
 }
 
@@ -88,8 +93,8 @@ describe("오늘 — 상태", () => {
     expect(document.querySelector(".today-date")?.textContent).toBe("10월 16일 금요일");
     expect(document.querySelector("h1")?.textContent).toBe("오늘은 어떤 마음이 머물렀나요?");
     expect(calls[0]?.headers["x-timezone"]).toBeTruthy();
-    byText("오늘의 마음 남기기")?.click();
-    expect(location.hash).toBe(`#/write/${TODAY}?step=event`);
+    stone("오늘의 마음 남기기")?.click();
+    await vi.waitFor(() => expect(location.hash).toBe(`#/write/${TODAY}?step=event`), { timeout: 3000 });
     expect(currentFlow()?.depth).toBe(1);
     // 화면 아래 고정 버튼 줄이 없다(U-1)
     expect(document.querySelector(".bottom-bar")).toBeNull();
@@ -98,15 +103,17 @@ describe("오늘 — 상태", () => {
   it("이어 쓰기: 쓰던 단계 칩, 누르면 그 단계로", async () => {
     await openToday(todayReply({ entry: summary({ resume: { step: "details", categoryCode: "sadness" }, categories: ["sadness"] }) }));
     expect(document.querySelector(".today-chip")?.textContent).toBe("슬픔 세부 감정 중 · 임시저장됨");
-    byText("이어서 써요")?.click();
-    expect(location.hash).toBe(`#/write/${TODAY}?step=details&c=sadness`);
+    stone("이어서 써요")?.click();
+    await vi.waitFor(() => expect(location.hash).toBe(`#/write/${TODAY}?step=details&c=sadness`), { timeout: 3000 });
   });
 
   it("기록 있음: 새로 만들지 않고 그 기록을 연다", async () => {
     await openToday(todayReply({ entry: summary({ status: "completed" }) }));
-    expect(byText("오늘의 마음 남기기")).toBeUndefined();
-    byText("오늘의 기록 보기")?.click();
-    expect(location.hash).toBe(`#/record/${TODAY}`);
+    expect(stone("오늘의 마음 남기기")).toBeNull();
+    // 기록이 있는 날 돌은 그날의 편지(읽기)를 연다(D-128) — 고른 계열의 조약돌만 켜진다
+    expect(document.querySelector(".forest")?.classList.contains("recorded")).toBe(true);
+    stone("오늘의 기록 보기")?.click();
+    await vi.waitFor(() => expect(location.hash).toBe(`#/record/${TODAY}`), { timeout: 3000 });
   });
 
   it("지난 날 쓰던 글 줄: 어제면 '어제', 더 지난 글은 날짜로 — 누르면 그 글을 이어 쓴다", async () => {
@@ -120,15 +127,16 @@ describe("오늘 — 상태", () => {
   it("연결이 끊기면 시작을 막고 다시 시도를 둔다 — 확인 없이 새로 시작하지 않는다(D-083 ①)", async () => {
     let online = false;
     const calls = await openToday(() => (online ? todayReply() : "offline"));
-    expect(byText("오늘의 마음 남기기")?.getAttribute("aria-disabled")).toBe("true");
+    expect(stone("오늘의 마음 남기기")?.getAttribute("aria-disabled")).toBe("true");
     expect(document.querySelector(".today-line")?.textContent).toBe("연결이 끊겼어요 · 연결되면 시작할 수 있어요");
-    byText("오늘의 마음 남기기")?.click();
+    stone("오늘의 마음 남기기")?.click();
+    await flush(10);
     expect(location.hash).toBe("#/today");
     online = true;
     byText("다시 시도")?.click();
     await flush(10);
     expect(calls).toHaveLength(2);
-    expect(byText("오늘의 마음 남기기")?.getAttribute("aria-disabled")).toBeNull();
+    expect(stone("오늘의 마음 남기기")?.getAttribute("aria-disabled")).toBeNull();
   });
 
   it("서버 오류면 '확인하지 못했어요'", async () => {
@@ -140,7 +148,7 @@ describe("오늘 — 상태", () => {
     writeUnsent({ v: 1, date: TODAY, mode: "draft", baseRevision: 2, diary: withText(emptyDiary(), "eventText", "가짜"), step: { step: "reason", category: null }, pending: null, savedAt: 1 });
     // 그날 기록 조회는 닿지 않게 둔다 — 배경 보내기는 닿지 못하면 다음 기회로 미룬다(오늘 화면만 본다)
     await openToday((path) => (path === "/api/today" ? todayReply({ entry: summary({ status: "completed", revision: 4 }) }) : "offline"));
-    expect(byText("오늘의 기록 보기")).toBeDefined();
+    expect(stone("오늘의 기록 보기")).not.toBeNull();
     expect(document.querySelector(".today-line")?.textContent).toBe("이 휴대폰에 보내지 못한 글이 남아 있어요");
     byText("남은 글 보기")?.click();
     expect(location.hash).toBe(`#/write/${TODAY}?step=reason`);
@@ -149,46 +157,27 @@ describe("오늘 — 상태", () => {
   it("서버에 없어도 이 휴대폰에 못 보낸 오늘 글이 있으면 이어 쓰기다(U-2)", async () => {
     writeUnsent({ v: 1, date: TODAY, mode: "draft", baseRevision: null, diary: withText(emptyDiary(), "eventText", "가짜"), step: { step: "feelings", category: null }, pending: null, savedAt: 1 });
     await openToday((path) => (path === "/api/today" ? todayReply() : { status: 404, body: { error: "not_found" } }));
-    expect(document.querySelector(".today-chip")?.textContent).toBe("마음 고르기 중 · 이 휴대폰에 잠시 보관 중");
+    await vi.waitFor(() => expect(document.querySelector(".today-chip")?.textContent).toBe("마음 고르기 중 · 이 휴대폰에 잠시 보관 중"));
   });
 });
 
-describe("오늘 — 아래 작은 줄", () => {
-  it("잠금이 켜져 있을 때만 '지금 잠그기'가 있고, 누르면 잠금을 청하고 잠금 층이 뜬다", async () => {
-    app.appLock = true;
-    const calls = stubFetch((request) => (request.path === "/api/today" ? todayReply() : { status: 204 }));
-    history.replaceState(null, "", "/#/today");
-    render();
-    byText("지금 잠그기")?.click();
-    await vi.waitFor(() => expect(document.getElementById("lock-layer")).not.toBeNull());
-    expect(calls.map((call) => `${call.method} ${call.path}`)).toContain("POST /api/app-lock/lock");
-    expect(app.locked).toBe(true);
-  });
-
-  it("앱 잠금은 하위 화면으로 push한다", async () => {
+describe("오늘 — 아래 줄을 걷었다(A-10)", () => {
+  it("아래 버튼 줄이 없고 '지난 기록' 알약이 달력으로 — 위기 안내·잠금·로그아웃은 설정에서", async () => {
     await openToday(todayReply());
-    const length = history.length;
-    byText("앱 잠금")?.click();
-    expect(location.hash).toBe("#/settings/lock");
-    expect(history.length).toBe(length + 1);
-  });
-
-  it("'도움이 필요할 때'는 줄의 맨 앞이고 다른 버튼과 같은 모양이며, 위기 안내로 push한다(TASK-PERSONAL-01 A-1)", async () => {
-    await openToday(todayReply());
-    const tools = [...document.querySelectorAll<HTMLButtonElement>(".today-tools button")];
-    expect(tools.map((button) => button.textContent)).toEqual(["도움이 필요할 때", "앱 잠금", "내 기록 내보내기", "모든 기록 지우기", "로그아웃"]);
-    const help = byText("도움이 필요할 때");
-    expect(help?.className).toBe("btn btn-quiet btn-small");
-    expect(help?.className).toBe(byText("앱 잠금")?.className);
-    const length = history.length;
-    help?.click();
-    expect(location.hash).toBe("#/help");
-    expect(history.length).toBe(length + 1);
+    expect(document.querySelector(".today-tools")).toBeNull();
+    expect(byText("도움이 필요할 때")).toBeUndefined();
+    expect(byText("지금 잠그기")).toBeUndefined();
+    expect(document.querySelector(".today-past")?.getAttribute("href")).toBe("#/calendar");
+    expect(document.querySelector(".today-past")?.textContent).toBe("지난 기록");
+    // 숲·조약돌은 장식, 돌 아래 문구는 돌 이름과 겹쳐 읽히지 않게 숨긴다
+    expect(document.querySelectorAll(".forest .pb").length).toBe(9);
+    expect([...document.querySelectorAll(".forest .pb img")].every((img) => img.getAttribute("alt") === "")).toBe(true);
+    expect(document.querySelector(".forest .cap")?.getAttribute("aria-hidden")).toBe("true");
   });
 
   it("로그아웃: 확인 시트 → DELETE /api/session → 열쇠 화면 replace + 토스트", async () => {
     const calls = await openToday((path) => (path === "/api/today" ? todayReply() : { status: 200, body: { ok: true } }));
-    byText("로그아웃")?.click();
+    confirmLogout(document.body);
     const sheet = document.querySelector(".sheet");
     expect(sheet?.textContent).toContain("로그아웃할까요?");
     [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find((b) => b.textContent === "로그아웃")?.click();
@@ -201,7 +190,7 @@ describe("오늘 — 아래 작은 줄", () => {
   it("못 보낸 글이 있으면 먼저 알리고, 그래도 로그아웃하면 이 휴대폰의 사본을 지운다(U-2)", async () => {
     writeUnsent({ v: 1, date: "2026-10-15", mode: "draft", baseRevision: 3, diary: withText(emptyDiary(), "eventText", "가짜"), step: null, pending: null, savedAt: 1 });
     await openToday((path) => (path === "/api/today" ? todayReply() : path.startsWith("/api/diaries") ? "offline" : { status: 200, body: {} }));
-    byText("로그아웃")?.click();
+    confirmLogout(document.body);
     expect(document.querySelector(".sheet")?.textContent).toContain("아직 보내지 못한 글이 있어요");
     [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find((b) => b.textContent === "그래도 로그아웃")?.click();
     await vi.waitFor(() => expect(location.hash).toBe("#/auth"));
@@ -211,7 +200,7 @@ describe("오늘 — 아래 작은 줄", () => {
 
   it("로그아웃이 연결 문제로 안 되면 로그인 상태를 그대로 두고 알린다", async () => {
     await openToday((path) => (path === "/api/today" ? todayReply() : "offline"));
-    byText("로그아웃")?.click();
+    confirmLogout(document.body);
     [...document.querySelectorAll<HTMLButtonElement>(".sheet button")].find((b) => b.textContent === "로그아웃")?.click();
     await vi.waitFor(() => expect(document.querySelector(".toast")?.textContent).toBe("인터넷에 연결되면 로그아웃할 수 있어요."));
     expect(app.authenticated).toBe(true);

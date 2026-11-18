@@ -1,7 +1,7 @@
 // 좁은 화면과 큰 글자(UX_SPEC §12): 360×640에서 화면을 200%로 키워도 가로 스크롤이 없고, 마음 이름이 잘리지 않으며,
 // 크기의 −/+는 44px 아래로 줄지 않고 패널 밖으로 나가지 않는다. 확대는 문서에 zoom 2를 주어 흉내 낸다(Safari의 페이지 확대와 같은 효과).
 import { expect, type Page, test } from "@playwright/test";
-import { freshToday, next } from "./helpers";
+import { freshToday, next, pickFeeling } from "./helpers";
 
 async function zoom(page: Page): Promise<void> {
   await page.evaluate(() => document.documentElement.style.setProperty("zoom", "2"));
@@ -31,11 +31,11 @@ test("200% 확대·360×640: 가로 스크롤 없음, 이름이 잘리지 않음
   await noSideScroll(page, "있었던 일");
   await next(page);
   await zoom(page);
-  await page.getByRole("button", { name: "즐거움" }).click();
+  await pickFeeling(page, "즐거움");
   await noSideScroll(page, "마음 고르기");
   const clipped = await page.evaluate(() =>
-    Array.from(document.querySelectorAll<HTMLElement>(".choice-feeling")).some((button) => {
-      const name = button.querySelector(".choice-name")?.getBoundingClientRect();
+    Array.from(document.querySelectorAll<HTMLElement>(".ff")).some((button) => {
+      const name = button.querySelector(".ff-nm")?.getBoundingClientRect();
       const box = button.getBoundingClientRect();
       return name !== undefined && (name.right > box.right + 0.5 || name.left < box.left - 0.5);
     })

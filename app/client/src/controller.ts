@@ -14,6 +14,7 @@ import { KEYS, readStored, removeStored, writeStored } from "./lib/storage";
 import { currentRouteName, navigate, render, startRouter } from "./router";
 import { app, fetchSession, markLoggedOut } from "./state";
 import { hideCover, isCovered } from "./ui/cover";
+import { dropSplash, finishSplash } from "./ui/splash";
 import { hideLockLayer, isLockLayerShown, showLockLayer } from "./ui/lockLayer";
 import { openSheet } from "./ui/sheet";
 import { showToast } from "./ui/toast";
@@ -144,6 +145,7 @@ export async function logout(): Promise<void> {
 // ───────── 시작 ─────────
 
 function showBootFailure(offline: boolean): void {
+  dropSplash(); // 로딩 화면이 오류 문구를 덮지 않게
   const root = document.getElementById("app");
   if (!root) return;
   const retry = h("button", { type: "button", class: "btn btn-primary", text: "다시 시도" });
@@ -200,6 +202,8 @@ export async function boot(): Promise<void> {
   startRouter();
   render();
   syncHeartbeat();
+  // 첫 화면을 그린 뒤 로딩 화면을 걷는다 — 오늘이면 숲이 오늘 숲 자리로 겹치고, 잠겼으면 잠금 층 위로 짧게 사라진다
+  void finishSplash(app.locked ? "lock" : (location.hash.replace(/^#\/?/, "").split(/[/?]/)[0] ?? ""));
 }
 
 // ───────── 다시 보일 때 ─────────

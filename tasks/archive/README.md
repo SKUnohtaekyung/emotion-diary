@@ -13,6 +13,8 @@
 
 | 파일 | 상태 | 남은 일이 간 곳 |
 | --- | --- | --- |
+| [TASK-REPLAN-01.md](TASK-REPLAN-01.md) 전체 순서 다시 세우기 | done(2026-11-11) — 결정 D-126~D-128 | 다음 작업 → TASK-REFLECT-01(`dashboard-reminder`) |
+| [TASK-PERSONAL-01.md](TASK-PERSONAL-01.md) personal-start(본인 사용 시작) | superseded(2026-11-11, D-126) — 운영 건물·`#/help`·자판 배치 C·첫 백업 복원까지 짓고 `main`에 반영(PR #45·#46). 관문 판정 없이 대체 | 지은 것은 공개 준비(`limited-mvp-release`)가 이어 쓴다 — 새 순서는 `tasks/replan/2026-11-11/PLAN.md` |
 | [TASK-SLICE-01.md](TASK-SLICE-01.md) first-slice('오늘 한 편' 첫 조각) | done(2026-10-20 — PR #40·#41 → `main` `b74242c`, CI 통과, 개발용 건물 `main` `d2ed814` 원격 검사, iPhone `mobile-slice`) — 관문 `first-slice` 통과, 결정 D-123 | 다음 작업 → TASK-PERSONAL-01(`tasks/CURRENT_TASK.md`). 자판이 뜰 때 상단 줄이 상태 막대와 겹치는 결함 → `tasks/first-slice/2026-10-16/PLAN.md` 5-12·`docs/STATUS.md` §4(언제 고칠지 사용자 결정 대기). 2026-10-20 옮김(원문 4,761B, SHA-256 앞 12자리 `57dabc32fe99`, 직전 커밋 `d2ed814`, 상대 링크 3개의 경로 깊이만 고침) |
 | [TASK-DATA-02.md](TASK-DATA-02.md) data-control(내 데이터 통제) | done(2026-10-17, 커밋 `eedc783`·`85ac8c9` — PR #43 → PR #42 → `main` `8416734`, CI 통과) — 관문 `data-control` 통과, 결정 D-124 | 남은 것: 작업 스케줄러 등록·운영 백업 토큰은 `personal-start`(U-3). 기록은 `tasks/data-control/2026-10-17/PLAN.md`. 2026-10-17 옮김(원문 1854B, SHA-256 앞 12자리 `37840c18d028`, 직전 커밋 `8416734`, 상대 링크의 경로 깊이만 고침) |
 | [TASK-DATA-01.md](TASK-DATA-01.md) data-foundation(저장 핵심) | done(2026-10-16, 커밋 `89c0017` — PR #38 → PR #37 → `main` `adb3d06`, 마감 정리 PR #39 → `main` `47ddd90`) — 관문 `data-integrity` 통과, 결정 D-122 | 다음 작업 → TASK-SLICE-01(`tasks/CURRENT_TASK.md`, `tasks/first-slice/2026-10-16/`), 내보내기·전체 삭제·백업 → `data-control`, F-22의 '작성 중 만료 시 입력을 잃지 않음' → `first-slice`. 2026-10-16 옮김(원문 3,471B, SHA-256 앞 12자리 `e2dfaafb4b78`, 직전 커밋 `47ddd90`, 상대 링크 1개의 경로 깊이만 고침) |

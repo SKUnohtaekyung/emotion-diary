@@ -3,6 +3,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import AxeBuilder from "@axe-core/playwright";
 import { expect, type Page } from "@playwright/test";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../../..");
@@ -78,12 +79,17 @@ export async function todayDate(page: Page): Promise<string> {
   });
 }
 
+/** 마음 고르기에서 그 계열의 친구를 누른다 — 언덕 위 친구의 이름은 "<친구>, <계열>"이다(시안 meadow.js). */
+export async function pickFeeling(page: Page, category: string): Promise<void> {
+  await page.getByRole("button", { name: new RegExp(`, ${category}$`) }).click();
+}
+
 /** 오늘 새 글: 사건 → 마음 하나(첫 세부 감정) → 크기 5 → 이유 단계까지. 이유 칸 앞에서 멈춘다. */
 export async function writeToReason(page: Page, category = "분노", event = "가짜 사건: 시험"): Promise<void> {
   await page.getByRole("button", { name: "오늘의 마음 남기기" }).click();
   await page.getByLabel("무슨 일이 있었나요?").fill(event);
   await next(page);
-  await page.getByRole("button", { name: category, exact: true }).click();
+  await pickFeeling(page, category);
   await next(page);
   await page.locator(".choice-pill").first().click();
   await next(page);
@@ -95,4 +101,25 @@ export async function writeToReason(page: Page, category = "분노", event = "�
 /** 저장 상태 줄이 '저장됨'이 될 때까지(서버가 받았다). */
 export async function waitSaved(page: Page): Promise<void> {
   await expect(page.locator(".save-status")).toHaveText(/^저장됨/, { timeout: 10_000 });
+}
+
+/**
+ * 자동 접근성 검사(axe — TASK-REFLECT-01 A-12, MAP R11). serious·critical 위반이 0이어야 한다.
+ * 실패하면 규칙 id와 걸린 요소를 그대로 보인다. 화면 낭독기 수동 확인을 대신하지 않는다(공개 관문 public-only).
+ */
+export async function expectNoSeriousA11y(page: Page): Promise<void> {
+  // 진입 연출(떠오르기·튀어 들어오기 — 끝이 있는 움직임)이 끝난 뒤에 잰다. 움직이는 중에는 투명도 때문에 대비가 낮게 재진다.
+  // 끝없는 움직임(숨쉬기·뼈대 깜빡임)은 기다리지 않는다.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((animation) => animation.effect?.getComputedTiming().iterations !== Number.POSITIVE_INFINITY)
+        .map((animation) => animation.finished.catch(() => undefined))
+    )
+  );
+  const result = await new AxeBuilder({ page }).analyze();
+  const serious = result.violations.filter((violation) => violation.impact === "serious" || violation.impact === "critical");
+  const report = serious.map((violation) => `${violation.id}: ${violation.nodes.map((node) => node.target.join(" ")).join(", ")}`);
+  expect(report, "axe serious·critical 위반").toEqual([]);
 }

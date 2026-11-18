@@ -97,7 +97,7 @@ function renderScope({ root, alive }: ViewContext): () => void {
   root.append(
     h(
       "section",
-      { class: "screen" },
+      { class: "screen settings-sub" },
       h("div", { class: "screen-top" }, backButton()),
       h("h1", { text: TEXT.title }),
       h("p", { class: "lede", text: TEXT.lede }),
@@ -187,7 +187,7 @@ function renderDone({ root }: ViewContext): () => void {
   root.append(
     h(
       "section",
-      { class: "screen" },
+      { class: "screen settings-sub" },
       h("h1", { text: TEXT.doneTitle }),
       sent ? h("p", { class: "data-filename", text: sent.name }) : null,
       h("p", { class: "note", text: sent?.via === "download" ? TEXT.whereDownload : TEXT.whereShare }),
@@ -206,7 +206,7 @@ function renderFail({ root }: ViewContext): () => void {
   root.append(
     h(
       "section",
-      { class: "screen" },
+      { class: "screen settings-sub" },
       h("div", { class: "screen-top" }, backButton()),
       h("h1", { text: TEXT.failTitle }),
       h("p", { class: "lede", text: TEXT.failBody }),

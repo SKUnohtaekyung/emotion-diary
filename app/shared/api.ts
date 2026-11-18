@@ -63,10 +63,16 @@ export const API = {
   /** 경로 표의 열쇠 — 실제 주소는 diaryPath(날짜) */
   diary: "/api/diaries/:date",
   diaryComplete: "/api/diaries/:date/complete",
+  /** 완료 취소(completed → draft, TASK-JOURNAL-01 A-4) */
+  diaryUncomplete: "/api/diaries/:date/uncomplete",
   /** 모든 기록 지우기(DELETE) — D-112 ⑩, DATA_MODEL §8 */
   diaries: "/api/diaries",
   /** 내보내기(GET, 로그인 cookie) — 화면이 받아 공유 창으로 넘긴다(ARCHITECTURE §4.1) */
   export: "/api/export",
+  /** 달력의 한 달(날짜·상태만, TASK-REFLECT-01 A-7) — 실제 주소는 calendarPath(달) */
+  calendar: "/api/calendar/:month",
+  /** 통계 재료(완료 기록의 날짜·세부 감정·크기 — 글 없음, A-6·A-7) — 실제 주소는 statsPath(7|30) */
+  stats: "/api/stats/:days",
   /** PC 백업 전용(Authorization: Bearer — cookie·CSRF 없음, D-109). BACKUP_TOKEN_HASH가 없으면 404 */
   backupExport: "/api/backup/export",
   backupImport: "/api/backup/import"
@@ -77,6 +83,9 @@ export const DELETE_ALL_CONFIRM = "모든 기록 삭제";
 
 export const diaryPath = (date: string) => `/api/diaries/${encodeURIComponent(date)}`;
 export const diaryCompletePath = (date: string) => `${diaryPath(date)}/complete`;
+export const diaryUncompletePath = (date: string) => `${diaryPath(date)}/uncomplete`;
+export const calendarPath = (month: string) => `/api/calendar/${encodeURIComponent(month)}`;
+export const statsPath = (days: number) => `/api/stats/${days}`;
 
 export type AppEnvName = "local" | "dev" | "prod";
 
@@ -118,6 +127,8 @@ export type ErrorCode =
   | "key_locked" // 429 — 열쇠를 여러 번 틀려 잠시 잠겼다(맞는 열쇠는 상관없이 들어온다 — RK-041)
   | "pin_resting" // 429 — 비밀번호를 다섯 번 틀려 잠시 쉰다
   | "invalid_date" // 400 — 주소의 날짜가 YYYY-MM-DD 달력 날짜가 아니다
+  | "invalid_month" // 400 — 주소의 달이 YYYY-MM이 아니다(달력, TASK-REFLECT-01)
+  | "invalid_period" // 400 — 통계 기간이 7·30이 아니다(TASK-REFLECT-01)
   | "invalid_timezone" // 400 — x-timezone이 없거나 모르는 시간대다
   | "idempotency_key_required" // 400 — idempotency-key가 없거나 모양이 틀렸다
   | "invalid_text" // 422 — 글이 너무 길거나 받을 수 없는 문자가 있다(field)
@@ -131,6 +142,7 @@ export type ErrorCode =
   | "incomplete" // 422 — 완료 조건이 모자란다(missing)
   | "revision_conflict" // 409 — 판 번호가 지금 것과 다르다(currentRevision)
   | "not_draft" // 409 — 이미 완료된 기록이다
+  | "not_completed" // 409 — 완료 취소할 기록이 임시저장이다
   | "idempotency_mismatch" // 409 — 같은 영수증 열쇠로 다른 요청을 보냈다
   | "confirm_mismatch" // 422 — 모든 기록 지우기의 확인 문구가 다르다
   | "invalid_import" // 422 — 다시 넣을 기록의 모양이 틀렸다(field)

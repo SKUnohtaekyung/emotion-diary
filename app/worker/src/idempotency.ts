@@ -11,7 +11,7 @@ import { fail, json } from "./http";
 
 const KEY = /^[A-Za-z0-9_-]{16,64}$/;
 
-export type Operation = "diary.save" | "diary.complete" | "diary.delete";
+export type Operation = "diary.save" | "diary.complete" | "diary.uncomplete" | "diary.delete";
 
 export interface Receipt {
   operation: Operation;
