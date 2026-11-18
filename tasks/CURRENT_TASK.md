@@ -4,6 +4,7 @@
 
 | 작업 | 상태 | 어디에 |
 | --- | --- | --- |
+| 공모전 발표 준비(성결대 창업아이디어 경진대회, 2026-11-24 Zoom 본선) | **진행 중(2026-11-18)** — 발표 방식 리서치, 사용자 생각 원문 저장·판단, 주장 근거 확인까지. Figma 덱 수정 전이고 사용자 답 일곱 가지를 기다린다. 제품 정본은 바꾸지 않았다(대회용 가설) | [contest/2026-sungkyul-startup/12-발표-준비-인계.md](../contest/2026-sungkyul-startup/12-발표-준비-인계.md) |
 | TASK-PERSONAL-01 personal-start(본인 사용 시작) | **진행 중(2026-10-20)** — 사용자 답 U-1~U-4대로 계획 승인 없이 진행. 코드·운영 환경·문서는 커밋해 `main`에 반영했다(사용자 지시, 휴대폰 확인 전). 남은 것: 사용자 휴대폰 확인 → 정본 기록 → 관문 판정(아래 '다음 세션이 할 일') | 이 파일 아래, 요청·계획은 [personal-start/2026-10-20/](personal-start/2026-10-20/PLAN.md) |
 | direct-journal 착수 준비(쓰면서 시안 이식) | **준비 끝(2026-10-20) — 사용자 답 대기.** 변경 지도·사실표·질문 6개를 썼다. 작업 번호와 계획(PLAN)은 personal-start 관문 뒤, 질문의 답을 받고 정한다 | [direct-journal/2026-10-20/](direct-journal/2026-10-20/QUESTIONS.md)(MAP·FACTS·QUESTIONS) |
 | [TASK-SLICE-01](archive/TASK-SLICE-01.md) first-slice('오늘 한 편' 첫 조각) | 끝(2026-10-20) — 결정 D-123, 관문 `first-slice` 통과(화면 시험·E2E·CI는 PR #40·#41 → `main` `b74242c`, iPhone `mobile-slice` 2026-10-20). 남은 결함 하나(자판이 뜰 때 상단 줄이 상태 막대와 겹침 — PLAN 5-12) | [archive/](archive/README.md), 요청·계획은 [first-slice/2026-10-16/](first-slice/2026-10-16/PLAN.md) |
