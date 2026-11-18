@@ -513,11 +513,11 @@
   max-width: none;
 }
 
-/* ═══ 감사 — 저녁 무렵 등불 아래 카드 ═══ */
+/* ═══ 감사 — 해 질 녘 등불과 그 빛이 닿은 작은 들꽃(2026-11-18 B+F) ═══
+   노을 하늘은 땅의 배경: 위는 흰 바탕에서 이음매 없이 시작하고(땅이 짧아도 맨 위가 흰색이 되게 min()으로 끝을 땅 높이에 맞춘다) 언덕 쪽으로 짙어진다. */
 .nt-thanks .nt-land {
   --nt-sky: 11rem;
-  --nt-mid-h: 4.6rem;
-  --nt-tree-h: var(--nt-mid-h);
+  background: linear-gradient(to top, var(--land-dusk-horizon) 3rem, var(--land-dusk-sky) min(9rem, 65%), var(--bg) min(16rem, 100%));
 }
 
 .nt-tags {
@@ -596,95 +596,87 @@
   padding-left: 3rem;
 }
 
-/* 노을 띠: 아주 옅은 크림빛 두 겹(밝은 바탕 유지) */
-.nt-dusk {
-  position: absolute;
-  left: -40%;
-  right: -40%;
-  bottom: 0;
-  border-radius: 50% 50% 0 0 / 4.5rem 4.5rem 0 0;
-  pointer-events: none;
-}
-
-.nt-dusk.d1 {
-  top: 0.75rem;
-  background: color-mix(in srgb, var(--service-light) 34%, var(--bg));
-}
-
-.nt-dusk.d2 {
-  height: calc(var(--nt-crest0) + var(--nt-mid-h) + 3.5rem);
-  background: color-mix(in srgb, var(--service-light) 72%, var(--bg));
-}
-
-/* 등불: 언덕 마루에 세운 기둥 끝의 작은 등. 빛은 옅은 크림빛 둥근 면 둘 */
-.nt-lantern {
-  position: absolute;
-  left: var(--x);
-  bottom: calc(var(--nt-crest0) + var(--nt-mid-h) - var(--dy) - 0.3rem);
-  width: 0;
-  height: 4rem;
-  pointer-events: none;
-}
-
-.nt-lpole {
-  position: absolute;
-  left: -1.5px;
-  bottom: 0;
-  width: 3px;
-  height: 3.6rem;
-  border-radius: 2px;
-  background: color-mix(in srgb, var(--land-hill-near) 45%, var(--service-ink));
-}
-
-.nt-lamp {
-  position: absolute;
-  left: -0.75rem;
-  top: 0;
-  width: 1.5rem;
-  height: 1.9rem;
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--service-light) 45%, var(--envelope-flap));
-}
-
-.nt-lamp::before,
-.nt-lamp::after {
-  content: "";
-  position: absolute;
-  left: -0.15rem;
-  right: -0.15rem;
-  height: 0.35rem;
-  border-radius: 0.2rem;
-  background: color-mix(in srgb, var(--land-hill-near) 45%, var(--service-ink));
-}
-
-.nt-lamp::before {
-  top: -0.2rem;
-}
-
-.nt-lamp::after {
-  bottom: -0.2rem;
-}
-
-.nt-lglow {
+/* 감사 그림(SVG 한 장, PaperScenes.tsx ThanksArt): 폭에 맞춰 늘고 땅 맨 아래에 붙는다 — 가까운 언덕(.nt-base)이 그 위 마루를 덮는다. 색은 land.* 토큰만 */
+.ta-art {
   position: absolute;
   left: 0;
-  top: 0.95rem;
-  border-radius: 50%;
-  transform-origin: 50% 50%;
+  bottom: 0;
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
 }
 
-.nt-lglow.g1 {
-  width: 4.5rem;
-  height: 4.5rem;
-  margin: -2.25rem 0 0 -2.25rem;
-  background: color-mix(in srgb, var(--service-light) 58%, transparent);
+.ta-far {
+  fill: var(--land-hill-far);
 }
 
-.nt-lglow.g2 {
-  width: 7rem;
-  height: 7rem;
-  margin: -3.5rem 0 0 -3.5rem;
-  background: color-mix(in srgb, var(--service-light) 30%, transparent);
+.ta-mid {
+  fill: var(--land-hill-mid);
+}
+
+.ta-tree,
+.ta-leaf {
+  fill: var(--land-hill-near);
+}
+
+.ta-tree-shade {
+  fill: var(--land-tree-shade);
+}
+
+.ta-far-tree {
+  fill: var(--land-far-tree);
+}
+
+.ta-far-tree-shade {
+  fill: var(--land-far-tree-shade);
+}
+
+.ta-trunk {
+  fill: var(--land-lamp-frame);
+  opacity: 0.75;
+}
+
+.ta-frame {
+  fill: var(--land-lamp-frame);
+}
+
+.ta-lamp {
+  fill: var(--land-lamp);
+}
+
+.ta-core {
+  fill: var(--land-lamp-core);
+}
+
+.ta-mullion {
+  fill: var(--land-lamp-frame);
+  opacity: 0.35;
+}
+
+.ta-stem {
+  fill: none;
+  stroke: var(--land-lamp-frame);
+  stroke-width: 1.4;
+  opacity: 0.8;
+}
+
+.ta-petal {
+  fill: var(--land-lamp-core);
+  stroke: var(--land-flower-edge);
+  stroke-width: 0.6;
+}
+
+.ta-fcore {
+  fill: var(--land-flower-core);
+}
+
+.ta-glow-stop {
+  stop-color: var(--land-lamp-glow);
+}
+
+.ta-pool-stop {
+  stop-color: var(--land-lamp-pool);
 }
 
 /* 초점이 들어온 쪽지·카드는 곧게 펴진다 — 글의 내용이 아니라 손끝(초점)에만 반응하고, 나가면 다시 기운다 */
@@ -947,11 +939,9 @@
   .nt-tag {
     animation: nt-hang 620ms var(--ease) calc(120ms + var(--i) * 160ms) backwards;
   }
-  .nt-lglow {
-    animation: nt-breathe 7s ease-in-out infinite;
-  }
-  .nt-lglow.g2 {
-    animation-delay: -1.6s;
+  /* 감사 그림: 등불 빛만 아주 천천히 숨 쉰다(이 화면의 반복 움직임 하나) */
+  .ta-glow {
+    animation: ta-glow 7s ease-in-out infinite;
   }
   .nt-slip,
   .nt-tag {
@@ -1068,18 +1058,6 @@
   }
 }
 
-@keyframes nt-breathe {
-  0%,
-  100% {
-    scale: 1;
-    opacity: 1;
-  }
-  50% {
-    scale: 1.03;
-    opacity: 0.8;
-  }
-}
-
 @keyframes rs-note-in {
   from {
     opacity: 0;
@@ -1123,5 +1101,15 @@
   }
   50% {
     transform: rotate(1.6deg);
+  }
+}
+
+@keyframes ta-glow {
+  0%,
+  100% {
+    opacity: 0.82;
+  }
+  50% {
+    opacity: 1;
   }
 }

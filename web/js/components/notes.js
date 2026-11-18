@@ -1,7 +1,7 @@
 // 오늘 있었던 일·칭찬·감사 화면의 장면(D-069). 이유 화면(reason.js)과 같은 종이·초록 언덕·민트 테이프의 한 가족이되, 화면마다 다른 이야기를 한다.
 //   오늘 있었던 일 = 길의 시작·아침: 날짜 탭이 붙은 줄 종이 노트, 아래는 이른 아침 언덕·흰 길·시작하는 돌.
 //   칭찬          = 빛 아래 쪽지: 민트 테이프로 붙인 세 장의 쪽지, 아래는 해가 높이 뜬 언덕과 이번에 고른 계열의 조약돌.
-//   감사          = 저녁 무렵 등불: 끈에 꿴 세 장의 종이 카드, 아래는 노을 띠와 언덕, 작은 등불 하나.
+//   감사          = 해 질 녘 등불과 들꽃: 끈에 꿴 세 장의 종이 카드, 아래는 노을 하늘·언덕과 등불 빛이 닿은 작은 들꽃 무리(SVG 한 장, thanksArt).
 // 입력 묶음(dateField·eventField·slots)은 write.js가 만든 것이다 — 다시 만들지 않고 그대로 안에 넣거나(날짜·사건) 입력만 옮겨 감싼다(칭찬·감사).
 // 저장·검증·오류 표시·state.draft 갱신이 그 DOM과 리스너에 걸려 있다. 옮긴 <input>은 같은 노드이므로 리스너가 그대로 산다.
 // 장면(해·언덕·나무·길·돌·조약돌·등불)은 장식이다(aria-hidden). 사용자가 쓴 글의 내용·길이에 반응하지 않고, 점수·보상·누적을 말하지 않는다.
@@ -83,16 +83,60 @@ function pebbles(cats) {
   }));
 }
 
+// ── 감사 장면 그림(2026-11-18, 휴대폰 확인 뒤 사용자 선택 B+F): 해 질 녘 언덕의 등불 빛이 곁의 작은 들꽃 무리에 닿는다 ──
+// 감사의 첫 단계 '좋은 것을 알아보기'(Emmons)와 '세 가지 좋은 일'의 알아차리기 — 지나치기 쉬운 작은 좋은 것. 빛은 등불 하나에서 언덕 뒤로 퍼지고,
+// 땅에 고이는 빛은 가운데 언덕 모양으로 잘라 마루선과 겹치지 않는다(전에는 빛 원이 마루를 가로질러 색이 겹쳐 보였다).
+// 좌표는 360 폭 기준 하나(viewBox 0 80 360 190)이고 화면 폭에 맞춰 늘어난다. 색은 CSS 클래스(.ta-*)가 tokens의 land.* 변수로 칠한다.
+// 쓴 칸 수에 반응하지 않고 늘 같다. 친구·조약돌 없음. 반복 움직임은 등불 빛의 숨 하나(움직임 줄이기면 멈춤). 앱(PaperScenes.tsx)도 같은 좌표다.
+const TA_FAR = "M0,206 C58,188 120,184 182,193 C240,201 300,196 360,181 L360,270 L0,270 Z";
+const TA_MID = "M0,234 C66,216 146,211 222,222 C282,231 330,233 360,226 L360,270 L0,270 Z";
+let taSeq = 0;
+function thanksShapes(uid) {
+  const S = (tag, attrs, ...kids) => ({ tag, attrs, kids });
+  const tree = (x, y, r, far = false) => {
+    const cy = y - r * 1.6;
+    return S("g", {},
+      S("rect", { class: "ta-trunk", x: x - 1.5, y: y - r * 1.25, width: 3, height: r * 1.3, rx: 1.5 }),
+      S("circle", { class: far ? "ta-far-tree-shade" : "ta-tree-shade", cx: x, cy, r }),
+      S("circle", { class: far ? "ta-far-tree" : "ta-tree", cx: x + r * 0.16, cy: cy - r * 0.12, r: r * 0.86 }));
+  };
+  const flower = (x, y, h, r) => S("g", {},
+    S("path", { class: "ta-stem", d: `M${x},${y} Q${x - 2},${y - h / 2} ${x},${y - h}` }),
+    ...[0, 72, 144, 216, 288].map((a) => S("circle", { class: "ta-petal", cx: +(x + Math.cos((a * Math.PI) / 180) * r * 0.9).toFixed(2), cy: +(y - h + Math.sin((a * Math.PI) / 180) * r * 0.9).toFixed(2), r: +(r * 0.62).toFixed(2) })),
+    S("circle", { class: "ta-fcore", cx: x, cy: y - h, r: r * 0.5 }));
+  const leaf = (x, y, f) => S("path", { class: "ta-leaf", d: `M${x},${y} q${6 * f},-7 ${12 * f},-3 q${-6 * f},5 ${-12 * f},3 Z` });
+  const grad = (id, cls, a) => S("radialGradient", { id }, S("stop", { class: cls, offset: 0, "stop-opacity": a }), S("stop", { class: cls, offset: 0.35, "stop-opacity": +(a * 0.45).toFixed(2) }), S("stop", { class: cls, offset: 1, "stop-opacity": 0 }));
+  // 등불(바닥 256,228): 기둥·받침·갓·꼭지·등 몸통·안쪽 빛·살·아래 테
+  const lamp = S("g", {},
+    S("rect", { class: "ta-frame", x: 254.4, y: 176, width: 3.2, height: 52, rx: 1.6 }),
+    S("rect", { class: "ta-frame", x: 250, y: 225, width: 12, height: 3, rx: 1.5 }),
+    S("path", { class: "ta-frame", d: "M242,151 L270,151 L264,143 L248,143 Z" }),
+    S("circle", { class: "ta-frame", cx: 256, cy: 141, r: 2.2 }),
+    S("rect", { class: "ta-lamp", x: 245, y: 151, width: 22, height: 24, rx: 4 }),
+    S("rect", { class: "ta-core", x: 249, y: 155, width: 14, height: 16, rx: 3 }),
+    S("rect", { class: "ta-mullion", x: 255.4, y: 151, width: 1.2, height: 24 }),
+    S("rect", { class: "ta-frame", x: 243.5, y: 174, width: 25, height: 3, rx: 1.5 }));
+  return S("svg", { class: "ta-art", viewBox: "0 80 360 190", "aria-hidden": "true", focusable: "false" },
+    S("defs", {}, grad(`ta-glow-${uid}`, "ta-glow-stop", 0.9), grad(`ta-pool-${uid}`, "ta-pool-stop", 0.85), S("clipPath", { id: `ta-mid-${uid}` }, S("path", { d: TA_MID }))),
+    S("path", { class: "ta-far", d: TA_FAR }),
+    tree(300, 196, 6, true), tree(318, 192, 4.5, true),
+    S("circle", { class: "ta-glow", cx: 256, cy: 163, r: 64, fill: `url(#ta-glow-${uid})` }),
+    S("path", { class: "ta-mid", d: TA_MID }),
+    S("g", { "clip-path": `url(#ta-mid-${uid})` }, S("ellipse", { cx: 236, cy: 232, rx: 88, ry: 18, fill: `url(#ta-pool-${uid})` })),
+    lamp,
+    leaf(196, 233, 1.4), leaf(232, 232, -1.4),
+    flower(202, 235, 19, 5.6), flower(215, 233, 27, 6.6), flower(228, 236, 15, 5),
+    tree(44, 232, 8), tree(68, 228, 5.5));
+}
+const buildSvg = ({ tag, attrs, kids }) => svgEl(tag, Object.fromEntries(Object.entries(attrs).map(([k, v]) => [k, String(v)])), ...kids.map(buildSvg));
+const thanksArt = () => buildSvg(thanksShapes(++taSeq));
+
 const PRAISE = { far: { l: -45, r: -45, ry: 3.5 }, mid: { l: -10, r: -85, ry: 3 }, near: { l: -55, r: -10, ry: 2 } };
-const THANKS = { mid: { l: -40, r: -45, ry: 3.25 }, near: { l: -10, r: -55, ry: 2 } };
+const THANKS = { near: { l: -10, r: -55, ry: 2 } };
 
 export function renderNotesScene({ kind, slots, cats = [] }) {
   if (kind === "thanks") {
-    const lamp = el("div", { class: "nt-lantern", "aria-hidden": "true", style: { "--x": "74%", "--dy": `${drop(74, THANKS.mid).toFixed(3)}rem` } },
-      el("i", { class: "nt-lglow g2" }), el("i", { class: "nt-lglow g1" }), el("i", { class: "nt-lpole" }), el("i", { class: "nt-lamp" }));
-    const land = el("div", { class: "nt-land" },
-      el("i", { class: "nt-dusk d1", "aria-hidden": "true" }), el("i", { class: "nt-dusk d2", "aria-hidden": "true" }),
-      hill("mid", THANKS.mid), tree(10, 6, THANKS.mid), tree(17, 4.5, THANKS.mid), lamp);
+    const land = el("div", { class: "nt-land", "aria-hidden": "true" }, thanksArt());
     return el("div", { class: "nt-scene nt-thanks" }, el("div", { class: "nt-desk" }, wrapSlots(slots, "nt-tag", "nt-tags")), land, base(THANKS.near));
   }
   const land = el("div", { class: "nt-land" },

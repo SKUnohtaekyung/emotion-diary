@@ -182,16 +182,40 @@ describe("글 쓰는 네 단계의 장면(D-069, J-4) — 장식은 읽히지 �
     expect(root.querySelector(".rs-friends, .rs-story")).toBeNull();
   });
 
-  it("칭찬은 고른 계열의 조약돌(같은 크기·개수 글자 없음), 감사는 등불 — 땅은 장식", () => {
+  it("칭찬은 고른 계열의 조약돌(같은 크기·개수 글자 없음), 감사는 등불과 들꽃 그림 한 장 — 땅은 장식", () => {
     const root = host();
     render(<NotesScene kind="praise" categories={["joy", "anger"]}><input id="praises-0" /></NotesScene>, root);
     expect(root.querySelectorAll(".nt-peb").length).toBe(2);
     expect(root.querySelector(".nt-land")?.getAttribute("aria-hidden")).toBe("true");
     expect(root.querySelector(".nt-land")?.textContent).toBe("");
     render(<NotesScene kind="thanks" categories={["joy"]}><input id="gratitudes-0" /></NotesScene>, root);
-    expect(root.querySelector(".nt-lantern")).not.toBeNull();
-    expect(root.querySelector(".nt-peb")).toBeNull();
+    const art = root.querySelector("svg.ta-art");
+    expect(art?.getAttribute("aria-hidden")).toBe("true");
+    // 등불 하나와 들꽃 셋 — 쓴 칸 수와 상관없이 늘 같다(D-050: 모으기·늘기 없음), 친구·조약돌 없음
+    expect(art?.querySelectorAll(".ta-lamp")).toHaveLength(1);
+    expect(art?.querySelectorAll(".ta-fcore")).toHaveLength(3);
+    expect(root.querySelector(".nt-peb, .friend-img")).toBeNull();
+    // 땅에 고이는 빛은 가운데 언덕 모양으로 자른다(빛이 마루선을 가로지르지 않게 — 휴대폰 확인 지적)
+    const clip = art?.querySelector("clipPath")?.id ?? "";
+    expect(clip).not.toBe("");
+    expect(art?.querySelector("ellipse")?.parentElement?.getAttribute("clip-path")).toBe(`url(#${clip})`);
+    // 색은 클래스(토큰 변수)로만 칠한다 — 도형에 색 글자를 직접 적지 않는다
+    for (const node of art?.querySelectorAll("[fill]") ?? []) expect(node.getAttribute("fill")).toMatch(/^url\(#ta-/);
     expect(root.querySelector(".nt-desk input#gratitudes-0")).not.toBeNull();
+  });
+
+  it("감사 그림은 같은 문서에 둘이어도 그라데이션·자르기 id가 겹치지 않는다(단계 전환 중)", () => {
+    const root = host();
+    render(
+      <div>
+        <NotesScene kind="thanks" categories={[]}><input id="a" /></NotesScene>
+        <NotesScene kind="thanks" categories={[]}><input id="b" /></NotesScene>
+      </div>,
+      root
+    );
+    const ids = [...root.querySelectorAll("svg.ta-art [id]")].map((node) => node.id);
+    expect(ids.length).toBe(6);
+    expect(new Set(ids).size).toBe(ids.length);
   });
 });
 

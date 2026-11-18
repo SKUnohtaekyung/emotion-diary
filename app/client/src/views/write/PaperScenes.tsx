@@ -2,7 +2,7 @@
 //   있었던 일 = 길의 시작·아침: 줄 종이 노트(+.5°), 이른 아침 언덕·흰 길·시작하는 돌
 //   이유     = 줄 노트(−.6°)·민트 테이프, 언덕 위에 이번에 고른 친구들(같은 크기, 손으로 정한 자리표)
 //   칭찬     = 크림 쪽지 셋, 해가 높이 뜬 언덕과 이번에 고른 계열의 조약돌
-//   감사     = 끈에 꿴 카드 셋, 노을 띠와 언덕, 작은 등불
+//   감사     = 끈에 꿴 카드 셋, 해 질 녘 하늘·언덕과 등불 빛이 닿은 작은 들꽃 무리(SVG 한 장, ThanksArt — 2026-11-18 B+F)
 // 입력 칸(라벨·글 칸)은 단계(steps.tsx)가 만들어 children으로 넘긴다 — 저장·검증은 거기 그대로다.
 // 장면은 장식이다(aria-hidden). 쓴 글의 내용·길이에 반응하지 않고 점수·보상·누적을 말하지 않는다. 그림은 문서 흐름 안에 있고
 // 시안의 sticky 가까운 언덕·버튼 줄은 흐름 안으로 옮겼다(D-123, MAP R2) — 가까운 언덕은 장면 맨 아래에, 버튼 줄은 그 바로 뒤에 선다.
@@ -214,8 +214,103 @@ function Pebbles({ categories }: { categories: readonly string[] }) {
   );
 }
 
+// ── 감사 장면 그림(2026-11-18, 휴대폰 확인 뒤 사용자 선택 B+F — 시안 web/js/components/notes.js thanksArt와 같은 좌표) ──
+// 해 질 녘 언덕의 등불 빛이 곁의 작은 들꽃 무리에 닿는다: 감사의 첫 단계 '좋은 것을 알아보기'(Emmons)와 '세 가지 좋은 일'의 알아차리기 —
+// 지나치기 쉬운 작은 좋은 것. 빛은 등불 하나에서 언덕 뒤로 퍼지고, 땅에 고이는 빛은 가운데 언덕 모양으로 잘라 마루선과 겹치지 않는다
+// (전에는 빛 원이 마루를 가로질러 색이 겹쳐 보였다 — 휴대폰 확인 지적). 좌표는 360 폭 하나(viewBox 0 80 360 190), 화면 폭에 맞춰 늘어난다.
+// 색은 CSS 클래스(.ta-*)가 tokens의 land.* 변수로 칠한다. 쓴 칸 수에 반응하지 않고 늘 같다. 친구·조약돌 없음.
+// 반복 움직임은 등불 빛의 숨 하나(움직임 줄이기면 멈춤).
+const TA_FAR = "M0,206 C58,188 120,184 182,193 C240,201 300,196 360,181 L360,270 L0,270 Z";
+const TA_MID = "M0,234 C66,216 146,211 222,222 C282,231 330,233 360,226 L360,270 L0,270 Z";
+const fix = (value: number): number => Math.round(value * 100) / 100;
+
+function TaTree({ x, y, r, far = false }: { x: number; y: number; r: number; far?: boolean }) {
+  const cy = y - r * 1.6;
+  return (
+    <g>
+      <rect class="ta-trunk" x={x - 1.5} y={fix(y - r * 1.25)} width={3} height={fix(r * 1.3)} rx={1.5} />
+      <circle class={far ? "ta-far-tree-shade" : "ta-tree-shade"} cx={x} cy={fix(cy)} r={r} />
+      <circle class={far ? "ta-far-tree" : "ta-tree"} cx={fix(x + r * 0.16)} cy={fix(cy - r * 0.12)} r={fix(r * 0.86)} />
+    </g>
+  );
+}
+
+function TaFlower({ x, y, h, r }: { x: number; y: number; h: number; r: number }) {
+  return (
+    <g>
+      <path class="ta-stem" d={`M${x},${y} Q${x - 2},${y - h / 2} ${x},${y - h}`} />
+      {[0, 72, 144, 216, 288].map((a) => (
+        <circle key={a} class="ta-petal" cx={fix(x + Math.cos((a * Math.PI) / 180) * r * 0.9)} cy={fix(y - h + Math.sin((a * Math.PI) / 180) * r * 0.9)} r={fix(r * 0.62)} />
+      ))}
+      <circle class="ta-fcore" cx={x} cy={y - h} r={fix(r * 0.5)} />
+    </g>
+  );
+}
+
+const TaLeaf = ({ x, y, f }: { x: number; y: number; f: number }) => (
+  <path class="ta-leaf" d={`M${x},${y} q${fix(6 * f)},-7 ${fix(12 * f)},-3 q${fix(-6 * f)},5 ${fix(-12 * f)},3 Z`} />
+);
+
+const TaGradient = ({ id, cls, a }: { id: string; cls: string; a: number }) => (
+  <radialGradient id={id}>
+    <stop class={cls} offset={0} stop-opacity={a} />
+    <stop class={cls} offset={0.35} stop-opacity={fix(a * 0.45)} />
+    <stop class={cls} offset={1} stop-opacity={0} />
+  </radialGradient>
+);
+
+let taSeq = 0;
+/** 감사 장면의 그림 한 장. 같은 문서에 둘이 있어도(전환 중) 그라데이션·자르기 id가 섞이지 않게 화면마다 고유 id를 쓴다 */
+function ThanksArt() {
+  const uid = useRef(0);
+  if (uid.current === 0) {
+    taSeq += 1;
+    uid.current = taSeq;
+  }
+  const glow = `ta-glow-${uid.current}`;
+  const pool = `ta-pool-${uid.current}`;
+  const mid = `ta-mid-${uid.current}`;
+  return (
+    <svg class="ta-art" viewBox="0 80 360 190" aria-hidden="true" focusable="false">
+      <defs>
+        <TaGradient id={glow} cls="ta-glow-stop" a={0.9} />
+        <TaGradient id={pool} cls="ta-pool-stop" a={0.85} />
+        <clipPath id={mid}>
+          <path d={TA_MID} />
+        </clipPath>
+      </defs>
+      <path class="ta-far" d={TA_FAR} />
+      <TaTree x={300} y={196} r={6} far />
+      <TaTree x={318} y={192} r={4.5} far />
+      <circle class="ta-glow" cx={256} cy={163} r={64} fill={`url(#${glow})`} />
+      <path class="ta-mid" d={TA_MID} />
+      <g clip-path={`url(#${mid})`}>
+        <ellipse cx={236} cy={232} rx={88} ry={18} fill={`url(#${pool})`} />
+      </g>
+      {/* 등불(바닥 256,228): 기둥·받침·갓·꼭지·등 몸통·안쪽 빛·살·아래 테 */}
+      <g>
+        <rect class="ta-frame" x={254.4} y={176} width={3.2} height={52} rx={1.6} />
+        <rect class="ta-frame" x={250} y={225} width={12} height={3} rx={1.5} />
+        <path class="ta-frame" d="M242,151 L270,151 L264,143 L248,143 Z" />
+        <circle class="ta-frame" cx={256} cy={141} r={2.2} />
+        <rect class="ta-lamp" x={245} y={151} width={22} height={24} rx={4} />
+        <rect class="ta-core" x={249} y={155} width={14} height={16} rx={3} />
+        <rect class="ta-mullion" x={255.4} y={151} width={1.2} height={24} />
+        <rect class="ta-frame" x={243.5} y={174} width={25} height={3} rx={1.5} />
+      </g>
+      <TaLeaf x={196} y={233} f={1.4} />
+      <TaLeaf x={232} y={232} f={-1.4} />
+      <TaFlower x={202} y={235} h={19} r={5.6} />
+      <TaFlower x={215} y={233} h={27} r={6.6} />
+      <TaFlower x={228} y={236} h={15} r={5} />
+      <TaTree x={44} y={232} r={8} />
+      <TaTree x={68} y={228} r={5.5} />
+    </svg>
+  );
+}
+
 const PRAISE = { far: { l: -45, r: -45, ry: 3.5 }, mid: { l: -10, r: -85, ry: 3 }, near: { l: -55, r: -10, ry: 2 } };
-const THANKS = { mid: { l: -40, r: -45, ry: 3.25 }, near: { l: -10, r: -55, ry: 2 } };
+const THANKS = { near: { l: -10, r: -55, ry: 2 } };
 
 /** 칭찬·감사 장면. 입력 묶음(fieldset)은 단계가 만들어 넘긴다 — 쪽지·카드는 각 입력의 바탕이다(.nt-slip·.nt-tag, 단계가 감싼다) */
 export function NotesScene({ kind, categories, children }: { kind: "praise" | "thanks"; categories: readonly string[]; children: ComponentChildren }) {
@@ -224,17 +319,7 @@ export function NotesScene({ kind, categories, children }: { kind: "praise" | "t
     return (
       <Scene kind="thanks" paper={desk}>
         <div class="nt-land" aria-hidden="true">
-          <i class="nt-dusk d1" />
-          <i class="nt-dusk d2" />
-          <Hill kind="mid" geo={THANKS.mid} />
-          <Tree x={10} r={6} geo={THANKS.mid} />
-          <Tree x={17} r={4.5} geo={THANKS.mid} />
-          <div class="nt-lantern" style={{ "--x": "74%", "--dy": `${drop(74, THANKS.mid).toFixed(3)}rem` }}>
-            <i class="nt-lglow g2" />
-            <i class="nt-lglow g1" />
-            <i class="nt-lpole" />
-            <i class="nt-lamp" />
-          </div>
+          <ThanksArt />
           <Near geo={THANKS.near} />
         </div>
       </Scene>
