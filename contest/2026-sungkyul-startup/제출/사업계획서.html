@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>HON 사업계획서 — 2026학년도 교내 창업아이디어 경진대회</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  @font-face { font-family: "Pretendard"; src: url("../../../design/fonts/PretendardVariable.woff2") format("woff2"); font-weight: 100 900; font-display: block; }
+  @page { size: A4; margin: 0; }
+  :root {
+    --ink: #092328; --text: #1c2b2e; --muted: #5a6664; --faint: #8a9492;
+    --green: #2a7a5a; --mint: #62fdb4; --mint-soft: #dff7ec; --land: #cfe8dc;
+    --cream: #fff3d6; --soft: #f3f2ee; --line: #e6e4de; --line-strong: #c9c7bf;
+    --warm: #a63f1e;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #d9dcda; }
+  body { font-family: "Pretendard", "Malgun Gothic", sans-serif; color: var(--text); font-size: 12.4px; line-height: 1.62; -webkit-print-color-adjust: exact; print-color-adjust: exact; word-break: keep-all; }
+  .page { position: relative; width: 794px; height: 1123px; margin: 16px auto; padding: 50px 56px 54px; background: #fff; overflow: hidden; page-break-after: always; break-after: page; }
+  @media print { html, body { background: #fff; } .page { margin: 0; } }
+  svg { font-family: inherit; display: block; }
+  img { display: block; max-width: 100%; }
+
+  .run { display: flex; justify-content: space-between; align-items: baseline; font-size: 10px; color: var(--faint); letter-spacing: .02em; margin-bottom: 30px; }
+  .run b { color: var(--ink); font-weight: 800; letter-spacing: .08em; }
+  .foot { position: absolute; left: 56px; right: 56px; bottom: 26px; display: flex; justify-content: space-between; font-size: 9.5px; color: var(--faint); }
+  .eyebrow { font-size: 12px; font-weight: 700; color: var(--green); margin: 0 0 8px; }
+  h1 { font-size: 31px; line-height: 1.24; font-weight: 800; color: var(--ink); margin: 0 0 14px; letter-spacing: -.02em; }
+  h1 em, h2 em { font-style: normal; color: var(--green); }
+  h2 { font-size: 17px; line-height: 1.35; font-weight: 750; color: var(--ink); margin: 26px 0 8px; letter-spacing: -.01em; }
+  h3 { font-size: 13px; font-weight: 700; color: var(--ink); margin: 0 0 4px; }
+  p { margin: 0 0 8px; }
+  .lead { font-size: 14px; line-height: 1.6; color: var(--text); max-width: 600px; }
+  .muted { color: var(--muted); }
+  .src { font-size: 9.6px; color: var(--faint); line-height: 1.45; margin-top: 6px; }
+  .tag { display: inline-block; font-size: 10px; font-weight: 700; color: var(--ink); background: var(--mint); border-radius: 999px; padding: 2px 9px; vertical-align: 2px; }
+  .tag.plain { background: var(--soft); color: var(--muted); }
+  ul { margin: 0; padding: 0; list-style: none; }
+  li { position: relative; padding-left: 13px; margin-bottom: 4px; }
+  li::before { content: ""; position: absolute; left: 1px; top: .72em; width: 5px; height: 5px; border-radius: 50%; background: var(--green); }
+  .cols { display: grid; gap: 26px; }
+  .c2 { grid-template-columns: 1fr 1fr; } .c3 { grid-template-columns: repeat(3, 1fr); } .c4 { grid-template-columns: repeat(4, 1fr); }
+  .rule { border-top: 1.5px solid var(--ink); padding-top: 11px; }
+  .rule.thin { border-top: 1px solid var(--line-strong); }
+  .big { font-size: 40px; line-height: 1; font-weight: 800; color: var(--ink); letter-spacing: -.03em; }
+  .big small { font-size: 16px; font-weight: 700; margin-left: 2px; letter-spacing: 0; }
+  .fig { margin: 14px 0 0; }
+  .fig figcaption, .cap { font-size: 10.2px; color: var(--muted); margin-top: 7px; line-height: 1.5; }
+  .shot { border-radius: 14px; overflow: hidden; background: #f4f9f6; }
+  table { width: 100%; border-collapse: collapse; font-size: 11.4px; line-height: 1.5; }
+  th { text-align: left; font-weight: 700; color: var(--muted); font-size: 10.4px; padding: 0 10px 6px 0; border-bottom: 1.5px solid var(--ink); }
+  td { padding: 8px 10px 8px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  td b { color: var(--ink); }
+  .quote { margin: 20px 0 0; padding: 4px 0 4px 20px; border-left: 4px solid var(--mint); }
+  .quote p { font-size: 19px; line-height: 1.45; font-weight: 700; color: var(--ink); letter-spacing: -.01em; margin: 0 0 6px; }
+  .quote cite { font-style: normal; font-size: 10.4px; color: var(--muted); }
+  .was { color: var(--faint); text-decoration: line-through; text-decoration-color: var(--line-strong); }
+  .arrow { color: var(--green); font-weight: 800; }
+
+  /* 표지 */
+  .cover { padding: 0; }
+  .cover .top { padding: 62px 56px 0; }
+  .cover .kicker { font-size: 12px; color: var(--muted); letter-spacing: .04em; }
+  .cover .doc { font-size: 15px; font-weight: 700; color: var(--ink); letter-spacing: .5em; margin-top: 6px; }
+  .wordmark { display: flex; align-items: center; gap: 4px; font-size: 104px; font-weight: 900; color: var(--ink); letter-spacing: -.02em; line-height: 1; margin: 64px 0 18px; }
+  .wordmark svg { width: 92px; height: 78px; margin: 0 2px; }
+  .cover .tagline { font-size: 25px; font-weight: 750; color: var(--ink); line-height: 1.35; letter-spacing: -.02em; }
+  .cover .tagline em { font-style: normal; color: var(--green); }
+  .cover .one { font-size: 13.4px; color: var(--muted); margin-top: 12px; max-width: 520px; }
+  .meta { margin: 44px 0 0; display: grid; grid-template-columns: 110px 1fr; row-gap: 0; font-size: 13px; }
+  .meta dt { color: var(--muted); padding: 9px 0; border-top: 1px solid var(--line); }
+  .meta dd { margin: 0; padding: 9px 0; border-top: 1px solid var(--line); color: var(--ink); font-weight: 650; }
+  .meta dd span { font-weight: 400; color: var(--faint); }
+  .cover .hero { position: absolute; left: 0; right: 0; bottom: 0; height: 372px; background: #f4f9f6; overflow: hidden; }
+  .cover .hero img { position: absolute; left: 50%; top: 18px; width: 780px; max-width: none; transform: translateX(-50%); }
+  .p2 .cols.c3 { margin-top: 30px !important; } .p2 h2 { margin-top: 40px; } .p2 .quote { margin-top: 38px; } .p2 .quote p { font-size: 21px; } .p2 .lead { margin-top: 34px !important; }
+  .tight td { padding-top: 6px; padding-bottom: 6px; } .tight h2 { margin-top: 18px; }
+</style>
+</head>
+<body>
+
+<!-- 1. 표지 -->
+<section class="page cover">
+  <div class="top">
+    <div class="kicker">2026학년도 교내 창업아이디어 경진대회</div>
+    <div class="doc">사업계획서</div>
+    <div class="wordmark">H<svg viewBox="0 0 92 78" aria-hidden="true"><ellipse cx="44" cy="38" rx="40" ry="32" fill="#1d4a4f"/><ellipse cx="56" cy="46" rx="29" ry="22" fill="#8fbfb8"/></svg>N</div>
+    <div class="tagline">감정에 <em>이름</em>을 붙이며 나를 이해하고,<br>내 삶의 <em>기준</em>을 세우는 기록</div>
+    <p class="one">AI가 수많은 답을 만들어 주는 시대에, 매일의 감정을 기록하며 자신을 이해하고 스스로의 기준을 만들어 가도록 돕는 자기이해 기록 앱</p>
+    <dl class="meta">
+      <dt>팀명</dt><dd>HON(혼)</dd>
+      <dt>아이템명</dt><dd>HON(혼) — 감정에 이름을 붙이는 자기이해 기록 앱</dd>
+      <dt>아이템 분야</dt><dd>기술창업 <span>(정보·통신)</span></dd>
+      <dt>대표자(팀장)</dt><dd><span>(성명 기재)</span></dd>
+    </dl>
+  </div>
+  <div class="hero"><img src="../../../docs/assets/readme/hero.png" alt="HON 화면 시안: 오늘, 마음 고르기, 편지, 달력, 통계"></div>
+</section>
+
+<!-- 2. 소개: 배경 -->
+<section class="page p2">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 소개 · 배경</p>
+  <h1>답을 만드는 능력이<br><em>흔해지고</em> 있다.</h1>
+
+  <div class="cols c3" style="margin-top:22px">
+    <div class="rule">
+      <div class="big">18<small>분</small></div>
+      <p style="margin-top:9px"><b>AI 안경을 쓰고 수능 모의 수학 30문항을 푸는 데 걸린 시간.</b> 결과는 1등급이었다(2026년 6월).</p>
+      <p class="muted">교육부는 2027학년도 수능에서 AI 안경을 쓰는 것만으로 부정행위로 처리하기로 했다.</p>
+      <p class="src">파이낸셜뉴스 2026.11.9. · 경향신문 2026.10.27.</p>
+    </div>
+    <div class="rule">
+      <svg viewBox="0 0 200 86" width="200" height="86" role="img" aria-label="공인회계사 합격자의 수습기관 등록률: 2022년 91%, 2025년 28%">
+        <text x="0" y="13" font-size="10.5" fill="#5a6664">2022</text>
+        <rect x="34" y="3" width="118" height="13" rx="4" fill="#c9c7bf"/>
+        <text x="158" y="14" font-size="12" font-weight="700" fill="#092328">91%</text>
+        <text x="0" y="41" font-size="10.5" fill="#5a6664">2025</text>
+        <rect x="34" y="31" width="36.4" height="13" rx="4" fill="#2a7a5a"/>
+        <text x="76" y="42" font-size="12" font-weight="700" fill="#092328">28%</text>
+        <text x="0" y="78" font-size="26" font-weight="800" fill="#092328" letter-spacing="-.8">91 → 28%</text>
+      </svg>
+      <p style="margin-top:6px"><b>공인회계사 합격자가 수습기관에 등록한 비율.</b></p>
+      <p class="muted">3년 사이 셋 중 둘이 자리를 못 구하게 됐다.</p>
+      <p class="src">택스워치 2026.9.21.</p>
+    </div>
+    <div class="rule">
+      <div class="big" style="font-size:34px">GPT-6<small>Astra</small></div>
+      <p style="margin-top:15px"><b>2026년 9월, OpenAI가 새 모델을 공개했다.</b></p>
+      <p class="muted">사람 대신 일을 처리하는 모델이 해마다 새로 나온다.</p>
+      <p class="src">VentureBeat 2026.9.3.</p>
+    </div>
+  </div>
+
+  <h2>같은 AI를 받아도 결과는 갈렸다</h2>
+  <div class="cols" style="grid-template-columns: 372px 1fr; gap: 28px; align-items: start">
+    <svg viewBox="0 0 372 150" width="372" height="150" role="img" aria-label="케냐 소상공인 실험: 전체 평균은 뚜렷한 차이 없음, 성과가 낮던 절반은 약 10% 낮아짐, 성과가 높던 절반은 15% 남짓 높아졌으나 통계적으로 확실하지 않음">
+      <line x1="186" y1="6" x2="186" y2="128" stroke="#c9c7bf" stroke-width="1"/>
+      <text x="186" y="145" font-size="9.5" fill="#8a9492" text-anchor="middle">AI를 받지 않은 집단</text>
+      <text x="0" y="24" font-size="11" fill="#1c2b2e">전체 평균</text>
+      <circle cx="190" cy="20" r="5" fill="#fff" stroke="#092328" stroke-width="2"/>
+      <text x="202" y="24" font-size="11" font-weight="700" fill="#092328">뚜렷한 차이 없음</text>
+      <text x="0" y="66" font-size="11" fill="#1c2b2e">성과가 낮던 절반</text>
+      <rect x="126" y="54" width="60" height="16" rx="4" fill="#a63f1e"/>
+      <text x="120" y="66" font-size="11" font-weight="700" fill="#092328" text-anchor="end"></text>
+      <text x="194" y="66" font-size="11" font-weight="700" fill="#092328">약 10% 낮아짐</text>
+      <text x="0" y="108" font-size="11" fill="#1c2b2e">성과가 높던 절반</text>
+      <rect x="187" y="96" width="90" height="16" rx="4" fill="#fff" stroke="#2a7a5a" stroke-width="1.5" stroke-dasharray="4 3"/>
+      <text x="284" y="104" font-size="10.5" font-weight="700" fill="#092328">15% 남짓</text>
+      <text x="284" y="117" font-size="9.5" fill="#5a6664">확실하지 않음</text>
+    </svg>
+    <div>
+      <p>케냐 소상공인 640명에게 다섯 달 동안 AI 사업 조언자를 준 실험이다. 평균 성과는 달라지지 않았고, 처음부터 성과가 낮던 절반은 오히려 나빠졌다.</p>
+      <p>두 집단이 AI에게 묻는 것과 받는 답은 비슷했다. 저자들은 <b>여러 조언 가운데 무엇을 골라 실행했는지</b>가 갈랐다고 해석한다.</p>
+      <p class="src">Otis 외, Management Science, 2026. 매출·이익 기준. 점선은 통계적으로 유의하지 않은 결과.</p>
+    </div>
+  </div>
+
+  <blockquote class="quote">
+    <p>“지능이 싸고 흔해지면 병목은 이 질문이 된다.<br>나는 무엇을 원하는가.”</p>
+    <cite>유발 하라리, 2026년 7월 대담 「The next 50 years」</cite>
+  </blockquote>
+
+  <p class="lead" style="margin-top:22px">사람에게 남는 것은 <b>무엇을 원하고 무엇을 고를지</b>다. 우리는 그 답을 찾는 연습이 매일의 감정을 알아차리는 데서 시작할 수 있다고 본다. <span class="tag plain">우리의 가설</span></p>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>2</span></div>
+</section>
+
+<!-- 3. 소개: HON -->
+<section class="page">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 소개 · 무엇인가</p>
+  <h1>하루 한 편, 감정에 <em>이름</em>을 붙인다.</h1>
+  <p class="lead">고르고, 크기를 정하고, 내 말로 적는다. 그렇게 남긴 마음이 달력과 편지로 쌓인다.</p>
+
+  <figure class="fig">
+    <div class="shot"><img src="../../../docs/assets/readme/write-flow.png" alt="기록 한 번의 일곱 화면: 오늘, 마음 고르기, 세부 감정, 크기, 이유, 편지, 완료" style="width:682px"></div>
+    <figcaption>기록 한 번의 흐름. 오늘 → 마음 고르기 → 세부 감정 → 크기 → 이유 → 편지 → 완료. 칭찬과 감사는 건너뛸 수 있다.</figcaption>
+  </figure>
+
+  <h2 style="margin-top:14px">아홉 계열, <em>194개</em>의 세부 감정</h2>
+  <div class="cols" style="grid-template-columns: 404px 1fr; gap: 30px; align-items: start">
+    <svg id="taxo" viewBox="0 0 404 236" width="404" height="236" role="img" aria-label="계열별 세부 감정 수: 슬픔 53, 기쁨 32, 즐거움 24, 분노 23, 미움 21, 사랑 18, 희망 12, 공포 8, 혐오 3"></svg>
+    <div>
+      <ul>
+        <li>여러 감정을 함께 고르고, 크기를 1부터 10까지 정한다.</li>
+        <li>계열마다 친구가 하나씩 있다. 이름은 감정이 마음속에서 하는 일을 <b>순우리말</b>로 붙였다.</li>
+        <li>친구는 감정의 모양일 뿐, 사용자를 평가하지 않는다.</li>
+        <li>남긴 기록은 달력의 조약돌과 편지로 쌓이고 언제든 다시 읽을 수 있다.</li>
+      </ul>
+      <p class="cap" style="margin-top:12px">막대 끝의 글자는 그 계열을 받치는 정서 연구의 근거 등급이다(A가 가장 높다). 근거가 약한 계열도 숨기지 않고 표시했다.</p>
+      <p class="src">감정 체계 v2, 2026.9. 계열마다 연구 두 편 이상 확인 (Shaver 외 1987, Keltner 외 2019, Panksepp 2010 등)</p>
+    </div>
+  </div>
+
+  <figure class="fig" style="margin-top:12px">
+    <div class="shot"><img src="../../../docs/assets/readme/look-back.png" alt="달력, 그날의 편지, 통계 화면" style="width:650px; margin:0 auto"></div>
+    <figcaption>쌓이면 다시 볼 수 있다. 달력, 그날의 편지, 통계. 가장 많은 감정을 순위로 세우지 않고 얼마나 자주 곁에 있었는지로 보여 준다.</figcaption>
+  </figure>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>3</span></div>
+</section>
+
+<!-- 4. 소개: 지금 단계 -->
+<section class="page">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 소개 · 지금 단계</p>
+  <h1>아이디어가 아니라,<br><em>돌아가는 앱</em>이 있다.</h1>
+
+  <div class="cols c4" style="margin-top:22px; gap:22px">
+    <div class="rule"><div class="big">194</div><p style="margin-top:8px">근거 등급과 함께 정리한 세부 감정</p></div>
+    <div class="rule"><div class="big">61</div><p style="margin-top:8px">조사한 감정·일기·심리 서비스</p></div>
+    <div class="rule"><div class="big">508</div><p style="margin-top:8px">통과한 자동 시험 <span class="muted">(2026.10.20.)</span></p></div>
+    <div class="rule"><div class="big">20</div><p style="margin-top:8px">통과한 실제 브라우저 시험 <span class="muted">(2026.10.20.)</span></p></div>
+  </div>
+
+  <figure class="fig" style="margin-top:26px">
+    <svg viewBox="0 0 1920 620" width="682" height="220" role="img" aria-label="진행 상황: 서비스 WHY, 시장·경쟁 조사, 194개 감정 체계, 디자인 시스템, 전체 화면 시안을 마쳤고 지금은 앱 핵심 구현을 마친 단계. 다음은 시안 화면 옮기기, 사용자 연구, 돌아보기와 AI 근거 게이트">
+      <path d="M0 250 C 480 200, 1040 190, 1920 120 L1920 620 L0 620 Z" fill="#cfe8dc"/>
+      <path d="M120 380 C 420 320, 760 420, 1060 340 S 1620 250, 1800 260" fill="none" stroke="#fff" stroke-width="34" stroke-linecap="round"/>
+      <g fill="#092328"><circle cx="170" cy="369" r="15"/><circle cx="400" cy="341" r="15"/><circle cx="630" cy="356" r="15"/><circle cx="860" cy="373" r="15"/><circle cx="1070" cy="337" r="15"/></g>
+      <g font-size="31" font-weight="650" fill="#092328" text-anchor="middle">
+        <text x="170" y="444">서비스 WHY</text>
+        <text x="400" y="290">시장·경쟁 조사</text>
+        <text x="630" y="430">194개 감정 체계</text>
+        <text x="860" y="308">디자인 시스템</text>
+        <text x="1070" y="412">전체 화면 시안</text>
+      </g>
+      <rect x="1126" y="162" width="430" height="70" rx="35" fill="#62fdb4"/>
+      <text x="1341" y="208" font-size="31" font-weight="750" fill="#092328" text-anchor="middle">지금 · 앱 핵심 구현 완료</text>
+      <ellipse cx="1340" cy="296" rx="54" ry="42" fill="#1d4a4f"/><ellipse cx="1356" cy="308" rx="38" ry="28" fill="#8fbfb8"/>
+      <g fill="#fff" stroke="#5a6664" stroke-width="4"><circle cx="1530" cy="272" r="13"/><circle cx="1670" cy="260" r="13"/><circle cx="1800" cy="260" r="13"/></g>
+      <g font-size="26" fill="#5a6664" text-anchor="middle">
+        <text x="1530" y="330">시안 화면</text><text x="1530" y="362">옮기기</text>
+        <text x="1670" y="330">사용자</text><text x="1670" y="362">연구</text>
+        <text x="1806" y="330">돌아보기</text><text x="1806" y="362">AI 보조</text>
+      </g>
+      <g font-size="24" fill="#5a6664"><circle cx="128" cy="560" r="10" fill="#092328"/><text x="150" y="568">끝난 것</text><circle cx="290" cy="560" r="9" fill="#fff" stroke="#5a6664" stroke-width="3"/><text x="312" y="568">다음에 할 것</text></g>
+    </svg>
+  </figure>
+
+  <div class="cols" style="grid-template-columns: 1fr 330px; margin-top:22px; gap:30px; align-items: start">
+    <div>
+      <div class="rule">
+        <h3>지금 되는 것</h3>
+        <ul>
+          <li>전체 화면 시안 (2026년 10월 마감)</li>
+          <li>로그인, 앱 잠금</li>
+          <li>오늘 한 편 쓰기와 고치기, 자동 임시저장</li>
+          <li>내 기록 내보내기, 모든 기록 지우기</li>
+          <li>백업에서 되살리기 (복원 연습 통과)</li>
+          <li>위기 안내 화면</li>
+        </ul>
+      </div>
+      <div class="rule thin" style="margin-top:16px">
+        <h3>다음에 할 것</h3>
+        <ul>
+          <li>시안의 화면을 실제 앱에 옮기기</li>
+          <li>달력과 통계, 돌아보기</li>
+          <li>AI 보조 <span class="muted">— 직접 쓰기를 써 본 뒤 넣을지 정한다</span></li>
+        </ul>
+      </div>
+    </div>
+    <figure class="fig" style="margin:0">
+      <div class="shot"><img src="../../../docs/assets/readme/care.png" alt="앱 잠금, 설정, 위기 안내 화면" style="width:330px"></div>
+      <figcaption>내 기록을 지키는 화면. 앱 잠금, 내 기록 내보내기, 위기 안내.</figcaption>
+    </figure>
+  </div>
+
+  <div class="cols c2" style="margin-top:22px; gap:34px">
+    <div>
+      <h3>만든 방식</h3>
+      <p>휴대폰 홈 화면에 설치하는 웹앱이다. 서버와 데이터베이스를 직접 만들었고, 지금은 무료 클라우드 한도 안에서 운영한다. 하루에 한 편만 남는다는 규칙은 화면이 아니라 데이터베이스가 지킨다.</p>
+    </div>
+    <div>
+      <h3>팀</h3>
+      <table>
+        <tr><td style="width:70px"><b>대표</b></td><td>기획, 디자인, 개발</td></tr>
+        <tr><td><b>팀원</b></td><td>리서치, 기획, 디자인</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>4</span></div>
+</section>
+
+<!-- 5. 가치: 문제 -->
+<section class="page tight">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 가치 · 풀려는 문제</p>
+  <h1>기준은 내가 나를 <em>아는 만큼</em> 생긴다.</h1>
+  <figure class="fig" style="margin-top:4px">
+    <div class="shot"><img src="../../../docs/assets/readme/onboarding.png" alt="앱을 처음 열 때 건네는 여섯 장면" style="width:682px"></div>
+    <figcaption>앱을 처음 열 때 건네는 여섯 장면. 답은 금방 오는 시대다 → 무엇을 고를지는 누가 정할까 → 기준은 내가 나를 아는 만큼 생긴다 → 그 단서는 매일의 마음에 있다.</figcaption>
+  </figure>
+  <div class="cols c2" style="gap:34px; margin-top:14px">
+    <ul>
+      <li>답이 많아질수록 고르는 기준이 필요하다. 그 기준은 내가 무엇에 기뻐하고 무엇에 흔들리는지 아는 데서 나온다.</li>
+      <li>그런데 하루의 마음은 ‘좋았다’와 ‘별로였다’ 사이 어딘가에서 이름 없이 지나간다.</li>
+    </ul>
+    <ul>
+      <li>대상은 <b>만 14세 이상 청소년과 청년</b>이다. 나는 누구이고 어떻게 살 것인지를 만들어 가는 시기다.</li>
+      <li>그 시기에 현실의 부담도 함께 있다.</li>
+    </ul>
+  </div>
+
+  <div class="cols c2" style="gap:34px; margin-top:14px">
+    <div class="rule">
+      <h3>청년 (19~34세)</h3>
+      <svg viewBox="0 0 314 140" width="314" height="140" role="img" aria-label="최근 1년 번아웃을 겪은 청년 32.2%, 번아웃 이유 가운데 진로불안 39.1%">
+        <text x="0" y="14" font-size="10.5" fill="#5a6664">최근 1년 번아웃 경험</text>
+        <rect x="0" y="22" width="314" height="14" rx="4" fill="#eceae4"/>
+        <rect x="0" y="22" width="101.1" height="14" rx="4" fill="#2a7a5a"/>
+        <text x="0" y="62" font-size="24" font-weight="800" fill="#092328" letter-spacing="-.6">32.2%</text>
+        <text x="84" y="61" font-size="10.5" fill="#5a6664">셋 중 하나</text>
+        <text x="0" y="90" font-size="10.5" fill="#5a6664">번아웃 이유로 가장 많이 든 것 — 진로불안</text>
+        <rect x="0" y="98" width="314" height="14" rx="4" fill="#eceae4"/>
+        <rect x="0" y="98" width="122.8" height="14" rx="4" fill="#2a7a5a"/>
+        <text x="0" y="136" font-size="24" font-weight="800" fill="#092328" letter-spacing="-.6">39.1%</text>
+      </svg>
+      <p class="src">국무조정실, 2024 청년의 삶 실태조사 (국가승인통계, 15,098명)</p>
+    </div>
+    <div class="rule">
+      <h3>청소년 (중·고등학생)</h3>
+      <svg viewBox="0 0 314 140" width="314" height="140" role="img" aria-label="스트레스 인지율 남학생 32.9%, 여학생 50.3%. 우울감 경험률 남학생 21.7%, 여학생 29.9%">
+        <text x="0" y="14" font-size="10.5" fill="#5a6664">스트레스 인지율</text>
+        <text x="0" y="33" font-size="10.5" fill="#1c2b2e">남</text><rect x="18" y="23" width="240" height="12" rx="4" fill="#eceae4"/><rect x="18" y="23" width="79" height="12" rx="4" fill="#2a7a5a"/><text x="264" y="33" font-size="11.5" font-weight="700" fill="#092328">32.9%</text>
+        <text x="0" y="51" font-size="10.5" fill="#1c2b2e">여</text><rect x="18" y="41" width="240" height="12" rx="4" fill="#eceae4"/><rect x="18" y="41" width="120.7" height="12" rx="4" fill="#2a7a5a"/><text x="264" y="51" font-size="11.5" font-weight="700" fill="#092328">50.3%</text>
+        <text x="0" y="86" font-size="10.5" fill="#5a6664">우울감 경험률</text>
+        <text x="0" y="105" font-size="10.5" fill="#1c2b2e">남</text><rect x="18" y="95" width="240" height="12" rx="4" fill="#eceae4"/><rect x="18" y="95" width="52.1" height="12" rx="4" fill="#2a7a5a"/><text x="264" y="105" font-size="11.5" font-weight="700" fill="#092328">21.7%</text>
+        <text x="0" y="123" font-size="10.5" fill="#1c2b2e">여</text><rect x="18" y="113" width="240" height="12" rx="4" fill="#eceae4"/><rect x="18" y="113" width="71.8" height="12" rx="4" fill="#2a7a5a"/><text x="264" y="123" font-size="11.5" font-weight="700" fill="#092328">29.9%</text>
+      </svg>
+      <p class="src">질병관리청, 2025 청소년건강행태조사 (54,170명)</p>
+    </div>
+  </div>
+  <p class="cap">이 통계는 부담이 함께 있다는 것을 보여 줄 뿐이다. 원인이 자기이해의 부족이라는 뜻이 아니고, HON은 이 문제를 진단하거나 치료하는 서비스가 아니다.</p>
+
+  <h2>다른 점 1 · 기록 흐름을 <em>심리학 연구</em>로 한 단계씩 검토해 만들었다</h2>
+  <table>
+    <tr><th style="width:44%">연구가 보여 준 것</th><th>설계에 반영한 것</th></tr>
+    <tr><td>감정에 이름을 붙이면 그 순간의 반응이 줄어든다.<br><span class="muted">Torre &amp; Lieberman, 2018</span></td><td><b>194개 세부 감정</b>에서 가까운 말을 고른다.</td></tr>
+    <tr><td>자기에 잠겨 묻는 ‘왜’는 괴로움을 키우고, 한 걸음 떨어져 물으면 줄어든다.<br><span class="muted">Kross 외, 2005 · Treynor 외, 2003</span></td><td>이유를 묻는 말을 <b>“그 마음은 무엇에서 왔을까요?”</b>로 정하고 “친구의 일기를 읽듯 한 걸음 떨어져 적어 봐요”라는 안내를 붙였다.</td></tr>
+    <tr><td>문항이 늘면 부담과 빠뜨림이 늘어난다.<br><span class="muted">Eisele 외, 2022</span></td><td>칭찬과 감사를 <b>한 화면의 선택 칸</b>으로 합쳤다. 쓰던 글은 자동으로 임시저장된다.</td></tr>
+    <tr><td>감사 적기는 다른 활동과 견주면 이점이 줄거나 사라진다.<br><span class="muted">Davis 외, 2016 · Cregg &amp; Cheavens, 2021</span></td><td>필수로 두지 않았다. <b>근거가 약한 곳도 그대로 적어 두고</b> 설계에 반영했다.</td></tr>
+  </table>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>5</span></div>
+</section>
+
+<!-- 6. 가치: 다른 점 2, 3 -->
+<section class="page">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 가치 · 다른 점</p>
+  <h1>AI는 나를 <em>정의하지 않는다.</em><br>이해할 수 있게 돕는다.</h1>
+  <p class="lead">AI는 내가 쓴 기록을 바탕으로 정리하고 잇는다. 말은 관찰, 후보, 질문으로만 건넨다. 마지막 해석은 사용자가 한다. <span class="tag">설계 완료 · 구현은 다음 단계</span></p>
+
+  <table style="margin-top:16px; font-size:13px">
+    <tr><th style="width:38%">이렇게 말하지 않는다</th><th style="width:5%"></th><th>이렇게 건넨다</th></tr>
+    <tr><td class="was">당신은 외롭습니다.</td><td class="arrow">→</td><td><b>외로움, 서운함, 소외감 중 가까운 게 있나요?</b></td></tr>
+    <tr><td class="was">원인은 인정 욕구입니다.</td><td class="arrow">→</td><td><b>인정받지 못했다고 느낀 순간과 이어질 수 있어요. 어떻게 느끼나요?</b></td></tr>
+    <tr><td class="was">당신은 이런 사람입니다.</td><td class="arrow">→</td><td><b>최근 기록에서 이런 흐름이 반복됐어요. 나에게도 맞는 해석인가요?</b></td></tr>
+  </table>
+
+  <h2>해석은 근거가 있을 때만, 한계와 함께</h2>
+  <svg viewBox="0 0 682 104" width="682" height="104" role="img" aria-label="돌아보기의 네 단계: 관찰, 근거, 한계, 질문">
+    <g font-size="11" fill="#5a6664">
+      <text x="0" y="14" font-weight="700" fill="#2a7a5a">관찰</text><text x="176" y="14" font-weight="700" fill="#2a7a5a">근거</text><text x="352" y="14" font-weight="700" fill="#2a7a5a">한계</text><text x="528" y="14" font-weight="700" fill="#2a7a5a">질문</text>
+    </g>
+    <g stroke="#092328" stroke-width="1.5"><line x1="0" y1="24" x2="150" y2="24"/><line x1="176" y1="24" x2="326" y2="24"/><line x1="352" y1="24" x2="502" y2="24"/><line x1="528" y1="24" x2="678" y2="24"/></g>
+    <g font-size="12.5" font-weight="650" fill="#092328">
+      <text x="0" y="48">이번 달 ‘허전한’을</text><text x="0" y="66">네 번 골랐어요.</text>
+      <text x="176" y="48">9월 3·11·18·24일의</text><text x="176" y="66">기록이에요.</text>
+      <text x="352" y="48">기록이 적어서 넓게</text><text x="352" y="66">말하긴 어려워요.</text>
+      <text x="528" y="48">이 흐름이 나에게도</text><text x="528" y="66">맞나요?</text>
+    </g>
+    <text x="0" y="96" font-size="10.5" fill="#5a6664">근거가 모자라면 해석하지 않고 모자라다고 말한다. 위기 신호가 보이면 분석을 멈추고 도움받을 곳(112 · 119 · 109)으로 안내한다.</text>
+  </svg>
+
+  <h2>다른 점 2 · 근거를 밝힌 한국어 감정 체계</h2>
+  <div class="cols c3" style="gap:24px">
+    <div class="rule thin"><h3>계열마다 연구 두 편 이상</h3><p>아홉 계열은 정서 연구에서 근거를 확인해 정했다. 근거가 엇갈리는 곳은 판정 표에 반대 근거까지 적었다.</p></div>
+    <div class="rule thin"><h3>단어마다 근거 등급</h3><p>194개 단어에 등급을 붙여 공개한다. 근거가 약한 것을 약하다고 표시하는 것이 원칙이다.</p></div>
+    <div class="rule thin"><h3>한계를 먼저 밝힌다</h3><p>기본 정서를 분류한 표가 아니라 일기 표현을 위한 범주다. 진단 범주가 아니다.</p></div>
+  </div>
+
+  <h2>일부러 넣지 않은 것</h2>
+  <table>
+    <tr><th style="width:26%">시장에서 흔한 장치</th><th style="width:30%">시장이 쓰는 이유</th><th>HON에 있는 것</th></tr>
+    <tr><td class="was">캐릭터 키우기와 모으기</td><td class="muted">돌아올 이유를 만든다</td><td>쓴 날마다 달력에 조약돌 하나가 놓인다</td></tr>
+    <tr><td class="was">배지와 등급</td><td class="muted">습관을 만든다</td><td>안 쓴 날은 달력 칸이 빈 채로 남는다</td></tr>
+    <tr><td class="was">저장 직후의 AI 답장</td><td class="muted">바로 보상을 준다</td><td>저장 전에 오늘 쓴 내용을 편지로 한 번 읽는다</td></tr>
+    <tr><td class="was">AI가 매기는 감정 점수</td><td class="muted">이름을 몰라도 기록된다</td><td>“외로움, 서운함 중 가까운 게 있나요?”처럼 묻는다</td></tr>
+  </table>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>6</span></div>
+</section>
+
+<!-- 7. 사업성: 시장 -->
+<section class="page">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 사업성 · 시장과 경쟁</p>
+  <h1>경쟁은 기록 <em>‘뒤’</em>에서 벌어진다.</h1>
+  <p class="lead">‘감정을 기록할 수 있다’는 이제 다른 점이 아니다. 얼마나 가볍게 남기는지, 남긴 뒤 무엇이 돌아오는지, 해석을 누가 하는지에서 갈린다.</p>
+
+  <div class="cols" style="grid-template-columns: 300px 1fr; gap: 34px; margin-top: 20px; align-items: start">
+    <div>
+      <div class="rule"><div class="big">61<small>개</small></div><p style="margin-top:8px">조사한 감정·일기·심리 서비스. 사용자가 하려는 일로 나누면 여섯 갈래다.</p></div>
+      <svg viewBox="0 0 300 204" width="300" height="204" style="margin-top:12px" role="img" aria-label="여섯 갈래와 HON과의 거리: 감정 어휘 가장 가깝다, 기분 기록 가깝다, AI 저널과 생활 기록 일부 겹침, 자가관리와 상담 멀다">
+        <g font-size="11.5" fill="#092328" font-weight="650">
+          <text x="0" y="16">감정 어휘</text><text x="0" y="50">기분 기록</text><text x="0" y="84">AI 저널</text><text x="0" y="118">생활 기록</text><text x="0" y="152">자가관리</text><text x="0" y="186">상담</text>
+        </g>
+        <g font-size="9.6" fill="#8a9492">
+          <text x="0" y="29">How We Feel · 마음보기</text><text x="0" y="63">Daylio · 하루콩</text><text x="0" y="97">Rosebud · Mindsera</text><text x="0" y="131">Day One · Apple Journal</text><text x="0" y="165">Wysa · 무디</text><text x="0" y="199">트로스트 · 마인드카페</text>
+        </g>
+        <g>
+          <g fill="#2a7a5a"><circle cx="186" cy="12" r="5"/><circle cx="202" cy="12" r="5"/><circle cx="218" cy="12" r="5"/><circle cx="234" cy="12" r="5"/></g>
+          <g fill="#2a7a5a"><circle cx="186" cy="46" r="5"/><circle cx="202" cy="46" r="5"/><circle cx="218" cy="46" r="5"/></g><circle cx="234" cy="46" r="5" fill="#e6e4de"/>
+          <g fill="#2a7a5a"><circle cx="186" cy="80" r="5"/><circle cx="202" cy="80" r="5"/></g><g fill="#e6e4de"><circle cx="218" cy="80" r="5"/><circle cx="234" cy="80" r="5"/></g>
+          <g fill="#2a7a5a"><circle cx="186" cy="114" r="5"/><circle cx="202" cy="114" r="5"/></g><g fill="#e6e4de"><circle cx="218" cy="114" r="5"/><circle cx="234" cy="114" r="5"/></g>
+          <circle cx="186" cy="148" r="5" fill="#2a7a5a"/><g fill="#e6e4de"><circle cx="202" cy="148" r="5"/><circle cx="218" cy="148" r="5"/><circle cx="234" cy="148" r="5"/></g>
+          <circle cx="186" cy="182" r="5" fill="#2a7a5a"/><g fill="#e6e4de"><circle cx="202" cy="182" r="5"/><circle cx="218" cy="182" r="5"/><circle cx="234" cy="182" r="5"/></g>
+        </g>
+        <g font-size="9.6" fill="#5a6664"><text x="248" y="16">가장 가깝다</text><text x="248" y="50">가깝다</text><text x="248" y="84">일부 겹침</text><text x="248" y="118">일부 겹침</text><text x="248" y="152">멀다</text><text x="248" y="186">멀다</text></g>
+      </svg>
+      <p class="cap">점이 많을수록 HON과 가깝다.</p>
+    </div>
+    <div>
+      <svg viewBox="0 0 348 312" width="348" height="312" role="img" aria-label="위치 지도. 가로축은 몇 번의 탭에서 깊은 성찰까지, 세로축은 AI가 판정하고 답장하는 쪽에서 해석을 내가 정하는 쪽까지. HON은 깊은 성찰이면서 해석을 내가 정하는 쪽에 있다">
+        <rect x="174" y="4" width="170" height="150" rx="14" fill="#dff7ec"/>
+        <line x1="4" y1="154" x2="344" y2="154" stroke="#c9c7bf"/><line x1="174" y1="4" x2="174" y2="304" stroke="#c9c7bf"/>
+        <g font-size="9.6" fill="#5a6664"><text x="180" y="18">해석은 내가 정한다</text><text x="180" y="300">AI가 판정하고 답장한다</text><text x="4" y="168">몇 번의 탭</text><text x="344" y="168" text-anchor="end">깊은 성찰 →</text></g>
+        <g fill="#8a9492">
+          <circle cx="140" cy="40" r="3.6"/><circle cx="164" cy="70" r="3.6"/><circle cx="31" cy="76" r="3.6"/><circle cx="65" cy="106" r="3.6"/><circle cx="92" cy="148" r="3.6"/><circle cx="194" cy="106" r="3.6"/><circle cx="310" cy="28" r="3.6"/>
+          <circle cx="126" cy="184" r="3.6"/><circle cx="164" cy="214" r="3.6"/><circle cx="242" cy="214" r="3.6"/><circle cx="198" cy="238" r="3.6"/><circle cx="269" cy="178" r="3.6"/><circle cx="296" cy="244" r="3.6"/><circle cx="228" cy="262" r="3.6"/><circle cx="85" cy="268" r="3.6"/>
+        </g>
+        <g font-size="9.6" fill="#5a6664">
+          <text x="134" y="43" text-anchor="end">How We Feel</text><text x="158" y="73" text-anchor="end">마음보기</text><text x="38" y="79">Daylio</text><text x="72" y="109">하루콩</text><text x="99" y="146">인사이드</text><text x="201" y="109">One Year</text><text x="304" y="31" text-anchor="end">Day One</text>
+          <text x="133" y="187">무디</text><text x="158" y="217" text-anchor="end">심스페이스</text><text x="249" y="217">타임버블</text><text x="205" y="241">라임</text><text x="276" y="181">Mindsera</text><text x="290" y="247" text-anchor="end">Rosebud</text><text x="235" y="265">Wysa</text><text x="92" y="271">감정 팔레트</text>
+        </g>
+        <circle cx="288" cy="62" r="20" fill="#092328"/>
+        <text x="288" y="66.5" font-size="12" font-weight="900" fill="#62fdb4" text-anchor="middle" letter-spacing=".5">HON</text>
+      </svg>
+      <p class="cap">몇 번의 탭이 기본인 시장에서 HON은 깊이 쪽에, 해석을 사용자가 정하는 쪽에 선다. 위치는 HON의 판단이다.</p>
+    </div>
+  </div>
+
+  <h2>가장 자주 비교될 서비스와 견주면</h2>
+  <table>
+    <tr><th style="width:24%">서비스</th><th style="width:30%">자리</th><th>HON과 다른 점</th></tr>
+    <tr><td><b>하루콩 · Daylio</b></td><td>몇 번의 탭으로 기분 기록</td><td>기록이 훨씬 가볍다. HON은 감정에 이름을 붙이고 이유를 적는다</td></tr>
+    <tr><td><b>How We Feel · 마음보기</b></td><td>감정 어휘로 이름 붙이기</td><td>HON은 아홉 계열 194개와 근거 등급을 공개한다</td></tr>
+    <tr><td><b>심스페이스 · 감정 팔레트</b></td><td>AI가 답장하거나 감정 점수를 매긴다</td><td>HON의 AI는 감정을 판정하지 않는다</td></tr>
+    <tr><td><b>Rosebud · 타임버블</b></td><td>AI가 기억하고 대화한다</td><td>HON은 일기 원문과 AI의 근거 저장소를 섞지 않는다</td></tr>
+  </table>
+  <p class="src">감정일기 통합 벤치마킹(2026.9.24., 스토어와 공식 자료 조사)</p>
+
+  <h2>기록을 이어 가게 하는 힘은 세 가지다</h2>
+  <div class="cols c3" style="gap:0">
+    <div style="padding:12px 18px 12px 0; border-top:1px solid var(--line-strong)"><h3>습관형</h3><p style="margin:0">알림, 달력, 연속 기록.<br><span class="muted">놓치면 죄책감이 생길 수 있다.</span></p></div>
+    <div style="padding:12px 18px; border-top:1px solid var(--line-strong)"><h3>애착형</h3><p style="margin:0">캐릭터, AI와의 관계.<br><span class="muted">의존의 위험이 있다.</span></p></div>
+    <div style="padding:12px 18px; border-top:1.5px solid var(--ink); background: var(--mint-soft)"><h3>자산형 <span class="tag">HON의 선택</span></h3><p style="margin:0">달력, 편지, 통계, 돌아보기. 쌓인 기록의 가치.<br><span class="muted">처음 몇 주는 가치가 약할 수 있다. 가장 먼저 검증한다.</span></p></div>
+  </div>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>7</span></div>
+</section>
+
+<!-- 8. 사업성: 수익 -->
+<section class="page">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 사업성 · 수익 모델과 가격</p>
+  <h1><em>원가가 드는 곳</em>에만<br>돈을 받는다.</h1>
+  <p class="lead">직접 쓰는 기록은 서버 비용이 거의 들지 않는다. AI는 쓸 때마다 원가가 든다. 그래서 기록은 끝까지 무료로 두고, AI가 들어가는 기능에만 값을 받는다.</p>
+
+  <div class="cols c2" style="gap:0; margin-top:20px">
+    <div style="padding:16px 22px 18px 0; border-top:1.5px solid var(--ink)">
+      <h3>늘 무료</h3>
+      <ul>
+        <li>쓰기, 고치기, 지우기</li>
+        <li>달력, 그날의 편지 다시 읽기</li>
+        <li>기본 통계</li>
+        <li>내 기록 내보내기, 모든 기록 지우기</li>
+        <li>위기 안내</li>
+      </ul>
+    </div>
+    <div style="padding:16px 22px 18px; background: var(--mint-soft); border-top:1.5px solid var(--ink)">
+      <h3>구독</h3>
+      <ul>
+        <li><b>돌아보기 심화</b> — AI가 기록을 이어 정리한다</li>
+        <li><b>AI 보조</b> — 감정 후보와 질문을 건넨다</li>
+        <li>기간을 넓힌 돌아보기 (석 달, 한 해)</li>
+      </ul>
+    </div>
+  </div>
+  <svg viewBox="0 0 682 62" width="682" height="62" style="margin-top:14px" role="img" aria-label="처음 세 번 무료, 다른 사람에게 알리면 횟수 추가, 그 뒤 구독">
+    <g font-size="12" font-weight="700" fill="#092328">
+      <rect x="0" y="6" width="196" height="38" rx="19" fill="#f3f2ee"/><text x="98" y="30" text-anchor="middle">돌아보기 심화 처음 3회 무료</text>
+      <rect x="244" y="6" width="196" height="38" rx="19" fill="#f3f2ee"/><text x="342" y="30" text-anchor="middle">알리면 횟수를 더 준다</text>
+      <rect x="488" y="6" width="194" height="38" rx="19" fill="#092328"/><text x="585" y="30" text-anchor="middle" fill="#fff">구독</text>
+    </g>
+    <g stroke="#2a7a5a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M206 25h26m-7-6 7 6-7 6"/><path d="M450 25h26m-7-6 7 6-7 6"/></g>
+    <text x="0" y="60" font-size="10" fill="#5a6664">횟수는 가정이다. 공유하는 것은 초대 링크이고, 기록 내용은 어떤 경우에도 공유 대상이 아니다.</text>
+  </svg>
+
+  <div class="cols c2" style="gap:34px; margin-top:18px">
+    <div class="rule thin"><h3>다음 단계</h3><p><b>한 해의 기록물.</b> 한 해의 편지와 조약돌을 한 권으로 묶는다. 쌓인 기록이 물건으로 돌아오고, 기록을 재촉하지 않는다.</p></div>
+    <div class="rule thin"><h3>하지 않는 것</h3><p><b>광고와 데이터 판매.</b> 감정을 다루는 서비스에서는 신뢰가 곧 제품이다.</p></div>
+  </div>
+
+  <h2>가격은 <em>조사</em>로 정한다</h2>
+  <div class="cols" style="grid-template-columns: 330px 1fr; gap: 34px; align-items: start">
+    <div>
+      <svg viewBox="0 0 330 122" width="330" height="122" role="img" aria-label="참고 가격대: 국내 기록 앱 구독은 월 1,900원에서 4,900원, AI 저널 구독은 월 9,900원에서 14,000원대">
+        <g stroke="#e6e4de"><line x1="30" y1="14" x2="30" y2="86"/><line x1="130" y1="14" x2="130" y2="86"/><line x1="230" y1="14" x2="230" y2="86"/><line x1="330" y1="14" x2="330" y2="86"/></g>
+        <g font-size="9.4" fill="#8a9492" text-anchor="middle"><text x="30" y="100">0</text><text x="130" y="100">5,000</text><text x="230" y="100">10,000</text><text x="330" y="100" text-anchor="end">15,000원</text></g>
+        <text x="30" y="27" font-size="10.5" fill="#1c2b2e">국내 기록 앱</text>
+        <rect x="68" y="32" width="60" height="10" rx="4" fill="#2a7a5a"/>
+        <text x="134" y="41" font-size="10.5" font-weight="700" fill="#092328">1,900 ~ 4,900원</text>
+        <text x="30" y="63" font-size="10.5" fill="#1c2b2e">AI 저널</text>
+        <rect x="228" y="68" width="82" height="10" rx="4" fill="#2a7a5a"/>
+        <text x="222" y="77" font-size="10.5" font-weight="700" fill="#092328" text-anchor="end">9,900 ~ 14,000원</text>
+        <text x="30" y="118" font-size="9.4" fill="#8a9492">월 구독료, 2026년 9월 조사 시점의 스토어 표기</text>
+      </svg>
+    </div>
+    <div>
+      <p><b>가격 민감도 조사(Van Westendorp)</b>로 받아들일 수 있는 가격의 범위를 잡는다. 돌아보기를 한 번 써 본 사람에게 네 가지를 묻는다.</p>
+      <table style="font-size:11px">
+        <tr><td style="width:22px; color:var(--green); font-weight:800">1</td><td>너무 싸서 품질이 의심되는 가격</td></tr>
+        <tr><td style="color:var(--green); font-weight:800">2</td><td>싸다고 느끼는, 사기 좋은 가격</td></tr>
+        <tr><td style="color:var(--green); font-weight:800">3</td><td>비싸지만 그래도 고려할 가격</td></tr>
+        <tr><td style="color:var(--green); font-weight:800">4</td><td>너무 비싸서 사지 않을 가격</td></tr>
+      </table>
+      <p class="cap">말로 답한 값은 실제 결제와 다를 수 있다. 조사로 범위를 잡고 시험 사용자의 실제 결제로 확인한다. AI를 넣으면 돌아보기 한 번의 원가를 먼저 재서 가격의 바닥으로 삼는다.</p>
+    </div>
+  </div>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>8</span></div>
+</section>
+
+<!-- 9. 사업성: 검증·위험·순서 -->
+<section class="page">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 사업성 · 검증과 순서</p>
+  <h1>모르는 것을 <em>먼저 확인</em>한다.</h1>
+  <p class="lead">수요를 확인한 자료는 아직 없다. 가장 먼저 볼 것은 기록이 쌓이기 전 처음 몇 주에 다시 열 이유가 충분한가다.</p>
+
+  <div class="cols c3" style="gap:24px; margin-top:20px">
+    <div class="rule"><h3>사용자 연구</h3><p>인터뷰 15~20명, 4주 기록. 지난 경험을 묻는다. “이 앱을 쓰겠느냐”는 묻지 않는다.</p></div>
+    <div class="rule"><h3>볼 숫자</h3><p>첫 기록 완료율과 7일 뒤 재방문. 이유 칸에서 멈추는 사람이 많으면 선택 칸으로 바꾸는 것을 다시 본다.</p></div>
+    <div class="rule"><h3>가격</h3><p>가격 민감도 조사와 시험 사용자의 실제 결제.</p></div>
+  </div>
+
+  <h2>위험과 대응</h2>
+  <table>
+    <tr><th style="width:21%">위험</th><th style="width:36%">근거</th><th>대응</th></tr>
+    <tr><td><b>계속 쓰지 않는다</b></td><td>정신건강 앱의 30일 유지율은 중앙값이 한 자릿수다.<br><span class="muted">Baumel 외, 2019</span></td><td>건너뛸 수 있는 칸, 자동 임시저장, 비운 날에도 돌아오기 쉬운 달력. 첫 돌아보기를 무료로 겪게 한다</td></tr>
+    <tr><td><b>기록이 부담이 된다</b></td><td>기분을 자주 재면 부담을 느끼는 사람이 있다.<br><span class="muted">기분 추적 메타분석, 2025</span></td><td>하루 한 편. 기록하지 않은 날을 실패로 만들지 않는다. 언제 쓸지는 사용자가 정한다</td></tr>
+    <tr><td><b>개인정보</b></td><td>감정 기록은 민감한 정보다</td><td>내 기록은 내가 내려받고 지운다. 이 기능은 늘 무료다. 광고와 데이터 판매를 하지 않는다</td></tr>
+    <tr><td><b>청소년</b></td><td>만 14세 미만은 법정대리인 동의가 의무다</td><td>만 14세 미만은 받지 않는다. 청소년에게 열기 전에 대상 나이의 사용성 시험과 안전 검토를 한다</td></tr>
+    <tr><td><b>AI의 잘못된 해석</b></td><td>AI의 그럴듯한 답을 그대로 믿으면 판단이 나빠질 수 있다</td><td>근거가 된 기록과 판단의 한계를 함께 보인다. 근거가 모자라면 해석하지 않는다</td></tr>
+  </table>
+
+  <h2>앞으로의 순서</h2>
+  <svg viewBox="0 0 682 176" width="682" height="176" role="img" aria-label="앞으로의 순서: 2026년 11월에서 12월 시안 화면 옮기기와 달력·통계, 2027년 1분기 사용자 연구와 가격 조사, 2분기 돌아보기와 닫힌 시험 사용, 하반기 공개와 구독 시작">
+    <line x1="6" y1="34" x2="676" y2="34" stroke="#c9c7bf" stroke-width="2"/>
+    <g><circle cx="6" cy="34" r="6" fill="#092328"/><circle cx="176" cy="34" r="6" fill="#fff" stroke="#092328" stroke-width="2"/><circle cx="346" cy="34" r="6" fill="#fff" stroke="#092328" stroke-width="2"/><circle cx="516" cy="34" r="6" fill="#fff" stroke="#092328" stroke-width="2"/></g>
+    <g font-size="11" font-weight="700" fill="#2a7a5a"><text x="0" y="16">2026년 11~12월</text><text x="170" y="16">2027년 1분기</text><text x="340" y="16">2027년 2분기</text><text x="510" y="16">2027년 하반기</text></g>
+    <g font-size="12.5" font-weight="700" fill="#092328"><text x="0" y="66">화면 옮기기</text><text x="170" y="66">사용자 연구</text><text x="340" y="66">돌아보기</text><text x="510" y="66">공개</text></g>
+    <g font-size="10.6" fill="#1c2b2e">
+      <text x="0" y="86">시안의 화면을 실제 앱에</text><text x="0" y="102">옮긴다</text><text x="0" y="122">달력과 통계를 붙인다</text>
+      <text x="170" y="86">인터뷰 15~20명,</text><text x="170" y="102">4주 기록</text><text x="170" y="122">가격 민감도 조사</text>
+      <text x="340" y="86">돌아보기를 붙인다</text><text x="340" y="106">AI를 넣을지 정하고</text><text x="340" y="122">원가를 잰다</text><text x="340" y="142">성인 청년 대상</text><text x="340" y="158">닫힌 시험 사용</text>
+      <text x="510" y="86">구독을 시작한다</text><text x="510" y="106">청소년 대상은 안전</text><text x="510" y="122">검토를 마친 뒤 연다</text>
+    </g>
+  </svg>
+  <p class="cap">지금 운영비는 0원이다. 무료 클라우드 한도 안에서 돌아간다.</p>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>9</span></div>
+</section>
+
+<!-- 10. 기대효과 -->
+<section class="page">
+  <div class="run"><span>2026학년도 교내 창업아이디어 경진대회 · 사업계획서</span><b>HON</b></div>
+  <p class="eyebrow">아이템의 기대효과</p>
+  <h1>해석과 선택은<br>언제나 <em>내가</em> 한다.</h1>
+
+  <svg viewBox="0 0 682 60" width="682" height="60" style="margin-top:12px" role="img" aria-label="자기 관찰에서 자기 이해, 기준, 선택, 행동으로 이어지는 흐름">
+    <g font-size="13" font-weight="700" fill="#092328" text-anchor="middle">
+      <rect x="0" y="8" width="112" height="40" rx="20" fill="#dff7ec"/><text x="56" y="33">자기 관찰</text>
+      <rect x="142" y="8" width="112" height="40" rx="20" fill="#dff7ec"/><text x="198" y="33">자기 이해</text>
+      <rect x="284" y="8" width="112" height="40" rx="20" fill="#dff7ec"/><text x="340" y="33">기준</text>
+      <rect x="426" y="8" width="112" height="40" rx="20" fill="#dff7ec"/><text x="482" y="33">선택</text>
+      <rect x="568" y="8" width="112" height="40" rx="20" fill="#092328"/><text x="624" y="33" fill="#fff">행동</text>
+    </g>
+    <g stroke="#2a7a5a" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M118 28h18m-6-5 6 5-6 5"/><path d="M260 28h18m-6-5 6 5-6 5"/><path d="M402 28h18m-6-5 6 5-6 5"/><path d="M544 28h18m-6-5 6 5-6 5"/></g>
+  </svg>
+
+  <div class="cols c3" style="gap:26px; margin-top:22px">
+    <div class="rule">
+      <h3>사용자에게</h3>
+      <ul>
+        <li>자기 경험을 다시 볼 수 있게 된다.</li>
+        <li>스스로에게 물을 재료가 남는다.</li>
+        <li>어떤 상황에서 무엇을 느끼고 무엇을 중요하게 여기는지 알아 가면서, 자기 기준으로 고르는 연습이 된다.</li>
+      </ul>
+    </div>
+    <div class="rule">
+      <h3>AI 서비스 설계에</h3>
+      <ul>
+        <li>사용자를 판정하지 않는 AI의 한 사례가 된다.</li>
+        <li>관찰과 후보와 질문만 건네고 해석은 사람에게 남긴다.</li>
+        <li>AI가 사람의 최종 책임을 대신해서는 안 된다는 국제 원칙과 같은 방향이다.</li>
+      </ul>
+    </div>
+    <div class="rule">
+      <h3>한국어 감정 어휘에</h3>
+      <ul>
+        <li>194개 감정 단어를 근거 등급과 함께 정리한 자료가 남는다.</li>
+        <li>근거가 약한 곳과 한계까지 적은 판정 기록을 함께 남긴다.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div style="margin-top:26px; padding:18px 22px; background: var(--cream); border-radius: 14px">
+    <h3>약속하지 않는 것</h3>
+    <p style="margin:0">정신건강이 좋아진다거나 진짜 나를 찾는다고 약속하지 않는다. 글쓰기의 효과는 연구에서 작게 나타났다(표현적 글쓰기 메타분석, 2023, 31개 실험 4,012명). HON은 진단이나 치료가 아니라 일상의 자기이해를 돕는 기록이다.</p>
+  </div>
+
+  <blockquote class="quote" style="margin-top:28px">
+    <p>AI가 수많은 답을 만드는 시대에,<br>HON이 지키려는 것은 내 삶의 판단권이다.</p>
+  </blockquote>
+
+  <h2 style="margin-top:34px">출처</h2>
+  <div class="cols c2" style="gap:26px; font-size:9.6px; line-height:1.55; color: var(--muted)">
+    <div>
+      파이낸셜뉴스(2026.11.9.), 경향신문(2026.10.27.) — 2027학년도 수능 AI 안경 대책<br>
+      택스워치(2026.9.21.) — 공인회계사 수습기관 등록률<br>
+      VentureBeat(2026.9.3.) — GPT-6 Astra 공개<br>
+      Otis 외(2026), The Uneven Impact of Generative AI on Entrepreneurial Performance, <i>Management Science</i><br>
+      Yuval Noah Harari(2026.7.), The next 50 years: humanity, AI, power<br>
+      국무조정실, 2024 청년의 삶 실태조사<br>
+      질병관리청, 2025 청소년건강행태조사<br>
+      UNESCO, Recommendation on the Ethics of AI · OECD AI Principles
+    </div>
+    <div>
+      Torre &amp; Lieberman(2018), <i>Emotion Review</i><br>
+      Kross, Ayduk &amp; Mischel(2005) · Treynor 외(2003)<br>
+      Eisele 외(2022), <i>Assessment</i> · Baumel 외(2019), <i>JMIR</i><br>
+      Davis 외(2016) · Cregg &amp; Cheavens(2021)<br>
+      Shaver 외(1987) · Keltner 외(2019) · Panksepp(2010)<br>
+      표현적 글쓰기 메타분석(2023) · 기분 추적 메타분석(2025)<br>
+      HON 감정일기 통합 벤치마킹(2026.9.24.) · 경쟁 서비스 정리<br>
+      HON 기록 흐름의 심리학적 검토(2026.9.24.) · 감정 체계 v2 판정 표
+    </div>
+  </div>
+  <div class="foot"><span>HON — 감정에 이름을 붙이는 자기이해 기록 앱</span><span>10</span></div>
+</section>
+
+<script>
+// 계열별 세부 감정 수 막대. 값은 data/taxonomy/v2.json(194개), 색은 design/tokens.json의 감정 색 500.
+(function () {
+  const rows = [
+    ["슬픔", "설이", "seori--sadness", 53, "#3F8FD6", "A"], ["기쁨", "나래", "narae--joy", 32, "#E9BE1A", "A"],
+    ["즐거움", "누리", "nuri--enjoyment", 24, "#5E9C2E", "B+"], ["분노", "타온", "taon--anger", 23, "#E8663C", "A"],
+    ["미움", "아린", "arin--hate", 21, "#4750A6", "C"], ["사랑", "품이", "pumi--love", 18, "#E1609B", "B+"],
+    ["희망", "바라", "bara--wish", 12, "#A855CE", "B+"], ["공포", "숨이", "sumi--fear", 8, "#199A8C", "A"],
+    ["혐오", "가름", "gareum--disgust", 3, "#918C37", "A"]
+  ];
+  const svg = document.getElementById("taxo"), NS = "http://www.w3.org/2000/svg";
+  const add = (tag, attrs, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; svg.appendChild(e); return e; };
+  const x0 = 112, scale = 216 / 53, rowH = 26;
+  rows.forEach(([name, friend, file, n, color, grade], i) => {
+    const y = i * rowH;
+    add("image", { href: `../../../design/characters/flat-friends/ui/${file}-160.png`, x: 0, y: y, width: 26, height: 26 });
+    add("text", { x: 34, y: y + 12, "font-size": 11.5, "font-weight": 700, fill: "#092328" }, name);
+    add("text", { x: 34, y: y + 24, "font-size": 9.4, fill: "#8a9492" }, friend);
+    add("rect", { x: x0, y: y + 6, width: Math.max(n * scale, 4), height: 13, rx: 4, fill: color });
+    add("text", { x: x0 + Math.max(n * scale, 4) + 6, y: y + 17, "font-size": 11.5, "font-weight": 700, fill: "#092328" }, String(n));
+    add("text", { x: x0 + Math.max(n * scale, 4) + (n > 9 ? 26 : 19), y: y + 17, "font-size": 9.4, fill: "#8a9492" }, grade);
+  });
+})();
+</script>
+</body>
+</html>
